@@ -219,6 +219,10 @@ export default function PricingPageContent() {
         </div>
       </section>
 
+      <p className="pricing-unified-note">
+        All plans include full access to Pelican. Same model, same capabilities. Choose based on how often you&apos;ll use it.
+      </p>
+
       {error && (
         <div className="pricing-error">
           {error}

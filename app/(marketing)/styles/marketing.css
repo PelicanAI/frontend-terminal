@@ -807,6 +807,36 @@
   margin-right: auto;
 }
 
+.pricing-unified-note {
+  margin: 2.25rem auto 1.75rem;
+  max-width: 860px;
+  text-align: center;
+  font-family: var(--font-ibm-plex), system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: rgba(241, 245, 249, 0.88);
+  letter-spacing: 0.01em;
+}
+
+.pricing-unified-note::before,
+.pricing-unified-note::after {
+  content: '';
+  display: block;
+  height: 1px;
+  width: min(140px, 35%);
+  margin: 0.75rem auto;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), transparent);
+}
+
+@media (max-width: 640px) {
+  .pricing-unified-note {
+    font-size: 1rem;
+    margin: 1.75rem auto 1.5rem;
+    padding: 0 0.5rem;
+  }
+}
+
 .pricing-amount {
   font-family: var(--font-bebas-neue), sans-serif;
   font-size: 4rem;
