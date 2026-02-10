@@ -1076,10 +1076,10 @@
 
   /* ========== Learning Mode Styles ========== */
 
-  /* Highlighted trading term in chat messages */
+  /* Highlighted trading term in chat messages — orange theme */
   .learning-term {
-    border-bottom: 1px dotted rgba(139, 92, 246, 0.5);
-    color: #c4b5fd;
+    border-bottom: 1px dotted rgba(251, 146, 60, 0.5);
+    color: #f97316;
     cursor: pointer;
     transition: all 0.15s ease;
     position: relative;
@@ -1087,33 +1087,21 @@
   }
 
   .learning-term:hover {
-    border-bottom-color: #8b5cf6;
-    color: #ddd6fe;
-    background: rgba(139, 92, 246, 0.08);
+    border-bottom-color: #f97316;
+    color: #fb923c;
+    background: rgba(251, 146, 60, 0.06);
     border-radius: 2px;
   }
 
-  /* Light mode overrides */
-  .learning-term {
-    color: #7c3aed;
-    border-bottom-color: rgba(124, 58, 237, 0.4);
-  }
-
-  .learning-term:hover {
-    color: #6d28d9;
-    border-bottom-color: #7c3aed;
-    background: rgba(124, 58, 237, 0.06);
-  }
-
   .dark .learning-term {
-    color: #c4b5fd;
-    border-bottom-color: rgba(139, 92, 246, 0.5);
+    color: #fdba74;
+    border-bottom-color: rgba(251, 146, 60, 0.5);
   }
 
   .dark .learning-term:hover {
-    border-bottom-color: #8b5cf6;
-    color: #ddd6fe;
-    background: rgba(139, 92, 246, 0.08);
+    border-bottom-color: #fb923c;
+    color: #fed7aa;
+    background: rgba(251, 146, 60, 0.08);
   }
 
   /* CSS-only tooltip for term definitions */
@@ -1123,7 +1111,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: #1e1e2e;
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(251, 146, 60, 0.2);
     border-radius: 8px;
     padding: 8px 12px;
     font-size: 12px;

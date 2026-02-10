@@ -106,8 +106,15 @@ export function applyLearningHighlights(html: string): string {
 
   let result = html
 
+  // Track which terms have already been highlighted (first instance only)
+  const highlightedTerms = new Set<string>()
+
   // Process candidates longest-first (already sorted)
   for (const candidate of matchCandidates) {
+    // Skip if this term was already highlighted
+    const termKey = candidate.entry.term.toLowerCase()
+    if (highlightedTerms.has(termKey)) continue
+
     const escaped = escapeRegExp(candidate.pattern)
     const hasSpecialChars = /[^a-zA-Z0-9\s]/.test(candidate.pattern)
     const boundaryPattern = hasSpecialChars
@@ -115,6 +122,7 @@ export function applyLearningHighlights(html: string): string {
       : `\\b${escaped}\\b`
     const regex = new RegExp(boundaryPattern, 'gi')
 
+    let matched = false
     // Split on HTML tags, process only text parts (same approach as applyTickerLinks)
     const parts = result.split(/(<[^>]*>)/g)
     result = parts
@@ -123,9 +131,11 @@ export function applyLearningHighlights(html: string): string {
         if (part.startsWith('<')) return part
         // Skip if this text segment is empty
         if (!part.trim()) return part
-        // Don't match inside already-wrapped learning-term spans
-        // (text parts won't contain tags, but check for data attributes from prior replacements)
-        return part.replace(regex, (matched) => {
+        // Only highlight the first instance
+        if (matched) return part
+        return part.replace(regex, (matchedText) => {
+          if (matched) return matchedText
+          matched = true
           const safeDef = candidate.entry.shortDef
             .replace(/&/g, '&amp;')
             .replace(/"/g, '&quot;')
@@ -136,10 +146,14 @@ export function applyLearningHighlights(html: string): string {
             .replace(/"/g, '&quot;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
-          return `<span class="learning-term" data-learning-term="${candidate.entry.term}" data-term-full="${safeFull}" data-term-def="${safeDef}">${matched}</span>`
+          return `<span class="learning-term" data-learning-term="${candidate.entry.term}" data-term-full="${safeFull}" data-term-def="${safeDef}">${matchedText}</span>`
         })
       })
       .join('')
+
+    if (matched) {
+      highlightedTerms.add(termKey)
+    }
   }
 
   // Re-sanitize with learning-term data attributes allowed
