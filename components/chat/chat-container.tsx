@@ -19,6 +19,7 @@ import { SystemMessage } from "./SystemMessage"
 import { ConversationHistorySkeleton } from "./conversation-history-skeleton"
 import { NewMessagesPill } from "./new-messages-pill"
 import { ErrorMessage } from "./error-message"
+import { LearningModeToggle } from "./LearningModeToggle"
 
 interface ChatContainerProps {
   messages: Message[]
@@ -365,6 +366,7 @@ export function ChatContainer({
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <LearningModeToggle />
               <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-green-100 dark:bg-green-900/30">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
                 <span className="text-[10px] sm:text-xs font-medium text-green-700 dark:text-green-400">Open</span>
