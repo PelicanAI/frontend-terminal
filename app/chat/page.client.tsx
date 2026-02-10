@@ -27,6 +27,8 @@ import { PaywallGate } from "@/components/paywall-gate"
 import { useCreditsContext } from "@/providers/credits-provider"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { ChartProvider, useChart } from "@/providers/chart-provider"
+import { LearningModeProvider, useLearningMode } from "@/providers/learning-mode-provider"
+import { LearningModeToggle } from "@/components/chat/LearningModeToggle"
 import { ChatCreditCounter } from "@/components/chat/credit-counter"
 
 const SettingsModal = dynamic(() => import("@/components/settings-modal").then(m => ({ default: m.SettingsModal })))
@@ -79,6 +81,19 @@ function MobileChartSheet() {
         )}
       </SheetContent>
     </Sheet>
+  )
+}
+
+function LearningAwareTradingPanel(props: React.ComponentProps<typeof TradingContextPanel>) {
+  const { enabled, selectedTerm, clearTerm, learnTabActive, setLearnTabActive } = useLearningMode()
+  return (
+    <TradingContextPanel
+      {...props}
+      selectedTerm={enabled ? selectedTerm : null}
+      onClearTerm={clearTerm}
+      learnTabActive={enabled && learnTabActive}
+      onLearnTabClick={() => setLearnTabActive(!learnTabActive)}
+    />
   )
 }
 
@@ -376,6 +391,7 @@ export default function ChatPage() {
     <PaywallGate>
       <ChatErrorBoundary onReset={() => clearMessages()}>
         <ChartProvider>
+        <LearningModeProvider>
         <ChartPanelExpander onExpand={() => {
           setTradingPanelCollapsed(false)
           localStorage.setItem('pelican_trading_panel_collapsed', 'false')
@@ -464,6 +480,7 @@ export default function ChatPage() {
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
             <ChatCreditCounter />
+            <LearningModeToggle />
             <ThemeToggle />
           </div>
         </div>
@@ -486,6 +503,7 @@ export default function ChatPage() {
             </div>
             <div className="flex items-center gap-2">
               <ChatCreditCounter />
+              <LearningModeToggle />
               <ThemeToggle />
             </div>
           </div>
@@ -586,7 +604,7 @@ export default function ChatPage() {
             className="hidden xl:block h-full overflow-y-auto flex-shrink-0"
             style={{ width: panelWidth }}
           >
-            <TradingContextPanel
+            <LearningAwareTradingPanel
               collapsed={tradingPanelCollapsed}
               onToggleCollapse={handleTradingPanelToggle}
               indices={indices}
@@ -634,6 +652,7 @@ export default function ChatPage() {
       />
       <MobileChartSheet />
         </div>
+        </LearningModeProvider>
         </ChartProvider>
       </ChatErrorBoundary>
     </PaywallGate>

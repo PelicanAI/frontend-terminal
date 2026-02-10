@@ -206,6 +206,17 @@
       "teamCompany": "Team & Company",
       "support": "Support"
     }
+  },
+  "learning": {
+    "title": "Learning Mode",
+    "toggle": "Learn",
+    "toggleTooltip": "Highlight trading terms in chat responses",
+    "tabTitle": "Learn",
+    "placeholder": "Click any highlighted term in the chat to learn about it. Toggle Learning Mode in the chat header.",
+    "askFollowUp": "Ask a follow-up...",
+    "poweredByAI": "Powered by AI - for educational purposes only",
+    "clearChat": "Clear",
+    "termIntro": "Ask me anything about {term} — how to use it, common strategies, or what it means for your trades."
   }
 }
 

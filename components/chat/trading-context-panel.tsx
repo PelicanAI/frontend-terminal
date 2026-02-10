@@ -1,13 +1,14 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { TrendingUp, TrendingDown, Activity, Star, ChevronDown, ChevronUp } from "lucide-react"
+import { TrendingUp, TrendingDown, Activity, Star, ChevronDown, ChevronUp, BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useChart } from "@/providers/chart-provider"
 import { TradingViewChart } from "./TradingViewChart"
 import { EconomicCalendar } from "./EconomicCalendar"
+import { EducationChat } from "./EducationChat"
 
 interface MarketIndex {
   symbol: string
@@ -39,6 +40,11 @@ interface TradingContextPanelProps {
   onRefresh?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
+  // Learning mode props
+  selectedTerm?: { term: string; fullName: string; shortDef: string; category: string } | null
+  onClearTerm?: () => void
+  learnTabActive?: boolean
+  onLearnTabClick?: () => void
 }
 
 export function TradingContextPanel({
@@ -50,6 +56,10 @@ export function TradingContextPanel({
   isLoading = false,
   collapsed = false,
   onToggleCollapse,
+  selectedTerm,
+  onClearTerm,
+  learnTabActive = false,
+  onLearnTabClick,
 }: TradingContextPanelProps) {
   const { mode, selectedTicker, showChart, showCalendar, closeChart } = useChart()
   const [isCollapsed, setIsCollapsed] = useState(collapsed)
@@ -102,11 +112,12 @@ export function TradingContextPanel({
   const tabs = [
     { key: "market" as const, label: "Market" },
     { key: "calendar" as const, label: "Calendar" },
+    { key: "learn" as const, label: "Learn" },
   ]
 
-  const activeMode = mode === "chart" && selectedTicker ? "chart" : mode === "calendar" ? "calendar" : "overview"
+  const activeMode = learnTabActive ? "learn" : mode === "chart" && selectedTicker ? "chart" : mode === "calendar" ? "calendar" : "overview"
 
-  // Chart and calendar modes get a full-height card with no tabs
+  // Chart, calendar, and learn modes get a full-height card
   if (activeMode === "chart" || activeMode === "calendar") {
     return (
       <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden h-full">
@@ -135,25 +146,45 @@ export function TradingContextPanel({
       {/* Tab bar */}
       <div className="flex items-center border-b border-white/5">
         <div className="flex flex-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => {
-                if (tab.key === "calendar") showCalendar()
-                else if (tab.key === "market") closeChart()
-              }}
-              className={cn(
-                "flex-1 py-2.5 text-xs font-medium transition-colors border-b-2",
-                mode === "overview" && tab.key === "market"
-                  ? "text-teal-500 border-teal-500"
-                  : mode === tab.key
-                    ? "text-teal-500 border-teal-500"
+          {tabs.map((tab) => {
+            const isActive =
+              tab.key === "learn"
+                ? learnTabActive
+                : !learnTabActive &&
+                  ((mode === "overview" && tab.key === "market") || mode === tab.key)
+
+            return (
+              <button
+                key={tab.key}
+                onClick={() => {
+                  if (tab.key === "learn") {
+                    onLearnTabClick?.()
+                  } else {
+                    if (tab.key === "calendar") showCalendar()
+                    else if (tab.key === "market") closeChart()
+                    // Deactivate learn tab when switching to market/calendar
+                    if (learnTabActive && onLearnTabClick) onLearnTabClick()
+                  }
+                }}
+                className={cn(
+                  "flex-1 py-2.5 text-xs font-medium transition-colors border-b-2 relative",
+                  isActive
+                    ? tab.key === "learn"
+                      ? "text-purple-500 border-purple-500"
+                      : "text-teal-500 border-teal-500"
                     : "text-muted-foreground border-transparent hover:text-foreground hover:border-white/10"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
+                )}
+              >
+                <span className="flex items-center justify-center gap-1">
+                  {tab.key === "learn" && <BookOpen className="h-3 w-3" />}
+                  {tab.label}
+                  {tab.key === "learn" && selectedTerm && !learnTabActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                  )}
+                </span>
+              </button>
+            )
+          })}
         </div>
         <div className="flex items-center gap-1 px-2">
           <button
@@ -177,6 +208,18 @@ export function TradingContextPanel({
         </div>
       </div>
 
+      {/* Learn tab content */}
+      {learnTabActive && (
+        <div className="flex-1 overflow-hidden" style={{ height: 'calc(100% - 42px)' }}>
+          <EducationChat
+            selectedTerm={selectedTerm ?? null}
+            onClear={onClearTerm ?? (() => {})}
+          />
+        </div>
+      )}
+
+      {/* Market tab content */}
+      {!learnTabActive && (
       <AnimatePresence>
         {!isCollapsed && (
           <motion.div
@@ -322,6 +365,7 @@ export function TradingContextPanel({
           </motion.div>
         )}
       </AnimatePresence>
+      )}
     </Card>
   )
 }

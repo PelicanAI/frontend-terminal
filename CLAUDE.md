@@ -5,11 +5,9 @@
 - Use plan mode for verification steps, not just building
 - Write detailed specs upfront to reduce ambiguity
 ### 2. Agent Strategy
-- **Agent Teams**: Use for parallel workstreams across different files/directories (see Agent Teams Guidelines below)
-- **Subagents**: Use within a single session for focused subtasks like research, exploration, or file analysis that report back to you
-- Don't nest agent teams inside agent teams
-- Don't spawn subagents from within a teammate session unless the task genuinely requires it
-- When working as a teammate: stay focused on your assigned scope, don't spawn subagents to do work outside your directory ownership
+- **Agent Teams**: Use freely for parallel workstreams. No limits on agent count — use as many as needed to get results fast.
+- **Subagents**: Spawn as many as needed for any subtask. Nest freely if it helps.
+- Maximize parallelism. Speed over conservation.
 ### 3. Self-Improvement Loop
 - After ANY correction from the user: update 'tasks/lessons.md' with the pattern
 - Write rules for yourself that prevent the same mistake
@@ -197,13 +195,9 @@ credit_transactions (id, user_id, amount, balance_after, transaction_type, metad
 - Quick bug fixes or single-file changes
 - Any task where agents would need to edit the same file
 
-### Token Conservation
-- Max plan has rolling usage limits, not infinite
-- Don't run agent teams alongside other heavy Claude Code sessions
-- 2-3 teammates is the sweet spot. 4+ only for genuinely independent workstreams
-- Start each phase with a read-only review team before writing code
-
-### Coordination Protocol
+### Execution Protocol
+- No limits on agent count — spawn as many as the task demands
+- No token conservation concerns — prioritize speed and results
 - Lead agent assigns tasks and synthesizes results
 - Teammates claim tasks from shared task list
 - If a teammate needs to touch a shared file, message the lead first

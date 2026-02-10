@@ -1,0 +1,1087 @@
+[
+  {
+    "term": "RSI",
+    "fullName": "Relative Strength Index",
+    "category": "indicator",
+    "shortDef": "Momentum oscillator (0-100) measuring speed and magnitude of price changes. Above 70 = overbought, below 30 = oversold.",
+    "aliases": ["relative strength index"]
+  },
+  {
+    "term": "MACD",
+    "fullName": "Moving Average Convergence Divergence",
+    "category": "indicator",
+    "shortDef": "Trend-following momentum indicator showing the relationship between two moving averages. Signal line crossovers indicate buy/sell opportunities.",
+    "aliases": ["moving average convergence divergence"]
+  },
+  {
+    "term": "Bollinger Bands",
+    "fullName": "Bollinger Bands",
+    "category": "indicator",
+    "shortDef": "Volatility bands placed above and below a moving average. Width expands with volatility. Price touching upper/lower band can signal overbought/oversold.",
+    "aliases": ["bollinger band", "bbands"]
+  },
+  {
+    "term": "SMA",
+    "fullName": "Simple Moving Average",
+    "category": "indicator",
+    "shortDef": "Average closing price over a set number of periods. Common periods: 20, 50, 200. Used to identify trend direction and support/resistance.",
+    "aliases": ["simple moving average"]
+  },
+  {
+    "term": "EMA",
+    "fullName": "Exponential Moving Average",
+    "category": "indicator",
+    "shortDef": "Moving average that gives more weight to recent prices, reacting faster to changes than SMA. Common periods: 9, 12, 26.",
+    "aliases": ["exponential moving average"]
+  },
+  {
+    "term": "Moving Average",
+    "fullName": "Moving Average",
+    "category": "indicator",
+    "shortDef": "Average price over a specific time period that smooths out fluctuations to show trend direction. SMA and EMA are the most common types.",
+    "aliases": ["moving averages", "MA"]
+  },
+  {
+    "term": "Stochastic Oscillator",
+    "fullName": "Stochastic Oscillator",
+    "category": "indicator",
+    "shortDef": "Momentum indicator comparing closing price to price range over a period. Above 80 = overbought, below 20 = oversold.",
+    "aliases": ["stochastic", "stochastics"]
+  },
+  {
+    "term": "ATR",
+    "fullName": "Average True Range",
+    "category": "indicator",
+    "shortDef": "Measures market volatility by averaging the true range (high-low including gaps) over a period. Higher ATR = more volatile.",
+    "aliases": ["average true range"]
+  },
+  {
+    "term": "ADX",
+    "fullName": "Average Directional Index",
+    "category": "indicator",
+    "shortDef": "Measures trend strength from 0-100 regardless of direction. Above 25 = strong trend, below 20 = weak/no trend.",
+    "aliases": ["average directional index"]
+  },
+  {
+    "term": "OBV",
+    "fullName": "On-Balance Volume",
+    "category": "indicator",
+    "shortDef": "Cumulative volume indicator that adds volume on up days and subtracts on down days. Divergence from price can signal reversals.",
+    "aliases": ["on-balance volume", "on balance volume"]
+  },
+  {
+    "term": "VWAP",
+    "fullName": "Volume Weighted Average Price",
+    "category": "indicator",
+    "shortDef": "Average price weighted by volume throughout the day. Institutional benchmark - price above VWAP is bullish, below is bearish.",
+    "aliases": ["volume weighted average price"]
+  },
+  {
+    "term": "Fibonacci Retracement",
+    "fullName": "Fibonacci Retracement",
+    "category": "indicator",
+    "shortDef": "Horizontal lines at key Fibonacci ratios (23.6%, 38.2%, 50%, 61.8%) indicating potential support/resistance levels during pullbacks.",
+    "aliases": ["fibonacci", "fib retracement", "fib levels", "fib"]
+  },
+  {
+    "term": "Ichimoku Cloud",
+    "fullName": "Ichimoku Kinko Hyo",
+    "category": "indicator",
+    "shortDef": "Comprehensive indicator showing support/resistance, trend direction, and momentum using five lines and a cloud. Price above cloud = bullish.",
+    "aliases": ["ichimoku", "ichimoku kinko hyo"]
+  },
+  {
+    "term": "Williams %R",
+    "fullName": "Williams Percent Range",
+    "category": "indicator",
+    "shortDef": "Momentum oscillator (-100 to 0) measuring overbought/oversold levels. Above -20 = overbought, below -80 = oversold.",
+    "aliases": ["williams percent range", "williams r"]
+  },
+  {
+    "term": "CCI",
+    "fullName": "Commodity Channel Index",
+    "category": "indicator",
+    "shortDef": "Oscillator measuring price deviation from its statistical mean. Above +100 = overbought, below -100 = oversold.",
+    "aliases": ["commodity channel index"]
+  },
+  {
+    "term": "Parabolic SAR",
+    "fullName": "Parabolic Stop and Reverse",
+    "category": "indicator",
+    "shortDef": "Trailing stop indicator that appears as dots above or below price. Dots flip sides when trend reverses, providing stop-loss levels.",
+    "aliases": ["parabolic stop and reverse", "psar"]
+  },
+  {
+    "term": "Volume Profile",
+    "fullName": "Volume Profile",
+    "category": "indicator",
+    "shortDef": "Shows trading activity at specific price levels over time. High volume nodes act as support/resistance; low volume nodes as breakout zones.",
+    "aliases": ["volume at price", "vpvr"]
+  },
+  {
+    "term": "Momentum",
+    "fullName": "Momentum Indicator",
+    "category": "indicator",
+    "shortDef": "Rate of change in price over a given period. Positive momentum = uptrend strengthening, negative = downtrend strengthening.",
+    "aliases": ["price momentum"]
+  },
+  {
+    "term": "Head and Shoulders",
+    "fullName": "Head and Shoulders Pattern",
+    "category": "pattern",
+    "shortDef": "Bearish reversal pattern with three peaks: two shoulders flanking a higher head. Break below the neckline confirms reversal.",
+    "aliases": ["head & shoulders", "h&s"]
+  },
+  {
+    "term": "Double Top",
+    "fullName": "Double Top Pattern",
+    "category": "pattern",
+    "shortDef": "Bearish reversal pattern where price tests a resistance level twice and fails, forming an M-shape. Confirmed on break below support.",
+    "aliases": ["double-top"]
+  },
+  {
+    "term": "Double Bottom",
+    "fullName": "Double Bottom Pattern",
+    "category": "pattern",
+    "shortDef": "Bullish reversal pattern where price tests a support level twice and holds, forming a W-shape. Confirmed on break above resistance.",
+    "aliases": ["double-bottom"]
+  },
+  {
+    "term": "Cup and Handle",
+    "fullName": "Cup and Handle Pattern",
+    "category": "pattern",
+    "shortDef": "Bullish continuation pattern shaped like a tea cup. The cup forms a rounded bottom, followed by a small pullback (handle) before breakout.",
+    "aliases": ["cup & handle"]
+  },
+  {
+    "term": "Bull Flag",
+    "fullName": "Bull Flag Pattern",
+    "category": "pattern",
+    "shortDef": "Bullish continuation pattern: sharp upward move (flagpole) followed by a downward-sloping consolidation (flag). Breakout continues the uptrend.",
+    "aliases": ["bullish flag"]
+  },
+  {
+    "term": "Bear Flag",
+    "fullName": "Bear Flag Pattern",
+    "category": "pattern",
+    "shortDef": "Bearish continuation pattern: sharp downward move (flagpole) followed by an upward-sloping consolidation (flag). Breakdown continues the downtrend.",
+    "aliases": ["bearish flag"]
+  },
+  {
+    "term": "Pennant",
+    "fullName": "Pennant Pattern",
+    "category": "pattern",
+    "shortDef": "Continuation pattern formed by converging trendlines after a strong move. Similar to a flag but triangular in shape. Breakout follows prior trend.",
+    "aliases": ["pennant pattern"]
+  },
+  {
+    "term": "Wedge",
+    "fullName": "Wedge Pattern",
+    "category": "pattern",
+    "shortDef": "Pattern with converging trendlines sloping in the same direction. Rising wedges are bearish; falling wedges are bullish.",
+    "aliases": ["rising wedge", "falling wedge", "wedge pattern"]
+  },
+  {
+    "term": "Triangle",
+    "fullName": "Triangle Pattern",
+    "category": "pattern",
+    "shortDef": "Consolidation pattern with converging trendlines. Ascending = bullish, descending = bearish, symmetrical = neutral until breakout.",
+    "aliases": ["ascending triangle", "descending triangle", "symmetrical triangle"]
+  },
+  {
+    "term": "Doji",
+    "fullName": "Doji Candlestick",
+    "category": "pattern",
+    "shortDef": "Candlestick where open and close are nearly equal, forming a cross shape. Signals indecision and potential reversal at key levels.",
+    "aliases": ["doji candle", "doji candlestick"]
+  },
+  {
+    "term": "Hammer",
+    "fullName": "Hammer Candlestick",
+    "category": "pattern",
+    "shortDef": "Bullish reversal candle with a small body at the top and long lower shadow (2x+ body). Appears after downtrends, showing buyers stepping in.",
+    "aliases": ["hammer candle", "hammer candlestick"]
+  },
+  {
+    "term": "Engulfing",
+    "fullName": "Engulfing Candlestick Pattern",
+    "category": "pattern",
+    "shortDef": "Two-candle reversal pattern where the second candle completely engulfs the first. Bullish engulfing = bullish reversal, bearish engulfing = bearish.",
+    "aliases": ["bullish engulfing", "bearish engulfing", "engulfing pattern", "engulfing candle"]
+  },
+  {
+    "term": "Morning Star",
+    "fullName": "Morning Star Pattern",
+    "category": "pattern",
+    "shortDef": "Three-candle bullish reversal: large bearish candle, small-bodied indecision candle, then large bullish candle closing above midpoint of first.",
+    "aliases": ["morning star pattern"]
+  },
+  {
+    "term": "Evening Star",
+    "fullName": "Evening Star Pattern",
+    "category": "pattern",
+    "shortDef": "Three-candle bearish reversal: large bullish candle, small-bodied indecision candle, then large bearish candle closing below midpoint of first.",
+    "aliases": ["evening star pattern"]
+  },
+  {
+    "term": "Hanging Man",
+    "fullName": "Hanging Man Candlestick",
+    "category": "pattern",
+    "shortDef": "Bearish reversal candle identical to a hammer but appearing after an uptrend. Long lower shadow shows selling pressure despite recovery.",
+    "aliases": ["hanging man candle"]
+  },
+  {
+    "term": "Shooting Star",
+    "fullName": "Shooting Star Candlestick",
+    "category": "pattern",
+    "shortDef": "Bearish reversal candle with small body at bottom and long upper shadow. Appears after uptrends, showing rejection at higher prices.",
+    "aliases": ["shooting star candle"]
+  },
+  {
+    "term": "Spinning Top",
+    "fullName": "Spinning Top Candlestick",
+    "category": "pattern",
+    "shortDef": "Candle with small body and roughly equal upper and lower shadows. Signals market indecision - neither buyers nor sellers dominate.",
+    "aliases": ["spinning top candle"]
+  },
+  {
+    "term": "Marubozu",
+    "fullName": "Marubozu Candlestick",
+    "category": "pattern",
+    "shortDef": "Strong candle with no shadows (or very small ones). Bullish marubozu = strong buying, bearish marubozu = strong selling throughout the session.",
+    "aliases": ["marubozu candle"]
+  },
+  {
+    "term": "P/E Ratio",
+    "fullName": "Price-to-Earnings Ratio",
+    "category": "fundamental",
+    "shortDef": "Stock price divided by earnings per share. Measures how much investors pay per dollar of earnings. Lower P/E may indicate undervaluation.",
+    "aliases": ["price-to-earnings", "price to earnings ratio", "PE ratio", "P/E"]
+  },
+  {
+    "term": "EPS",
+    "fullName": "Earnings Per Share",
+    "category": "fundamental",
+    "shortDef": "Company's net profit divided by outstanding shares. Higher EPS indicates greater profitability. Key metric in earnings reports.",
+    "aliases": ["earnings per share"]
+  },
+  {
+    "term": "Market Cap",
+    "fullName": "Market Capitalization",
+    "category": "fundamental",
+    "shortDef": "Total market value of a company's outstanding shares. Large cap: $10B+, mid cap: $2-10B, small cap: under $2B.",
+    "aliases": ["market capitalization", "market cap", "mkt cap"]
+  },
+  {
+    "term": "Revenue",
+    "fullName": "Revenue",
+    "category": "fundamental",
+    "shortDef": "Total income from sales of goods or services before expenses. Also called top-line. Revenue growth is a key indicator of business health.",
+    "aliases": ["top line", "top-line", "sales revenue"]
+  },
+  {
+    "term": "EBITDA",
+    "fullName": "Earnings Before Interest, Taxes, Depreciation, and Amortization",
+    "category": "fundamental",
+    "shortDef": "Measure of operating profitability excluding non-cash charges and financing decisions. Used to compare companies regardless of capital structure.",
+    "aliases": ["earnings before interest taxes depreciation and amortization"]
+  },
+  {
+    "term": "Free Cash Flow",
+    "fullName": "Free Cash Flow",
+    "category": "fundamental",
+    "shortDef": "Cash generated after accounting for capital expenditures. Available for dividends, buybacks, and debt reduction. Positive FCF = financially healthy.",
+    "aliases": ["FCF", "free cash flow"]
+  },
+  {
+    "term": "Book Value",
+    "fullName": "Book Value",
+    "category": "fundamental",
+    "shortDef": "Net asset value of a company (total assets minus total liabilities). Book value per share compared to stock price shows if stock is over/undervalued.",
+    "aliases": ["book value per share", "BV"]
+  },
+  {
+    "term": "Dividend Yield",
+    "fullName": "Dividend Yield",
+    "category": "fundamental",
+    "shortDef": "Annual dividend per share divided by stock price, expressed as a percentage. Higher yield = more income per dollar invested.",
+    "aliases": ["div yield", "dividend rate"]
+  },
+  {
+    "term": "Debt-to-Equity",
+    "fullName": "Debt-to-Equity Ratio",
+    "category": "fundamental",
+    "shortDef": "Total debt divided by shareholders' equity. Measures financial leverage. Higher ratio = more debt-financed, which increases risk.",
+    "aliases": ["debt to equity ratio", "D/E ratio", "D/E"]
+  },
+  {
+    "term": "ROE",
+    "fullName": "Return on Equity",
+    "category": "fundamental",
+    "shortDef": "Net income divided by shareholders' equity. Measures how efficiently a company generates profit from equity. Higher ROE = better returns.",
+    "aliases": ["return on equity"]
+  },
+  {
+    "term": "ROA",
+    "fullName": "Return on Assets",
+    "category": "fundamental",
+    "shortDef": "Net income divided by total assets. Shows how efficiently management uses assets to generate profit. Higher ROA = more efficient.",
+    "aliases": ["return on assets"]
+  },
+  {
+    "term": "Gross Margin",
+    "fullName": "Gross Profit Margin",
+    "category": "fundamental",
+    "shortDef": "Revenue minus cost of goods sold, divided by revenue. Shows profitability of core business before overhead. Higher = better pricing power.",
+    "aliases": ["gross profit margin"]
+  },
+  {
+    "term": "Operating Margin",
+    "fullName": "Operating Profit Margin",
+    "category": "fundamental",
+    "shortDef": "Operating income divided by revenue. Measures profitability from core operations after all operating expenses. Higher = more efficient operations.",
+    "aliases": ["operating profit margin", "operating income margin"]
+  },
+  {
+    "term": "Net Margin",
+    "fullName": "Net Profit Margin",
+    "category": "fundamental",
+    "shortDef": "Net income divided by revenue. Bottom-line profitability after all expenses, taxes, and interest. The definitive profitability measure.",
+    "aliases": ["net profit margin", "profit margin"]
+  },
+  {
+    "term": "Price-to-Book",
+    "fullName": "Price-to-Book Ratio",
+    "category": "fundamental",
+    "shortDef": "Stock price divided by book value per share. Below 1 may indicate undervaluation. Commonly used for financial and asset-heavy companies.",
+    "aliases": ["P/B ratio", "price to book", "PB ratio"]
+  },
+  {
+    "term": "Price-to-Sales",
+    "fullName": "Price-to-Sales Ratio",
+    "category": "fundamental",
+    "shortDef": "Market cap divided by total revenue. Useful for valuing companies with negative earnings. Lower ratio suggests better value.",
+    "aliases": ["P/S ratio", "price to sales", "PS ratio"]
+  },
+  {
+    "term": "PEG Ratio",
+    "fullName": "Price/Earnings to Growth Ratio",
+    "category": "fundamental",
+    "shortDef": "P/E ratio divided by earnings growth rate. Accounts for growth when assessing valuation. PEG of 1 = fairly valued, below 1 = potentially undervalued.",
+    "aliases": ["price earnings to growth", "PEG"]
+  },
+  {
+    "term": "Enterprise Value",
+    "fullName": "Enterprise Value",
+    "category": "fundamental",
+    "shortDef": "Market cap plus debt minus cash. Represents total company value from an acquirer's perspective. Used in EV/EBITDA and EV/Revenue ratios.",
+    "aliases": ["EV"]
+  },
+  {
+    "term": "Short Interest",
+    "fullName": "Short Interest",
+    "category": "fundamental",
+    "shortDef": "Number of shares currently sold short. High short interest can lead to short squeezes. Often expressed as a percentage of float.",
+    "aliases": ["short interest ratio", "SI"]
+  },
+  {
+    "term": "Float",
+    "fullName": "Public Float",
+    "category": "fundamental",
+    "shortDef": "Number of shares available for public trading (total shares minus restricted/insider shares). Low float stocks are more volatile.",
+    "aliases": ["public float", "free float"]
+  },
+  {
+    "term": "Call Option",
+    "fullName": "Call Option",
+    "category": "options",
+    "shortDef": "Contract giving the right (not obligation) to buy an asset at a specific price before expiration. Profits when the underlying rises.",
+    "aliases": ["call", "calls"]
+  },
+  {
+    "term": "Put Option",
+    "fullName": "Put Option",
+    "category": "options",
+    "shortDef": "Contract giving the right (not obligation) to sell an asset at a specific price before expiration. Profits when the underlying falls.",
+    "aliases": ["put", "puts"]
+  },
+  {
+    "term": "Strike Price",
+    "fullName": "Strike Price",
+    "category": "options",
+    "shortDef": "The fixed price at which an option holder can buy (call) or sell (put) the underlying asset. Key determinant of option value.",
+    "aliases": ["exercise price", "strike"]
+  },
+  {
+    "term": "Expiration Date",
+    "fullName": "Expiration Date",
+    "category": "options",
+    "shortDef": "The last day an options contract can be exercised. After expiration, unexercised options become worthless. Time decay accelerates near expiration.",
+    "aliases": ["expiration", "expiry", "expiry date"]
+  },
+  {
+    "term": "Premium",
+    "fullName": "Option Premium",
+    "category": "options",
+    "shortDef": "The price paid to buy an options contract. Composed of intrinsic value (in-the-money amount) plus time value (time until expiration).",
+    "aliases": ["option premium", "options premium"]
+  },
+  {
+    "term": "Implied Volatility",
+    "fullName": "Implied Volatility",
+    "category": "options",
+    "shortDef": "Market's expectation of future price movement priced into options. Higher IV = more expensive options. IV crush occurs after events like earnings.",
+    "aliases": ["IV", "implied vol"]
+  },
+  {
+    "term": "Delta",
+    "fullName": "Delta (Options Greek)",
+    "category": "options",
+    "shortDef": "Measures how much an option's price changes per $1 move in the underlying. Calls: 0 to 1, puts: 0 to -1. Also approximates probability of expiring ITM.",
+    "aliases": ["options delta"]
+  },
+  {
+    "term": "Gamma",
+    "fullName": "Gamma (Options Greek)",
+    "category": "options",
+    "shortDef": "Rate of change of delta per $1 move in the underlying. Highest for at-the-money options near expiration. Measures delta's sensitivity.",
+    "aliases": ["options gamma"]
+  },
+  {
+    "term": "Theta",
+    "fullName": "Theta (Options Greek)",
+    "category": "options",
+    "shortDef": "Time decay - how much an option's value decreases per day. Always negative for long options. Accelerates as expiration approaches.",
+    "aliases": ["time decay", "options theta"]
+  },
+  {
+    "term": "Vega",
+    "fullName": "Vega (Options Greek)",
+    "category": "options",
+    "shortDef": "Measures sensitivity of option price to a 1% change in implied volatility. Higher vega = more affected by IV changes.",
+    "aliases": ["options vega"]
+  },
+  {
+    "term": "In the Money",
+    "fullName": "In the Money",
+    "category": "options",
+    "shortDef": "Option with intrinsic value. Call is ITM when stock price > strike price. Put is ITM when stock price < strike price.",
+    "aliases": ["ITM", "in-the-money"]
+  },
+  {
+    "term": "Out of the Money",
+    "fullName": "Out of the Money",
+    "category": "options",
+    "shortDef": "Option with no intrinsic value. Call is OTM when stock price < strike price. Put is OTM when stock price > strike price.",
+    "aliases": ["OTM", "out-of-the-money"]
+  },
+  {
+    "term": "At the Money",
+    "fullName": "At the Money",
+    "category": "options",
+    "shortDef": "Option where the strike price equals (or is very close to) the current stock price. ATM options have the most time value.",
+    "aliases": ["ATM", "at-the-money"]
+  },
+  {
+    "term": "Iron Condor",
+    "fullName": "Iron Condor",
+    "category": "options",
+    "shortDef": "Four-leg options strategy combining a bull put spread and bear call spread. Profits from low volatility when price stays within a range.",
+    "aliases": ["iron condor spread"]
+  },
+  {
+    "term": "Straddle",
+    "fullName": "Straddle",
+    "category": "options",
+    "shortDef": "Buying a call and put at the same strike and expiration. Profits from large moves in either direction. Used before high-volatility events.",
+    "aliases": ["long straddle", "straddle strategy"]
+  },
+  {
+    "term": "Strangle",
+    "fullName": "Strangle",
+    "category": "options",
+    "shortDef": "Buying a call and put at different strikes but same expiration. Cheaper than a straddle but requires a larger move to profit.",
+    "aliases": ["long strangle", "strangle strategy"]
+  },
+  {
+    "term": "Covered Call",
+    "fullName": "Covered Call",
+    "category": "options",
+    "shortDef": "Selling a call option while owning the underlying stock. Generates income from premiums but caps upside. Popular income strategy.",
+    "aliases": ["covered call strategy", "buy-write"]
+  },
+  {
+    "term": "Protective Put",
+    "fullName": "Protective Put",
+    "category": "options",
+    "shortDef": "Buying a put option while owning the underlying stock. Acts as insurance against downside risk. Also called a married put.",
+    "aliases": ["married put", "protective put strategy"]
+  },
+  {
+    "term": "Spread",
+    "fullName": "Options Spread",
+    "category": "options",
+    "shortDef": "Strategy involving simultaneous buying and selling of options with different strikes or expirations. Limits both risk and reward.",
+    "aliases": ["option spread", "vertical spread", "credit spread", "debit spread"]
+  },
+  {
+    "term": "Limit Order",
+    "fullName": "Limit Order",
+    "category": "orderType",
+    "shortDef": "Order to buy or sell at a specific price or better. Buy limits execute at or below the limit price; sell limits at or above.",
+    "aliases": ["limit buy", "limit sell"]
+  },
+  {
+    "term": "Market Order",
+    "fullName": "Market Order",
+    "category": "orderType",
+    "shortDef": "Order to buy or sell immediately at the best available price. Guarantees execution but not price. Can result in slippage in volatile markets.",
+    "aliases": ["market buy", "market sell"]
+  },
+  {
+    "term": "Stop Loss",
+    "fullName": "Stop Loss Order",
+    "category": "orderType",
+    "shortDef": "Order that becomes a market order when price reaches a specified level. Used to limit losses by automatically selling at a predetermined price.",
+    "aliases": ["stop-loss", "stop loss order", "SL"]
+  },
+  {
+    "term": "Take Profit",
+    "fullName": "Take Profit Order",
+    "category": "orderType",
+    "shortDef": "Order to automatically close a position when price reaches a target profit level. Locks in gains without manual monitoring.",
+    "aliases": ["take-profit", "take profit order", "TP"]
+  },
+  {
+    "term": "Trailing Stop",
+    "fullName": "Trailing Stop Order",
+    "category": "orderType",
+    "shortDef": "Stop order that moves with the price by a fixed amount or percentage. Locks in profits as price moves favorably while still protecting against reversal.",
+    "aliases": ["trailing stop loss", "trailing stop order"]
+  },
+  {
+    "term": "Stop Limit",
+    "fullName": "Stop Limit Order",
+    "category": "orderType",
+    "shortDef": "Combines stop and limit orders. When stop price is triggered, a limit order is placed instead of a market order. More control but no execution guarantee.",
+    "aliases": ["stop-limit", "stop limit order"]
+  },
+  {
+    "term": "GTC",
+    "fullName": "Good Till Cancelled",
+    "category": "orderType",
+    "shortDef": "Order that remains active until executed or manually cancelled, rather than expiring at end of day. Most brokers cap GTC at 60-90 days.",
+    "aliases": ["good till cancelled", "good til canceled"]
+  },
+  {
+    "term": "Fill or Kill",
+    "fullName": "Fill or Kill Order",
+    "category": "orderType",
+    "shortDef": "Order that must be executed immediately in its entirety or cancelled completely. No partial fills allowed. Used for large orders.",
+    "aliases": ["FOK", "fill-or-kill"]
+  },
+  {
+    "term": "OCO",
+    "fullName": "One Cancels Other",
+    "category": "orderType",
+    "shortDef": "Pair of orders where executing one automatically cancels the other. Commonly used to set both a take profit and stop loss simultaneously.",
+    "aliases": ["one cancels other", "one-cancels-other", "OCO order"]
+  },
+  {
+    "term": "Sharpe Ratio",
+    "fullName": "Sharpe Ratio",
+    "category": "riskManagement",
+    "shortDef": "Risk-adjusted return metric. (Return - Risk-free rate) / Standard deviation. Higher = better risk-adjusted performance. Above 1 is good, above 2 is very good.",
+    "aliases": ["sharpe"]
+  },
+  {
+    "term": "Drawdown",
+    "fullName": "Drawdown",
+    "category": "riskManagement",
+    "shortDef": "Peak-to-trough decline in portfolio value before recovery. Expressed as a percentage. Key measure of downside risk and strategy resilience.",
+    "aliases": ["DD"]
+  },
+  {
+    "term": "Max Drawdown",
+    "fullName": "Maximum Drawdown",
+    "category": "riskManagement",
+    "shortDef": "Largest peak-to-trough decline in portfolio value over a period. Worst-case scenario metric. Lower max drawdown = less extreme losses.",
+    "aliases": ["maximum drawdown", "MDD"]
+  },
+  {
+    "term": "Risk-Reward Ratio",
+    "fullName": "Risk-Reward Ratio",
+    "category": "riskManagement",
+    "shortDef": "Potential loss versus potential gain on a trade. A 1:3 ratio means risking $1 to potentially make $3. Minimum 1:2 is generally recommended.",
+    "aliases": ["risk reward", "risk/reward", "R:R", "R/R"]
+  },
+  {
+    "term": "Position Sizing",
+    "fullName": "Position Sizing",
+    "category": "riskManagement",
+    "shortDef": "Determining how many shares or contracts to trade based on account size and risk tolerance. Common rule: risk no more than 1-2% of account per trade.",
+    "aliases": ["position size"]
+  },
+  {
+    "term": "Volatility",
+    "fullName": "Volatility",
+    "category": "riskManagement",
+    "shortDef": "Statistical measure of price dispersion over time. Higher volatility = larger price swings = more risk and opportunity. Measured by standard deviation.",
+    "aliases": ["vol", "price volatility"]
+  },
+  {
+    "term": "Beta",
+    "fullName": "Beta",
+    "category": "riskManagement",
+    "shortDef": "Measures a stock's volatility relative to the market. Beta 1 = moves with market, >1 = more volatile, <1 = less volatile, negative = inverse.",
+    "aliases": ["beta coefficient"]
+  },
+  {
+    "term": "Alpha",
+    "fullName": "Alpha",
+    "category": "riskManagement",
+    "shortDef": "Excess return of an investment relative to a benchmark index. Positive alpha = outperformance, negative alpha = underperformance.",
+    "aliases": ["jensen's alpha"]
+  },
+  {
+    "term": "Correlation",
+    "fullName": "Correlation",
+    "category": "riskManagement",
+    "shortDef": "Statistical measure (-1 to +1) of how two assets move relative to each other. +1 = same direction, -1 = opposite, 0 = no relationship.",
+    "aliases": ["price correlation"]
+  },
+  {
+    "term": "Diversification",
+    "fullName": "Diversification",
+    "category": "riskManagement",
+    "shortDef": "Spreading investments across different assets, sectors, or geographies to reduce risk. Uncorrelated assets provide the best diversification.",
+    "aliases": ["portfolio diversification"]
+  },
+  {
+    "term": "Hedge",
+    "fullName": "Hedge",
+    "category": "riskManagement",
+    "shortDef": "Investment made to reduce risk of adverse price movements. Common hedges: buying puts, shorting correlated assets, or using inverse ETFs.",
+    "aliases": ["hedging", "hedged position"]
+  },
+  {
+    "term": "Support",
+    "fullName": "Support Level",
+    "category": "marketStructure",
+    "shortDef": "Price level where buying interest is strong enough to prevent further decline. Acts as a floor. Broken support often becomes resistance.",
+    "aliases": ["support level", "support zone"]
+  },
+  {
+    "term": "Resistance",
+    "fullName": "Resistance Level",
+    "category": "marketStructure",
+    "shortDef": "Price level where selling pressure is strong enough to prevent further advance. Acts as a ceiling. Broken resistance often becomes support.",
+    "aliases": ["resistance level", "resistance zone"]
+  },
+  {
+    "term": "Trend Line",
+    "fullName": "Trend Line",
+    "category": "marketStructure",
+    "shortDef": "Line connecting higher lows (uptrend) or lower highs (downtrend). Used to identify trend direction and potential support/resistance.",
+    "aliases": ["trendline", "trend lines"]
+  },
+  {
+    "term": "Breakout",
+    "fullName": "Breakout",
+    "category": "marketStructure",
+    "shortDef": "Price moving above a resistance level or pattern boundary with increased volume. Signals potential start of a new trend or continuation.",
+    "aliases": ["price breakout", "breaking out"]
+  },
+  {
+    "term": "Breakdown",
+    "fullName": "Breakdown",
+    "category": "marketStructure",
+    "shortDef": "Price falling below a support level or pattern boundary with increased volume. Bearish signal indicating potential for further decline.",
+    "aliases": ["price breakdown", "breaking down"]
+  },
+  {
+    "term": "Consolidation",
+    "fullName": "Consolidation",
+    "category": "marketStructure",
+    "shortDef": "Period of sideways price movement within a range. Price compresses between support and resistance before eventually breaking out or breaking down.",
+    "aliases": ["consolidating", "range-bound"]
+  },
+  {
+    "term": "Accumulation",
+    "fullName": "Accumulation",
+    "category": "marketStructure",
+    "shortDef": "Phase where informed investors gradually buy shares, typically after a decline. Price stabilizes on above-average volume before an uptrend begins.",
+    "aliases": ["accumulation phase", "accumulation zone"]
+  },
+  {
+    "term": "Distribution",
+    "fullName": "Distribution",
+    "category": "marketStructure",
+    "shortDef": "Phase where informed investors gradually sell shares, typically after an advance. Price stalls on above-average volume before a downtrend begins.",
+    "aliases": ["distribution phase", "distribution zone"]
+  },
+  {
+    "term": "Volume",
+    "fullName": "Trading Volume",
+    "category": "marketStructure",
+    "shortDef": "Number of shares or contracts traded in a given period. High volume confirms price moves; low volume suggests weak conviction.",
+    "aliases": ["trading volume", "vol"]
+  },
+  {
+    "term": "Liquidity",
+    "fullName": "Market Liquidity",
+    "category": "marketStructure",
+    "shortDef": "How easily an asset can be bought or sold without significantly affecting its price. High liquidity = tight spreads, fast execution.",
+    "aliases": ["market liquidity", "liquid"]
+  },
+  {
+    "term": "Bid-Ask Spread",
+    "fullName": "Bid-Ask Spread",
+    "category": "marketStructure",
+    "shortDef": "Difference between the highest price a buyer will pay (bid) and lowest a seller will accept (ask). Tighter spread = more liquid market.",
+    "aliases": ["bid ask spread", "spread"]
+  },
+  {
+    "term": "Bid",
+    "fullName": "Bid Price",
+    "category": "marketStructure",
+    "shortDef": "Highest price a buyer is willing to pay for an asset. Sell market orders fill at the bid price.",
+    "aliases": ["bid price"]
+  },
+  {
+    "term": "Ask",
+    "fullName": "Ask Price",
+    "category": "marketStructure",
+    "shortDef": "Lowest price a seller is willing to accept for an asset. Buy market orders fill at the ask price. Also called the offer.",
+    "aliases": ["ask price", "offer price", "offer"]
+  },
+  {
+    "term": "Market Maker",
+    "fullName": "Market Maker",
+    "category": "marketStructure",
+    "shortDef": "Firm that provides liquidity by continuously quoting both bid and ask prices. Profits from the spread while ensuring smooth trading.",
+    "aliases": ["market makers", "MM"]
+  },
+  {
+    "term": "Dark Pool",
+    "fullName": "Dark Pool",
+    "category": "marketStructure",
+    "shortDef": "Private exchange where large institutional trades are executed anonymously to avoid impacting market prices. Not visible on public order books.",
+    "aliases": ["dark pools", "dark pool trading"]
+  },
+  {
+    "term": "Level 2",
+    "fullName": "Level 2 Market Data",
+    "category": "marketStructure",
+    "shortDef": "Shows the full order book with all bid and ask prices and sizes beyond just the best bid/ask. Reveals depth of supply and demand at each price.",
+    "aliases": ["level 2 data", "level II", "L2"]
+  },
+  {
+    "term": "Order Book",
+    "fullName": "Order Book",
+    "category": "marketStructure",
+    "shortDef": "Electronic list of all open buy and sell orders for a security, organized by price level. Shows market depth and supply/demand balance.",
+    "aliases": ["order book depth", "depth of market", "DOM"]
+  },
+  {
+    "term": "Gap",
+    "fullName": "Price Gap",
+    "category": "marketStructure",
+    "shortDef": "Space on a chart where no trading occurred between sessions. Gap up = opens above prior close, gap down = opens below. Gaps often get filled.",
+    "aliases": ["gap up", "gap down", "price gap", "gapping"]
+  },
+  {
+    "term": "Opening Bell",
+    "fullName": "Opening Bell",
+    "category": "marketStructure",
+    "shortDef": "Signal marking the start of the regular trading session at 9:30 AM ET. The first 30-60 minutes typically see the highest volume and volatility.",
+    "aliases": ["market open", "opening bell"]
+  },
+  {
+    "term": "Bull Market",
+    "fullName": "Bull Market",
+    "category": "general",
+    "shortDef": "Extended period of rising prices, typically defined as a 20%+ gain from a low. Characterized by optimism, investor confidence, and economic growth.",
+    "aliases": ["bull", "bullish", "bull run"]
+  },
+  {
+    "term": "Bear Market",
+    "fullName": "Bear Market",
+    "category": "general",
+    "shortDef": "Extended period of falling prices, typically defined as a 20%+ decline from a high. Characterized by pessimism and widespread selling.",
+    "aliases": ["bear", "bearish", "bear run"]
+  },
+  {
+    "term": "Long Position",
+    "fullName": "Long Position",
+    "category": "general",
+    "shortDef": "Buying an asset with the expectation that its price will rise. Profit = selling price minus purchase price. The most basic trading position.",
+    "aliases": ["long", "going long", "long trade"]
+  },
+  {
+    "term": "Short Position",
+    "fullName": "Short Position",
+    "category": "general",
+    "shortDef": "Selling borrowed shares with the expectation of buying them back at a lower price. Profit = selling price minus buyback price. Carries unlimited risk.",
+    "aliases": ["short", "shorting", "short selling", "short trade"]
+  },
+  {
+    "term": "Margin",
+    "fullName": "Margin",
+    "category": "general",
+    "shortDef": "Borrowed money from a broker to purchase securities. Margin trading amplifies both gains and losses. Maintenance margin must be maintained to avoid margin calls.",
+    "aliases": ["margin trading", "buying on margin"]
+  },
+  {
+    "term": "Leverage",
+    "fullName": "Leverage",
+    "category": "general",
+    "shortDef": "Using borrowed capital to increase potential returns. 2x leverage = 2x gains but also 2x losses. Common in futures, forex, and margin accounts.",
+    "aliases": ["leveraged", "financial leverage"]
+  },
+  {
+    "term": "Equity",
+    "fullName": "Equity",
+    "category": "general",
+    "shortDef": "Ownership value in an asset. In trading, refers to stocks/shares. In accounts, means total value minus what's owed (margin debt).",
+    "aliases": ["equities", "equity value"]
+  },
+  {
+    "term": "Index",
+    "fullName": "Market Index",
+    "category": "general",
+    "shortDef": "Statistical measure tracking the performance of a group of stocks. S&P 500, DJIA, and NASDAQ Composite are the most followed US indices.",
+    "aliases": ["market index", "indices", "stock index"]
+  },
+  {
+    "term": "ETF",
+    "fullName": "Exchange-Traded Fund",
+    "category": "general",
+    "shortDef": "Fund that trades on an exchange like a stock, tracking an index, sector, or strategy. Offers diversification with the liquidity of individual stocks.",
+    "aliases": ["exchange-traded fund", "exchange traded fund", "ETFs"]
+  },
+  {
+    "term": "Sector Rotation",
+    "fullName": "Sector Rotation",
+    "category": "general",
+    "shortDef": "Strategy of moving investments between market sectors based on the economic cycle. Different sectors outperform during expansion, peak, recession, and recovery.",
+    "aliases": ["sector rotation strategy"]
+  },
+  {
+    "term": "Relative Strength",
+    "fullName": "Relative Strength",
+    "category": "general",
+    "shortDef": "Comparison of a stock's performance to a benchmark or another stock. Outperformers show rising relative strength. Different from RSI.",
+    "aliases": ["comparative strength"]
+  },
+  {
+    "term": "Mean Reversion",
+    "fullName": "Mean Reversion",
+    "category": "general",
+    "shortDef": "Theory that prices tend to return to their historical average over time. Overbought/oversold conditions revert to the mean. Basis for many trading strategies.",
+    "aliases": ["reversion to the mean", "mean-reversion"]
+  },
+  {
+    "term": "Swing Trade",
+    "fullName": "Swing Trading",
+    "category": "general",
+    "shortDef": "Trading style holding positions for days to weeks, capturing short-to-medium-term price moves. Uses technical analysis for entry/exit timing.",
+    "aliases": ["swing trading", "swing trader"]
+  },
+  {
+    "term": "Day Trade",
+    "fullName": "Day Trading",
+    "category": "general",
+    "shortDef": "Buying and selling within the same trading day, closing all positions before market close. Requires $25K minimum (PDT rule) for US stocks.",
+    "aliases": ["day trading", "day trader", "intraday trading"]
+  },
+  {
+    "term": "Scalping",
+    "fullName": "Scalping",
+    "category": "general",
+    "shortDef": "Ultra-short-term trading strategy capturing small price movements over seconds to minutes. Requires fast execution, tight spreads, and high volume.",
+    "aliases": ["scalp", "scalp trade", "scalper"]
+  },
+  {
+    "term": "Position Trade",
+    "fullName": "Position Trading",
+    "category": "general",
+    "shortDef": "Long-term trading style holding positions for weeks to months, based on major trends and fundamental analysis. Lowest time commitment trading style.",
+    "aliases": ["position trading", "position trader"]
+  },
+  {
+    "term": "Candlestick",
+    "fullName": "Candlestick Chart",
+    "category": "general",
+    "shortDef": "Chart type showing open, high, low, and close prices as a candle shape. Body shows open-to-close range; wicks show high and low extremes.",
+    "aliases": ["candlestick chart", "candle", "candles", "candlesticks"]
+  },
+  {
+    "term": "Backtesting",
+    "fullName": "Backtesting",
+    "category": "general",
+    "shortDef": "Testing a trading strategy against historical data to evaluate performance. Good backtests show consistent results but past performance doesn't guarantee future results.",
+    "aliases": ["backtest", "back-testing"]
+  },
+  {
+    "term": "Paper Trading",
+    "fullName": "Paper Trading",
+    "category": "general",
+    "shortDef": "Simulated trading with virtual money to practice strategies without financial risk. Essential for beginners to test before using real capital.",
+    "aliases": ["paper trade", "sim trading", "simulated trading"]
+  },
+  {
+    "term": "Slippage",
+    "fullName": "Slippage",
+    "category": "general",
+    "shortDef": "Difference between expected trade price and actual execution price. Common during high volatility or low liquidity. Market orders are most susceptible.",
+    "aliases": ["price slippage"]
+  },
+  {
+    "term": "Premarket",
+    "fullName": "Premarket Trading",
+    "category": "marketStructure",
+    "shortDef": "Trading session before the regular market open (4:00-9:30 AM ET). Lower liquidity and wider spreads. Often driven by overnight news and earnings.",
+    "aliases": ["pre-market", "premarket trading", "pre-market hours"]
+  },
+  {
+    "term": "After Hours",
+    "fullName": "After Hours Trading",
+    "category": "marketStructure",
+    "shortDef": "Trading session after the regular market close (4:00-8:00 PM ET). Lower volume and liquidity than regular hours. Earnings reactions often occur here.",
+    "aliases": ["after-hours", "after hours trading", "extended hours"]
+  },
+  {
+    "term": "Margin Call",
+    "fullName": "Margin Call",
+    "category": "riskManagement",
+    "shortDef": "Broker's demand for additional funds when account equity falls below maintenance margin requirements. Failure to meet it results in forced liquidation.",
+    "aliases": ["margin call"]
+  },
+  {
+    "term": "Short Squeeze",
+    "fullName": "Short Squeeze",
+    "category": "marketStructure",
+    "shortDef": "Rapid price increase caused by short sellers being forced to buy shares to cover losses, creating a feedback loop of buying pressure.",
+    "aliases": ["short squeeze", "squeeze"]
+  },
+  {
+    "term": "Dead Cat Bounce",
+    "fullName": "Dead Cat Bounce",
+    "category": "pattern",
+    "shortDef": "Temporary, short-lived recovery in price during a prolonged decline. Not a true reversal - the downtrend typically resumes after the bounce.",
+    "aliases": ["dead cat bounce"]
+  },
+  {
+    "term": "Golden Cross",
+    "fullName": "Golden Cross",
+    "category": "indicator",
+    "shortDef": "Bullish signal when a shorter-term moving average (e.g., 50-day) crosses above a longer-term one (e.g., 200-day). Suggests uptrend beginning.",
+    "aliases": ["golden cross"]
+  },
+  {
+    "term": "Death Cross",
+    "fullName": "Death Cross",
+    "category": "indicator",
+    "shortDef": "Bearish signal when a shorter-term moving average (e.g., 50-day) crosses below a longer-term one (e.g., 200-day). Suggests downtrend beginning.",
+    "aliases": ["death cross"]
+  },
+  {
+    "term": "Relative Volume",
+    "fullName": "Relative Volume",
+    "category": "indicator",
+    "shortDef": "Current volume compared to the average volume for the same time of day. RVOL > 2 indicates unusually high interest. Key for day traders.",
+    "aliases": ["RVOL", "relative volume"]
+  },
+  {
+    "term": "Earnings Report",
+    "fullName": "Earnings Report",
+    "category": "fundamental",
+    "shortDef": "Quarterly financial statement showing revenue, expenses, and net income. Earnings beats/misses drive significant post-announcement price moves.",
+    "aliases": ["earnings", "quarterly earnings", "earnings release"]
+  },
+  {
+    "term": "Insider Trading",
+    "fullName": "Insider Trading",
+    "category": "fundamental",
+    "shortDef": "Legal: Corporate insiders buying/selling their own company's stock (must be disclosed). Illegal: Trading on material non-public information.",
+    "aliases": ["insider buying", "insider selling"]
+  },
+  {
+    "term": "Dollar Cost Averaging",
+    "fullName": "Dollar Cost Averaging",
+    "category": "riskManagement",
+    "shortDef": "Investing a fixed dollar amount at regular intervals regardless of price. Reduces impact of volatility by buying more shares when prices are low.",
+    "aliases": ["DCA", "dollar-cost averaging"]
+  },
+  {
+    "term": "Portfolio Rebalancing",
+    "fullName": "Portfolio Rebalancing",
+    "category": "riskManagement",
+    "shortDef": "Periodically adjusting portfolio weights back to target allocations. Sells overweight assets and buys underweight ones to maintain desired risk profile.",
+    "aliases": ["rebalancing", "rebalance"]
+  },
+  {
+    "term": "Fibonacci Extension",
+    "fullName": "Fibonacci Extension",
+    "category": "indicator",
+    "shortDef": "Projects potential price targets beyond a retracement using Fibonacci ratios (127.2%, 161.8%, 261.8%). Used to set take-profit levels.",
+    "aliases": ["fib extension", "fibonacci extensions"]
+  },
+  {
+    "term": "Options Chain",
+    "fullName": "Options Chain",
+    "category": "options",
+    "shortDef": "Table displaying all available options contracts for a security, organized by strike price and expiration date. Shows bids, asks, volume, and greeks.",
+    "aliases": ["option chain", "options table"]
+  },
+  {
+    "term": "Open Interest",
+    "fullName": "Open Interest",
+    "category": "options",
+    "shortDef": "Total number of outstanding options or futures contracts that have not been settled. Rising open interest confirms trend strength.",
+    "aliases": ["OI", "open interest"]
+  },
+  {
+    "term": "Wash Sale",
+    "fullName": "Wash Sale Rule",
+    "category": "riskManagement",
+    "shortDef": "IRS rule prohibiting claiming a tax loss if you repurchase the same or substantially identical security within 30 days before or after the sale.",
+    "aliases": ["wash sale rule", "wash sale"]
+  },
+  {
+    "term": "Pattern Day Trader",
+    "fullName": "Pattern Day Trader",
+    "category": "general",
+    "shortDef": "Designation for traders executing 4+ day trades within 5 business days in a margin account. Requires maintaining $25,000 minimum equity (PDT rule).",
+    "aliases": ["PDT", "PDT rule", "pattern day trader rule"]
+  },
+  {
+    "term": "Catalyst",
+    "fullName": "Catalyst",
+    "category": "general",
+    "shortDef": "Event or news that triggers a significant price move. Examples: earnings reports, FDA approvals, mergers, analyst upgrades/downgrades.",
+    "aliases": ["stock catalyst", "price catalyst"]
+  },
+  {
+    "term": "Bag Holder",
+    "fullName": "Bag Holder",
+    "category": "general",
+    "shortDef": "Investor holding a position that has significantly declined in value. Often results from holding through a crash or pump-and-dump.",
+    "aliases": ["bagholding", "bagholder"]
+  },
+  {
+    "term": "FOMO",
+    "fullName": "Fear of Missing Out",
+    "category": "general",
+    "shortDef": "Emotional impulse to enter a trade because of rapid price movement or hype, often leading to buying at the top. A common trading psychology pitfall.",
+    "aliases": ["fear of missing out"]
+  },
+  {
+    "term": "FUD",
+    "fullName": "Fear, Uncertainty, and Doubt",
+    "category": "general",
+    "shortDef": "Negative sentiment or misinformation spread to cause panic selling. Recognizing FUD vs. legitimate concerns is key to avoiding emotional decisions.",
+    "aliases": ["fear uncertainty and doubt"]
+  }
+]

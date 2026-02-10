@@ -4,6 +4,8 @@ import { useRef, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import { formatLine, applyTickerLinks } from "./format-utils"
 import { useChart } from "@/providers/chart-provider"
+import { useLearningMode } from "@/providers/learning-mode-provider"
+import { applyLearningHighlights } from "@/lib/glossary/term-matcher"
 
 interface TextSegmentProps {
   content: string
@@ -17,10 +19,22 @@ interface TextSegmentProps {
 export function TextSegment({ content, index, isStreaming, isLargeContent, tickers, economicTerms }: TextSegmentProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const { showChart, showCalendar } = useChart()
+  const { enabled: learningEnabled, selectTerm } = useLearningMode()
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
       const target = e.target as HTMLElement
+
+      // Handle learning term clicks
+      const learningTerm = target.getAttribute("data-learning-term")
+      if (learningTerm) {
+        e.preventDefault()
+        const fullName = target.getAttribute("data-term-full") || ""
+        const shortDef = target.getAttribute("data-term-def") || ""
+        selectTerm({ term: learningTerm, fullName, shortDef, category: "" })
+        return
+      }
+
       if (!target.classList.contains("ticker-link")) return
 
       e.preventDefault()
@@ -34,17 +48,19 @@ export function TextSegment({ content, index, isStreaming, isLargeContent, ticke
         showChart(ticker)
       }
     },
-    [showChart, showCalendar]
+    [showChart, showCalendar, selectTerm]
   )
 
   const hasLinks = (tickers && tickers.length > 0) || (economicTerms && economicTerms.length > 0)
 
+  const hasClickables = hasLinks || learningEnabled
+
   useEffect(() => {
     const el = containerRef.current
-    if (!el || !hasLinks) return
+    if (!el || !hasClickables) return
     el.addEventListener("click", handleClick)
     return () => el.removeEventListener("click", handleClick)
-  }, [handleClick, hasLinks])
+  }, [handleClick, hasClickables])
 
   // Performance: skip expensive formatting during streaming for large content
   if (isStreaming && isLargeContent) {
@@ -71,6 +87,11 @@ export function TextSegment({ content, index, isStreaming, isLargeContent, ticke
   // Apply ticker + economic term highlighting for non-streaming assistant messages
   if (hasLinks && !isStreaming) {
     safeLines = applyTickerLinks(safeLines, tickers ?? [], economicTerms)
+  }
+
+  // Apply learning mode highlights
+  if (learningEnabled && !isStreaming) {
+    safeLines = applyLearningHighlights(safeLines)
   }
 
   return (

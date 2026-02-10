@@ -191,11 +191,11 @@ export function applyTickerLinks(
     }
   }
 
-  // Re-sanitize with data-ticker and data-economic-term allowed
+  // Re-sanitize with data-ticker, data-economic-term, and learning-mode attrs allowed
   return DOMPurify.sanitize(result, {
     ALLOWED_TAGS: ["strong", "em", "a", "span", "br", "h1", "h2", "h3", "h4", "h5", "h6"],
     ALLOWED_ATTR: ["class", "href", "target", "rel"],
-    ADD_ATTR: ["data-ticker", "data-economic-term"],
+    ADD_ATTR: ["data-ticker", "data-economic-term", "data-learning-term", "data-term-full", "data-term-def"],
     ALLOWED_URI_REGEXP: /^https?:\/\//i,
   })
 }
