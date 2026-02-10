@@ -118,9 +118,51 @@ export function TradingContextPanel({
   const activeMode = learnTabActive ? "learn" : mode === "chart" && selectedTicker ? "chart" : mode === "calendar" ? "calendar" : "overview"
 
   // Chart, calendar, and learn modes get a full-height card
-  if (activeMode === "chart" || activeMode === "calendar") {
+  if (activeMode === "chart" || activeMode === "calendar" || activeMode === "learn") {
     return (
-      <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden h-full">
+      <Card className="border-l-0 rounded-l-none bg-[var(--surface-1)]/40 backdrop-blur border-white/5 overflow-hidden h-full flex flex-col">
+        {activeMode === "learn" && (
+          <div className="flex items-center border-b border-white/5 shrink-0">
+            <div className="flex flex-1">
+              {tabs.map((tab) => {
+                const isActive = tab.key === "learn"
+                  ? true
+                  : false
+
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => {
+                      if (tab.key === "learn") {
+                        onLearnTabClick?.()
+                      } else {
+                        if (tab.key === "calendar") showCalendar()
+                        else if (tab.key === "market") closeChart()
+                        if (learnTabActive && onLearnTabClick) onLearnTabClick()
+                      }
+                    }}
+                    className={cn(
+                      "flex-1 py-2.5 text-xs font-medium transition-colors border-b-2 relative",
+                      isActive
+                        ? tab.key === "learn"
+                          ? "text-purple-500 border-purple-500"
+                          : "text-teal-500 border-teal-500"
+                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-white/10"
+                    )}
+                  >
+                    <span className="flex items-center justify-center gap-1">
+                      {tab.key === "learn" && <BookOpen className="h-3 w-3" />}
+                      {tab.label}
+                      {tab.key === "learn" && selectedTerm && !learnTabActive && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                      )}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeMode}
@@ -128,9 +170,14 @@ export function TradingContextPanel({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="h-full"
+            className="h-full min-h-0 flex-1"
           >
-            {activeMode === "chart" && selectedTicker ? (
+            {activeMode === "learn" ? (
+              <EducationChat
+                selectedTerm={selectedTerm ?? null}
+                onClear={onClearTerm ?? (() => {})}
+              />
+            ) : activeMode === "chart" && selectedTicker ? (
               <TradingViewChart symbol={selectedTicker} onClose={closeChart} />
             ) : (
               <EconomicCalendar onClose={closeChart} />
