@@ -178,7 +178,7 @@ export function MessageBubble({
                         variant="ghost"
                         size="sm"
                         onClick={handleStartEdit}
-                        className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground opacity-0 group-hover/ts:opacity-100 transition-opacity"
+                        className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                         title="Edit message"
                       >
                         <Pencil className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />
