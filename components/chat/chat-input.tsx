@@ -212,6 +212,12 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
           {pendingDraft && <DraftIndicator pendingDraft={pendingDraft} />}
         </div>
+
+        <div className="hidden sm:flex items-center justify-between px-3 pb-1 pt-0.5">
+          <span className="text-[11px] text-muted-foreground/50">
+            <kbd className="px-1 py-0.5 rounded bg-muted/30 text-[10px] font-mono">Enter</kbd> to send · <kbd className="px-1 py-0.5 rounded bg-muted/30 text-[10px] font-mono">Shift+Enter</kbd> for new line
+          </span>
+        </div>
       </div>
     )
   },

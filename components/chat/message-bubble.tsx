@@ -15,6 +15,17 @@ import { MessageContent } from "./message/message-content"
 import { AttachmentDisplay } from "./message/attachment-display"
 import { extractTradingMetadata } from "@/lib/trading-metadata"
 
+function formatMessageTime(date: Date): string {
+  const now = new Date()
+  const isToday = date.toDateString() === now.toDateString()
+  const time = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+  if (isToday) return time
+  const yesterday = new Date(now)
+  yesterday.setDate(yesterday.getDate() - 1)
+  if (date.toDateString() === yesterday.toDateString()) return `Yesterday ${time}`
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ` ${time}`
+}
+
 interface MessageBubbleProps {
   message: Message
   isStreaming?: boolean
@@ -88,14 +99,17 @@ export function MessageBubble({
     return (
       <motion.div
         {...animationVariant}
-        className="w-full py-4"
+        className="w-full py-4 group/ts"
         role="article"
         aria-label="Your message"
         data-message-id={message.id}
         data-message-role="user"
       >
         <div className="max-w-3xl mx-auto px-4 sm:px-8">
-          <div className="flex gap-4 sm:gap-6 items-start justify-end">
+          <div className="flex gap-4 sm:gap-6 items-start justify-end relative">
+            <span className="absolute -top-4 right-0 text-[10px] text-muted-foreground/60 opacity-0 group-hover/ts:opacity-100 transition-opacity duration-150 pointer-events-none">
+              {formatMessageTime(message.timestamp)}
+            </span>
             <div className="max-w-[85%] sm:max-w-[70%] md:max-w-[60%] overflow-hidden">
               <div className="rounded-2xl bg-white/[0.06] px-4 py-3">
                 <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
@@ -126,14 +140,17 @@ export function MessageBubble({
   return (
     <motion.div
       {...animationVariant}
-      className="w-full py-4"
+      className="w-full py-4 group/ts"
       role="article"
       aria-label="Assistant message"
       data-message-id={message.id}
       data-message-role="assistant"
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-8">
-        <div className="flex gap-3 sm:gap-6 items-start">
+        <div className="flex gap-3 sm:gap-6 items-start relative">
+          <span className="absolute -top-4 left-0 text-[10px] text-muted-foreground/60 opacity-0 group-hover/ts:opacity-100 transition-opacity duration-150 pointer-events-none">
+            {formatMessageTime(message.timestamp)}
+          </span>
           <div className="flex-shrink-0">
             <Image
               src="/pelican-logo-transparent.webp"

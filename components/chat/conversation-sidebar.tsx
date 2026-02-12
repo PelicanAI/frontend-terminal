@@ -239,11 +239,14 @@ export function ConversationSidebar({
     const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000)
     const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
 
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
+
     const groups = {
       today: [] as Conversation[],
       yesterday: [] as Conversation[],
       previous7Days: [] as Conversation[],
-      earlier: [] as Conversation[],
+      previous30Days: [] as Conversation[],
+      older: [] as Conversation[],
     }
 
     filteredConversations.forEach((conv) => {
@@ -254,8 +257,10 @@ export function ConversationSidebar({
         groups.yesterday.push(conv)
       } else if (convDate >= sevenDaysAgo) {
         groups.previous7Days.push(conv)
+      } else if (convDate >= thirtyDaysAgo) {
+        groups.previous30Days.push(conv)
       } else {
-        groups.earlier.push(conv)
+        groups.older.push(conv)
       }
     })
 
@@ -481,14 +486,42 @@ export function ConversationSidebar({
                 </div>
               )}
 
-              {/* Earlier */}
-              {groupedConversations.earlier.length > 0 && (
+              {/* Previous 30 Days */}
+              {groupedConversations.previous30Days.length > 0 && (
                 <div>
                   <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Earlier
+                    Previous 30 Days
                   </h4>
                   <div className="space-y-1">
-                    {groupedConversations.earlier.map((conv) => (
+                    {groupedConversations.previous30Days.map((conv) => (
+                      <ConversationItem
+                        key={conv.id}
+                        conversation={conv}
+                        isActive={currentConversationId === conv.id}
+                        isEditing={editingId === conv.id}
+                        isNavigatingToThis={isNavigating && navigatingToId === conv.id}
+                        editTitle={editTitle}
+                        onSelect={handleSelect}
+                        onStartEdit={handleStartEdit}
+                        onCancelEdit={handleCancelEdit}
+                        onConfirmEdit={handleRenameConversation}
+                        onEditTitleChange={handleEditTitleChange}
+                        onDelete={handleDelete}
+                        newChatLabel={t.common.newChat}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Older */}
+              {groupedConversations.older.length > 0 && (
+                <div>
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    Older
+                  </h4>
+                  <div className="space-y-1">
+                    {groupedConversations.older.map((conv) => (
                       <ConversationItem
                         key={conv.id}
                         conversation={conv}
