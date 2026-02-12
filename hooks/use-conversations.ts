@@ -259,6 +259,17 @@ export function useConversations(): UseConversationsReturn {
   }, [user?.id, loadFromDatabase])
 
   // --------------------------------------------------------------------------
+  // Instant refresh on conversation creation (supplements Realtime)
+  // --------------------------------------------------------------------------
+  useEffect(() => {
+    const handler = () => {
+      if (user?.id) loadFromDatabase(user.id)
+    }
+    window.addEventListener('pelican:conversation-created', handler)
+    return () => window.removeEventListener('pelican:conversation-created', handler)
+  }, [user?.id, loadFromDatabase])
+
+  // --------------------------------------------------------------------------
   // Load more (pagination)
   // --------------------------------------------------------------------------
   const loadMore = useCallback(async () => {

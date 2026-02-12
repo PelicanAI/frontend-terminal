@@ -300,6 +300,8 @@ export default function ChatPage() {
     onConversationCreated: (conversationId: string) => {
       latestConversationIdRef.current = conversationId
       conversationRouter.setCurrentConversationId(conversationId)
+      // Signal sidebar to refresh immediately (don't rely solely on Realtime latency)
+      window.dispatchEvent(new CustomEvent('pelican:conversation-created'))
     },
     onTrialExhausted: (info) => {
       setTrialExhaustedMessage(
