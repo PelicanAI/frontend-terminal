@@ -15,6 +15,7 @@ import { useFileUpload } from "@/hooks/use-file-upload"
 import { useConversationRouter } from "@/hooks/use-conversation-router"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { createClient } from "@/lib/supabase/client"
+import { uploadChatImage } from "@/lib/upload-image"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
@@ -264,8 +265,40 @@ export default function ChatPage() {
       // Message sent successfully, hide offline banner if it was showing
       setShowOfflineBanner(false)
       messageHandler.handleMessageFinish()
+
+      // Persist image metadata to the user message in Supabase
+      const imagesMeta = pendingImageMetaRef.current
+      const activeConvId = latestConversationIdRef.current
+      if (imagesMeta.length > 0 && activeConvId) {
+        pendingImageMetaRef.current = []
+        try {
+          const supabase = createClient()
+          // Find the most recent user message in this conversation
+          const { data: recentMsg } = await supabase
+            .from('messages')
+            .select('id, metadata')
+            .eq('conversation_id', activeConvId)
+            .eq('role', 'user')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+
+          if (recentMsg) {
+            const existingMeta = (recentMsg.metadata as Record<string, unknown>) || {}
+            await supabase
+              .from('messages')
+              .update({
+                metadata: { ...existingMeta, images: imagesMeta },
+              })
+              .eq('id', recentMsg.id)
+          }
+        } catch (e) {
+          console.error('[Chat] Failed to persist image metadata:', e)
+        }
+      }
     },
     onConversationCreated: (conversationId: string) => {
+      latestConversationIdRef.current = conversationId
       conversationRouter.setCurrentConversationId(conversationId)
     },
     onTrialExhausted: (info) => {
@@ -343,20 +376,63 @@ export default function ChatPage() {
     messageHandler.handleSendMessage(message)
   }
 
+  // Track image metadata for persistence after message send
+  const pendingImageMetaRef = useRef<Array<{ storagePath: string; name: string; size: number }>>([])
+  // Track latest conversation ID (updated by onConversationCreated before onFinish fires)
+  const latestConversationIdRef = useRef<string | null>(conversationIdFromUrl)
+  latestConversationIdRef.current = conversationIdFromUrl
+  // Capture original File objects as they're uploaded (so we can re-upload images to chat-images)
+  const imageFilesRef = useRef<Map<string, File>>(new Map())
+
+  // Wrap the file upload to capture image File objects
+  const handleFileUploadWithCapture = useCallback((files: File[]) => {
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        imageFilesRef.current.set(`${file.name}:${file.type}`, file)
+      }
+    }
+    fileUpload.handleMultipleFileUpload(files)
+  }, [fileUpload])
+
   const handleSendMessageWithFiles = useCallback(async (message: string) => {
     // Get uploaded file IDs and attachments
     const fileIds = fileUpload.getUploadedFileIds()
     const attachments = fileUpload.getUploadedAttachments()
-    
+
+    // Upload any image attachments to chat-images bucket for persistence
+    const imagesMeta: Array<{ storagePath: string; name: string; size: number }> = []
+    if (user && attachments.length > 0) {
+      for (const att of attachments) {
+        if (att.type?.startsWith('image/')) {
+          const key = `${att.name}:${att.type}`
+          const originalFile = imageFilesRef.current.get(key)
+          if (originalFile) {
+            const result = await uploadChatImage(originalFile, user.id)
+            if (result) {
+              imagesMeta.push({
+                storagePath: result.storagePath,
+                name: originalFile.name,
+                size: originalFile.size,
+              })
+            }
+            imageFilesRef.current.delete(key)
+          }
+        }
+      }
+    }
+
+    // Store pending image metadata for post-send DB update
+    pendingImageMetaRef.current = imagesMeta
+
     // Send message with files
-    await messageHandler.handleSendMessage(message, { 
+    await messageHandler.handleSendMessage(message, {
       fileIds: fileIds.length > 0 ? fileIds : undefined,
       attachments: attachments.length > 0 ? attachments : undefined
     })
-    
+
     // Clear uploaded files after sending
     fileUpload.clearUploadedFiles()
-  }, [fileUpload, messageHandler])
+  }, [fileUpload, messageHandler, user])
 
   const handleConversationSelect = (id: string) => {
     conversationRouter.handleConversationSelect(id)
@@ -520,7 +596,7 @@ export default function ChatPage() {
                 onStopGeneration={handleStopGeneration}
                 onRegenerateMessage={regenerateLastMessage}
                 onQuickStart={outOfCredits ? undefined : handleQuickStart}
-                onFileUpload={fileUpload.handleMultipleFileUpload}
+                onFileUpload={handleFileUploadWithCapture}
                 onSettingsClick={handleSettingsClick}
                 outOfCredits={outOfCredits}
               />
@@ -548,7 +624,7 @@ export default function ChatPage() {
                 ref={chatInputRef}
                 onSendMessage={handleSendMessageWithFiles}
                 onStopResponse={handleStopGeneration}
-                onFileUpload={fileUpload.handleMultipleFileUpload}
+                onFileUpload={handleFileUploadWithCapture}
                 disabled={isLoadingMessages || outOfCredits}
                 disabledSend={outOfCredits || ((chatLoading || isLoadingMessages) && !messageHandler.isQueueingMessage)}
                 canSend={!outOfCredits && ((!chatLoading && !isLoadingMessages) || messageHandler.isQueueingMessage)}

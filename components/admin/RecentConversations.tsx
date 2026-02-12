@@ -1,21 +1,29 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { MessageSquare, ChevronDown, ChevronUp, Loader2, Search, Eye } from 'lucide-react'
+  MessageSquare,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  Search,
+  Copy,
+  Check,
+  Clock,
+} from 'lucide-react'
+
+// =============================================================================
+// TYPES
+// =============================================================================
 
 interface ConversationRow {
   id: string
   title: string | null
   userName: string | null
   createdAt: string
+  messageCount?: number | null
 }
 
 interface ConvoMessage {
@@ -24,6 +32,18 @@ interface ConvoMessage {
   content: string
   created_at: string
 }
+
+interface CachedMessages {
+  messages: ConvoMessage[]
+  total: number
+  loaded: number // how many we've loaded so far
+}
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+const MESSAGES_BATCH = 20
 
 function timeAgo(dateStr: string) {
   const now = Date.now()
@@ -41,84 +61,120 @@ function timeAgo(dateStr: string) {
 
 function formatTime(dateStr: string) {
   return new Date(dateStr).toLocaleTimeString('en-US', {
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
+    hour12: true,
   })
 }
 
-function formatDateTime(dateStr: string) {
-  return new Date(dateStr).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+function formatDuration(startStr: string, endStr: string): string {
+  const start = new Date(startStr).getTime()
+  const end = new Date(endStr).getTime()
+  const diff = Math.abs(end - start)
+  const minutes = Math.floor(diff / 60000)
+  if (minutes < 1) return '< 1 min'
+  if (minutes < 60) return `${minutes} min`
+  const hours = Math.floor(minutes / 60)
+  const rem = minutes % 60
+  return rem > 0 ? `${hours}h ${rem}m` : `${hours}h`
 }
 
-function MessageBubble({ msg }: { msg: ConvoMessage }) {
-  const [expanded, setExpanded] = useState(false)
+function formatCopyThread(messages: ConvoMessage[]): string {
+  return messages
+    .map((msg) => {
+      const role = msg.role === 'user' ? 'User' : 'Assistant'
+      const time = formatTime(msg.created_at)
+      return `${role} (${time}): ${msg.content}`
+    })
+    .join('\n\n')
+}
+
+// =============================================================================
+// MESSAGE ROW
+// =============================================================================
+
+function AdminMessageRow({ msg }: { msg: ConvoMessage }) {
+  const [hovered, setHovered] = useState(false)
+  const [copied, setCopied] = useState(false)
   const isUser = msg.role === 'user'
-  const isLong = msg.content.length > 500
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      await navigator.clipboard.writeText(msg.content)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {}
+  }
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div
-        className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-          isUser
-            ? 'bg-purple-600/20 text-purple-100'
-            : 'bg-muted text-foreground'
-        }`}
-      >
-        <p className="text-[10px] text-muted-foreground mb-1">
-          {isUser ? 'User' : 'Assistant'} &middot; {formatTime(msg.created_at)}
-        </p>
-        <p className="whitespace-pre-wrap break-words">
-          {isLong && !expanded ? msg.content.slice(0, 500) + '...' : msg.content}
-        </p>
-        {isLong && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="text-xs text-purple-400 hover:text-purple-300 mt-1"
-          >
-            {expanded ? 'Show less' : 'Show more'}
-          </button>
-        )}
+    <div
+      className="py-3 border-b border-[#1e1e2e] last:border-b-0"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div className="flex items-center justify-between mb-1.5">
+        <span
+          className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
+            isUser
+              ? 'bg-purple-600/30 text-purple-300'
+              : 'bg-zinc-700/50 text-zinc-300'
+          }`}
+        >
+          {isUser ? 'User' : 'Assistant'}
+        </span>
+        <div className="flex items-center gap-2">
+          {hovered && (
+            <button
+              onClick={handleCopy}
+              className="text-[10px] text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+            >
+              {copied ? (
+                <Check className="size-3" />
+              ) : (
+                <Copy className="size-3" />
+              )}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          )}
+          <span className="text-[11px] text-muted-foreground tabular-nums">
+            {formatTime(msg.created_at)}
+          </span>
+        </div>
       </div>
+      <p className="text-sm text-white whitespace-pre-wrap break-words">
+        {msg.content}
+      </p>
     </div>
   )
 }
 
-function ModalMessageBubble({ msg }: { msg: ConvoMessage }) {
-  const isUser = msg.role === 'user'
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
 
-  return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div
-        className={`max-w-[85%] rounded-lg px-4 py-3 text-sm ${
-          isUser
-            ? 'bg-purple-600/20 text-purple-100'
-            : 'bg-zinc-800 text-foreground'
-        }`}
-      >
-        <p className="text-[10px] text-muted-foreground mb-1">
-          {isUser ? 'User' : 'Assistant'} &middot; {formatDateTime(msg.created_at)}
-        </p>
-        <p className="whitespace-pre-wrap break-words">{msg.content}</p>
-      </div>
-    </div>
-  )
-}
-
-export function RecentConversations({ conversations: initial }: { conversations: ConversationRow[] }) {
+export function RecentConversations({
+  conversations: initial,
+}: {
+  conversations: ConversationRow[]
+}) {
   const [conversations, setConversations] = useState<ConversationRow[]>(initial)
   const [hasMore, setHasMore] = useState(initial.length >= 10)
   const [loadingMore, setLoadingMore] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [messagesCache, setMessagesCache] = useState<Record<string, ConvoMessage[]>>({})
+  const [messagesCache, setMessagesCache] = useState<
+    Record<string, CachedMessages>
+  >({})
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [loadingMoreMessages, setLoadingMoreMessages] = useState(false)
   const [emailFilter, setEmailFilter] = useState('')
+  const [contentFilter, setContentFilter] = useState('')
   const [debouncedEmail, setDebouncedEmail] = useState('')
-  const [modalConvId, setModalConvId] = useState<string | null>(null)
+  const [debouncedContent, setDebouncedContent] = useState('')
+  const [copyAllState, setCopyAllState] = useState<string | null>(null) // conversation ID that was just copied
+
+  const expandedRef = useRef<string | null>(null)
+  expandedRef.current = expandedId
 
   // Debounce email filter
   useEffect(() => {
@@ -126,9 +182,15 @@ export function RecentConversations({ conversations: initial }: { conversations:
     return () => clearTimeout(timer)
   }, [emailFilter])
 
-  // Refetch when debounced email changes
+  // Debounce content filter
   useEffect(() => {
-    if (!debouncedEmail) {
+    const timer = setTimeout(() => setDebouncedContent(contentFilter), 300)
+    return () => clearTimeout(timer)
+  }, [contentFilter])
+
+  // Refetch when debounced filters change
+  useEffect(() => {
+    if (!debouncedEmail && !debouncedContent) {
       setConversations(initial)
       setHasMore(initial.length >= 10)
       return
@@ -136,7 +198,9 @@ export function RecentConversations({ conversations: initial }: { conversations:
 
     let cancelled = false
     const fetchFiltered = async () => {
-      const params = new URLSearchParams({ limit: '10', email: debouncedEmail })
+      const params = new URLSearchParams({ limit: '10' })
+      if (debouncedEmail) params.set('email', debouncedEmail)
+      if (debouncedContent) params.set('content', debouncedContent)
       try {
         const res = await fetch(`/api/admin/conversations?${params}`)
         if (res.ok && !cancelled) {
@@ -145,12 +209,25 @@ export function RecentConversations({ conversations: initial }: { conversations:
           setHasMore(data.hasMore === true)
         }
       } catch (e) {
-        console.error('[RecentConversations] email filter fetch failed:', e)
+        console.error('[RecentConversations] filter fetch failed:', e)
       }
     }
     fetchFiltered()
-    return () => { cancelled = true }
-  }, [debouncedEmail, initial])
+    return () => {
+      cancelled = true
+    }
+  }, [debouncedEmail, debouncedContent, initial])
+
+  // Escape key handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && expandedRef.current) {
+        setExpandedId(null)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   const loadMore = useCallback(async () => {
     if (loadingMore || !hasMore || conversations.length === 0) return
@@ -159,6 +236,7 @@ export function RecentConversations({ conversations: initial }: { conversations:
       const last = conversations[conversations.length - 1]!
       const params = new URLSearchParams({ limit: '10', cursor: last.createdAt })
       if (debouncedEmail) params.set('email', debouncedEmail)
+      if (debouncedContent) params.set('content', debouncedContent)
       const res = await fetch(`/api/admin/conversations?${params}`)
       if (res.ok) {
         const data = await res.json()
@@ -171,44 +249,124 @@ export function RecentConversations({ conversations: initial }: { conversations:
     } finally {
       setLoadingMore(false)
     }
-  }, [loadingMore, hasMore, conversations, debouncedEmail])
+  }, [loadingMore, hasMore, conversations, debouncedEmail, debouncedContent])
 
-  const handleToggle = useCallback(async (id: string) => {
-    if (expandedId === id) {
-      setExpandedId(null)
-      return
-    }
+  const fetchMessages = useCallback(
+    async (conversationId: string, offset: number = 0) => {
+      const params = new URLSearchParams({
+        limit: String(MESSAGES_BATCH),
+        offset: String(offset),
+      })
+      const res = await fetch(
+        `/api/admin/conversations/${conversationId}/messages?${params}`
+      )
+      if (!res.ok) throw new Error('Failed to fetch messages')
+      const data = await res.json()
+      return { messages: data.messages ?? [], total: data.total ?? 0 }
+    },
+    []
+  )
 
-    setExpandedId(id)
-
-    // Don't refetch if cached
-    if (messagesCache[id]) return
-
-    setLoadingId(id)
-    try {
-      const res = await fetch(`/api/admin/conversations/${id}/messages`)
-      if (res.ok) {
-        const data = await res.json()
-        setMessagesCache((prev) => ({ ...prev, [id]: data.messages ?? [] }))
+  const handleToggle = useCallback(
+    async (id: string) => {
+      if (expandedId === id) {
+        setExpandedId(null)
+        return
       }
-    } catch (e) {
-      console.error('[RecentConversations] Failed to fetch messages:', e)
-    } finally {
-      setLoadingId(null)
-    }
-  }, [expandedId, messagesCache])
 
-  const modalConv = modalConvId ? conversations.find((c) => c.id === modalConvId) : null
-  const modalMessages = modalConvId ? messagesCache[modalConvId] : null
+      setExpandedId(id)
+
+      // Don't refetch if cached
+      if (messagesCache[id]) return
+
+      setLoadingId(id)
+      try {
+        const { messages, total } = await fetchMessages(id, 0)
+        setMessagesCache((prev) => ({
+          ...prev,
+          [id]: { messages, total, loaded: messages.length },
+        }))
+      } catch (e) {
+        console.error('[RecentConversations] Failed to fetch messages:', e)
+      } finally {
+        setLoadingId(null)
+      }
+    },
+    [expandedId, messagesCache, fetchMessages]
+  )
+
+  const handleLoadMoreMessages = useCallback(
+    async (conversationId: string) => {
+      const cached = messagesCache[conversationId]
+      if (!cached || loadingMoreMessages) return
+
+      setLoadingMoreMessages(true)
+      try {
+        const { messages: newMsgs } = await fetchMessages(
+          conversationId,
+          cached.loaded
+        )
+        setMessagesCache((prev) => {
+          const existing = prev[conversationId]
+          if (!existing) return prev
+          return {
+            ...prev,
+            [conversationId]: {
+              ...existing,
+              messages: [...existing.messages, ...newMsgs],
+              loaded: existing.loaded + newMsgs.length,
+            },
+          }
+        })
+      } catch (e) {
+        console.error('[RecentConversations] Failed to load more messages:', e)
+      } finally {
+        setLoadingMoreMessages(false)
+      }
+    },
+    [messagesCache, loadingMoreMessages, fetchMessages]
+  )
+
+  const handleCopyAll = useCallback(
+    async (conversationId: string) => {
+      const cached = messagesCache[conversationId]
+      if (!cached || cached.messages.length === 0) return
+
+      try {
+        // If we haven't loaded all messages, fetch them all for copy
+        let allMessages = cached.messages
+        if (cached.loaded < cached.total) {
+          const { messages } = await fetchMessages(conversationId, 0)
+          // Fetch with high limit to get all
+          const res = await fetch(
+            `/api/admin/conversations/${conversationId}/messages?limit=200&offset=0`
+          )
+          if (res.ok) {
+            const data = await res.json()
+            allMessages = data.messages ?? cached.messages
+          }
+        }
+
+        const formatted = formatCopyThread(allMessages)
+        await navigator.clipboard.writeText(formatted)
+        setCopyAllState(conversationId)
+        setTimeout(() => setCopyAllState(null), 2000)
+      } catch {
+        console.error('[RecentConversations] Copy all failed')
+      }
+    },
+    [messagesCache, fetchMessages]
+  )
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Recent Conversations</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="relative mb-3">
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Recent Conversations</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Filters */}
+        <div className="flex gap-2 mb-3">
+          <div className="relative flex-1">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
               placeholder="Filter by email..."
@@ -217,117 +375,170 @@ export function RecentConversations({ conversations: initial }: { conversations:
               className="pl-8 h-8 text-sm"
             />
           </div>
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Input
+              placeholder="Filter by content..."
+              value={contentFilter}
+              onChange={(e) => setContentFilter(e.target.value)}
+              className="pl-8 h-8 text-sm"
+            />
+          </div>
+        </div>
 
-          {conversations.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {debouncedEmail ? 'No conversations matching that email' : 'No recent conversations'}
-            </p>
-          ) : (
-            <div className="space-y-1">
-              {conversations.map((conv) => {
-                const isExpanded = expandedId === conv.id
-                const messages = messagesCache[conv.id]
-                const isLoading = loadingId === conv.id
+        {conversations.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            {debouncedEmail || debouncedContent
+              ? 'No conversations matching filters'
+              : 'No recent conversations'}
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {conversations.map((conv) => {
+              const isExpanded = expandedId === conv.id
+              const cached = messagesCache[conv.id]
+              const messages = cached?.messages ?? []
+              const isLoading = loadingId === conv.id
+              const hasMoreMsgs =
+                cached && cached.loaded < cached.total
 
-                return (
-                  <div key={conv.id}>
-                    <button
-                      onClick={() => handleToggle(conv.id)}
-                      className="w-full flex items-start gap-3 text-sm p-2 rounded-md hover:bg-muted/50 transition-colors text-left"
-                    >
-                      <MessageSquare className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-medium">
-                          {conv.title || 'Untitled conversation'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {conv.userName || 'Unknown user'} &middot; {timeAgo(conv.createdAt)}
-                        </p>
-                      </div>
-                      {isExpanded ? (
-                        <ChevronUp className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
-                      ) : (
-                        <ChevronDown className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
-                      )}
-                    </button>
-
-                    {isExpanded && (
-                      <div className="ml-7 mr-2 mb-2 mt-1 border-l-2 border-border pl-3 space-y-2">
-                        {isLoading && (
-                          <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
-                            <Loader2 className="size-3 animate-spin" />
-                            Loading messages...
-                          </div>
-                        )}
-                        {!isLoading && messages && messages.length === 0 && (
-                          <p className="text-xs text-muted-foreground py-2">No messages</p>
-                        )}
-                        {!isLoading && messages && messages.length > 0 && (
-                          <>
-                            <div className="space-y-2 max-h-80 overflow-y-auto">
-                              {messages.map((msg) => (
-                                <MessageBubble key={msg.id} msg={msg} />
-                              ))}
-                            </div>
-                            <button
-                              onClick={() => setModalConvId(conv.id)}
-                              className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors py-1"
-                            >
-                              <Eye className="size-3" />
-                              View full conversation
-                            </button>
-                          </>
-                        )}
-                      </div>
+              return (
+                <div key={conv.id}>
+                  {/* Conversation header */}
+                  <button
+                    onClick={() => handleToggle(conv.id)}
+                    className="w-full flex items-start gap-3 text-sm p-2 rounded-md hover:bg-muted/50 transition-colors text-left"
+                  >
+                    <MessageSquare className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">
+                        {conv.title || 'Untitled conversation'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {conv.userName || 'Unknown user'} &middot;{' '}
+                        {timeAgo(conv.createdAt)}
+                      </p>
+                    </div>
+                    {isExpanded ? (
+                      <ChevronUp className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
                     )}
-                  </div>
-                )
-              })}
+                  </button>
 
-              {hasMore && (
-                <button
-                  onClick={loadMore}
-                  disabled={loadingMore}
-                  className="w-full flex items-center justify-center gap-2 text-sm p-2 rounded-md hover:bg-muted/50 transition-colors text-muted-foreground"
-                >
-                  {loadingMore ? (
-                    <>
-                      <Loader2 className="size-3 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    'Show more'
+                  {/* Expanded conversation view */}
+                  {isExpanded && (
+                    <div className="ml-7 mr-2 mb-2 mt-1 border-l-2 border-border pl-3">
+                      {/* Loading state */}
+                      {isLoading && (
+                        <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
+                          <Loader2 className="size-3 animate-spin" />
+                          Loading messages...
+                        </div>
+                      )}
+
+                      {/* Empty state */}
+                      {!isLoading && messages.length === 0 && cached && (
+                        <p className="text-xs text-muted-foreground py-2">
+                          No messages
+                        </p>
+                      )}
+
+                      {/* Messages loaded */}
+                      {!isLoading && messages.length > 0 && (
+                        <>
+                          {/* Metadata row */}
+                          <div className="flex items-center gap-3 text-[11px] text-muted-foreground py-2 border-b border-[#1e1e2e]">
+                            <span className="flex items-center gap-1">
+                              <MessageSquare className="size-3" />
+                              {cached!.total} messages
+                            </span>
+                            {messages.length >= 2 && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="size-3" />
+                                {formatDuration(
+                                  messages[0]!.created_at,
+                                  messages[messages.length - 1]!.created_at
+                                )}
+                              </span>
+                            )}
+                            <span>{conv.userName}</span>
+                          </div>
+
+                          {/* Copy All button */}
+                          <div className="py-1.5">
+                            <button
+                              onClick={() => handleCopyAll(conv.id)}
+                              className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                            >
+                              {copyAllState === conv.id ? (
+                                <>
+                                  <Check className="size-3" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="size-3" />
+                                  Copy All
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Message list */}
+                          <div className="max-h-[500px] overflow-y-auto">
+                            {messages.map((msg) => (
+                              <AdminMessageRow key={msg.id} msg={msg} />
+                            ))}
+
+                            {/* Load more messages */}
+                            {hasMoreMsgs && (
+                              <button
+                                onClick={() =>
+                                  handleLoadMoreMessages(conv.id)
+                                }
+                                disabled={loadingMoreMessages}
+                                className="w-full flex items-center justify-center gap-2 text-xs py-2 text-purple-400 hover:text-purple-300 transition-colors"
+                              >
+                                {loadingMoreMessages ? (
+                                  <>
+                                    <Loader2 className="size-3 animate-spin" />
+                                    Loading...
+                                  </>
+                                ) : (
+                                  `Load more (${cached!.total - cached!.loaded} remaining)`
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
                   )}
-                </button>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                </div>
+              )
+            })}
 
-      <Dialog open={modalConvId !== null} onOpenChange={(open) => { if (!open) setModalConvId(null) }}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="text-sm font-medium truncate">
-              {modalConv?.title || 'Untitled conversation'}
-              {modalConv?.userName && (
-                <span className="text-muted-foreground font-normal ml-2">
-                  — {modalConv.userName}
-                </span>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-            {modalMessages && modalMessages.length > 0 ? (
-              modalMessages.map((msg) => (
-                <ModalMessageBubble key={msg.id} msg={msg} />
-              ))
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-8">No messages</p>
+            {/* Load more conversations */}
+            {hasMore && (
+              <button
+                onClick={loadMore}
+                disabled={loadingMore}
+                className="w-full flex items-center justify-center gap-2 text-sm p-2 rounded-md hover:bg-muted/50 transition-colors text-muted-foreground"
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="size-3 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  'Show more'
+                )}
+              </button>
             )}
           </div>
-        </DialogContent>
-      </Dialog>
-    </>
+        )}
+      </CardContent>
+    </Card>
   )
 }

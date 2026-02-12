@@ -1,6 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
+interface ImageMeta {
+  storagePath: string
+  name: string
+  size: number
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -13,18 +19,18 @@ export async function GET(
     if (!uuidRegex.test(conversationId)) {
       return NextResponse.json({ error: 'Invalid conversation id' }, { status: 400 })
     }
-    
+
     const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Query messages table using conversation UUID
+    // Include metadata to reconstruct image attachments
     const { data: messages, error } = await supabase
       .from('messages')
-      .select('id, role, content, created_at')
-      .eq('conversation_id', conversationId)  // Use conversation UUID directly
+      .select('id, role, content, created_at, metadata')
+      .eq('conversation_id', conversationId)
       .eq('user_id', user.id)
       .order('created_at', { ascending: true })
       .limit(100)
@@ -34,8 +40,38 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 })
     }
 
+    // Resolve signed URLs for any stored images in metadata
+    const resolvedMessages = await Promise.all(
+      (messages || []).map(async (msg) => {
+        const meta = msg.metadata as Record<string, unknown> | null
+        const images = meta?.images as ImageMeta[] | undefined
+
+        if (!images || images.length === 0) {
+          return msg
+        }
+
+        // Generate signed URLs for stored images
+        const attachments = await Promise.all(
+          images.map(async (img) => {
+            const { data } = await supabase.storage
+              .from('chat-images')
+              .createSignedUrl(img.storagePath, 3600)
+
+            const ext = img.storagePath.split('.').pop()?.toLowerCase() || 'png'
+            return {
+              type: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
+              name: img.name,
+              url: data?.signedUrl || '',
+            }
+          })
+        )
+
+        return { ...msg, attachments: attachments.filter((a) => a.url) }
+      })
+    )
+
     return NextResponse.json({
-      messages: messages || [],
+      messages: resolvedMessages,
       conversationId
     }, {
       headers: { "Cache-Control": "private, no-cache" },

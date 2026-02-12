@@ -269,12 +269,14 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
       }
       
       // Transform API messages to our Message format
+      // Includes attachments resolved from message metadata (image persistence)
       const loadedMessages: Message[] = (data.messages || []).map((msg: any) => ({
         id: msg.id || createMessageId(),
         role: msg.role as 'user' | 'assistant' | 'system',
         content: msg.content,
         timestamp: new Date(msg.created_at || Date.now()),
         isStreaming: false,
+        ...(msg.attachments?.length ? { attachments: msg.attachments } : {}),
       }));
       
       logger.info('[CHAT-LOAD] Loaded messages', { 

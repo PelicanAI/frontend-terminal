@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(Math.max(1, parseInt(searchParams.get('limit') || '10')), 50)
   const cursor = searchParams.get('cursor') || ''
   const email = searchParams.get('email') || ''
+  const contentSearch = searchParams.get('content') || ''
 
   const admin = getServiceClient()
 
@@ -31,9 +32,35 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // If content search, find conversation IDs with matching messages
+  let contentConversationIds: string[] | null = null
+
+  if (contentSearch) {
+    const { data: matchingMessages, error: searchError } = await admin
+      .from('messages')
+      .select('conversation_id')
+      .ilike('content', `%${contentSearch}%`)
+      .limit(500)
+
+    if (searchError) {
+      console.error('[Admin Conversations] content search failed:', searchError.message)
+    } else {
+      contentConversationIds = [...new Set(
+        (matchingMessages ?? []).map((m) => m.conversation_id as string)
+      )]
+
+      if (contentConversationIds.length === 0) {
+        return NextResponse.json(
+          { conversations: [], hasMore: false },
+          { headers: { 'Cache-Control': 'private, no-cache' } }
+        )
+      }
+    }
+  }
+
   let query = admin
     .from('conversations')
-    .select('id, title, user_id, created_at')
+    .select('id, title, user_id, created_at, message_count')
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -43,6 +70,10 @@ export async function GET(req: NextRequest) {
 
   if (filterUserIds) {
     query = query.in('user_id', filterUserIds)
+  }
+
+  if (contentConversationIds) {
+    query = query.in('id', contentConversationIds)
   }
 
   const { data, error } = await query
@@ -70,6 +101,7 @@ export async function GET(req: NextRequest) {
     title: c.title as string | null,
     userName: userEmailMap.get(c.user_id as string) ?? null,
     createdAt: c.created_at as string,
+    messageCount: (c.message_count as number | null) ?? null,
   }))
 
   return NextResponse.json({
