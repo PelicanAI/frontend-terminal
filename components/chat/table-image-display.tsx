@@ -1,9 +1,7 @@
 "use client"
 
-import React, { useState } from "react"
-import { Download, Share2, Check, ExternalLink, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+import { useState, useEffect, useCallback } from "react"
+import { X, Loader2 } from "lucide-react"
 import type { Attachment } from "@/lib/chat-utils"
 
 interface TableImageDisplayProps {
@@ -11,105 +9,24 @@ interface TableImageDisplayProps {
 }
 
 export function TableImageDisplay({ attachment }: TableImageDisplayProps) {
-  const [copied, setCopied] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [error, setError] = useState(false)
-  const { toast } = useToast()
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
-  const handleDownload = () => {
-    try {
-      const link = document.createElement("a")
-      link.href = attachment.url
-      link.download = attachment.name || "pelican_analysis.png"
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+  const closeLightbox = useCallback(() => setLightboxOpen(false), [])
 
-      toast({
-        title: "Downloaded",
-        description: "Table image saved successfully",
-      })
-    } catch (err) {
-      console.error("Download failed:", err)
-      toast({
-        title: "Download failed",
-        description: "Could not download the image",
-        variant: "destructive",
-      })
+  useEffect(() => {
+    if (!lightboxOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox()
     }
-  }
-
-  const handleShare = async () => {
-    try {
-      // Convert data URL to blob for sharing
-      const response = await fetch(attachment.url)
-      const blob = await response.blob()
-      const file = new File([blob], attachment.name, { type: "image/png" })
-
-      if (navigator.share && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: "Pelican Analysis",
-          text: "Check out this market analysis from Pelican!",
-        })
-      } else {
-        // Fallback: copy to clipboard
-        handleCopyImage()
-      }
-    } catch (err) {
-      if (err instanceof Error && err.name !== "AbortError") {
-        console.error("Share failed:", err)
-        toast({
-          title: "Share not available",
-          description: "Try downloading or copying instead",
-          variant: "destructive",
-        })
-      }
+    document.addEventListener("keydown", handleKeyDown)
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+      document.body.style.overflow = ""
     }
-  }
-
-  const handleCopyImage = async () => {
-    try {
-      const response = await fetch(attachment.url)
-      const blob = await response.blob()
-      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])
-
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-
-      toast({
-        title: "Copied!",
-        description: "Image copied to clipboard",
-      })
-    } catch (err) {
-      console.error("Failed to copy image:", err)
-      // Fallback: open in new tab
-      handleOpenInNewTab()
-    }
-  }
-
-  const handleOpenInNewTab = () => {
-    const newWindow = window.open()
-    if (newWindow) {
-      const doc = newWindow.document
-      doc.title = attachment.name || 'Table'
-
-      const body = doc.body
-      body.style.margin = '0'
-      body.style.display = 'flex'
-      body.style.justifyContent = 'center'
-      body.style.alignItems = 'center'
-      body.style.minHeight = '100vh'
-      body.style.background = '#f3f4f6'
-
-      const img = doc.createElement('img')
-      img.src = attachment.url
-      img.style.maxWidth = '100%'
-      img.style.height = 'auto'
-      img.alt = 'Pelican Analysis'
-      body.appendChild(img)
-    }
-  }
+  }, [lightboxOpen, closeLightbox])
 
   if (error) {
     return (
@@ -120,73 +37,46 @@ export function TableImageDisplay({ attachment }: TableImageDisplayProps) {
   }
 
   return (
-    <div className="pelican-table-container my-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="image-wrapper relative bg-background rounded-lg shadow-lg overflow-hidden border border-border">
-        {!imageLoaded && (
-          <div className="loading-skeleton h-96 bg-muted animate-pulse flex items-center justify-center">
-            <div className="flex flex-col items-center gap-2">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              <span className="text-muted-foreground text-sm">Loading table...</span>
+    <>
+      <div className="my-2">
+        <div
+          className="max-w-[320px] rounded-xl overflow-hidden border border-[#1e1e2e] cursor-pointer hover:scale-[1.02] hover:brightness-110 transition-all duration-200"
+          onClick={() => imageLoaded && setLightboxOpen(true)}
+        >
+          {!imageLoaded && (
+            <div className="h-48 bg-muted animate-pulse flex items-center justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
-          </div>
-        )}
-
-        <img
-          src={attachment.url}
-          alt={attachment.name || "Pelican Analysis Table"}
-          className={`w-full h-auto ${!imageLoaded ? "hidden" : ""}`}
-          onLoad={() => setImageLoaded(true)}
-          onError={() => {
-            console.error("Failed to load table image:", attachment.url)
-            setError(true)
-          }}
-          style={{ 
-            maxHeight: "800px", 
-            maxWidth: "100%",
-            objectFit: "contain",
-            display: imageLoaded ? "block" : "none"
-          }}
-        />
-
-        {imageLoaded && (
-          <div className="image-actions flex flex-wrap gap-2 p-3 bg-muted/50 border-t border-border">
-            <Button onClick={handleDownload} variant="outline" size="sm" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Download</span>
-            </Button>
-
-            <Button onClick={handleShare} variant="outline" size="sm" className="flex items-center gap-2">
-              <Share2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Share</span>
-            </Button>
-
-            <Button onClick={handleCopyImage} variant="outline" size="sm" className="flex items-center gap-2">
-              {copied ? (
-                <>
-                  <Check className="h-4 w-4 text-green-600" />
-                  <span className="hidden sm:inline">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4" />
-                  <span className="hidden sm:inline">Copy</span>
-                </>
-              )}
-            </Button>
-
-            <Button
-              onClick={handleOpenInNewTab}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 ml-auto"
-            >
-              <ExternalLink className="h-4 w-4" />
-              <span className="hidden sm:inline">Open</span>
-            </Button>
-          </div>
-        )}
+          )}
+          <img
+            src={attachment.url}
+            alt={attachment.name || "Pelican Analysis Table"}
+            className={`w-full h-auto ${!imageLoaded ? "hidden" : ""}`}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setError(true)}
+          />
+        </div>
       </div>
-    </div>
+
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+          onClick={closeLightbox}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+            onClick={closeLightbox}
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img
+            src={attachment.url}
+            alt={attachment.name || "Pelican Analysis Table"}
+            className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+    </>
   )
 }
-
