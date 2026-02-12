@@ -37,7 +37,7 @@ export function AttachmentsPreview({
             onRemove={onRemoveAttachment ? () => onRemoveAttachment(index) : undefined}
           />
         ))}
-        {pendingAttachments.map((pendingAttachment) => (
+        {pendingAttachments.map((pendingAttachment, pendingIdx) => (
           <AttachmentChip
             key={pendingAttachment.id}
             name={pendingAttachment.file.name}
@@ -46,7 +46,7 @@ export function AttachmentsPreview({
             onRetry={onRetryAttachment ? () => onRetryAttachment(pendingAttachment.id) : undefined}
             onRemove={
               onRemoveAttachment
-                ? () => onRemoveAttachment(pendingAttachments.indexOf(pendingAttachment))
+                ? () => onRemoveAttachment(attachments.length + pendingIdx)
                 : undefined
             }
           />

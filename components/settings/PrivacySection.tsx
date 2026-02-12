@@ -8,7 +8,6 @@ import { LogOut } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { logger } from "@/lib/logger"
-import { UploadedImagesSection } from "./UploadedImagesSection"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 interface PrivacySectionProps {
@@ -64,8 +63,6 @@ export function PrivacySection({ user }: PrivacySectionProps) {
           </div>
         </CardContent>
       </Card>
-
-      {user && <UploadedImagesSection userId={user.id} />}
 
       {user && (
         <Card className="border-red-200">

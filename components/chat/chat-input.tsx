@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, forwardRef, useImperativeHandle } from "react"
+import { useState, useRef, forwardRef, useImperativeHandle, useCallback } from "react"
 import { cn } from "@/lib/utils"
 import { AnimatePresence } from "framer-motion"
 import { useT } from "@/lib/providers/translation-provider"
@@ -53,6 +53,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
     const textareaRef = useRef<InputTextareaRef>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+    const isProcessingPaste = useRef(false)
 
     useImperativeHandle(ref, () => ({
       focus: () => textareaRef.current?.focus(),
@@ -78,7 +79,10 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       }
     }
 
-    const handlePaste = (e: React.ClipboardEvent) => {
+    const handlePaste = useCallback((e: React.ClipboardEvent) => {
+      // Prevent double-processing from rapid or duplicate paste events
+      if (isProcessingPaste.current) return
+
       const items = e.clipboardData?.items
       if (!items) return
 
@@ -89,8 +93,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
         if (item && item.type.startsWith("image/")) {
           const file = item.getAsFile()
           if (file) {
-            // Deduplicate: browsers can expose the same image as multiple DataTransferItems
-            const key = `${file.name}:${file.size}:${file.type}:${file.lastModified}`
+            const key = `${file.name}:${file.size}:${file.type}`
             if (!seen.has(key)) {
               seen.add(key)
               files.push(file)
@@ -101,9 +104,12 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
       if (files.length > 0 && onFileUpload) {
         e.preventDefault()
+        e.stopPropagation()
+        isProcessingPaste.current = true
         onFileUpload(files)
+        setTimeout(() => { isProcessingPaste.current = false }, 500)
       }
-    }
+    }, [onFileUpload])
 
     const handleDragOver = (e: React.DragEvent) => {
       e.preventDefault()

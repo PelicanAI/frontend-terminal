@@ -632,31 +632,21 @@ export default function ChatPage() {
                 onTypingDuringResponse={messageHandler.handleTypingDuringResponse}
                 isAIResponding={chatLoading}
                 pendingDraft={messageHandler.pendingDraft}
-                attachments={[
-                  ...fileUpload.pendingAttachments.map((pa) => ({
-                    name: pa.file.name,
-                    type: pa.file.type,
-                    url: "",
-                  })),
-                  ...fileUpload.uploadedFiles.map((f) => ({
-                    name: f.name,
-                    type: f.type,
-                    url: f.url,
-                  }))
-                ]}
+                attachments={fileUpload.uploadedFiles.map((f) => ({
+                  name: f.name,
+                  type: f.type,
+                  url: f.url,
+                }))}
                 onRemoveAttachment={(index: number) => {
-                  const pendingCount = fileUpload.pendingAttachments.length
-
-                  if (index < pendingCount) {
-                    // Remove from pending
-                    const attachment = fileUpload.pendingAttachments[index]
+                  const uploadedCount = fileUpload.uploadedFiles.length
+                  if (index < uploadedCount) {
+                    fileUpload.removeUploadedFile(index)
+                  } else {
+                    const pendingIndex = index - uploadedCount
+                    const attachment = fileUpload.pendingAttachments[pendingIndex]
                     if (attachment) {
                       fileUpload.handleRemovePendingAttachment(attachment.id)
                     }
-                  } else {
-                    // Remove from uploaded files
-                    const uploadedIndex = index - pendingCount
-                    fileUpload.removeUploadedFile(uploadedIndex)
                   }
                 }}
                 pendingAttachments={fileUpload.pendingAttachments}

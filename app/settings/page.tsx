@@ -27,6 +27,7 @@ import {
   AccountSection,
   TradingSection,
   PrivacySection,
+  UploadedImagesSection,
 } from "@/components/settings"
 import { type UserSettings, DEFAULT_SETTINGS } from "@/components/settings/types"
 
@@ -157,6 +158,10 @@ export default function SettingsPage() {
 
             {activeSection === "privacy" && (
               <PrivacySection user={user} />
+            )}
+
+            {activeSection === "images" && user && (
+              <UploadedImagesSection userId={user.id} />
             )}
           </div>
         </div>
