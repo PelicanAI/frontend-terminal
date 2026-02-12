@@ -20,7 +20,8 @@ export function ChartProvider({ children }: { children: ReactNode }) {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null)
 
   const showChart = useCallback((ticker: string) => {
-    setSelectedTicker(ticker.toUpperCase())
+    // Strip hyphens/slashes for TradingView (BTC-USD → BTCUSD, EUR/USD → EURUSD)
+    setSelectedTicker(ticker.replace(/[-/]/g, "").toUpperCase())
     setMode("chart")
   }, [])
 

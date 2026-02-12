@@ -56,6 +56,12 @@ export function extractTradingMetadata(content: string): TradingMetadata {
     allTickers.push(...forexMatches)
   }
 
+  // Extract hyphenated pairs (e.g. BTC-USD, ETH-USD, EUR-USD)
+  const hyphenMatches = content.match(/\b[A-Z]{2,5}-[A-Z]{2,5}\b/g)
+  if (hyphenMatches) {
+    allTickers.push(...hyphenMatches)
+  }
+
   // Extract standard tickers (2-5 letter uppercase words, excluding blocklist)
   const tickerMatches = content.match(/\b[A-Z]{2,5}\b/g)
   if (tickerMatches) {
