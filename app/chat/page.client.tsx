@@ -253,6 +253,7 @@ export default function ChatPage() {
     stopGeneration,
     clearMessages,
     regenerateLastMessage,
+    editMessage,
     addSystemMessage,
     conversationNotFound,
   } = useChat({
@@ -622,6 +623,7 @@ export default function ChatPage() {
                 isLoadingHistory={isLoadingMessages}
                 onStopGeneration={handleStopGeneration}
                 onRegenerateMessage={regenerateLastMessage}
+                onEditMessage={editMessage}
                 onQuickStart={outOfCredits ? undefined : handleQuickStart}
                 onFileUpload={handleFileUploadWithCapture}
                 onSettingsClick={handleSettingsClick}

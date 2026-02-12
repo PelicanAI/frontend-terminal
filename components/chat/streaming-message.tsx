@@ -10,6 +10,7 @@ interface StreamingMessageProps {
   onStop?: () => void
   onRegenerate?: () => void
   isRegenerating?: boolean
+  isGlobalLoading?: boolean
   onEdit?: (id: string, content: string) => void
   onDelete?: (id: string) => void
   onPin?: (id: string) => void
@@ -22,6 +23,7 @@ export const StreamingMessage = React.memo(function StreamingMessage({
   onStop,
   onRegenerate,
   isRegenerating,
+  isGlobalLoading,
   onEdit,
   onDelete,
   onPin,
@@ -88,6 +90,7 @@ export const StreamingMessage = React.memo(function StreamingMessage({
       <MessageBubble
         message={displayMessage}
         isStreaming={message.isStreaming || isRevealing}
+        isGlobalLoading={isGlobalLoading}
         showSkeleton={showTypingIndicator}
         isDarkMode={isDarkMode}
         onStop={message.isStreaming ? onStop : undefined}

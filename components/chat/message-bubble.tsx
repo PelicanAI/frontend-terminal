@@ -6,7 +6,7 @@ import Image from "next/image"
 import { MessageActions } from "./message-actions"
 import { motion } from "framer-motion"
 import { useState, useCallback, useMemo } from "react"
-import { Copy, Check } from "lucide-react"
+import { Copy, Check, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { getMessageAnimationVariant } from "@/lib/animation-config"
@@ -29,6 +29,7 @@ function formatMessageTime(date: Date): string {
 interface MessageBubbleProps {
   message: Message
   isStreaming?: boolean
+  isGlobalLoading?: boolean
   showSkeleton?: boolean
   isDarkMode?: boolean
   onRegenerate?: () => void
@@ -42,6 +43,7 @@ interface MessageBubbleProps {
 export function MessageBubble({
   message,
   isStreaming = false,
+  isGlobalLoading = false,
   showSkeleton = false,
   isDarkMode = false,
   onRegenerate,
@@ -52,6 +54,8 @@ export function MessageBubble({
   onPin,
 }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editContent, setEditContent] = useState('')
   const { toast } = useToast()
   const isUser = message.role === "user"
 
@@ -96,6 +100,25 @@ export function MessageBubble({
   const animationVariant = getMessageAnimationVariant(message.role)
 
   if (isUser) {
+    const handleStartEdit = () => {
+      setEditContent(message.content)
+      setIsEditing(true)
+    }
+
+    const handleSubmitEdit = () => {
+      const trimmed = editContent.trim()
+      if (trimmed && trimmed !== message.content) {
+        onEdit?.(message.id, trimmed)
+      }
+      setIsEditing(false)
+    }
+
+    const handleEditKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Escape') {
+        setIsEditing(false)
+      }
+    }
+
     return (
       <motion.div
         {...animationVariant}
@@ -110,26 +133,71 @@ export function MessageBubble({
             <span className="absolute -top-4 right-0 text-[10px] text-muted-foreground/60 opacity-0 group-hover/ts:opacity-100 transition-opacity duration-150 pointer-events-none">
               {formatMessageTime(message.timestamp)}
             </span>
-            <div className="max-w-[85%] sm:max-w-[70%] md:max-w-[60%] overflow-hidden">
-              <div className="rounded-2xl bg-white/[0.06] px-4 py-3">
-                <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
-                  <AttachmentDisplay attachments={message.attachments} />
-                  {message.content}
+            <div className={isEditing ? "w-full max-w-[85%] sm:max-w-[70%] md:max-w-[60%]" : "max-w-[85%] sm:max-w-[70%] md:max-w-[60%] overflow-hidden"}>
+              {isEditing ? (
+                <div className="w-full">
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    onKeyDown={handleEditKeyDown}
+                    className="w-full bg-white/[0.06] border border-border rounded-2xl px-4 py-3 text-[15px] sm:text-base leading-relaxed text-foreground resize-none focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    rows={Math.min(10, Math.max(2, editContent.split('\n').length + 1))}
+                    autoFocus
+                  />
+                  <div className="flex gap-2 mt-2 justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsEditing(false)}
+                      className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleSubmitEdit}
+                      disabled={!editContent.trim() || editContent.trim() === message.content}
+                      className="h-8 px-3 text-xs bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white"
+                    >
+                      Send
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="rounded-2xl bg-white/[0.06] px-4 py-3">
+                    <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
+                      <AttachmentDisplay attachments={message.attachments} />
+                      {message.content}
+                    </div>
+                  </div>
 
-              <div className="flex items-center gap-2 mt-2 justify-end">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleQuickCopy}
-                  className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
-                  title="Copy message"
-                >
-                  {copied ? <Check className="h-4 w-4 sm:h-3 sm:w-3 mr-1" /> : <Copy className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />}
-                  {copied ? "Copied" : "Copy"}
-                </Button>
-              </div>
+                  <div className="flex items-center gap-1 mt-2 justify-end">
+                    {onEdit && !isGlobalLoading && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleStartEdit}
+                        className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground opacity-0 group-hover/ts:opacity-100 transition-opacity"
+                        title="Edit message"
+                      >
+                        <Pencil className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />
+                        Edit
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleQuickCopy}
+                      className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
+                      title="Copy message"
+                    >
+                      {copied ? <Check className="h-4 w-4 sm:h-3 sm:w-3 mr-1" /> : <Copy className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />}
+                      {copied ? "Copied" : "Copy"}
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

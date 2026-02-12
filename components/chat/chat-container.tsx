@@ -425,6 +425,7 @@ export function ChatContainer({
                         : undefined
                     }
                     isRegenerating={index === lastAssistantIndex && message.role === "assistant" && isLoading && !message.isStreaming}
+                    isGlobalLoading={isLoading}
                     onEdit={onEditMessage}
                     onDelete={onDeleteMessage}
                     onPin={onPinMessage}

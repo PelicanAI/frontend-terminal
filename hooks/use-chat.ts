@@ -55,6 +55,7 @@ interface UseChatReturn {
   clearMessages: () => void;
   regenerateLastMessage: () => Promise<void>;
   retryLastMessage: () => Promise<void>;
+  editMessage: (messageId: string, newContent: string) => Promise<void>;
   addSystemMessage: (content: string) => string;
   conversationNotFound: boolean;
   isLoadingMessages: boolean;
@@ -515,6 +516,43 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     }
   }, [sendMessage, updateMessagesWithSync]);
 
+  const editMessage = useCallback(async (messageId: string, newContent: string) => {
+    const current = messagesRef.current;
+    const editIndex = current.findIndex((m) => m.id === messageId);
+    if (editIndex < 0) return;
+
+    const editedMessage = current[editIndex];
+    if (!editedMessage || editedMessage.role !== 'user') return;
+
+    // Delete all messages from the edited message onward from the database
+    const removed = current.slice(editIndex);
+    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const dbIds = removed.filter((m) => uuidRe.test(m.id)).map((m) => m.id);
+
+    if (dbIds.length > 0) {
+      try {
+        const supabase = createClient();
+        await supabase.from('messages').delete().in('id', dbIds);
+      } catch (e) {
+        logger.warn('[CHAT-EDIT] Failed to delete old messages from DB');
+      }
+    }
+
+    // Slice messages to before the edited message
+    const sliced = current.slice(0, editIndex);
+
+    // CRITICAL: Update ref BEFORE sendMessage so captureConversationHistory()
+    // reads the correct (sliced) messages. Same pattern as retryLastMessage.
+    messagesRef.current = sliced;
+    updateMessagesWithSync(() => sliced);
+
+    // Store the edited content as the last sent message (for retry)
+    lastSentMessageRef.current = newContent;
+
+    // Send the edited message
+    await sendMessage(newContent);
+  }, [sendMessage, updateMessagesWithSync]);
+
   const regenerateLastMessage = retryLastMessage;
 
   const stopGeneration = useCallback(() => {
@@ -626,6 +664,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
     clearMessages,
     regenerateLastMessage,
     retryLastMessage,
+    editMessage,
     addSystemMessage,
     conversationNotFound,
     isLoadingMessages,
