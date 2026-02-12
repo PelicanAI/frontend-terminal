@@ -317,6 +317,8 @@ export default function ChatPage() {
           }
         }
       }
+
+      window.dispatchEvent(new CustomEvent('pelican:conversation-created'))
     },
     onConversationCreated: (conversationId: string) => {
       latestConversationIdRef.current = conversationId
