@@ -5,7 +5,6 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { ConversationSidebar } from "@/components/chat/conversation-sidebar"
 import { ChatContainer } from "@/components/chat/chat-container"
 import { ChatInput, type ChatInputRef } from "@/components/chat/chat-input"
-import { TradingContextPanel } from "@/components/chat/trading-context-panel"
 import { ChatErrorBoundary } from "@/components/chat/chat-error-boundary"
 import { useChat } from "@/hooks/use-chat"
 import { useMarketData } from "@/hooks/use-market-data"
@@ -37,6 +36,7 @@ const TrialExhaustedModal = dynamic(() => import("@/components/trial-exhausted-m
 const InsufficientCreditsModal = dynamic(() => import("@/components/insufficient-credits-modal").then(m => ({ default: m.InsufficientCreditsModal })))
 const TradingViewChart = dynamic(() => import("@/components/chat/TradingViewChart").then(m => ({ default: m.TradingViewChart })), { ssr: false })
 const EconomicCalendar = dynamic(() => import("@/components/chat/EconomicCalendar").then(m => ({ default: m.EconomicCalendar })), { ssr: false })
+const TradingContextPanel = dynamic(() => import("@/components/chat/trading-context-panel").then(m => ({ default: m.TradingContextPanel })), { ssr: false })
 
 // Loading screen component for chat page
 function ChatLoadingScreen() {
