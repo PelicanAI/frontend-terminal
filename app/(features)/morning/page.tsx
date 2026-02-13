@@ -3,8 +3,6 @@
 import { useState } from "react"
 import { useTrades } from "@/hooks/use-trades"
 import { useMorningBrief } from "@/hooks/use-morning-brief"
-
-export const dynamic = 'force-dynamic'
 import { usePelicanPanel } from "@/hooks/use-pelican-panel"
 import { PelicanChatPanel } from "@/components/pelican-panel/pelican-chat-panel"
 import { TrendingUp, TrendingDown, Sparkles, RefreshCw, DollarSign, Percent } from "lucide-react"

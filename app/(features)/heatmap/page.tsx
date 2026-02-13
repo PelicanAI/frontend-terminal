@@ -3,8 +3,6 @@
 import { useState, useRef, useEffect } from "react"
 import { useHeatmap } from "@/hooks/use-heatmap"
 import { usePelicanPanel } from "@/hooks/use-pelican-panel"
-
-export const dynamic = 'force-dynamic'
 import { Treemap } from "@/components/heatmap/treemap"
 import { HeatmapGrid } from "@/components/heatmap/heatmap-grid"
 import { SectorLegend } from "@/components/heatmap/sector-legend"

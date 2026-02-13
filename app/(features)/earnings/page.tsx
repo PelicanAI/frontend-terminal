@@ -3,8 +3,6 @@
 import { useState, useMemo } from "react"
 import { useEarnings } from "@/hooks/use-earnings"
 import { usePelicanPanel } from "@/hooks/use-pelican-panel"
-
-export const dynamic = 'force-dynamic'
 import { PelicanChatPanel } from "@/components/pelican-panel/pelican-chat-panel"
 import { Calendar, RefreshCw, TrendingUp, Search } from "lucide-react"
 
