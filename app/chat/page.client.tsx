@@ -600,29 +600,31 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Desktop sidebar toggle button - only show when sidebar is collapsed */}
-        {sidebarCollapsed && (
-          <div className="hidden xl:flex items-center justify-between p-4 border-b border-border bg-background">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSidebarToggle}
-              className="glow-button glow-ghost"
-            >
-              <Menu className="h-4 w-4 text-foreground mr-2" />
-              <span className="text-sm font-medium">Show Sidebar</span>
-            </Button>
-            <div className="flex items-center gap-2">
-              <Image src="/pelican-logo-transparent.webp" alt="PelicanAI" width={24} height={24} className="w-6 h-6 object-contain" />
-              <span className="font-semibold text-foreground">Pelican AI</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ChatCreditCounter />
-              <LearningModeToggle />
-              <ThemeToggle />
-            </div>
+        {/* Desktop top controls */}
+        <div className="hidden xl:flex items-center justify-between p-4 border-b border-border bg-background">
+          <div>
+            {sidebarCollapsed && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSidebarToggle}
+                className="glow-button glow-ghost"
+              >
+                <Menu className="h-4 w-4 text-foreground mr-2" />
+                <span className="text-sm font-medium">Show Sidebar</span>
+              </Button>
+            )}
           </div>
-        )}
+          <div className="flex items-center gap-2">
+            <Image src="/pelican-logo-transparent.webp" alt="PelicanAI" width={24} height={24} className="w-6 h-6 object-contain" />
+            <span className="font-semibold text-foreground">Pelican AI</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <ChatCreditCounter />
+            <LearningModeToggle />
+            <ThemeToggle />
+          </div>
+        </div>
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto overscroll-none pb-[120px] md:pb-0 chat-scroll-area">
@@ -701,13 +703,13 @@ export default function ChatPage() {
         <>
           {/* Resize handle */}
           <div
-            className="hidden xl:flex items-center justify-center w-1.5 cursor-col-resize group hover:bg-purple-500/10 active:bg-purple-500/20 transition-colors flex-shrink-0"
+            className="hidden lg:flex items-center justify-center w-1.5 cursor-col-resize group hover:bg-purple-500/10 active:bg-purple-500/20 transition-colors flex-shrink-0"
             onMouseDown={handleResizeStart}
           >
             <div className="w-0.5 h-8 rounded-full bg-border group-hover:bg-purple-400/50 group-active:bg-purple-400 transition-colors" />
           </div>
           <div
-            className="hidden xl:block h-full overflow-y-auto flex-shrink-0"
+            className="hidden lg:block h-full overflow-y-auto flex-shrink-0"
             style={{ width: panelWidth }}
           >
             <LearningAwareTradingPanel
@@ -727,7 +729,7 @@ export default function ChatPage() {
 
       {/* Show expand button when trading panel is collapsed */}
       {tradingPanelCollapsed && (
-        <div className="hidden xl:flex items-start p-2 bg-background border-l border-border">
+        <div className="hidden lg:flex items-start p-2 bg-background border-l border-border">
           <Button
             variant="ghost"
             size="sm"
