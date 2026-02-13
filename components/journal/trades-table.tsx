@@ -8,12 +8,13 @@ interface TradesTableProps {
   trades: Trade[]
   onSelectTrade: (trade: Trade) => void
   selectedTradeId?: string | null
+  onScanTrade?: (trade: Trade) => void
 }
 
 type SortField = 'entry_date' | 'ticker' | 'pnl_amount' | 'pnl_percent'
 type SortDirection = 'asc' | 'desc'
 
-export function TradesTable({ trades, onSelectTrade, selectedTradeId }: TradesTableProps) {
+export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrade }: TradesTableProps) {
   const [sortField, setSortField] = useState<SortField>('entry_date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
@@ -144,6 +145,11 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId }: TradesTa
                 Status
               </span>
             </th>
+            <th className="pb-3 px-4 text-right">
+              <span className="text-xs font-semibold text-foreground/60 uppercase tracking-wide">
+                Actions
+              </span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -159,11 +165,20 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId }: TradesTa
                 className={`
                   border-b border-border cursor-pointer transition-colors
                   ${isSelected ? 'bg-purple-600/10' : 'hover:bg-white/[0.03]'}
+                  ${trade.is_paper ? 'border-dashed' : ''}
                 `}
               >
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-semibold text-foreground">{trade.ticker}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onScanTrade?.(trade)
+                      }}
+                      className="font-mono font-semibold text-foreground underline-offset-4 hover:text-primary hover:underline"
+                    >
+                      {trade.ticker}
+                    </button>
                     {trade.is_paper && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-600/20 text-yellow-400 font-medium">
                         P
@@ -221,6 +236,19 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId }: TradesTa
                   >
                     {trade.status}
                   </span>
+                </td>
+                <td className="py-3 px-4 text-right">
+                  {onScanTrade && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onScanTrade(trade)
+                      }}
+                      className="rounded border border-primary/30 bg-primary/20 px-3 py-1 text-[10px] font-bold text-primary transition-colors hover:bg-primary/30"
+                    >
+                      SCAN
+                    </button>
+                  )}
                 </td>
               </tr>
             )

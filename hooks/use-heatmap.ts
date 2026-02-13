@@ -89,6 +89,14 @@ export function getStockColor(changePercent: number | null): {
 
   const intensity = getColorIntensity(changePercent)
 
+  if (changePercent >= -0.3 && changePercent <= 0.3) {
+    return {
+      bg: 'bg-[oklch(0.22_0.02_280_/_0.4)]',
+      text: 'text-foreground/70',
+      border: 'border-white/10',
+    }
+  }
+
   if (changePercent > 0) {
     // Green for positive
     return {

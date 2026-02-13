@@ -12,7 +12,7 @@ type RateLimiterLike = {
   limit: (identifier: string) => Promise<RateLimitResult>
 }
 
-function createNoopLimiter(requests: number): RateLimiterLike {
+function createSafeMockLimiter(requests: number): RateLimiterLike {
   return {
     async limit() {
       return {
@@ -41,7 +41,7 @@ function createRedisClient() {
  */
 export function createUserRateLimiter(prefix: string, requests: number, window: `${number} ${"ms" | "s" | "m" | "h" | "d"}` | `${number}${"ms" | "s" | "m" | "h" | "d"}`) {
   const redis = createRedisClient()
-  if (!redis) return createNoopLimiter(requests)
+  if (!redis) return createSafeMockLimiter(requests)
 
   return new Ratelimit({
     redis,
@@ -55,7 +55,7 @@ export function createUserRateLimiter(prefix: string, requests: number, window: 
  */
 export function createIpRateLimiter(prefix: string, requests: number, window: `${number} ${"ms" | "s" | "m" | "h" | "d"}` | `${number}${"ms" | "s" | "m" | "h" | "d"}`) {
   const redis = createRedisClient()
-  if (!redis) return createNoopLimiter(requests)
+  if (!redis) return createSafeMockLimiter(requests)
 
   return new Ratelimit({
     redis,

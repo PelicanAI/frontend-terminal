@@ -5,7 +5,6 @@ import { useState, useRef, forwardRef, useImperativeHandle, useCallback } from "
 import { cn } from "@/lib/utils"
 import { AnimatePresence } from "framer-motion"
 import { useT } from "@/lib/providers/translation-provider"
-import { LIMITS, UI } from "@/lib/constants"
 import {
   AttachButton,
   SendButton,
@@ -32,10 +31,8 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       onQueueMessage,
       queueEnabled = false,
       placeholder,
-      isDarkMode = false,
       onTypingDuringResponse,
       isAIResponding = false,
-      onThemeChange,
       attachments = [],
       onRemoveAttachment,
       pendingAttachments = [],
@@ -134,7 +131,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
 
     const isSendDisabled = disabled || !message.trim() || !canSend || disabledSend || isAIResponding
     const characterCount = message.length
-    const showCharCount = characterCount >= LIMITS.CHAT_MAX_TOKENS * UI.CHAR_COUNT_THRESHOLD
 
     return (
       <div className="w-full">

@@ -6,11 +6,12 @@ import { useState } from "react"
 import dynamicImport from "next/dynamic"
 import { useTrades, Trade } from "@/hooks/use-trades"
 import { useTradeStats } from "@/hooks/use-trade-stats"
-import { usePelicanPanel } from "@/hooks/use-pelican-panel"
+import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { LogTradeModal } from "@/components/journal/log-trade-modal"
 import { CloseTradeModal } from "@/components/journal/close-trade-modal"
 import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
+import { AIGradeCard } from "@/components/journal/ai-grade-card"
 import { Plus, BarChart3, ListFilter } from "lucide-react"
 
 const DashboardTab = dynamicImport(
@@ -36,7 +37,22 @@ export default function JournalPage() {
 
   const { trades, isLoading: tradesLoading, logTrade, closeTrade, refetch } = useTrades()
   const { stats, equityCurve, isLoading: statsLoading } = useTradeStats()
-  const { state: pelicanState, close: closePelicanPanel } = usePelicanPanel()
+  const { isOpen: panelOpen, openWithPrompt, close: closePelicanPanel } = usePelicanPanelContext()
+  const handleScanTrade = async (trade: Trade) => {
+    const prompt = `Perform a high-fidelity audit on my ${trade.ticker} ${trade.direction} trade.
+Entry: $${trade.entry_price} | Exit: ${trade.exit_price ? `$${trade.exit_price}` : "Open"}
+Thesis: ${trade.thesis || trade.notes || "No notes provided."}
+
+Provide:
+1. Grade (A-F) based on entry timing and risk management.
+2. Exit efficiency: Did I leave money on the table?
+3. Behavioral check: Was this an emotional or systematic trade?`
+
+    await openWithPrompt(trade.ticker, prompt, "journal")
+    setActivePanel("pelican")
+    setSelectedTrade(trade)
+  }
+
 
   // Filter trades based on type
   const filteredTrades = trades.filter((trade) => {
@@ -49,7 +65,7 @@ export default function JournalPage() {
     setSelectedTrade(trade)
     setActivePanel('detail')
     // Close Pelican panel when opening detail
-    if (pelicanState.isOpen) {
+    if (panelOpen) {
       closePelicanPanel()
     }
   }
@@ -80,7 +96,7 @@ export default function JournalPage() {
   }
 
   // Monitor Pelican panel state - close detail panel when Pelican opens
-  const showPelicanPanel = pelicanState.isOpen
+  const showPelicanPanel = panelOpen
   if (showPelicanPanel && activePanel === 'detail') {
     setActivePanel('pelican')
     setSelectedTrade(null)
@@ -204,11 +220,26 @@ export default function JournalPage() {
           )}
 
           {activeTab === 'trades' && (
-            <TradesTable
-              trades={filteredTrades}
-              onSelectTrade={handleSelectTrade}
-              selectedTradeId={selectedTrade?.id}
-            />
+            <div className="space-y-6">
+              <TradesTable
+                trades={filteredTrades}
+                onSelectTrade={handleSelectTrade}
+                onScanTrade={handleScanTrade}
+                selectedTradeId={selectedTrade?.id}
+              />
+              {selectedTrade && (
+                <AIGradeCard
+                  overall="B+"
+                  dimensions={[
+                    { label: "Entry", grade: "B+", score: 82, note: "Entry timing aligned with session momentum." },
+                    { label: "Exit", grade: "B", score: 78, note: "Exit captured move but left continuation." },
+                    { label: "Risk", grade: "A-", score: 90, note: "Risk contained and stop placement respected." },
+                    { label: "Thesis", grade: "B", score: 76, note: "Thesis was clear but lacked catalyst depth." },
+                    { label: "Plan", grade: "B+", score: 84, note: "Execution followed plan with minor discretion drift." },
+                  ]}
+                />
+              )}
+            </div>
           )}
 
           {tradesLoading && trades.length === 0 && (

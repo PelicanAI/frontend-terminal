@@ -24,9 +24,10 @@ import { usePathname } from 'next/navigation'
 import dynamicImport from 'next/dynamic'
 import { TopNav } from '@/components/navigation/top-nav'
 import { PelicanPanelProvider, usePelicanPanelContext } from '@/providers/pelican-panel-provider'
-import { AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { TickerSearch } from '@/components/command-k/ticker-search'
 import { useCommandK } from '@/hooks/use-command-k'
+import { PelicanContainer } from '@/components/ui/pelican-container'
 
 const PelicanChatPanel = dynamicImport(
   () => import('@/components/pelican-panel/pelican-chat-panel').then((m) => ({ default: m.PelicanChatPanel })),
@@ -48,42 +49,44 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
   }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      {/* CMD+K Ticker Search */}
+    <PelicanContainer className="flex h-screen flex-col">
       <TickerSearch open={commandK.isOpen} onClose={commandK.close} />
 
-      {/* Top Navigation */}
-      <TopNav />
+      <div className="relative z-[var(--z-sticky)]">
+        <TopNav className="backdrop-blur-xl bg-[#0a0a0f]/80" />
+      </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Page Content (resizes when panel is open) */}
-        <div
-          className="flex-1 overflow-auto min-w-0 transition-all duration-200"
-          style={{
-            width: panel.isOpen ? '70%' : '100%',
-          }}
+      <div className="relative z-10 flex flex-1 overflow-hidden">
+        <motion.main
+          layout
+          initial={false}
+          animate={{ width: panel.isOpen ? "70%" : "100%" }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="min-w-0 flex-1 overflow-auto"
         >
           {children}
-        </div>
+        </motion.main>
 
-        {/* Pelican Panel (30% when open) */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {panel.isOpen && (
-            <div
-              className="hidden md:flex"
-              style={{
-                width: '30%',
-                minWidth: '330px',
-                maxWidth: '420px',
-              }}
+            <motion.aside
+              initial={{ x: 420, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 420, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="hidden border-l border-white/[0.05] bg-[#0a0a0f]/80 shadow-[0_0_50px_rgba(139,92,246,0.05)] backdrop-blur-2xl md:flex"
+              style={{ width: "30%", minWidth: "340px", maxWidth: "440px" }}
             >
-              <PelicanChatPanel />
-            </div>
+              <PelicanChatPanel
+                onConversationSelect={() => {
+                  window.dispatchEvent(new CustomEvent("pelican:conversation-created"))
+                }}
+              />
+            </motion.aside>
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </PelicanContainer>
   )
 }
 

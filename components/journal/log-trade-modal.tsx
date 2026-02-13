@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { TickerAutocomplete } from "./ticker-autocomplete"
 import { TradeFormData } from "@/hooks/use-trades"
-import { X } from "lucide-react"
 
 interface LogTradeModalProps {
   open: boolean

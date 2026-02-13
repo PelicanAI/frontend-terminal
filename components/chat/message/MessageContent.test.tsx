@@ -6,7 +6,7 @@ import { MessageContent } from "./message-content"
 vi.mock("framer-motion", () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
-      const { initial, animate, transition, whileHover, whileTap, ...htmlProps } = props as Record<string, unknown>
+      const htmlProps = props as Record<string, unknown>
       const safeProps: Record<string, unknown> = {}
       for (const [key, value] of Object.entries(htmlProps)) {
         if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
@@ -39,7 +39,7 @@ vi.mock("@/components/chat/data-visualizations/data-table", () => ({
 // Mock DOMPurify
 vi.mock("isomorphic-dompurify", () => ({
   default: {
-    sanitize: (input: string, _opts?: Record<string, unknown>) => input,
+    sanitize: (input: string) => input,
   },
 }))
 

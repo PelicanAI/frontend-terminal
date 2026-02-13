@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"
 
 import { useState, useRef, useEffect } from "react"
 import { useHeatmap } from "@/hooks/use-heatmap"
-import { usePelicanPanel } from "@/hooks/use-pelican-panel"
+import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { Treemap } from "@/components/heatmap/treemap"
 import { HeatmapGrid } from "@/components/heatmap/heatmap-grid"
 import { SectorLegend } from "@/components/heatmap/sector-legend"
@@ -26,7 +26,7 @@ export default function HeatmapPage() {
     refreshInterval: 60000, // 1 minute
   })
 
-  const { openWithPrompt } = usePelicanPanel()
+  const { openWithPrompt } = usePelicanPanelContext()
 
   // Calculate container dimensions for treemap
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function HeatmapPage() {
   const handleStockClick = (ticker: string, name: string) => {
     openWithPrompt(
       ticker,
-      `Analyze ${ticker} (${name}). Provide:\n1. Recent price action and key levels\n2. Technical setup\n3. Upcoming catalysts\n4. Risk/reward outlook`,
+      `Analyze this mover: ${ticker} (${name}). Provide momentum drivers, key levels, setup quality, and a tactical trade plan with invalidation.`,
       'heatmap'
     )
   }

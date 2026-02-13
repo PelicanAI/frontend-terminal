@@ -17,12 +17,14 @@ import { usePelicanPanelContext } from '@/providers/pelican-panel-provider'
 
 interface PelicanChatPanelInternalProps {
   isOpen: boolean
+  conversationId: string | null
   messages: Message[]
   isStreaming: boolean
   ticker: string | null
   onClose: () => void
   onSendMessage: (content: string) => void
   onRegenerate?: () => void
+  onConversationSelect?: (conversationId: string) => void
   className?: string
 }
 
@@ -107,18 +109,21 @@ function PanelMessage({ message, isStreaming = false, isAutoPrompt = false }: Pa
 
 function PelicanChatPanelInternal({
   isOpen,
+  conversationId,
   messages,
   isStreaming,
   ticker,
   onClose,
   onSendMessage,
   onRegenerate,
+  onConversationSelect,
   className,
 }: PelicanChatPanelInternalProps) {
   const [inputValue, setInputValue] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const lastNotifiedConversationRef = useRef<string | null>(null)
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -161,6 +166,13 @@ function PelicanChatPanelInternal({
 
   // Determine if first message is auto-prompt (from openWithPrompt)
   const firstMessageIsAutoPrompt = messages.length > 0 && messages[0]?.role === 'user'
+
+  useEffect(() => {
+    if (!conversationId) return
+    if (lastNotifiedConversationRef.current === conversationId) return
+    lastNotifiedConversationRef.current = conversationId
+    onConversationSelect?.(conversationId)
+  }, [conversationId, onConversationSelect])
 
   if (!isOpen) return null
 
@@ -369,9 +381,14 @@ function PelicanChatPanelInternal({
 // CONNECTED COMPONENT (EXPORTED)
 // =============================================================================
 
-export function PelicanChatPanel() {
+export function PelicanChatPanel({
+  onConversationSelect,
+}: {
+  onConversationSelect?: (conversationId: string) => void
+}) {
   const {
     isOpen,
+    conversationId,
     messages,
     isStreaming,
     ticker,
@@ -383,12 +400,14 @@ export function PelicanChatPanel() {
   return (
     <PelicanChatPanelInternal
       isOpen={isOpen}
+      conversationId={conversationId}
       messages={messages}
       isStreaming={isStreaming}
       ticker={ticker}
       onClose={close}
       onSendMessage={sendMessage}
       onRegenerate={regenerateLastMessage}
+      onConversationSelect={onConversationSelect}
     />
   )
 }

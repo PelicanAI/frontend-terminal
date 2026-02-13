@@ -78,8 +78,8 @@ export function TopNav({ className }: TopNavProps) {
 
   return (
     <nav className={cn(
-      "border-b border-border bg-background",
-      "sticky top-0 z-40",
+      "border-b border-border bg-[#0a0a0f]/80 backdrop-blur-xl",
+      "sticky top-0 z-[var(--z-sticky)]",
       className
     )}>
       <div className="flex items-center justify-between h-14 px-4">
@@ -154,17 +154,23 @@ export function TopNav({ className }: TopNavProps) {
         {/* Right: Streak + Credits */}
         <div className="flex items-center gap-3">
           {/* Streak */}
-          {journalStreak > 0 && (
-            <div
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20"
-              title={`${journalStreak} day journal streak`}
-            >
-              <Flame className="h-4 w-4 text-orange-500" />
-              <span className="text-sm font-semibold text-orange-500 tabular-nums">
-                {journalStreak}
-              </span>
-            </div>
-          )}
+          <div
+            className="flex items-center gap-2 rounded-full border px-3 py-1.5"
+            style={{
+              backgroundColor: "oklch(0.60 0.25 280 / 0.12)",
+              borderColor: "oklch(0.60 0.25 280 / 0.25)",
+            }}
+            title={`${journalStreak} day journal streak`}
+          >
+            <Flame className="h-4 w-4" style={{ color: "oklch(0.60 0.25 280)" }} />
+            <span className="text-xs font-semibold uppercase tracking-wide text-foreground/75">
+              Streak
+            </span>
+            <span className="text-sm font-semibold tabular-nums" style={{ color: "oklch(0.60 0.25 280)" }}>
+              {journalStreak}
+            </span>
+            <span className="text-xs text-foreground/65">days</span>
+          </div>
 
           {/* Credits Dropdown */}
           <DropdownMenu open={creditsDropdownOpen} onOpenChange={setCreditsDropdownOpen}>
@@ -172,7 +178,7 @@ export function TopNav({ className }: TopNavProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 px-3 hover:bg-sidebar-accent/50"
+                className="h-9 rounded-full border border-white/10 bg-white/[0.04] px-3 hover:bg-white/[0.08]"
               >
                 <span className="text-sm font-medium tabular-nums">
                   {(credits?.balance ?? 0).toLocaleString()} credits

@@ -55,7 +55,6 @@ export function ChatContainer({
   const { toast } = useToast()
   const elapsedSeconds = useResponseTimer(isLoading)
   const [isDragOver, setIsDragOver] = useState(false)
-  const [dragCounter, setDragCounter] = useState(0)
   const [newMessageCount, setNewMessageCount] = useState(0)
   const [showNewMessagesPill, setShowNewMessagesPill] = useState(false)
 
@@ -78,7 +77,6 @@ export function ChatContainer({
     scrollToBottom,
     handleNewMessage,
     handleStreamingEnd,
-    checkIfNearBottom,
     resetScrollAwayState,
     resetScrollState,
     showJump,
@@ -126,7 +124,6 @@ export function ChatContainer({
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setDragCounter((prev) => prev + 1)
     if (e.dataTransfer.types.includes("Files")) {
       setIsDragOver(true)
     }
@@ -135,13 +132,7 @@ export function ChatContainer({
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setDragCounter((prev) => {
-      const newCounter = prev - 1
-      if (newCounter === 0) {
-        setIsDragOver(false)
-      }
-      return newCounter
-    })
+    setIsDragOver(false)
   }, [])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -154,7 +145,6 @@ export function ChatContainer({
       e.preventDefault()
       e.stopPropagation()
       setIsDragOver(false)
-      setDragCounter(0)
 
       const files = e.dataTransfer.files
       if (files.length > 0 && onFileUpload) {
@@ -169,34 +159,6 @@ export function ChatContainer({
       }
     },
     [onFileUpload, validateFiles, toast],
-  )
-
-  const handleError = useCallback(
-    (error: Error, context: string) => {
-      console.error(`[v0] ${context} error:`, error)
-
-      let title = "Something went wrong"
-      let description = "Please try again"
-
-      if (error.message.includes("network")) {
-        title = "Connection issue"
-        description = "Check your internet connection and try again"
-      } else if (error.message.includes("rate limit")) {
-        title = "Too many requests"
-        description = "Please wait a moment before trying again"
-      } else if (error.message.includes("file")) {
-        title = "File upload failed"
-        description = "Please check the file format and size"
-      }
-
-      toast({
-        title,
-        description,
-        variant: "destructive",
-        duration: 5000,
-      })
-    },
-    [toast],
   )
 
   const handleJumpToBottom = useCallback(() => {

@@ -44,13 +44,9 @@ export const MessageBubble = memo(function MessageBubble({
   isStreaming = false,
   isGlobalLoading = false,
   showSkeleton = false,
-  isDarkMode = false,
   onRegenerate,
   isRegenerating = false,
-  onStop,
   onEdit,
-  onDelete,
-  onPin,
 }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -283,10 +279,8 @@ export const MessageBubble = memo(function MessageBubble({
     prevProps.isStreaming === nextProps.isStreaming &&
     prevProps.isGlobalLoading === nextProps.isGlobalLoading &&
     prevProps.showSkeleton === nextProps.showSkeleton &&
-    prevProps.isDarkMode === nextProps.isDarkMode &&
     prevProps.isRegenerating === nextProps.isRegenerating &&
     !!prevProps.onRegenerate === !!nextProps.onRegenerate &&
-    !!prevProps.onStop === !!nextProps.onStop &&
     !!prevProps.onEdit === !!nextProps.onEdit
   )
 })

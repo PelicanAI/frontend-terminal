@@ -5,7 +5,7 @@ import { SuggestedPrompts, SUGGESTED_PROMPTS } from "../SuggestedPrompts"
 vi.mock("framer-motion", () => ({
   motion: {
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
-      const { initial, animate, transition, whileHover, whileTap, ...rest } = props
+      const rest = props
       return <button {...rest}>{children}</button>
     },
   },

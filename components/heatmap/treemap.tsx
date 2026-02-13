@@ -1,21 +1,9 @@
 "use client"
 
 import { useMemo } from "react"
+import { treemap, hierarchy } from "d3-hierarchy"
 import { HeatmapStock } from "@/app/api/heatmap/route"
-import { getStockColor, formatChangePercent } from "@/hooks/use-heatmap"
-import { SECTOR_COLORS, type SP500Sector } from "@/lib/data/sp500-constituents"
-
-interface TreemapNode {
-  ticker: string
-  name: string
-  sector: string
-  changePercent: number | null
-  marketCap: number | null
-  x: number
-  y: number
-  width: number
-  height: number
-}
+import { formatChangePercent } from "@/hooks/use-heatmap"
 
 interface TreemapProps {
   stocks: HeatmapStock[]
@@ -24,201 +12,131 @@ interface TreemapProps {
   onStockClick?: (ticker: string, name: string) => void
 }
 
-/**
- * Squarified treemap algorithm
- * Allocates rectangles proportionally to market cap
- */
-function squarify(
-  stocks: HeatmapStock[],
-  x: number,
-  y: number,
-  width: number,
-  height: number
-): TreemapNode[] {
-  if (stocks.length === 0) return []
+type StockNode = {
+  ticker: string
+  name: string
+  price: number | null
+  changePercent: number | null
+  marketCap: number
+  sector: string
+}
 
-  // Calculate total market cap (use fallback for null values)
-  const totalMarketCap = stocks.reduce((sum, s) => {
-    // Use volume as proxy if marketCap is null (rough estimate)
-    const cap = s.marketCap ?? (s.volume ? s.volume * (s.price ?? 100) : 1000000000)
-    return sum + cap
-  }, 0)
+function toMarketCapValue(stock: HeatmapStock): number {
+  return stock.marketCap ?? (stock.volume ? stock.volume * (stock.price ?? 100) : 1_000_000_000)
+}
 
-  if (totalMarketCap === 0) return []
+function getTileColor(change: number): string {
+  if (Math.abs(change) <= 0.3) return "oklch(0.22 0.02 280 / 0.4)"
+  if (change >= 3) return "oklch(0.50 0.25 145)"
+  if (change >= 1) return "oklch(0.65 0.20 145 / 0.8)"
+  if (change <= -3) return "oklch(0.55 0.25 25)"
+  if (change <= -1) return "oklch(0.65 0.15 25 / 0.8)"
+  return "oklch(0.18 0.015 280)"
+}
 
-  const nodes: TreemapNode[] = []
-  let currentX = x
-  let currentY = y
-  let remainingWidth = width
-  let remainingHeight = height
-
-  // Sort by market cap descending for better visual distribution
-  const sortedStocks = [...stocks].sort((a, b) => {
-    const capA = a.marketCap ?? (a.volume ? a.volume * (a.price ?? 100) : 1000000000)
-    const capB = b.marketCap ?? (b.volume ? b.volume * (b.price ?? 100) : 1000000000)
-    return capB - capA
-  })
-
-  sortedStocks.forEach((stock, index) => {
-    const cap = stock.marketCap ?? (stock.volume ? stock.volume * (stock.price ?? 100) : 1000000000)
-    const ratio = cap / totalMarketCap
-
-    // Calculate dimensions based on remaining space
-    let nodeWidth: number
-    let nodeHeight: number
-
-    if (remainingWidth > remainingHeight) {
-      // Split horizontally
-      nodeWidth = ratio * width
-      nodeHeight = remainingHeight
-      currentX = x + nodes.reduce((sum, n) => sum + (n.y === currentY ? n.width : 0), 0)
-    } else {
-      // Split vertically
-      nodeWidth = remainingWidth
-      nodeHeight = ratio * height
-      currentY = y + nodes.reduce((sum, n) => sum + (n.x === currentX ? n.height : 0), 0)
-    }
-
-    // Ensure minimum size for readability
-    nodeWidth = Math.max(nodeWidth, 60)
-    nodeHeight = Math.max(nodeHeight, 40)
-
-    nodes.push({
-      ticker: stock.ticker,
-      name: stock.name,
-      sector: stock.sector,
-      changePercent: stock.changePercent,
-      marketCap: cap,
-      x: currentX,
-      y: currentY,
-      width: nodeWidth,
-      height: nodeHeight,
-    })
-
-    // Update remaining space
-    if (remainingWidth > remainingHeight) {
-      remainingWidth -= nodeWidth
-      if (remainingWidth < 60) {
-        currentY += nodeHeight
-        currentX = x
-        remainingWidth = width
-        remainingHeight -= nodeHeight
-      }
-    } else {
-      remainingHeight -= nodeHeight
-      if (remainingHeight < 40) {
-        currentX += nodeWidth
-        currentY = y
-        remainingHeight = height
-        remainingWidth -= nodeWidth
-      }
-    }
-  })
-
-  return nodes
+function getLabelSize(tileWidth: number): number {
+  return Math.max(9, Math.min(14, tileWidth / 12))
 }
 
 export function Treemap({ stocks, width, height, onStockClick }: TreemapProps) {
-  const nodes = useMemo(
-    () => squarify(stocks, 0, 0, width, height),
-    [stocks, width, height]
-  )
+  const root = useMemo(() => {
+    const grouped = new Map<string, StockNode[]>()
+    for (const stock of stocks) {
+      const children = grouped.get(stock.sector) ?? []
+      children.push({
+        ticker: stock.ticker,
+        name: stock.name,
+        price: stock.price,
+        changePercent: stock.changePercent,
+        marketCap: toMarketCapValue(stock),
+        sector: stock.sector,
+      })
+      grouped.set(stock.sector, children)
+    }
+
+    const data = {
+      name: "market",
+      children: Array.from(grouped.entries()).map(([sector, children]) => ({
+        name: sector,
+        children,
+      })),
+    }
+
+    return hierarchy(data)
+      .sum((d) => ("marketCap" in (d as object) ? ((d as unknown as StockNode).marketCap ?? 0) : 0))
+      .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+  }, [stocks])
+
+  const layoutRoot = useMemo(() => {
+    return treemap<unknown>()
+      .size([width, height])
+      .paddingOuter(2)
+      .paddingInner(1)
+      .paddingTop(18)(root as never)
+  }, [root, width, height])
+
+  const nodes = layoutRoot.descendants()
 
   if (stocks.length === 0) {
     return (
-      <div
-        className="flex items-center justify-center border border-border rounded-lg bg-surface-1"
-        style={{ width, height }}
-      >
-        <p className="text-foreground/50 text-sm">No data available</p>
+      <div className="flex items-center justify-center rounded-lg border border-border bg-surface-1" style={{ width, height }}>
+        <p className="text-sm text-foreground/50">No data available</p>
       </div>
     )
   }
 
   return (
-    <svg
-      width={width}
-      height={height}
-      className="rounded-lg border border-border"
-      style={{ backgroundColor: 'oklch(0.08 0.01 280)' }}
-    >
+    <div className="relative overflow-hidden rounded-lg border border-white/[0.05]" style={{ width, height }}>
       {nodes.map((node) => {
-        const colors = getStockColor(node.changePercent)
-        const isPositive = (node.changePercent ?? 0) > 0
-        const isNegative = (node.changePercent ?? 0) < 0
-
-        // Get sector base color
-        const sectorColor = SECTOR_COLORS[node.sector as SP500Sector] ?? 'oklch(0.50 0.15 280)'
-
-        // Apply performance overlay
-        let fillColor: string
-        if (isPositive) {
-          const opacity = Math.min(Math.abs(node.changePercent ?? 0) / 5, 1) * 0.4
-          fillColor = `color-mix(in oklch, ${sectorColor}, oklch(0.70 0.20 140) ${opacity * 100}%)`
-        } else if (isNegative) {
-          const opacity = Math.min(Math.abs(node.changePercent ?? 0) / 5, 1) * 0.4
-          fillColor = `color-mix(in oklch, ${sectorColor}, oklch(0.55 0.25 20) ${opacity * 100}%)`
-        } else {
-          fillColor = sectorColor
+        if (node.depth === 1) {
+          const sector = String((node.data as { name?: string }).name ?? "")
+          return (
+            <div
+              key={`sector-${sector}`}
+              className="pointer-events-none absolute truncate px-1 text-[10px] font-semibold uppercase tracking-wide text-foreground/50"
+              style={{ left: node.x0, top: node.y0, width: node.x1 - node.x0 }}
+            >
+              {sector}
+            </div>
+          )
         }
 
-        const showLabel = node.width > 80 && node.height > 50
-        const showPercent = node.width > 100 && node.height > 65
+        if (node.depth !== 2) return null
+
+        const stock = node.data as StockNode
+        const tileWidth = node.x1 - node.x0
+        const tileHeight = node.y1 - node.y0
+        const labelSize = getLabelSize(tileWidth)
+        const change = stock.changePercent ?? 0
+        const showPercent = tileWidth > 70 && tileHeight > 44
 
         return (
-          <g
-            key={node.ticker}
-            onClick={() => onStockClick?.(node.ticker, node.name)}
-            className="cursor-pointer transition-opacity hover:opacity-90"
+          <button
+            key={`stock-${stock.ticker}`}
+            onClick={() => onStockClick?.(stock.ticker, stock.name)}
+            className="absolute cursor-pointer border border-black/20 transition-all duration-200 hover:z-20 hover:scale-[1.02] hover:border-white/30 hover:shadow-2xl"
+            style={{
+              left: node.x0,
+              top: node.y0,
+              width: tileWidth,
+              height: tileHeight,
+              backgroundColor: getTileColor(change),
+            }}
+            title={`${stock.ticker} ${formatChangePercent(stock.changePercent)}`}
           >
-            <rect
-              x={node.x}
-              y={node.y}
-              width={node.width}
-              height={node.height}
-              fill={fillColor}
-              stroke="oklch(0.15 0.01 280)"
-              strokeWidth={1}
-              rx={4}
-            />
-            {showLabel && (
-              <>
-                <text
-                  x={node.x + node.width / 2}
-                  y={node.y + node.height / 2 - (showPercent ? 8 : 0)}
-                  textAnchor="middle"
-                  className="fill-white text-xs font-semibold font-mono select-none pointer-events-none"
-                  style={{ fontSize: '12px' }}
-                >
-                  {node.ticker}
-                </text>
-                {showPercent && (
-                  <text
-                    x={node.x + node.width / 2}
-                    y={node.y + node.height / 2 + 12}
-                    textAnchor="middle"
-                    className={`text-[10px] font-mono font-medium select-none pointer-events-none ${
-                      isPositive ? 'fill-green-200' : isNegative ? 'fill-red-200' : 'fill-white/70'
-                    }`}
-                  >
-                    {formatChangePercent(node.changePercent)}
-                  </text>
-                )}
-              </>
-            )}
-            {!showLabel && node.width > 40 && node.height > 30 && (
-              <text
-                x={node.x + node.width / 2}
-                y={node.y + node.height / 2}
-                textAnchor="middle"
-                className="fill-white text-[10px] font-mono font-semibold select-none pointer-events-none"
-              >
-                {node.ticker.substring(0, 4)}
-              </text>
-            )}
-          </g>
+            <div className="flex h-full w-full flex-col items-center justify-center px-1 font-mono text-white">
+              <div style={{ fontSize: `${labelSize}px` }} className="font-bold tracking-tight">
+                {stock.ticker}
+              </div>
+              {showPercent && (
+                <div className="text-[10px] opacity-85">
+                  {formatChangePercent(stock.changePercent)}
+                </div>
+              )}
+            </div>
+          </button>
         )
       })}
-    </svg>
+    </div>
   )
 }

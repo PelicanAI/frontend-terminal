@@ -23,7 +23,7 @@ const DEFAULT_ARROW_COLUMNS: Column[] = [
 ]
 
 // Helper: Format value based on type
-function formatValue(value: unknown, type?: string): string {
+function formatValue(value: unknown): string {
   if (value === null || value === undefined) return '—'
   return String(value)
 }
@@ -181,7 +181,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                         key={col.key}
                         className={getCellClass(value, col.type, colIndex === 0)}
                       >
-                        {formatValue(value, col.type)}
+                        {formatValue(value)}
                       </td>
                     )
                   })}
@@ -203,7 +203,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                           i === 0 && "sticky left-0 bg-inherit"
                         )}
                       >
-                        {formatValue(summary[col.key], col.type)}
+                        {formatValue(summary[col.key])}
                       </td>
                     ))
                   ) : stats ? (

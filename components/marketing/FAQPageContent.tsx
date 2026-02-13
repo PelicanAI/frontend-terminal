@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/providers/auth-provider';
 import { useT } from '@/lib/providers/translation-provider';
 import MarketingNav from '@/components/marketing/MarketingNav';
 import dynamic from 'next/dynamic';
@@ -199,17 +197,7 @@ function FAQAccordion({ item, isOpen, onToggle, id }: { item: FAQItem; isOpen: b
 
 export default function FAQPageContent() {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
-  const router = useRouter();
-  const { user } = useAuth();
   const t = useT();
-
-  const handleGetStarted = () => {
-    if (user) {
-      router.push('/chat');
-    } else {
-      router.push('/auth/login');
-    }
-  };
 
   const toggleItem = (key: string) => {
     setOpenItems((prev) => {

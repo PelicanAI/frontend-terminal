@@ -60,9 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const guestConversations = JSON.parse(guestConversationsRaw)
       if (!Array.isArray(guestConversations) || guestConversations.length === 0) return
 
-      let migratedCount = 0
-      let failedCount = 0
-
       for (const guestConv of guestConversations) {
         try {
           // Create conversation in Supabase
@@ -82,7 +79,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           if (convError || !newConv) {
             console.error("[Auth] Failed to migrate conversation:", convError)
-            failedCount++
             continue
           }
 
@@ -108,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }))
 
               // Insert messages with RLS-safe helper
-              const { success, count, error: msgError } = await bulkInsertWithRLSCheck(
+              const { success, error: msgError } = await bulkInsertWithRLSCheck(
                 supabase,
                 "messages",
                 messagesToInsert
@@ -122,11 +118,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           // Clear the guest messages from localStorage
           localStorage.removeItem(`pelican_guest_messages_${guestConv.id}`)
-          migratedCount++
 
         } catch (error) {
           console.error("[Auth] Migration error for conversation:", error)
-          failedCount++
         }
       }
 

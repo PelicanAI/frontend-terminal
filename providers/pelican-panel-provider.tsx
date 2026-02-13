@@ -9,6 +9,7 @@ import { usePelicanPanel, type PelicanPanelContext } from '@/hooks/use-pelican-p
 
 interface PelicanPanelContextValue {
   isOpen: boolean
+  conversationId: string | null
   messages: any[]
   isStreaming: boolean
   ticker: string | null
@@ -51,6 +52,7 @@ export function PelicanPanelProvider({
 
   const value: PelicanPanelContextValue = {
     isOpen: panel.state.isOpen,
+    conversationId: panel.state.conversationId,
     messages: panel.state.messages,
     isStreaming: panel.state.isStreaming,
     ticker: panel.state.ticker,

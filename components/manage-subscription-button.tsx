@@ -37,8 +37,7 @@ export function ManageSubscriptionButton({
       if (url) {
         window.location.href = url
       }
-    } catch (error) {
-
+    } catch {
     } finally {
       setLoading(false)
     }

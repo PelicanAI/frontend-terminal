@@ -76,7 +76,7 @@ export function detectStructuredData(text: string): StructuredDataTable | null {
       data: parsed.data,
       summary: parsed.summary,
     }
-  } catch (error) {
+  } catch {
 
     return null
   }
