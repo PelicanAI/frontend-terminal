@@ -229,7 +229,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
           </button>
         </form>
         <p className="text-[9px] text-muted-foreground/50 text-center mt-2">
-          Powered by AI
+          Powered by Pelican
         </p>
       </div>
     </div>

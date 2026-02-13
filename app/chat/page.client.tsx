@@ -62,6 +62,15 @@ function ChartPanelExpander({ onExpand }: { onExpand: () => void }) {
   return null
 }
 
+// Auto-expand trading panel and switch to Learn tab when a term is clicked
+function LearningPanelExpander({ onExpand }: { onExpand: () => void }) {
+  const { selectedTerm } = useLearningMode()
+  useEffect(() => {
+    if (selectedTerm) onExpand()
+  }, [selectedTerm, onExpand])
+  return null
+}
+
 // Mobile sheet — opens on screens below xl when a chart or calendar is requested
 function MobileChartSheet() {
   const { mode, selectedTicker, closeChart } = useChart()
@@ -498,6 +507,10 @@ export default function ChatPage() {
         <ChartProvider>
         <LearningModeProvider>
         <ChartPanelExpander onExpand={() => {
+          setTradingPanelCollapsed(false)
+          localStorage.setItem('pelican_trading_panel_collapsed', 'false')
+        }} />
+        <LearningPanelExpander onExpand={() => {
           setTradingPanelCollapsed(false)
           localStorage.setItem('pelican_trading_panel_collapsed', 'false')
         }} />
