@@ -7,11 +7,12 @@ import dynamicImport from "next/dynamic"
 import { useTrades, Trade } from "@/hooks/use-trades"
 import { useTradeStats } from "@/hooks/use-trade-stats"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
+import { useLiveQuotes } from "@/hooks/use-live-quotes"
 import { LogTradeModal } from "@/components/journal/log-trade-modal"
 import { CloseTradeModal } from "@/components/journal/close-trade-modal"
 import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
-import { AIGradeCard } from "@/components/journal/ai-grade-card"
+import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
 import { Plus, BarChart3, ListFilter } from "lucide-react"
 
 const DashboardTab = dynamicImport(
@@ -35,19 +36,80 @@ export default function JournalPage() {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null)
   const [tradeTypeFilter, setTradeTypeFilter] = useState<'all' | 'real' | 'paper'>('all')
 
-  const { trades, isLoading: tradesLoading, logTrade, closeTrade, refetch } = useTrades()
+  const { trades, isLoading: tradesLoading, logTrade, closeTrade, refetch, updateTrade } = useTrades()
   const { stats, equityCurve, isLoading: statsLoading } = useTradeStats()
   const { isOpen: panelOpen, openWithPrompt, close: closePelicanPanel } = usePelicanPanelContext()
+
+  // Get live quotes for all open positions
+  const openTickers = trades
+    .filter(t => t.status === 'open')
+    .map(t => t.ticker)
+    .filter((v, i, a) => a.indexOf(v) === i) // dedupe
+  const { quotes } = useLiveQuotes(openTickers)
+
   const handleScanTrade = async (trade: Trade) => {
-    const prompt = `Perform a high-fidelity audit on my ${trade.ticker} ${trade.direction} trade.
-Entry: $${trade.entry_price} | Exit: ${trade.exit_price ? `$${trade.exit_price}` : "Open"}
-Thesis: ${trade.thesis || trade.notes || "No notes provided."}
+    const quote = quotes[trade.ticker]
+    const currentPrice = quote?.price
 
-Provide:
-1. Grade (A-F) based on entry timing and risk management.
-2. Exit efficiency: Did I leave money on the table?
-3. Behavioral check: Was this an emotional or systematic trade?`
+    // Calculate holding days
+    const entryDate = new Date(trade.entry_date)
+    const endDate = trade.exit_date ? new Date(trade.exit_date) : new Date()
+    const holdingDays = Math.max(1, Math.round((endDate.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24)))
 
+    // Calculate unrealized P&L for open trades
+    let unrealizedPnL: { amount: number; percent: number; rMultiple: number | null } | undefined
+    if (trade.status === 'open' && currentPrice) {
+      const direction = trade.direction === 'long' ? 1 : -1
+      const pnlAmount = (currentPrice - trade.entry_price) * trade.quantity * direction
+      const pnlPercent = ((currentPrice - trade.entry_price) / trade.entry_price) * 100 * direction
+
+      let rMultiple: number | null = null
+      if (trade.stop_loss) {
+        const riskPerShare = Math.abs(trade.entry_price - trade.stop_loss)
+        if (riskPerShare > 0) {
+          rMultiple = ((currentPrice - trade.entry_price) * direction) / riskPerShare
+        }
+      }
+
+      unrealizedPnL = { amount: pnlAmount, percent: pnlPercent, rMultiple }
+    }
+
+    // Calculate distances to stop/target for open trades
+    let distanceToStop: number | undefined
+    let distanceToTarget: number | undefined
+    if (trade.status === 'open' && currentPrice) {
+      if (trade.stop_loss) {
+        distanceToStop = Math.abs((currentPrice - trade.stop_loss) / trade.stop_loss * 100)
+      }
+      if (trade.take_profit) {
+        distanceToTarget = Math.abs((trade.take_profit - currentPrice) / currentPrice * 100)
+      }
+    }
+
+    // Get current scan count
+    const scanCount = ((trade.ai_grade as { pelican_scan_count?: number })?.pelican_scan_count || 0)
+
+    // Build comprehensive prompt
+    const prompt = buildScanPrompt({
+      trade,
+      currentPrice,
+      holdingDays,
+      unrealizedPnL,
+      distanceToStop,
+      distanceToTarget,
+      scanCount,
+    })
+
+    // Update scan count in database
+    await updateTrade(trade.id, {
+      ai_grade: {
+        ...(trade.ai_grade as object || {}),
+        pelican_scan_count: ((trade.ai_grade as { pelican_scan_count?: number })?.pelican_scan_count || 0) + 1,
+        last_pelican_scan_at: new Date().toISOString(),
+      }
+    })
+
+    // Send to Pelican chat
     await openWithPrompt(trade.ticker, prompt, "journal")
     setActivePanel("pelican")
     setSelectedTrade(trade)
@@ -220,26 +282,12 @@ Provide:
           )}
 
           {activeTab === 'trades' && (
-            <div className="space-y-6">
-              <TradesTable
-                trades={filteredTrades}
-                onSelectTrade={handleSelectTrade}
-                onScanTrade={handleScanTrade}
-                selectedTradeId={selectedTrade?.id}
-              />
-              {selectedTrade && (
-                <AIGradeCard
-                  overall="B+"
-                  dimensions={[
-                    { label: "Entry", grade: "B+", score: 82, note: "Entry timing aligned with session momentum." },
-                    { label: "Exit", grade: "B", score: 78, note: "Exit captured move but left continuation." },
-                    { label: "Risk", grade: "A-", score: 90, note: "Risk contained and stop placement respected." },
-                    { label: "Thesis", grade: "B", score: 76, note: "Thesis was clear but lacked catalyst depth." },
-                    { label: "Plan", grade: "B+", score: 84, note: "Execution followed plan with minor discretion drift." },
-                  ]}
-                />
-              )}
-            </div>
+            <TradesTable
+              trades={filteredTrades}
+              onSelectTrade={handleSelectTrade}
+              onScanTrade={handleScanTrade}
+              selectedTradeId={selectedTrade?.id}
+            />
           )}
 
           {tradesLoading && trades.length === 0 && (

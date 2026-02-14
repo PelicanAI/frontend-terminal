@@ -136,6 +136,7 @@ export function useTrades({
         conviction: tradeData.conviction,
         is_paper: tradeData.is_paper ?? false,
         status: 'open',
+        position_size_usd: tradeData.entry_price * tradeData.quantity,
       })
       .select()
       .single()

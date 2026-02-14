@@ -3,6 +3,7 @@
 import { Trade } from "@/hooks/use-trades"
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react"
 import { useState } from "react"
+import { useLiveQuotes, type Quote } from "@/hooks/use-live-quotes"
 
 interface TradesTableProps {
   trades: Trade[]
@@ -11,12 +12,42 @@ interface TradesTableProps {
   onScanTrade?: (trade: Trade) => void
 }
 
+function getUnrealizedPnL(trade: Trade, quotes: Record<string, Quote>) {
+  if (trade.status !== 'open') return null
+  const quote = quotes[trade.ticker]
+  if (!quote) return null
+
+  const currentPrice = quote.price
+  const direction = trade.direction === 'long' ? 1 : -1
+  const pnlAmount = (currentPrice - trade.entry_price) * trade.quantity * direction
+  const pnlPercent = ((currentPrice - trade.entry_price) / trade.entry_price) * 100 * direction
+
+  // R-multiple (if stop loss set)
+  let rMultiple: number | null = null
+  if (trade.stop_loss) {
+    const riskPerShare = Math.abs(trade.entry_price - trade.stop_loss)
+    if (riskPerShare > 0) {
+      rMultiple = ((currentPrice - trade.entry_price) * direction) / riskPerShare
+    }
+  }
+
+  return { currentPrice, pnlAmount, pnlPercent, rMultiple }
+}
+
 type SortField = 'entry_date' | 'ticker' | 'pnl_amount' | 'pnl_percent'
 type SortDirection = 'asc' | 'desc'
 
 export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrade }: TradesTableProps) {
   const [sortField, setSortField] = useState<SortField>('entry_date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+
+  // Get live quotes for open positions
+  const openTickers = trades
+    .filter(t => t.status === 'open')
+    .map(t => t.ticker)
+    .filter((v, i, a) => a.indexOf(v) === i) // dedupe
+
+  const { quotes } = useLiveQuotes(openTickers)
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -119,6 +150,11 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
             </th>
             <th className="pb-3 px-4 text-right">
               <span className="text-xs font-semibold text-foreground/60 uppercase tracking-wide">
+                Current
+              </span>
+            </th>
+            <th className="pb-3 px-4 text-right">
+              <span className="text-xs font-semibold text-foreground/60 uppercase tracking-wide">
                 Exit
               </span>
             </th>
@@ -155,8 +191,15 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
         <tbody>
           {sortedTrades.map((trade) => {
             const isSelected = selectedTradeId === trade.id
-            const isWinner = trade.pnl_amount !== null && trade.pnl_amount > 0
-            const isLoser = trade.pnl_amount !== null && trade.pnl_amount < 0
+            const unrealized = getUnrealizedPnL(trade, quotes)
+
+            // For closed trades, use actual P&L; for open trades with quote, use unrealized
+            const displayPnL = trade.status === 'open' && unrealized
+              ? { amount: unrealized.pnlAmount, percent: unrealized.pnlPercent }
+              : { amount: trade.pnl_amount, percent: trade.pnl_percent }
+
+            const isWinner = displayPnL.amount !== null && displayPnL.amount > 0
+            const isLoser = displayPnL.amount !== null && displayPnL.amount < 0
 
             return (
               <tr
@@ -204,21 +247,32 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                   ${trade.entry_price.toFixed(2)}
                 </td>
                 <td className="py-3 px-4 text-right font-mono text-sm text-foreground">
+                  {trade.status === 'open' && unrealized ? (
+                    <span className={unrealized.currentPrice > trade.entry_price ? 'text-green-400' : unrealized.currentPrice < trade.entry_price ? 'text-red-400' : 'text-foreground'}>
+                      ${unrealized.currentPrice.toFixed(2)}
+                    </span>
+                  ) : trade.status === 'open' ? (
+                    <span className="text-foreground/30" title="Price unavailable">—</span>
+                  ) : (
+                    <span className="text-foreground/30">—</span>
+                  )}
+                </td>
+                <td className="py-3 px-4 text-right font-mono text-sm text-foreground">
                   {trade.exit_price ? `$${trade.exit_price.toFixed(2)}` : '—'}
                 </td>
                 <td className="py-3 px-4 text-right font-mono text-sm font-medium tabular-nums">
-                  {trade.pnl_amount !== null ? (
+                  {displayPnL.amount !== null ? (
                     <span className={isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}>
-                      {trade.pnl_amount >= 0 ? '+' : ''}${trade.pnl_amount.toFixed(2)}
+                      {displayPnL.amount >= 0 ? '+' : ''}${displayPnL.amount.toFixed(2)}
                     </span>
                   ) : (
                     <span className="text-foreground/30">—</span>
                   )}
                 </td>
                 <td className="py-3 px-4 text-right font-mono text-sm font-medium tabular-nums">
-                  {trade.pnl_percent !== null ? (
+                  {displayPnL.percent !== null ? (
                     <span className={isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}>
-                      {trade.pnl_percent >= 0 ? '+' : ''}{trade.pnl_percent.toFixed(2)}%
+                      {displayPnL.percent >= 0 ? '+' : ''}{displayPnL.percent.toFixed(2)}%
                     </span>
                   ) : (
                     <span className="text-foreground/30">—</span>

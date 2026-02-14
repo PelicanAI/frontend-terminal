@@ -2,28 +2,18 @@
 
 export const dynamic = "force-dynamic"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { Search, RefreshCw, Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react"
-import { useEarnings } from "@/hooks/use-earnings"
+import { useEarnings, type EarningsEvent } from "@/hooks/use-earnings"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
-
-interface EarningsEvent {
-  symbol: string
-  date: string
-  quarter: number
-  year: number
-  epsEstimate: number | null
-  revenueEstimate: number | null
-  hour: 'bmo' | 'amc' | 'dmh' | null
-}
 
 export default function EarningsPage() {
   const [search, setSearch] = useState('')
   const [weekOffset, setWeekOffset] = useState(0)
-  const [selectedDate, setSelectedDate] = useState<string>('')
 
-  const { events, isLoading, refetch } = useEarnings()
-  const { openWithPrompt } = usePelicanPanelContext()
+  // Default to today's date
+  const todayStr = new Date().toISOString().split('T')[0] ?? ''
+  const [selectedDate, setSelectedDate] = useState<string>(todayStr)
 
   // Calculate the week's date range
   const weekDates = useMemo(() => {
@@ -46,16 +36,16 @@ export default function EarningsPage() {
     return formatDate(d) === formatDate(new Date())
   }
 
-  // Default to today if it's a weekday, otherwise Monday
-  useEffect(() => {
-    const today = new Date()
-    const dayOfWeek = today.getDay()
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      setSelectedDate(formatDate(today))
-    } else if (weekDates[0]) {
-      setSelectedDate(formatDate(weekDates[0]))
-    }
-  }, [weekDates])
+  // Calculate week range for API call (Monday to Friday)
+  const weekStart = formatDate(weekDates[0] ?? new Date())
+  const weekEnd = formatDate(weekDates[4] ?? new Date())
+
+  const { events, isLoading, refetch } = useEarnings({ from: weekStart, to: weekEnd })
+  const { openWithPrompt } = usePelicanPanelContext()
+
+  // Count events for a specific date
+  const countForDate = (dateStr: string) =>
+    events.filter(e => e.date === dateStr).length
 
   // Filter events by selected date and search
   const filtered = useMemo(() => {
@@ -125,11 +115,12 @@ export default function EarningsPage() {
           {weekDates.map((d) => {
             const dateStr = formatDate(d)
             const active = dateStr === selectedDate
+            const count = countForDate(dateStr)
             return (
               <button
                 key={dateStr}
                 onClick={() => setSelectedDate(dateStr)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all relative ${
                   active
                     ? 'bg-[#8b5cf6] text-white'
                     : isToday(d)
@@ -138,7 +129,12 @@ export default function EarningsPage() {
                 }`}
               >
                 <div className="text-xs opacity-70">{d.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                <div>{d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                <div className="flex items-center justify-center gap-1">
+                  {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {count > 0 && (
+                    <span className="text-[9px] opacity-60 ml-0.5">({count})</span>
+                  )}
+                </div>
               </button>
             )
           })}
