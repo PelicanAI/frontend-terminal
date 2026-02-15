@@ -15,9 +15,9 @@ export function TradeDetailPanel({ trade, onClose, onCloseTrade }: TradeDetailPa
   const isLoser = trade.pnl_amount !== null && trade.pnl_amount < 0
 
   return (
-    <div className="w-full h-full flex flex-col bg-background border-l border-border">
+    <div className="w-full h-full flex flex-col bg-background md:border-l border-border">
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-border flex items-center justify-between">
+      <div className="flex-shrink-0 px-4 py-3 border-b border-border flex items-center justify-between min-h-[60px]">
         <div className="flex items-center gap-2">
           <div className="font-mono font-bold text-lg text-foreground">{trade.ticker}</div>
           <span
@@ -37,9 +37,9 @@ export function TradeDetailPanel({ trade, onClose, onCloseTrade }: TradeDetailPa
         </div>
         <button
           onClick={onClose}
-          className="p-1 hover:bg-white/[0.06] rounded transition-colors"
+          className="p-1 hover:bg-white/[0.06] rounded transition-colors active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
         >
-          <X className="w-4 h-4 text-foreground/60" />
+          <X className="w-5 h-5 text-foreground/60" />
         </button>
       </div>
 
@@ -240,7 +240,7 @@ export function TradeDetailPanel({ trade, onClose, onCloseTrade }: TradeDetailPa
         <div className="flex-shrink-0 p-4 border-t border-border">
           <button
             onClick={() => onCloseTrade(trade)}
-            className="w-full py-3 bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25 rounded-xl font-medium transition-colors"
+            className="w-full py-3 bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25 active:scale-95 rounded-xl font-medium transition-colors min-h-[44px]"
           >
             Close Trade
           </button>

@@ -151,17 +151,17 @@ export default function JournalPage() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="flex-shrink-0 px-6 py-4 border-b border-border">
-        <div className="flex items-center justify-between mb-3">
+      <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-border">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">Trade Journal</h1>
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground">Trade Journal</h1>
             <p className="text-xs text-muted-foreground mt-0.5">
               {trades.length} total trades • {stats?.win_rate.toFixed(1)}% win rate
             </p>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+          {/* Actions - Desktop */}
+          <div className="hidden sm:flex items-center gap-2">
             {/* Type Filter */}
             <div className="flex items-center gap-1 bg-white/[0.06] border border-border rounded-lg p-1">
               <button
@@ -208,7 +208,7 @@ export default function JournalPage() {
             {/* Log Trade Button */}
             <button
               onClick={() => setShowLogTradeModal(true)}
-              className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-500 transition-colors font-medium flex items-center gap-2"
+              className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-500 active:scale-95 transition-colors font-medium flex items-center gap-2 min-h-[44px]"
             >
               <Plus className="w-4 h-4" />
               Log Trade
@@ -217,11 +217,11 @@ export default function JournalPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
           <button
             onClick={() => setActiveTab('dashboard')}
             className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-colors
+              px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 active:scale-95 min-h-[44px]
               ${
                 activeTab === 'dashboard'
                   ? 'bg-white/[0.06] text-foreground'
@@ -235,7 +235,7 @@ export default function JournalPage() {
           <button
             onClick={() => setActiveTab('trades')}
             className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-colors
+              px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 active:scale-95 min-h-[44px]
               ${
                 activeTab === 'trades'
                   ? 'bg-white/[0.06] text-foreground'
@@ -252,7 +252,7 @@ export default function JournalPage() {
       {/* Main Content Area with Detail Panel Support */}
       <div className="flex-1 flex overflow-hidden">
         {/* Main Content */}
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-4 sm:p-6">
           {activeTab === 'dashboard' && (
             <DashboardTab
               stats={stats}
@@ -280,9 +280,9 @@ export default function JournalPage() {
           )}
         </div>
 
-        {/* Right Panel - Trade Detail (30%) */}
+        {/* Right Panel - Trade Detail (30% on desktop, hidden on mobile) */}
         {showDetailPanel && (
-          <div className="flex-shrink-0 w-[min(420px,30%)] h-full">
+          <div className="hidden md:flex flex-shrink-0 w-[min(420px,30%)] h-full">
             <TradeDetailPanel
               trade={selectedTrade}
               onClose={handleCloseDetailPanel}
@@ -291,6 +291,15 @@ export default function JournalPage() {
           </div>
         )}
       </div>
+
+      {/* Mobile FAB: Log Trade */}
+      <button
+        onClick={() => setShowLogTradeModal(true)}
+        className="sm:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#8b5cf6] rounded-full shadow-lg shadow-purple-500/25 flex items-center justify-center active:scale-95 transition-transform"
+        aria-label="Log Trade"
+      >
+        <Plus className="h-6 w-6 text-white" />
+      </button>
 
       {/* Modals */}
       <LogTradeModal
@@ -306,6 +315,23 @@ export default function JournalPage() {
           trade={selectedTrade}
           onSubmit={handleCloseTrade}
         />
+      )}
+
+      {/* Mobile: Trade Detail Bottom Sheet */}
+      {showDetailPanel && selectedTrade && (
+        <div className="md:hidden fixed inset-0 z-50 bg-black/50" onClick={handleCloseDetailPanel}>
+          <div
+            className="absolute bottom-0 left-0 right-0 h-[80vh] bg-background rounded-t-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mt-3 mb-2" />
+            <TradeDetailPanel
+              trade={selectedTrade}
+              onClose={handleCloseDetailPanel}
+              onCloseTrade={handleOpenCloseTrade}
+            />
+          </div>
+        </div>
       )}
     </div>
   )

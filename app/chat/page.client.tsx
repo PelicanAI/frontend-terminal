@@ -511,7 +511,7 @@ export default function ChatPage() {
           setTradingPanelCollapsed(false)
           localStorage.setItem('pelican_trading_panel_collapsed', 'false')
         }} />
-        <div id="main-content" className="flex h-full min-h-0 overflow-hidden relative chat-background-gradient chat-viewport-lock">
+        <div id="main-content" className="flex h-[calc(100vh-3.5rem)] min-h-0 overflow-hidden relative chat-background-gradient chat-viewport-lock">
       {/* Futuristic background effects - only in dark mode */}
       {/* <div className="absolute inset-0 dark:block hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-950/10 via-black to-violet-950/10" />
@@ -600,31 +600,6 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Desktop top controls */}
-        <div className="hidden xl:flex items-center justify-between p-4 border-b border-border bg-background">
-          <div>
-            {sidebarCollapsed && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleSidebarToggle}
-                className="glow-button glow-ghost"
-              >
-                <Menu className="h-4 w-4 text-foreground mr-2" />
-                <span className="text-sm font-medium">Show Sidebar</span>
-              </Button>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Image src="/pelican-logo-transparent.webp" alt="PelicanAI" width={24} height={24} className="w-6 h-6 object-contain" />
-            <span className="font-semibold text-foreground">Pelican AI</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <ChatCreditCounter />
-            <LearningModeToggle />
-            <ThemeToggle />
-          </div>
-        </div>
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto overscroll-none pb-[120px] md:pb-0 chat-scroll-area">

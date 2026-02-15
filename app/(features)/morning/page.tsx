@@ -103,23 +103,23 @@ Please provide:
   }
 
   return (
-    <div className="h-full overflow-auto p-6">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="h-full overflow-auto p-4 sm:p-6">
+      <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Morning Brief</h1>
+          <h1 className="text-lg sm:text-xl font-semibold text-foreground">Morning Brief</h1>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-white/[0.03] px-3 py-1.5">
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-white/[0.03] px-2 sm:px-3 py-1.5">
             <div className={`h-2 w-2 rounded-full ${isMarketOpen ? "bg-green-500" : "bg-yellow-500"}`} />
             <span className="text-xs text-foreground/70">{isMarketOpen ? "Market Open" : marketStatus.replace("-", " ")}</span>
           </div>
           <button
             onClick={() => refetchMovers()}
             disabled={moversLoading}
-            className="rounded-lg border border-border bg-white/[0.06] px-3 py-1.5 transition-colors hover:bg-white/[0.08] disabled:opacity-50"
+            className="rounded-lg border border-border bg-white/[0.06] px-2 sm:px-3 py-1.5 transition-colors hover:bg-white/[0.08] active:scale-95 disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Refresh movers"
           >
             <RefreshCw className={`h-4 w-4 text-foreground/70 ${moversLoading ? "animate-spin" : ""}`} />
@@ -127,7 +127,7 @@ Please provide:
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 p-0 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 p-0 lg:grid-cols-2">
         <PelicanCard className="p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-foreground">Active Exposure</h2>
@@ -148,7 +148,7 @@ Please provide:
                   <button
                     key={trade.id}
                     onClick={() => handleAnalyzeTicker(trade.ticker)}
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.03] p-3 text-left transition-colors hover:bg-white/[0.06]"
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.03] p-3 text-left transition-colors hover:bg-white/[0.06] active:scale-[0.98] min-h-[44px]"
                   >
                     <div className="mb-1 flex items-center justify-between">
                       <span className="font-mono text-sm font-semibold text-foreground">{trade.ticker}</span>
@@ -244,7 +244,7 @@ Please provide:
               <button
                 key={`${moversTab}-${mover.ticker}`}
                 onClick={() => handleAnalyzeTicker(mover.ticker, mover.name)}
-                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] p-3 transition-colors hover:bg-white/[0.06]"
+                className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] p-3 transition-colors hover:bg-white/[0.06] active:scale-[0.98] min-h-[44px]"
               >
                 <div className="text-left">
                   <div className="font-mono text-sm font-semibold text-foreground">{mover.ticker}</div>
@@ -280,7 +280,7 @@ Please provide:
             <button
               onClick={handleGenerateBrief}
               disabled={isGeneratingBrief}
-              className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-purple-500 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 sm:py-3 text-sm font-medium text-white transition-all hover:bg-purple-500 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] active:scale-95 disabled:opacity-50 min-h-[44px]"
             >
               <Sparkles className="h-4 w-4" />
               {isGeneratingBrief ? "Generating..." : "Run Daily Roast"}

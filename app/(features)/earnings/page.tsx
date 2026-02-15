@@ -74,28 +74,28 @@ export default function EarningsPage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-6">
+    <div className="h-full overflow-y-auto p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-xl font-bold text-white">Earnings Calendar</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-white">Earnings Calendar</h1>
           <p className="text-sm text-gray-400 mt-1">{filtered.length} reports</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="relative">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
             <input
               type="text"
               placeholder="Search ticker..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-[#13131a] border border-[#1e1e2e] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#8b5cf6] w-64"
+              className="pl-10 pr-4 py-2 bg-[#13131a] border border-[#1e1e2e] rounded-lg text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-[#8b5cf6] w-full sm:w-64 min-h-[44px]"
             />
           </div>
           <button
             onClick={() => refetch()}
             disabled={isLoading}
-            className="p-2 rounded-lg bg-[#13131a] border border-[#1e1e2e] hover:bg-[#1a1a24] transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg bg-[#13131a] border border-[#1e1e2e] hover:bg-[#1a1a24] active:scale-95 transition-colors disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <RefreshCw className={`h-4 w-4 text-gray-400 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -103,15 +103,15 @@ export default function EarningsPage() {
       </div>
 
       {/* Week Date Picker */}
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-1 sm:gap-2 mb-4 sm:mb-6 overflow-x-auto scrollbar-hide">
         <button
           onClick={() => setWeekOffset(prev => prev - 1)}
-          className="p-1.5 rounded hover:bg-[#1e1e2e] text-gray-400 hover:text-white transition-colors"
+          className="p-1.5 rounded hover:bg-[#1e1e2e] text-gray-400 hover:text-white active:scale-95 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
 
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-1 justify-center">
           {weekDates.map((d) => {
             const dateStr = formatDate(d)
             const active = dateStr === selectedDate
@@ -120,15 +120,15 @@ export default function EarningsPage() {
               <button
                 key={dateStr}
                 onClick={() => setSelectedDate(dateStr)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all relative ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all relative min-h-[44px] flex-shrink-0 ${
                   active
                     ? 'bg-[#8b5cf6] text-white shadow-inner'
                     : isToday(d)
                     ? 'bg-[#1e1e2e] text-[#8b5cf6] border border-[#8b5cf6]/30'
-                    : 'bg-[#13131a] text-gray-400 hover:bg-[#1e1e2e] hover:text-white'
+                    : 'bg-[#13131a] text-gray-400 hover:bg-[#1e1e2e] hover:text-white active:scale-95'
                 }`}
               >
-                <div className="text-xs opacity-70">{d.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                <div className="text-[10px] sm:text-xs opacity-70">{d.toLocaleDateString('en-US', { weekday: 'short' })}</div>
                 <div className="flex items-center justify-center gap-1">
                   {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   {count > 0 && (
@@ -142,7 +142,7 @@ export default function EarningsPage() {
 
         <button
           onClick={() => setWeekOffset(prev => prev + 1)}
-          className="p-1.5 rounded hover:bg-[#1e1e2e] text-gray-400 hover:text-white transition-colors"
+          className="p-1.5 rounded hover:bg-[#1e1e2e] text-gray-400 hover:text-white active:scale-95 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -208,14 +208,15 @@ function EarningsSection({
         <span className="text-xs text-gray-500">({events.length})</span>
       </div>
 
-      <div className="rounded-xl border border-[#1e1e2e] overflow-hidden">
+      {/* Desktop Table View */}
+      <div className="hidden md:block rounded-xl border border-[#1e1e2e] overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="section-header-gradient text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
               <th className="text-left px-4 py-3">Symbol</th>
               <th className="text-right px-4 py-3">Quarter</th>
               <th className="text-right px-4 py-3">EPS Est.</th>
-              <th className="text-right px-4 py-3 hidden md:table-cell">Rev. Est.</th>
+              <th className="text-right px-4 py-3">Rev. Est.</th>
             </tr>
           </thead>
           <tbody>
@@ -242,7 +243,7 @@ function EarningsSection({
                     <span className="text-gray-600">—</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-400 text-right font-mono hidden md:table-cell">
+                <td className="px-4 py-3 text-sm text-gray-400 text-right font-mono">
                   {event.revenueEstimate != null ? (
                     formatRevenue(event.revenueEstimate)
                   ) : (
@@ -253,6 +254,50 @@ function EarningsSection({
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
+        {events.map((event, i) => (
+          <div
+            key={`${event.symbol}-${i}`}
+            onClick={() => onRowClick(event.symbol)}
+            className="rounded-lg border border-[#1e1e2e] bg-[#13131a] p-4 cursor-pointer transition-colors hover:bg-[#1a1a24] active:scale-[0.98] min-h-[44px]"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono font-bold text-lg text-[#8b5cf6]">
+                {event.symbol}
+              </span>
+              <span className="text-xs text-gray-400 font-mono">
+                Q{event.quarter} {event.year}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <div className="text-xs text-gray-500 mb-1">EPS Est.</div>
+                <div className="font-mono text-sm">
+                  {event.epsEstimate != null ? (
+                    <span className={event.epsEstimate >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                      ${event.epsEstimate.toFixed(2)}
+                    </span>
+                  ) : (
+                    <span className="text-gray-600">—</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-1">Rev. Est.</div>
+                <div className="font-mono text-sm text-gray-400">
+                  {event.revenueEstimate != null ? (
+                    formatRevenue(event.revenueEstimate)
+                  ) : (
+                    <span className="text-gray-600">—</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

@@ -116,8 +116,10 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
+    <>
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full">
         <thead className="border-b border-border">
           <tr className="text-left">
             <th className="pb-3 px-4">
@@ -310,6 +312,131 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
           })}
         </tbody>
       </table>
-    </div>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
+        {sortedTrades.map((trade) => {
+          const isSelected = selectedTradeId === trade.id
+          const unrealized = getUnrealizedPnL(trade, quotes)
+
+          const displayPnL = trade.status === 'open' && unrealized
+            ? { amount: unrealized.pnlAmount, percent: unrealized.pnlPercent }
+            : { amount: trade.pnl_amount, percent: trade.pnl_percent }
+
+          const isWinner = displayPnL.amount !== null && displayPnL.amount > 0
+          const isLoser = displayPnL.amount !== null && displayPnL.amount < 0
+
+          return (
+            <div
+              key={trade.id}
+              onClick={() => onSelectTrade(trade)}
+              className={`
+                rounded-lg border cursor-pointer transition-colors p-4 min-h-[44px]
+                ${isSelected ? 'bg-purple-600/10 border-purple-500/30' : 'bg-white/[0.03] border-border hover:bg-white/[0.06]'}
+                ${trade.is_paper ? 'border-dashed' : ''}
+              `}
+            >
+              {/* Header Row */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onScanTrade?.(trade)
+                    }}
+                    className="font-mono font-semibold text-lg text-foreground underline-offset-4 hover:text-primary hover:underline"
+                  >
+                    {trade.ticker}
+                  </button>
+                  {trade.is_paper && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-600/20 text-yellow-400 font-medium">
+                      P
+                    </span>
+                  )}
+                </div>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded border font-medium uppercase ${
+                    trade.direction === 'long'
+                      ? 'bg-green-500/15 text-green-400 border-green-500/20'
+                      : 'bg-red-500/15 text-red-400 border-red-500/20'
+                  }`}
+                >
+                  {trade.direction}
+                </span>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div>
+                  <div className="text-xs text-foreground/50 mb-0.5">Entry</div>
+                  <div className="font-mono text-sm text-foreground">${trade.entry_price.toFixed(2)}</div>
+                </div>
+                {trade.status === 'open' && unrealized ? (
+                  <div>
+                    <div className="text-xs text-foreground/50 mb-0.5">Current</div>
+                    <div className={`font-mono text-sm ${unrealized.currentPrice > trade.entry_price ? 'text-green-400' : unrealized.currentPrice < trade.entry_price ? 'text-red-400' : 'text-foreground'}`}>
+                      ${unrealized.currentPrice.toFixed(2)}
+                    </div>
+                  </div>
+                ) : trade.exit_price ? (
+                  <div>
+                    <div className="text-xs text-foreground/50 mb-0.5">Exit</div>
+                    <div className="font-mono text-sm text-foreground">${trade.exit_price.toFixed(2)}</div>
+                  </div>
+                ) : null}
+              </div>
+
+              {/* P&L Row */}
+              {displayPnL.amount !== null && (
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs text-foreground/50">P&L</div>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-mono text-sm font-medium ${isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}`}>
+                      {displayPnL.amount >= 0 ? '+' : ''}${displayPnL.amount.toFixed(2)}
+                    </span>
+                    {displayPnL.percent !== null && (
+                      <span className={`font-mono text-xs ${isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}`}>
+                        ({displayPnL.percent >= 0 ? '+' : ''}{displayPnL.percent.toFixed(2)}%)
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer Row */}
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-foreground/60">{new Date(trade.entry_date).toLocaleDateString()}</div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full font-medium uppercase ${
+                      trade.status === 'open'
+                        ? 'bg-blue-600/20 text-blue-400'
+                        : trade.status === 'closed'
+                        ? 'bg-foreground/10 text-foreground/60'
+                        : 'bg-foreground/5 text-foreground/40'
+                    }`}
+                  >
+                    {trade.status === 'open' && <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />}
+                    {trade.status}
+                  </span>
+                  {onScanTrade && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onScanTrade(trade)
+                      }}
+                      className="rounded border border-[#8b5cf6]/20 bg-[#8b5cf6]/15 px-3 py-1 text-[10px] font-bold text-[#8b5cf6] transition-colors hover:bg-[#8b5cf6]/25 active:scale-95 min-h-[44px] flex items-center"
+                    >
+                      SCAN
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </>
   )
 }

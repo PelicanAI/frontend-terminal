@@ -51,14 +51,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark:bg-[#0a0a0f]">
+    <html lang="en" suppressHydrationWarning className="dark:bg-[#0c0c14]">
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="theme-color" content="#0a0a0f" />
+        <meta name="theme-color" content="#0c0c14" />
       </head>
-      <body className={`font-sans antialiased bg-background dark:bg-[#0a0a0f] ${inter.variable} ${GeistMono.variable}`}>
+      <body className={`font-sans antialiased bg-background ${inter.variable} ${GeistMono.variable}`}>
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded">Skip to main content</a>
         <SentryErrorBoundary>
           <Suspense fallback={<div className="min-h-screen bg-background" />}>

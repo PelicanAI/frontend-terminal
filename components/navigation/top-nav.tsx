@@ -65,7 +65,7 @@ export function TopNav({ className }: TopNavProps) {
 
   return (
     <nav className={cn(
-      "sticky top-0 z-40 w-full border-b border-[#1e1e2e]/60 bg-[#0a0a0f]/95 backdrop-blur-xl shadow-[0_1px_3px_rgba(0,0,0,0.3)]",
+      "sticky top-0 z-40 w-full border-b border-white/[0.04] bg-[#0c0c14]/80 backdrop-blur-xl",
       className
     )}>
       <div className="flex items-center justify-between h-14 px-4">
@@ -88,8 +88,8 @@ export function TopNav({ className }: TopNavProps) {
             </span>
           </Link>
 
-          {/* Tabs */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Tabs — horizontal scroll on mobile, inline on desktop */}
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 mx-2 sm:mx-4 md:mx-0 md:flex-initial">
             {NAV_TABS.map((tab) => {
               const isActive = activeTab === tab.key
 
@@ -98,62 +98,38 @@ export function TopNav({ className }: TopNavProps) {
                   key={tab.key}
                   href={tab.href}
                   className={cn(
-                    "relative px-3 py-4 text-sm font-medium transition-colors",
+                    "relative px-3 py-1.5 md:py-4 text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 rounded-lg md:rounded-none active:scale-95",
                     isActive
-                      ? "text-white brightness-110"
-                      : "text-gray-400 hover:text-gray-200"
+                      ? "text-white brightness-110 bg-white/[0.06] md:bg-transparent"
+                      : "text-gray-400 hover:text-gray-200 active:bg-white/[0.03]"
                   )}
                 >
                   {tab.label}
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8b5cf6] rounded-full shadow-[0_0_8px_rgba(139,92,246,0.4)]" />
+                    <span className="hidden md:block absolute bottom-0 left-0 right-0 h-0.5 bg-[#8b5cf6] rounded-full shadow-[0_0_8px_rgba(139,92,246,0.4)]" />
                   )}
                 </Link>
               )
             })}
           </div>
-
-          {/* Mobile: Dropdown menu for tabs */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="sm" className="h-9">
-                {NAV_TABS.find(t => t.key === activeTab)?.label || 'Menu'}
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {NAV_TABS.map((tab) => (
-                <DropdownMenuItem key={tab.key} asChild>
-                  <Link
-                    href={tab.href}
-                    className={cn(
-                      "w-full cursor-pointer",
-                      activeTab === tab.key && "text-primary font-medium"
-                    )}
-                  >
-                    {tab.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         {/* Right: Streak + Credits */}
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
           {/* Streak */}
-          <div className="flex items-center gap-1.5 text-sm text-gray-400">
-            <span className={`${journalStreak > 0 ? 'text-lg filter drop-shadow-[0_0_6px_rgba(251,146,60,0.4)]' : ''}`}>🔥</span>
-            <span className="font-mono font-medium text-white tabular-nums">{journalStreak}</span>
-            <span className="text-xs">days</span>
+          <div className="flex items-center gap-1 sm:gap-1.5 text-sm text-gray-400">
+            <span className={`${journalStreak > 0 ? 'text-base sm:text-lg filter drop-shadow-[0_0_6px_rgba(251,146,60,0.4)]' : ''}`}>🔥</span>
+            <span className="font-mono font-medium text-white tabular-nums text-sm sm:text-base">{journalStreak}</span>
+            <span className="text-xs hidden sm:inline">days</span>
           </div>
 
           {/* Credits */}
           <Link
             href="/pricing"
-            className="px-3 py-1 rounded-full border border-[#1e1e2e] bg-[#13131a] text-sm font-mono text-white hover:border-[#8b5cf6]/30 hover:bg-[#1a1a24] transition-all tabular-nums"
+            className="px-2 sm:px-3 py-1 rounded-full border border-white/[0.08] bg-[var(--surface-1)] text-xs sm:text-sm font-mono text-white hover:border-[#8b5cf6]/30 hover:bg-[var(--surface-2)] active:scale-95 transition-all tabular-nums"
           >
-            {(credits?.balance ?? 0).toLocaleString()} credits
+            <span className="hidden sm:inline">{(credits?.balance ?? 0).toLocaleString()} credits</span>
+            <span className="sm:hidden">{(credits?.balance ?? 0).toLocaleString()}</span>
           </Link>
         </div>
       </div>

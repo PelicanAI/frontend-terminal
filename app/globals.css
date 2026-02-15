@@ -87,16 +87,16 @@
 
 /* Fixed dark mode selector to work properly with next-themes */
 .dark {
-  /* Futuristic dark theme with purple accents - matches login page */
-  --background: #0a0a0f;
+  /* Futuristic dark theme with purple accents - brighter base */
+  --background: #0c0c14;
   --foreground: oklch(0.95 0.002 280);
-  --muted: oklch(0.12 0.01 280);
+  --muted: oklch(0.14 0.01 280);
   --muted-foreground: oklch(0.75 0 0);
 
-  /* Layered surfaces with purple glow */
-  --surface-1: oklch(0.08 0.01 280);
-  --surface-2: oklch(0.18 0.015 280);
-  --surface-3: oklch(0.22 0.02 280);
+  /* Layered surfaces with purple glow - brighter depth */
+  --surface-1: #111119;
+  --surface-2: #16161f;
+  --surface-3: #1c1c28;
 
   /* Purple accent borders */
   --border: oklch(0.35 0.08 280);
@@ -453,7 +453,8 @@
 
   /* Chat background gradient - only for dark mode */
   .dark .chat-background-gradient {
-    background: radial-gradient(ellipse at top, rgba(88, 28, 135, 0.3) 0%, transparent 70%);
+    background: radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.03) 0%, transparent 60%),
+                var(--background);
   }
 
   /* ========== Mobile App-Like Chat Experience ========== */
@@ -592,5 +593,15 @@
     border-radius: 50%;
     background: #22c55e;
     animation: live-pulse 2s ease-in-out infinite;
+  }
+
+  /* Hide scrollbars */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

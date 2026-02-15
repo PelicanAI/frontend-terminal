@@ -85,7 +85,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto backdrop-blur-sm">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto backdrop-blur-sm">
         <DialogHeader>
           <DialogTitle>Log New Trade</DialogTitle>
           <DialogDescription>
@@ -164,7 +164,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                 step="any"
                 min="0"
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:border-[#8b5cf6]/50 focus:ring-1 focus:ring-[#8b5cf6]/20"
+                className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-base text-foreground focus:outline-none focus:border-[#8b5cf6]/50 focus:ring-1 focus:ring-[#8b5cf6]/20 min-h-[44px]"
                 placeholder="100"
               />
             </div>
@@ -179,7 +179,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                 step="any"
                 min="0"
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 min-h-[44px]"
                 placeholder="150.00"
               />
             </div>
@@ -197,7 +197,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                 onChange={(e) => setStopLoss(e.target.value)}
                 step="any"
                 min="0"
-                className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 min-h-[44px]"
                 placeholder="140.00"
               />
             </div>
@@ -211,7 +211,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                 onChange={(e) => setTakeProfit(e.target.value)}
                 step="any"
                 min="0"
-                className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 min-h-[44px]"
                 placeholder="160.00"
               />
             </div>
@@ -227,7 +227,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
               value={entryDate}
               onChange={(e) => setEntryDate(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+              className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 min-h-[44px]"
             />
           </div>
 
@@ -268,7 +268,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
               type="text"
               value={setupTags}
               onChange={(e) => setSetupTags(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+              className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-base text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 min-h-[44px]"
               placeholder="breakout, momentum, swing (comma-separated)"
             />
           </div>
@@ -313,14 +313,14 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
               type="button"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground hover:bg-white/[0.08] transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground hover:bg-white/[0.08] active:scale-95 transition-colors disabled:opacity-50 min-h-[44px]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !ticker || !quantity || !entryPrice}
-              className="flex-1 py-3 rounded-xl bg-[#8b5cf6] text-white font-medium transition-all hover:bg-[#7c3aed] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 rounded-xl bg-[#8b5cf6] text-white font-medium transition-all hover:bg-[#7c3aed] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
             >
               {isSubmitting ? 'Logging...' : 'Log Trade'}
             </button>
