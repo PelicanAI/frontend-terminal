@@ -24,14 +24,11 @@ import {
   Settings,
   User,
   LogOut,
-  PanelLeftClose,
   Shield,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
 import Link from "next/link"
-import Image from "next/image"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { useT } from "@/lib/providers/translation-provider"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { createClient } from "@/lib/supabase/client"
@@ -317,35 +314,7 @@ export function ConversationSidebar({
       )}
     >
       {/* Header */}
-      <div className="p-3 space-y-3 border-b border-sidebar-border/30">
-        {/* Logo + Brand */}
-        <div className="flex items-center gap-2.5 px-1">
-          <Image
-            src="/pelican-logo-transparent.webp"
-            alt="Pelican AI"
-            width={32}
-            height={32}
-            className="w-8 h-8 object-contain"
-          />
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-sidebar-foreground">Pelican AI</span>
-            <span className="text-[10px] text-gray-500">Trading Intelligence</span>
-          </div>
-          <div className="ml-auto flex items-center gap-1">
-            <ThemeToggle />
-            {onToggleCollapse && !isMobileSheet && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onToggleCollapse}
-                className="h-8 w-8 hover:bg-sidebar-accent/50"
-              >
-                <PanelLeftClose className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </div>
-
+      <div className="p-3 space-y-2 border-b border-sidebar-border/30">
         {/* New Chat + Search Row */}
         <div className="flex gap-2">
           <Button

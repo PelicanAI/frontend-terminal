@@ -65,17 +65,17 @@ export function TopNav({ className }: TopNavProps) {
         <div className="flex items-center gap-6">
           {/* Logo */}
           <Link
-            href="/"
-            className="flex items-center gap-2 group transition-opacity hover:opacity-80 flex-shrink-0"
+            href="/chat"
+            className="flex items-center gap-2.5 group transition-opacity hover:opacity-80 flex-shrink-0"
           >
             <Image
               src="/pelican-logo-transparent.webp"
               alt="Pelican AI"
-              width={24}
-              height={24}
-              className="w-6 h-6 object-contain"
+              width={32}
+              height={32}
+              className="w-8 h-8 object-contain"
             />
-            <span className="font-bold text-base bg-gradient-to-r from-white to-purple-300 bg-clip-text text-transparent hidden sm:inline">
+            <span className="text-sm font-bold text-white tracking-tight">
               Pelican AI
             </span>
           </Link>
