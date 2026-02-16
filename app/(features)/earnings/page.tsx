@@ -288,8 +288,8 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
 
   return (
     <div className="h-full overflow-y-auto p-4 sm:p-6">
-      {/* Header with subtle elevation */}
-      <div className="mb-6 pb-5 rounded-xl bg-gradient-to-b from-white/[0.03] to-transparent px-4 pt-4 border-b border-white/[0.04]">
+      {/* Header */}
+      <div className="mb-6 pb-5 px-4 pt-4 border-b border-white/[0.04]">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-white">Earnings Calendar</h1>
