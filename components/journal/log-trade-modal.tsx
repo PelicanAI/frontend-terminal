@@ -125,7 +125,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                   setAssetType('stock')
                 }
               }}
-              placeholder="Search ticker (e.g., AAPL)"
+              placeholder="Search by ticker or company name (e.g., AAPL or Apple)"
               autoFocus
             />
           </div>
@@ -251,14 +251,69 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
           {/* Risk at Stop Calculation */}
           {quantity && entryPrice && stopLoss && (
             <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-red-500/5 border border-red-500/10">
-              <span className="text-xs text-foreground/60">Risk at Stop</span>
-              <span className="text-sm font-mono font-semibold text-red-400">
-                ${Math.abs(
-                  parseFloat(quantity) * (parseFloat(entryPrice) - parseFloat(stopLoss))
-                ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <span className="text-xs text-red-300/70 font-medium">Risk at Stop</span>
+              <span className="text-sm font-mono font-semibold text-red-400 tabular-nums">
+                ${(() => {
+                  const qty = parseFloat(quantity)
+                  const entry = parseFloat(entryPrice)
+                  const stop = parseFloat(stopLoss)
+                  const riskAmount = direction === 'short'
+                    ? Math.abs(stop - entry) * qty
+                    : Math.abs(entry - stop) * qty
+                  return riskAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                })()}
               </span>
             </div>
           )}
+
+          {/* Profit at Target Calculation */}
+          {quantity && entryPrice && takeProfit && (
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/30">
+              <span className="text-xs text-green-300/70 font-medium">Profit at Target</span>
+              <span className="text-sm font-mono font-semibold text-green-400 tabular-nums">
+                ${(() => {
+                  const qty = parseFloat(quantity)
+                  const entry = parseFloat(entryPrice)
+                  const target = parseFloat(takeProfit)
+                  const profitAmount = direction === 'short'
+                    ? Math.abs(entry - target) * qty
+                    : Math.abs(target - entry) * qty
+                  return profitAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                })()}
+              </span>
+            </div>
+          )}
+
+          {/* Risk/Reward Ratio */}
+          {quantity && entryPrice && stopLoss && takeProfit && (() => {
+            const qty = parseFloat(quantity)
+            const entry = parseFloat(entryPrice)
+            const stop = parseFloat(stopLoss)
+            const target = parseFloat(takeProfit)
+
+            const riskAmount = direction === 'short'
+              ? Math.abs(stop - entry) * qty
+              : Math.abs(entry - stop) * qty
+
+            const profitAmount = direction === 'short'
+              ? Math.abs(entry - target) * qty
+              : Math.abs(target - entry) * qty
+
+            const ratio = riskAmount > 0 ? profitAmount / riskAmount : 0
+
+            return ratio > 0 && (
+              <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#8b5cf6]/10 border border-[#8b5cf6]/30">
+                <span className="text-xs text-purple-300/70 font-medium">Risk / Reward</span>
+                <span className={`text-sm font-mono font-semibold tabular-nums ${
+                  ratio >= 2 ? 'text-green-400' :
+                  ratio >= 1 ? 'text-yellow-400' :
+                  'text-red-400'
+                }`}>
+                  1:{ratio.toFixed(1)}
+                </span>
+              </div>
+            )
+          })()}
 
           {/* Stop Loss & Take Profit */}
           <div className="grid grid-cols-2 gap-4">
