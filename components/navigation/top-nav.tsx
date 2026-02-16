@@ -89,6 +89,19 @@ export function TopNav({ className }: TopNavProps) {
                 <Link
                   key={tab.key}
                   href={tab.href}
+                  onMouseEnter={() => {
+                    // Prefetch earnings data on hover for instant navigation
+                    if (tab.key === 'earnings') {
+                      const today = new Date()
+                      const monday = new Date(today)
+                      monday.setDate(today.getDate() - today.getDay() + 1)
+                      const friday = new Date(monday)
+                      friday.setDate(monday.getDate() + 4)
+                      const from = monday.toISOString().split('T')[0]
+                      const to = friday.toISOString().split('T')[0]
+                      fetch(`/api/earnings?from=${from}&to=${to}`).catch(() => {})
+                    }
+                  }}
                   className={cn(
                     "relative px-3 py-1.5 md:py-4 text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 rounded-lg md:rounded-none active:scale-95",
                     isActive

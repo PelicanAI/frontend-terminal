@@ -88,23 +88,24 @@
 /* Fixed dark mode selector to work properly with next-themes */
 .dark {
   /* Purple-tinted dark mode - warm purple undertones, clearly visible */
-  --background: #0c0b14;
-  --foreground: #e8e8ef;
-  --muted: oklch(0.14 0.01 280);
-  --muted-foreground: #9d9db5;
+  /* HSL format for shadcn/Tailwind compatibility */
+  --background: 252 30% 5%;              /* hsl(252, 30%, 5%) = dark purple base */
+  --foreground: 252 10% 92%;             /* light purple-tinted white */
+  --muted: 252 25% 12%;                  /* purple-tinted muted backgrounds */
+  --muted-foreground: 252 8% 65%;        /* muted text */
 
-  /* Layered surfaces with strong purple warmth - each step brighter + more purple */
-  --surface-0: #100f1a;
-  --surface-1: #151422;
-  --surface-2: #1b1930;
-  --surface-3: #221f38;
+  /* Layered surfaces - BRIGHTER with MORE purple saturation */
+  --surface-0: #13112a;                  /* significantly more purple */
+  --surface-1: #181630;                  /* clearly purple-tinted */
+  --surface-2: #1e1b38;                  /* distinctly warm purple */
+  --surface-3: #252240;                  /* hover states pop */
 
   /* Purple-tinted borders */
-  --border: rgba(139, 92, 246, 0.10);
+  --border: 252 50% 50% / 0.10;          /* purple-tinted border */
   --border-subtle: rgba(139, 92, 246, 0.06);
   --border-hover: rgba(139, 92, 246, 0.18);
   --border-active: rgba(139, 92, 246, 0.30);
-  --ring: rgba(139, 92, 246, 0.5);
+  --ring: 252 50% 50% / 0.5;             /* purple focus ring */
 
   /* Text colors */
   --text-primary: #e8e8ef;
@@ -140,13 +141,13 @@
   --chart-4: oklch(0.70 0.15 280);
   --chart-5: oklch(0.50 0.28 275);
 
-  /* Components with futuristic styling */
-  --card: oklch(0.18 0.015 280);
-  --card-foreground: oklch(0.95 0.004 280);
-  --popover: var(--surface-3);
-  --popover-foreground: oklch(0.95 0.004 280);
-  --sidebar: var(--surface-0);
-  --sidebar-foreground: #e8e8ef;
+  /* Components with futuristic styling - HSL format */
+  --card: 252 28% 8%;                    /* purple-tinted cards */
+  --card-foreground: 252 10% 92%;        /* light text on cards */
+  --popover: 252 28% 8%;                 /* same as card */
+  --popover-foreground: 252 10% 92%;     /* light text */
+  --sidebar: 252 35% 6%;                 /* darker purple for sidebar */
+  --sidebar-foreground: 252 10% 92%;     /* light text */
   --sidebar-primary: oklch(0.60 0.25 280);
   --sidebar-primary-foreground: oklch(0.98 0.002 280);
   --sidebar-accent: rgba(139, 92, 246, 0.08);
@@ -471,13 +472,13 @@
     }
   }
 
-  /* Chat background gradient - stronger purple aurora effect */
+  /* Chat background gradient - MUCH stronger purple aurora effect */
   .dark .chat-background-gradient {
     background:
-      radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.07) 0%, transparent 50%),
-      radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.04) 0%, transparent 40%),
-      radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 40%),
-      var(--background);
+      radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.10) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.06) 0%, transparent 40%),
+      radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+      hsl(var(--background));
   }
 
   /* ========== Mobile App-Like Chat Experience ========== */

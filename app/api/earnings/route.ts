@@ -52,9 +52,11 @@ export async function GET(request: NextRequest) {
 
     if (cachedData?.fetched_at) {
       const cacheAge = Date.now() - new Date(cachedData.fetched_at).getTime()
-      if (cacheAge < 3600_000) { // 1 hour
+      if (cacheAge < 21600_000) { // 6 hours (was 1 hour)
         return NextResponse.json(cachedData.data, {
-          headers: { "Cache-Control": "public, s-maxage=3600" },
+          headers: {
+            "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400"
+          },
         })
       }
     }
@@ -116,14 +118,14 @@ export async function GET(request: NextRequest) {
       lastUpdated: new Date().toISOString(),
     }
 
-    // Cache the response
+    // Cache the response (6 hours)
     await supabase
       .from('cached_market_data')
       .upsert({
         data_type: 'earnings_calendar',
         data: responseData,
         fetched_at: new Date().toISOString(),
-        expires_at: new Date(Date.now() + 3600_000).toISOString(),
+        expires_at: new Date(Date.now() + 21600_000).toISOString(), // 6 hours
         user_id: null,
         cache_key: cacheKey,
       }, {
@@ -131,7 +133,9 @@ export async function GET(request: NextRequest) {
       })
 
     return NextResponse.json(responseData, {
-      headers: { "Cache-Control": "public, s-maxage=3600" },
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400"
+      },
     })
   } catch (error) {
     console.error("Earnings API error:", error)

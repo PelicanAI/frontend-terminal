@@ -10,6 +10,45 @@ import { cn } from "@/lib/utils"
 
 const MAX_VISIBLE = 8
 
+// Loading skeleton for instant visual feedback
+function EarningsGridSkeleton() {
+  return (
+    <div className="hidden md:grid grid-cols-5 gap-px bg-[rgba(139,92,246,0.08)] mx-4 sm:mx-6 rounded-xl overflow-hidden border border-[rgba(139,92,246,0.08)]">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="bg-[var(--surface-0)] flex flex-col min-h-[400px]">
+          {/* Day header skeleton */}
+          <div className="p-3 text-center border-b border-[rgba(139,92,246,0.08)]">
+            <div className="h-3 w-10 bg-white/5 rounded mx-auto mb-1 animate-pulse" />
+            <div className="h-5 w-14 bg-white/5 rounded mx-auto mb-1 animate-pulse" />
+            <div className="h-3 w-8 bg-white/5 rounded mx-auto animate-pulse" />
+          </div>
+          {/* Section skeletons */}
+          <div className="px-2 pt-3 space-y-3">
+            {/* BMO section */}
+            <div>
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse mb-2" />
+              <div className="space-y-1.5">
+                {Array.from({ length: 6 }).map((_, j) => (
+                  <div key={j} className="h-7 w-full bg-white/5 rounded-md animate-pulse" />
+                ))}
+              </div>
+            </div>
+            {/* AMC section */}
+            <div>
+              <div className="h-3 w-20 bg-white/5 rounded animate-pulse mb-2" />
+              <div className="space-y-1.5">
+                {Array.from({ length: 6 }).map((_, j) => (
+                  <div key={j} className="h-7 w-full bg-white/5 rounded-md animate-pulse" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // Sort events by importance (revenue estimate as proxy for market cap)
 function sortByImportance(events: EarningsEvent[]): EarningsEvent[] {
   return [...events].sort((a, b) => {
@@ -37,13 +76,22 @@ function EarningsCard({
         "w-full px-2 py-1.5 rounded-md border transition-colors text-left group",
         highlighted
           ? "bg-[#8b5cf6]/10 border-[#8b5cf6]/40 ring-1 ring-[#8b5cf6]/20"
-          : "bg-[#13131a] border-[#1e1e2e] hover:border-[#8b5cf6]/30 hover:bg-[#1a1a24]"
+          : "bg-[var(--surface-1)] border-[rgba(139,92,246,0.08)] hover:border-[#8b5cf6]/30 hover:bg-[var(--surface-2)]"
       )}
     >
       <div className="flex items-center justify-between">
-        <span className="font-mono font-bold text-xs text-[#8b5cf6] group-hover:text-[#a78bfa]">
-          {event.symbol}
-        </span>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <img
+            src={`https://eodhd.com/img/logos/US/${event.symbol}.png`}
+            alt=""
+            className="w-4 h-4 rounded-sm object-contain flex-shrink-0 bg-white/5"
+            loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+          />
+          <span className="font-mono font-bold text-xs text-[#8b5cf6] group-hover:text-[#a78bfa] truncate">
+            {event.symbol}
+          </span>
+        </div>
         {event.epsEstimate != null ? (
           <span className={cn(
             "text-[10px] font-mono",
@@ -249,13 +297,11 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <RefreshCw className="h-5 w-5 text-gray-500 animate-spin" />
-        </div>
+        <EarningsGridSkeleton />
       ) : (
         <>
           {/* Desktop: 5-column grid */}
-          <div className="hidden md:grid grid-cols-5 gap-px bg-[#1e1e2e] rounded-xl overflow-hidden border border-[#1e1e2e]">
+          <div className="hidden md:grid grid-cols-5 gap-px bg-[rgba(139,92,246,0.08)] rounded-xl overflow-hidden border border-[rgba(139,92,246,0.08)]">
             {weekDays.map((day, i) => {
               const dayEvents = getEventsForDate(day.dateStr)
               const bmo = sortByImportance(dayEvents.filter(e => e.hour === 'bmo'))
@@ -263,7 +309,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
               const isToday = day.dateStr === todayStr
 
               return (
-                <div key={i} className="bg-[#0c0c14] flex flex-col min-h-[400px]">
+                <div key={i} className="bg-[var(--surface-0)] flex flex-col min-h-[400px]">
                   {/* Day header */}
                   <div className={cn(
                     "p-3 text-center border-b border-[#1e1e2e]",
@@ -320,7 +366,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
 
           {/* Mobile: horizontal scroll */}
           <div className="md:hidden overflow-x-auto scrollbar-hide">
-            <div className="flex gap-px min-w-[1000px] bg-[#1e1e2e] rounded-xl overflow-hidden border border-[#1e1e2e]">
+            <div className="flex gap-px min-w-[1000px] bg-[rgba(139,92,246,0.08)] rounded-xl overflow-hidden border border-[rgba(139,92,246,0.08)]">
               {weekDays.map((day, i) => {
                 const dayEvents = getEventsForDate(day.dateStr)
                 const bmo = sortByImportance(dayEvents.filter(e => e.hour === 'bmo'))
@@ -328,7 +374,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
                 const isToday = day.dateStr === todayStr
 
                 return (
-                  <div key={i} className="w-[200px] flex-shrink-0 bg-[#0c0c14] flex flex-col min-h-[400px]">
+                  <div key={i} className="w-[200px] flex-shrink-0 bg-[var(--surface-0)] flex flex-col min-h-[400px]">
                     {/* Day header */}
                     <div className={cn(
                       "p-3 text-center border-b border-[#1e1e2e]",
