@@ -29,6 +29,27 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
   const [conviction, setConviction] = useState("5")
   const [isPaper, setIsPaper] = useState(false)
 
+  // Normalize ticker for crypto/forex to ensure valid pairs
+  const normalizeTicker = (tickerValue: string, assetTypeValue: string): string => {
+    const t = tickerValue.toUpperCase().trim()
+
+    if (assetTypeValue === 'crypto') {
+      // BTC → BTCUSD, ETH → ETHUSD (if not already a pair)
+      if (!t.endsWith('USD') && !t.endsWith('USDT') && !t.endsWith('BTC') && !t.endsWith('ETH')) {
+        return `${t}USD`
+      }
+    }
+
+    if (assetTypeValue === 'forex') {
+      // EUR → EURUSD, GBP → GBPUSD (if only 3 chars)
+      if (t.length === 3) {
+        return `${t}USD`
+      }
+    }
+
+    return t
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -46,8 +67,11 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
         .map((t) => t.trim())
         .filter(Boolean)
 
+      // Normalize ticker before saving
+      const normalizedTicker = normalizeTicker(ticker, assetType)
+
       await onSubmit({
-        ticker,
+        ticker: normalizedTicker,
         asset_type: assetType,
         direction,
         quantity: parseFloat(quantity),
@@ -113,17 +137,23 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
               value={ticker}
               onChange={setTicker}
               onSelect={(result) => {
+                let detectedAssetType = 'stock'
+
                 if (result.type === 'CRYPTO' || result.market === 'crypto') {
-                  setAssetType('crypto')
+                  detectedAssetType = 'crypto'
                 } else if (result.type === 'FX' || result.market === 'fx') {
-                  setAssetType('forex')
+                  detectedAssetType = 'forex'
                 } else if (result.type === 'FUTURE' || result.market === 'futures') {
-                  setAssetType('future')
+                  detectedAssetType = 'future'
                 } else if (result.type === 'ETF') {
-                  setAssetType('etf')
-                } else {
-                  setAssetType('stock')
+                  detectedAssetType = 'etf'
                 }
+
+                setAssetType(detectedAssetType)
+
+                // Normalize ticker for crypto/forex immediately
+                const normalizedTicker = normalizeTicker(result.ticker, detectedAssetType)
+                setTicker(normalizedTicker)
               }}
               placeholder="Search by ticker or company name (e.g., AAPL or Apple)"
               autoFocus
