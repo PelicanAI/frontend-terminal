@@ -6,6 +6,7 @@ import { useMemo, useState, useEffect } from "react"
 import { useTrades } from "@/hooks/use-trades"
 import { useMorningBrief } from "@/hooks/use-morning-brief"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
+import { useLiveQuotes } from "@/hooks/use-live-quotes"
 import { PelicanCard } from "@/components/ui/pelican-card"
 import { Sparkles, RefreshCw, CalendarDays } from "lucide-react"
 import { getMarketStatus } from "@/hooks/use-market-data"
@@ -53,6 +54,11 @@ export default function MorningPage() {
   const { openTrades, isLoading: tradesLoading } = useTrades({ status: 'open' })
   const { movers, isLoading: moversLoading, refetch: refetchMovers } = useMorningBrief()
   const { openWithPrompt } = usePelicanPanelContext()
+
+  // Get live quotes for open positions to calculate unrealized P&L
+  const openTickersWithTypes = openTrades
+    .map(t => `${t.ticker}:${t.asset_type}`)
+  const { quotes } = useLiveQuotes(openTickersWithTypes)
 
   const marketStatus = getMarketStatus()
   const isMarketOpen = marketStatus === 'open'
@@ -247,8 +253,23 @@ Please provide:
           ) : (
             <div className="space-y-3">
               {openTrades.slice(0, 8).map((trade) => {
-                const pnl = trade.pnl_amount ?? 0
-                const pnlColor = pnl >= 0 ? "text-green-400" : "text-[var(--destructive)]"
+                // Calculate unrealized P&L from live prices
+                const quote = quotes[trade.ticker]
+                const currentPrice = quote?.price
+                const direction = trade.direction === 'long' ? 1 : -1
+
+                let unrealizedPnL: number | null = null
+                if (currentPrice) {
+                  unrealizedPnL = (currentPrice - trade.entry_price) * trade.quantity * direction
+                }
+
+                const pnl = unrealizedPnL ?? trade.pnl_amount ?? null
+                const pnlColor = pnl === null
+                  ? "text-foreground/40"
+                  : pnl >= 0
+                    ? "text-green-400"
+                    : "text-red-400"
+
                 return (
                   <button
                     key={trade.id}
@@ -267,7 +288,7 @@ Please provide:
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-foreground/60">Entry ${trade.entry_price.toFixed(2)} · Qty {trade.quantity}</span>
                       <span className={`font-mono ${pnlColor}`}>
-                        {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
+                        {pnl === null ? "—" : `${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)}`}
                       </span>
                     </div>
                   </button>

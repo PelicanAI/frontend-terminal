@@ -342,15 +342,10 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
               {/* Header Row */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onScanTrade?.(trade)
-                    }}
-                    className="font-mono font-semibold text-lg text-foreground underline-offset-4 hover:text-primary hover:underline"
-                  >
+                  <LogoImg symbol={trade.ticker} size={24} />
+                  <span className="font-mono font-semibold text-base text-purple-400">
                     {trade.ticker}
-                  </button>
+                  </span>
                   {trade.is_paper && (
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-600/20 text-yellow-400 font-medium">
                       P
@@ -369,42 +364,32 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="grid grid-cols-3 gap-3 text-xs mb-3">
                 <div>
-                  <div className="text-xs text-foreground/50 mb-0.5">Entry</div>
-                  <div className="font-mono text-sm text-foreground">${trade.entry_price.toFixed(2)}</div>
+                  <span className="text-foreground/40 block mb-0.5">Entry</span>
+                  <span className="font-mono text-foreground/90">${trade.entry_price.toFixed(2)}</span>
                 </div>
-                {trade.status === 'open' && unrealized ? (
-                  <div>
-                    <div className="text-xs text-foreground/50 mb-0.5">Current</div>
-                    <div className={`font-mono text-sm ${unrealized.currentPrice > trade.entry_price ? 'text-green-400' : unrealized.currentPrice < trade.entry_price ? 'text-red-400' : 'text-foreground'}`}>
+                <div>
+                  <span className="text-foreground/40 block mb-0.5">Current</span>
+                  {trade.status === 'open' && unrealized ? (
+                    <span className={`font-mono ${unrealized.currentPrice > trade.entry_price ? 'text-green-400' : unrealized.currentPrice < trade.entry_price ? 'text-red-400' : 'text-foreground/90'}`}>
                       ${unrealized.currentPrice.toFixed(2)}
-                    </div>
-                  </div>
-                ) : trade.exit_price ? (
-                  <div>
-                    <div className="text-xs text-foreground/50 mb-0.5">Exit</div>
-                    <div className="font-mono text-sm text-foreground">${trade.exit_price.toFixed(2)}</div>
-                  </div>
-                ) : null}
-              </div>
-
-              {/* P&L Row */}
-              {displayPnL.amount !== null && (
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-xs text-foreground/50">P&L</div>
-                  <div className="flex items-center gap-2">
-                    <span className={`font-mono text-sm font-medium ${isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}`}>
+                    </span>
+                  ) : (
+                    <span className="text-foreground/40">—</span>
+                  )}
+                </div>
+                <div>
+                  <span className="text-foreground/40 block mb-0.5">P&L</span>
+                  {displayPnL.amount !== null ? (
+                    <span className={`font-mono ${isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}`}>
                       {displayPnL.amount >= 0 ? '+' : ''}${displayPnL.amount.toFixed(2)}
                     </span>
-                    {displayPnL.percent !== null && (
-                      <span className={`font-mono text-xs ${isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}`}>
-                        ({displayPnL.percent >= 0 ? '+' : ''}{displayPnL.percent.toFixed(2)}%)
-                      </span>
-                    )}
-                  </div>
+                  ) : (
+                    <span className="text-foreground/40">—</span>
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* Footer Row */}
               <div className="flex items-center justify-between">

@@ -43,7 +43,7 @@ export function useEarnings({
       return response.json()
     },
     {
-      refreshInterval: 3600000, // 1 hour
+      refreshInterval: 60000, // 60 seconds - pick up newly reported actuals
       revalidateOnFocus: false,
     }
   )

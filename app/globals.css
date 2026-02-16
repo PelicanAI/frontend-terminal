@@ -644,4 +644,13 @@
   .border-subtle {
     border-color: rgba(139, 92, 246, 0.06);
   }
+
+  /* Safe area padding for mobile (notch/bottom bar) */
+  .pb-safe {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
 }

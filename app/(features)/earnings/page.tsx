@@ -11,6 +11,16 @@ import { LogoImg } from "@/components/ui/logo-img"
 
 const MAX_VISIBLE = 8
 
+// Revenue formatting helper
+function formatRevenue(value: number | null): string {
+  if (value === null || value === 0) return '—'
+  const abs = Math.abs(value)
+  if (abs >= 1e12) return `$${(value / 1e12).toFixed(1)}T`
+  if (abs >= 1e9) return `$${(value / 1e9).toFixed(1)}B`
+  if (abs >= 1e6) return `$${(value / 1e6).toFixed(0)}M`
+  return `$${(value / 1e3).toFixed(0)}K`
+}
+
 // Loading skeleton for instant visual feedback
 function EarningsGridSkeleton() {
   return (
@@ -87,16 +97,56 @@ function EarningsCard({
             {event.symbol}
           </span>
         </div>
-        {event.epsEstimate != null ? (
-          <span className={cn(
-            "text-[10px] font-mono",
-            event.epsEstimate >= 0 ? "text-emerald-400" : "text-red-400"
-          )}>
-            ${event.epsEstimate.toFixed(2)}
-          </span>
-        ) : (
-          <span className="text-[10px] text-gray-600">—</span>
-        )}
+
+        {/* Right side: EPS & Revenue data */}
+        <div className="text-right flex-shrink-0 ml-2">
+          {event.epsActual !== null ? (
+            // POST-REPORT: show actuals with beat/miss
+            <>
+              <div className={cn(
+                "text-xs font-mono tabular-nums",
+                event.epsActual > (event.epsEstimate || 0)
+                  ? "text-green-400"
+                  : event.epsActual < (event.epsEstimate || 0)
+                    ? "text-red-400"
+                    : "text-yellow-400"
+              )}>
+                {event.epsActual.toFixed(2)}
+                {event.epsEstimate !== null && (
+                  <span className="ml-1 text-[10px]">
+                    {event.epsActual > event.epsEstimate ? '▲' :
+                     event.epsActual < event.epsEstimate ? '▼' : '—'}
+                  </span>
+                )}
+              </div>
+              {event.revenueActual !== null && (
+                <div className={cn(
+                  "text-[10px] font-mono tabular-nums",
+                  event.revenueActual > (event.revenueEstimate || 0)
+                    ? "text-green-400/60"
+                    : "text-red-400/60"
+                )}>
+                  {formatRevenue(event.revenueActual)}
+                </div>
+              )}
+            </>
+          ) : event.epsEstimate !== null ? (
+            // PRE-REPORT: show estimates
+            <>
+              <div className="text-xs font-mono tabular-nums text-foreground/40">
+                Est {event.epsEstimate.toFixed(2)}
+              </div>
+              {event.revenueEstimate !== null && (
+                <div className="text-[10px] font-mono tabular-nums text-foreground/25">
+                  {formatRevenue(event.revenueEstimate)}
+                </div>
+              )}
+            </>
+          ) : (
+            // NO DATA: show placeholder
+            <span className="text-[10px] text-gray-600">—</span>
+          )}
+        </div>
       </div>
     </button>
   )

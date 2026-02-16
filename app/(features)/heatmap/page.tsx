@@ -164,14 +164,48 @@ export default function HeatmapPage() {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar - Sector Legend */}
-        <div className="flex-shrink-0 w-64 border-r border-white/[0.04] p-4 overflow-y-auto">
-          <SectorLegend
-            stocks={stocks}
-            selectedSectors={selectedSectors}
-            onToggleSector={handleToggleSector}
-          />
+      <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
+        {/* Sidebar - Sector Legend (horizontal scroll on mobile, vertical on desktop) */}
+        <div className="flex-shrink-0 sm:w-64 border-b sm:border-b-0 sm:border-r border-white/[0.04] overflow-y-auto">
+          {/* Mobile: horizontal scrolling pills */}
+          <div className="sm:hidden flex gap-2 overflow-x-auto scrollbar-hide p-3 pb-2">
+            {getSectors().map((sector) => {
+              const sectorStocks = stocks.filter(s => s.sector === sector)
+              const avgChange = sectorStocks.length > 0
+                ? sectorStocks.reduce((sum, s) => sum + (s.changePercent ?? 0), 0) / sectorStocks.length
+                : 0
+              const isSelected = selectedSectors.includes(sector)
+
+              return (
+                <button
+                  key={sector}
+                  onClick={() => handleToggleSector(sector)}
+                  className={`
+                    px-3 py-1.5 rounded-full text-[10px] whitespace-nowrap
+                    flex-shrink-0 border transition-colors
+                    ${isSelected
+                      ? 'bg-purple-500/20 border-purple-500/30 text-purple-300'
+                      : 'bg-white/[0.02] border-white/[0.04] text-foreground/50'
+                    }
+                  `}
+                >
+                  {sector}
+                  <span className={`ml-1 font-mono ${avgChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {avgChange >= 0 ? '+' : ''}{avgChange.toFixed(2)}%
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Desktop: existing vertical legend */}
+          <div className="hidden sm:block p-4">
+            <SectorLegend
+              stocks={stocks}
+              selectedSectors={selectedSectors}
+              onToggleSector={handleToggleSector}
+            />
+          </div>
         </div>
 
         {/* Heatmap visualization */}
@@ -207,8 +241,9 @@ export default function HeatmapPage() {
 
           {!error && filteredStocks.length > 0 && (
             <>
+              {/* Desktop: Treemap or Grid */}
               {viewMode === 'treemap' && (
-                <div className="flex items-center justify-center">
+                <div className="hidden sm:flex items-center justify-center">
                   <Treemap
                     stocks={filteredStocks}
                     width={dimensions.width}
@@ -219,8 +254,53 @@ export default function HeatmapPage() {
               )}
 
               {viewMode === 'grid' && (
-                <HeatmapGrid stocks={filteredStocks} onStockClick={handleStockClick} />
+                <div className="hidden sm:block">
+                  <HeatmapGrid stocks={filteredStocks} onStockClick={handleStockClick} />
+                </div>
               )}
+
+              {/* Mobile: Sorted list view */}
+              <div className="sm:hidden space-y-1 p-3">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-semibold text-foreground/50 uppercase">
+                    {selectedSectors.length === getSectors().length ? 'All Stocks' : `${selectedSectors.join(', ')}`} — Sorted by Change
+                  </h3>
+                  <span className="text-[10px] text-foreground/30">
+                    {filteredStocks.length} stocks
+                  </span>
+                </div>
+
+                {filteredStocks
+                  .sort((a, b) => (b.changePercent ?? 0) - (a.changePercent ?? 0))
+                  .map((stock) => (
+                    <button
+                      key={stock.ticker}
+                      onClick={() => handleStockClick(stock.ticker, stock.name)}
+                      className="w-full flex items-center justify-between p-2.5 rounded-lg hover:bg-white/[0.04] active:bg-white/[0.06] transition-colors min-h-[44px]"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-mono text-xs font-bold text-purple-400 w-12 text-left">
+                          {stock.ticker}
+                        </span>
+                        <span className="text-[10px] text-foreground/40 truncate">
+                          {stock.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <span className="text-[10px] font-mono text-foreground/50">
+                          ${stock.price?.toFixed(2) ?? '—'}
+                        </span>
+                        <span className={`text-xs font-mono font-semibold w-16 text-right ${
+                          (stock.changePercent ?? 0) >= 0 ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                          {(stock.changePercent ?? 0) >= 0 ? '+' : ''}
+                          {stock.changePercent?.toFixed(2) ?? '0.00'}%
+                        </span>
+                      </div>
+                    </button>
+                  ))
+                }
+              </div>
             </>
           )}
         </div>
