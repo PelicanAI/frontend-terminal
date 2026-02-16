@@ -110,6 +110,65 @@ get_popular_tickers(p_days INTEGER, p_limit INTEGER) → [{ ticker TEXT, mention
 - **Calendar**: TradingView economic calendar widget
 - **Learn**: Education chat (GPT-4o-mini) for Learning Mode
 
+### Morning Brief (`/morning`) — COMPLETE ✓
+- **Market Movers**: Gainers/Losers with price tier filters (All, $200+, $100-$200, etc.)
+  - Default: "All" tier (shows all tickers)
+  - Live price data via Polygon.io
+  - Click ticker → pre-fills chat
+- **Active Exposure**: Open positions with unrealized P&L calculated from live prices
+  - Formula: `(currentPrice - entryPrice) × quantity × direction`
+  - Color-coded: green (profit), red (loss), gray (unavailable)
+- **Earnings Today**: Today's earnings with EPS/Rev estimates and actuals
+  - Pre-report: "Est. EPS:" / "Est. Rev:" labels (muted)
+  - Post-report: "EPS:" / "Rev:" with beat/miss indicators (▲/▼)
+- **IPO Watch**: Upcoming IPOs with ticker, company, date, price range
+  - Smart date formatting (Today, Tomorrow, or date)
+  - Click → opens Pelican chat with IPO context
+- **Economic Calendar**: Key events for the day
+- Subtle header elevation with gradient background
+
+### Earnings Calendar (`/earnings`) — COMPLETE ✓
+- **5-Column Week Grid**: Monday-Friday layout with day headers
+- **Before Open Section**: ☀ Capped at 3 rows (small caps)
+  - "+N more" expands to show all
+  - "− collapse" to hide extras
+- **After Close Section**: 🌙 Shows 8 rows initially (big names like NVDA, AAPL, META)
+  - Same "+N more" expansion behavior
+- **Uniform Row Sizing**: ALL rows enlarged for better readability
+  - Logo: 20px, Ticker: text-sm font-semibold
+  - EPS/Rev: text-xs, Padding: px-3 py-2.5
+  - Hover: `hover:bg-white/[0.04]`
+- **Visual Divider**: Subtle border between Before Open and After Close
+- **Pelican Watermark**: Pure white logo at 3% opacity
+  - Overlays ON TOP of grid (not behind)
+  - CSS filter: `brightness(0) invert(1)` for pure white
+  - Brands every screenshot for social media exposure
+- **Consistent Background**: Uniform `#0a0a0f` top to bottom (no gradient)
+- **Header Polish**: Subtle border divider, clean spacing
+
+### Trade Journal (`/journal`) — COMPLETE ✓
+- **Positions Table**: Open/closed trades with live P&L tracking
+  - Multi-endpoint price fetching (stocks, crypto, forex)
+  - Ticker format: `ticker:assetType` for proper Polygon routing
+- **Log Trade Modal**: Full trade entry with validation
+  - Auto-appends "USD" for crypto/forex (BTC → BTCUSD, EUR → EURUSD)
+  - Company name search (not just ticker symbols)
+  - Position size, Risk at Stop, Profit at Target calculations
+  - Risk/Reward ratio with color coding (green ≥2:1, yellow 1-2:1, red <1:1)
+  - Asset type auto-detection from search results
+- **Crypto/Forex Support**: Polygon ticker prefixes
+  - Crypto: `X:BTCUSD`, Forex: `C:EURUSD`, Stocks: `AAPL`
+  - Logo mapping for crypto pairs (BTCUSD → BTC)
+- **Mobile Responsive**: Card layouts, bottom sheets, safe area padding
+
+### Market Heatmap (`/heatmap`) — COMPLETE ✓
+- Custom squarified treemap (no d3 dependency)
+- S&P 500 stocks with live price data
+- Sector filtering with horizontal pills on mobile
+- Click stock → pre-fills chat with analysis prompt
+- Auto-refresh: 60s market hours, 5m after hours
+- Mobile: sorted list view with color coding
+
 ### Admin Dashboard (`/admin`)
 - User list with search/filter
 - Recent signups table
@@ -132,11 +191,108 @@ Features use a "chat pre-fill" pattern: clicking elements composes messages in c
 Look for `prefillChatMessage` or similar — should be a shared utility.
 
 ### Data Fetching
-Check what pattern the codebase uses (SWR hooks, React Query, or raw useEffect). Match existing patterns.
+- **SWR Hooks**: Used for live data (prices, earnings, movers)
+  - `useLiveQuotes` - Multi-endpoint price fetching with asset type routing
+  - `useEarnings` - Earnings calendar with 60s refresh
+  - `useHeatmap` - Heatmap data with auto-refresh
+- **Format**: `ticker:assetType` for price fetching (`AAPL:stock`, `BTCUSD:crypto`, `EURUSD:forex`)
+
+### Polygon.io API Integration
+- **Different endpoints per asset class**:
+  - Stocks: `/v2/snapshot/locale/us/markets/stocks/tickers`
+  - Crypto: `/v2/snapshot/locale/global/markets/crypto/tickers`
+  - Forex: `/v2/snapshot/locale/global/markets/forex/tickers`
+- **Ticker Prefixes**:
+  - Crypto: `X:BTCUSD` (must include prefix)
+  - Forex: `C:EURUSD` (must include prefix)
+  - Stocks: `AAPL` (no prefix)
+- **Multi-endpoint routing**: Group tickers by asset type, fetch in parallel
 
 ### Supabase Client
 - Client-side: `createClient` or `createBrowserClient` (search lib/supabase/)
 - Server-side API routes: different client. Search for `createServerClient`.
+
+### Mobile Responsiveness Strategy
+- **Breakpoints**: sm: 640px, md: 768px, lg: 1024px
+- **Desktop ≥1024px**: Must look identical, no layout changes
+- **Mobile/Tablet**: Bottom sheets, card layouts, horizontal scrolling
+- **Safe Area**: `.pb-safe`, `.pt-safe` utilities for notch/bottom bar
+- **Pattern**: Desktop-first design, then mobile adaptations
+
+### Visual Branding
+- **Watermarks**: Overlay ON TOP of content (not background-image)
+  - Use `filter: brightness(0) invert(1)` for pure white
+  - `pointer-events-none` for click-through
+  - 3-5% opacity for subtle effect
+  - Positioned LAST in DOM for natural stacking order
+- **Consistency**: Uniform backgrounds, no gradients unless intentional hierarchy
+
+---
+
+## Key Learnings & Best Practices
+
+### Polygon.io Integration Lessons
+1. **Asset Type Routing is Critical**
+   - MUST use different endpoints per asset class (stocks, crypto, forex)
+   - MUST include prefixes for crypto (`X:`) and forex (`C:`)
+   - Group tickers by asset type before fetching to minimize API calls
+   - Pass `ticker:assetType` format from frontend to API routes
+
+2. **Logo Mapping for Crypto**
+   - Crypto pairs (BTCUSD) need mapping to base symbol (BTC) for logos
+   - Map in frontend: `getLogoSymbol()` function strips prefixes and maps pairs
+
+3. **Auto-normalization**
+   - Auto-append "USD" for bare crypto/forex symbols (BTC → BTCUSD, EUR → EURUSD)
+   - Prevents user errors when logging trades
+   - Apply normalization in form submission AND autocomplete selection
+
+### Visual Design Patterns
+1. **Watermarks for Screenshot Branding**
+   - Position LAST in DOM to overlay ON TOP of all content
+   - Use `filter: brightness(0) invert(1)` for pure white (regardless of original color)
+   - `pointer-events-none` for click-through behavior
+   - 3-5% opacity is sweet spot (visible but not distracting)
+   - Marketing hack: Every screenshot shared = free brand exposure
+
+2. **Background Consistency**
+   - Avoid gradients that create color shifts between sections
+   - Use borders (`border-white/[0.04]`) for visual separation, not background changes
+   - Keep entire page one uniform background (`#0a0a0f`)
+   - Let grid glows and content spacing create hierarchy
+
+3. **Visual Hierarchy with Data Density**
+   - Cap less important sections (Before Open earnings at 3 rows)
+   - Give more space to important data (After Close earnings at 8 rows)
+   - Use uniform sizing when differentiation isn't meaningful
+   - "+N more" expansion for overflow prevents overwhelming users
+
+### Form UX Enhancements
+1. **Progressive Reveal with Calculations**
+   - Show calculated metrics as form fields are filled (Position Size, Risk at Stop, Profit at Target)
+   - Color-code Risk/Reward ratios (green ≥2:1, yellow 1-2:1, red <1:1)
+   - Gamification through discipline: visible metrics encourage better trade planning
+
+2. **Smart Defaults**
+   - Market movers default to "All" tier (not $200+) - users can filter down
+   - Company name search, not just ticker symbols (more user-friendly)
+   - Asset type auto-detection from search results
+
+3. **Estimate vs Actual Clarity**
+   - Pre-report: "Est. EPS:" / "Est. Rev:" (muted color)
+   - Post-report: "EPS:" / "Rev:" with beat/miss indicators (▲/▼, colored)
+   - Label change makes transition from estimate to result obvious at a glance
+
+### Mobile Responsiveness Strategy
+1. **Desktop-First, Then Adapt**
+   - Desktop ≥1024px must remain pixel-perfect
+   - Mobile gets: bottom sheets, card layouts, horizontal scrolling
+   - Safe area utilities for notches/home bars
+
+2. **Consistent Patterns**
+   - Apply same header treatment across all feature pages
+   - Use same component patterns (sheets, pills, cards) throughout
+   - Mobile users expect consistency
 
 ---
 
@@ -195,17 +351,22 @@ trades, daily_journal, playbooks, watchlist, trade_screenshots, trade_imports
 ---
 
 ## Current TODO
-- [ ] A(full Q&A, copy, search)
+- [x] ~~Morning Brief with movers, earnings, IPOs~~ ✓ COMPLETE
+- [x] ~~Earnings Calendar with watermark branding~~ ✓ COMPLETE
+- [x] ~~Trade Journal with crypto/forex support~~ ✓ COMPLETE
+- [x] ~~Market Heatmap with live data~~ ✓ COMPLETE
+- [x] ~~Mobile responsiveness V2~~ ✓ COMPLETE
 - [ ] Image persistence (Supabase Storage → signed URLs)
 - [ ] TradingView attribution tags
 - [ ] Nick headshot + Twitter on team page
-- [ ] UI polish pass (chat formatting, spacing, visual hierarchy)
+- [ ] Chat UI polish (formatting, spacing, visual hierarchy)
 - [ ] Open Graph meta tags for social sharing
 - [ ] Landing page CRO improvements (audit score: 51/100)
 
-## Future TODO (not started)
-- [ ] Trade Journal frontend (tables exist in Supabase)
-- [ ] Market Heatmap frontend (Polygon.io API routes needed)
-- [ ] Morning Briefing feature
-- [ ] Position Dashboard with health scores
+## Future TODO
+- [ ] Trade Analytics Dashboard (equity curve, P&L charts)
+- [ ] Daily Journal feature (pre/post market notes)
+- [ ] Playbooks system (setup rules, checklists)
 - [ ] Sidebar Trades + Heatmap tabs
+- [ ] Position health scores
+- [ ] AI trade grading

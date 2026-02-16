@@ -5,9 +5,10 @@ import type React from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { Lock, Mail, ArrowLeft } from "lucide-react"
+import { ReferralCodeInput } from "@/components/ReferralCodeInput"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
@@ -19,6 +20,7 @@ export default function SignUpPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const planParam = searchParams.get('plan')
+  const recordReferralRef = useRef<((userId: string) => Promise<void>) | null>(null)
 
   // Store the plan parameter in sessionStorage for use after signup
   useEffect(() => {
@@ -72,6 +74,11 @@ export default function SignUpPage() {
             terms_accepted_at: new Date().toISOString(),
           })
           .eq("user_id", data.user.id)
+
+        // Record referral if available
+        if (recordReferralRef.current) {
+          await recordReferralRef.current(data.user.id)
+        }
 
         // User is logged in, redirect to pricing (new users need to subscribe)
         // Check if there's a pre-selected plan from the marketing site
@@ -225,6 +232,8 @@ export default function SignUpPage() {
                   />
                 </div>
               </div>
+
+              <ReferralCodeInput onReferralReady={(fn) => { recordReferralRef.current = fn; }} />
 
               <div className="flex items-center pt-2">
                 <input

@@ -104,6 +104,17 @@ export async function POST(request: NextRequest) {
             throw error
           }
 
+          // Activate referral bonus if this user was referred
+          const planAmount = planName === 'power' ? 249 : planName === 'pro' ? 99 : 29;
+          const { error: referralError } = await supabaseAdmin.rpc('activate_referral_bonus', {
+            p_user_id: userId,
+            p_plan_type: planName || 'base',
+            p_plan_amount: planAmount,
+          });
+          if (referralError) {
+            // Log but don't throw - referral bonus failure shouldn't block subscription setup
+            console.error('Referral bonus activation failed:', referralError);
+          }
         }
         break
       }

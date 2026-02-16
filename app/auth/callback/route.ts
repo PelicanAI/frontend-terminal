@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { User } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,6 +45,29 @@ export async function GET(request: NextRequest) {
       if (!user) {
         console.error('[AUTH CALLBACK] No user found after exchangeCodeForSession')
         return NextResponse.redirect(`${origin}/auth/error`)
+      }
+
+      // Handle referral code from cookie (OAuth flow)
+      const cookieStore = await cookies()
+      const referralCode = cookieStore.get('pelican_ref')?.value
+      if (referralCode) {
+        try {
+          // First validate the code
+          const { data: validationData, error: validationError } = await supabase.rpc('validate_referral_code', {
+            p_code: referralCode.toUpperCase().trim(),
+          })
+
+          if (!validationError && validationData?.valid && validationData.code_id) {
+            // Record the referral
+            await supabase.rpc('record_referral', {
+              p_user_id: user.id,
+              p_code_id: validationData.code_id,
+            })
+          }
+        } catch (error) {
+          console.error('[AUTH CALLBACK] Failed to record referral:', error)
+          // Continue without failing the auth flow
+        }
       }
 
       // Check if user has subscription and terms acceptance

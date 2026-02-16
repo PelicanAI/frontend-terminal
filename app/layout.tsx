@@ -7,6 +7,7 @@ import { Providers } from "@/lib/providers"
 import { Suspense } from "react"
 import * as Sentry from '@sentry/nextjs'
 import SentryErrorBoundary from "@/components/sentry-error-boundary"
+import { ReferralCapture } from "@/components/ReferralCapture"
 import "./globals.css"
 
 const inter = Inter({
@@ -59,6 +60,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#13112a" />
       </head>
       <body className={`font-sans antialiased bg-background ${inter.variable} ${GeistMono.variable}`}>
+        <ReferralCapture />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded">Skip to main content</a>
         <SentryErrorBoundary>
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
