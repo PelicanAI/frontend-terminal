@@ -8,10 +8,11 @@ import { useMorningBrief } from "@/hooks/use-morning-brief"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
 import { PelicanCard } from "@/components/ui/pelican-card"
-import { Sparkles, RefreshCw, CalendarDays } from "lucide-react"
+import { Sparkles, RefreshCw, CalendarDays, Rocket } from "lucide-react"
 import { getMarketStatus } from "@/hooks/use-market-data"
 import { LogoImg } from "@/components/ui/logo-img"
 import { MessageContent } from "@/components/chat/message/message-content"
+import type { IPOEntry } from "@/app/api/ipos/route"
 
 type MoversTab = "gainers" | "losers"
 
@@ -42,11 +43,29 @@ interface EconomicEvent {
   unit: string
 }
 
+// IPO date formatter
+function formatIPODate(dateStr: string): string {
+  const date = new Date(dateStr + 'T00:00:00')
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
+  if (date.toDateString() === today.toDateString()) return 'Today'
+  if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow'
+
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
 export default function MorningPage() {
   const [moversTab, setMoversTab] = useState<MoversTab>("gainers")
   const [priceTier, setPriceTier] = useState<PriceTier>(PRICE_TIERS[1]!) // Default to $200+
   const [economicEvents, setEconomicEvents] = useState<EconomicEvent[]>([])
   const [economicLoading, setEconomicLoading] = useState(true)
+  const [ipos, setIpos] = useState<IPOEntry[]>([])
   const [briefContent, setBriefContent] = useState<string>('')
   const [briefLoading, setBriefLoading] = useState(false)
   const [briefError, setBriefError] = useState<string | null>(null)
@@ -87,6 +106,14 @@ export default function MorningPage() {
       .catch(() => {
         setEconomicLoading(false)
       })
+  }, [])
+
+  // Fetch upcoming IPOs
+  useEffect(() => {
+    fetch('/api/ipos')
+      .then(r => r.json())
+      .then(data => setIpos(data.ipos || []))
+      .catch(() => setIpos([]))
   }, [])
 
   // Filter to only HIGH and MEDIUM impact events, sorted by date/time
@@ -424,6 +451,80 @@ Please provide:
             )}
           </div>
         </PelicanCard>
+
+        {/* IPO Watch */}
+        <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Rocket className="h-4 w-4 text-cyan-400" />
+              <h3 className="font-semibold text-sm">IPO Watch</h3>
+            </div>
+            {ipos.length > 0 && (
+              <span className="text-xs text-foreground/30">
+                {ipos.length} upcoming
+              </span>
+            )}
+          </div>
+
+          {ipos.length === 0 ? (
+            <p className="text-xs text-foreground/30">
+              No upcoming IPOs this week
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {ipos.slice(0, 6).map((ipo, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-colors min-h-[44px]"
+                  onClick={() => {
+                    const prompt = `Tell me about the ${ipo.company} IPO` +
+                      (ipo.ticker ? ` (${ipo.ticker})` : '') +
+                      (ipo.priceRangeLow && ipo.priceRangeHigh
+                        ? ` pricing at $${ipo.priceRangeLow}-$${ipo.priceRangeHigh}`
+                        : '')
+                    openWithPrompt(ipo.ticker || ipo.company, prompt, 'morning')
+                  }}
+                >
+                  {/* Left: ticker/company + date */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      {ipo.ticker && (
+                        <span className="text-sm font-semibold text-cyan-400">
+                          {ipo.ticker}
+                        </span>
+                      )}
+                      <span className="text-xs text-foreground/50 truncate">
+                        {ipo.company}
+                      </span>
+                    </div>
+                    {ipo.listingDate && (
+                      <span className="text-[10px] text-foreground/25">
+                        {formatIPODate(ipo.listingDate)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Right: price range */}
+                  <div className="text-right flex-shrink-0 ml-3">
+                    {ipo.finalPrice ? (
+                      <span className="text-xs font-mono tabular-nums text-green-400">
+                        ${ipo.finalPrice}
+                      </span>
+                    ) : ipo.priceRangeLow && ipo.priceRangeHigh ? (
+                      <span className="text-xs font-mono tabular-nums text-foreground/40">
+                        ${ipo.priceRangeLow}–${ipo.priceRangeHigh}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-foreground/20">
+                        TBD
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-6">
           {/* Header */}

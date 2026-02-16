@@ -70,7 +70,7 @@ function sortByImportance(events: EarningsEvent[]): EarningsEvent[] {
   })
 }
 
-// Compact earnings card component
+// Compact earnings card component with horizontal single-line layout
 function EarningsCard({
   event,
   onClick,
@@ -90,63 +90,60 @@ function EarningsCard({
           : "bg-[var(--surface-1)] border-[rgba(139,92,246,0.08)] hover:border-[#8b5cf6]/30 hover:bg-[var(--surface-2)]"
       )}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 min-w-0">
+      <div className="flex items-center gap-2">
+        {/* Left: logo + ticker */}
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
           <LogoImg symbol={event.symbol} size={16} />
           <span className="font-mono font-bold text-xs text-[#8b5cf6] group-hover:text-[#a78bfa] truncate">
             {event.symbol}
           </span>
         </div>
 
-        {/* Right side: EPS & Revenue data */}
-        <div className="text-right flex-shrink-0 ml-2">
-          {event.epsActual !== null ? (
-            // POST-REPORT: show actuals with beat/miss
-            <>
-              <div className={cn(
-                "text-xs font-mono tabular-nums",
-                event.epsActual > (event.epsEstimate || 0)
-                  ? "text-green-400"
-                  : event.epsActual < (event.epsEstimate || 0)
-                    ? "text-red-400"
-                    : "text-yellow-400"
-              )}>
-                {event.epsActual.toFixed(2)}
-                {event.epsEstimate !== null && (
-                  <span className="ml-1 text-[10px]">
-                    {event.epsActual > event.epsEstimate ? '▲' :
-                     event.epsActual < event.epsEstimate ? '▼' : '—'}
-                  </span>
-                )}
-              </div>
-              {event.revenueActual !== null && (
-                <div className={cn(
-                  "text-[10px] font-mono tabular-nums",
-                  event.revenueActual > (event.revenueEstimate || 0)
-                    ? "text-green-400/60"
-                    : "text-red-400/60"
-                )}>
-                  {formatRevenue(event.revenueActual)}
-                </div>
-              )}
-            </>
-          ) : event.epsEstimate !== null ? (
-            // PRE-REPORT: show estimates
-            <>
-              <div className="text-xs font-mono tabular-nums text-foreground/40">
-                Est {event.epsEstimate.toFixed(2)}
-              </div>
-              {event.revenueEstimate !== null && (
-                <div className="text-[10px] font-mono tabular-nums text-foreground/25">
-                  {formatRevenue(event.revenueEstimate)}
-                </div>
-              )}
-            </>
-          ) : (
-            // NO DATA: show placeholder
-            <span className="text-[10px] text-gray-600">—</span>
-          )}
-        </div>
+        {/* Center-right: EPS */}
+        {(event.epsActual !== null || event.epsEstimate !== null) && (
+          <div className={cn(
+            "text-xs font-mono tabular-nums whitespace-nowrap",
+            event.epsActual !== null
+              ? event.epsActual > (event.epsEstimate || 0)
+                ? "text-green-400"
+                : event.epsActual < (event.epsEstimate || 0)
+                  ? "text-red-400"
+                  : "text-foreground/50"
+              : "text-foreground/40"
+          )}>
+            <span className="text-foreground/25 mr-1">EPS:</span>
+            {event.epsActual !== null
+              ? event.epsActual.toFixed(2)
+              : event.epsEstimate?.toFixed(2)}
+            {event.epsActual !== null && event.epsEstimate !== null && (
+              <span className="ml-0.5 text-[10px]">
+                {event.epsActual > event.epsEstimate ? '▲' :
+                 event.epsActual < event.epsEstimate ? '▼' : ''}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Far right: Revenue */}
+        {(event.revenueActual !== null || event.revenueEstimate !== null) && (
+          <div className={cn(
+            "text-xs font-mono tabular-nums whitespace-nowrap",
+            event.revenueActual !== null
+              ? event.revenueActual > (event.revenueEstimate || 0)
+                ? "text-green-400/70"
+                : "text-red-400/70"
+              : "text-foreground/25"
+          )}>
+            <span className="text-foreground/25 mr-1">Rev:</span>
+            {formatRevenue(event.revenueActual ?? event.revenueEstimate)}
+            {event.revenueActual !== null && event.revenueEstimate !== null && (
+              <span className="ml-0.5 text-[10px]">
+                {event.revenueActual > event.revenueEstimate ? '▲' :
+                 event.revenueActual < event.revenueEstimate ? '▼' : ''}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </button>
   )
