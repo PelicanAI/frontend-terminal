@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic"
 
 import { useState } from "react"
 import dynamicImport from "next/dynamic"
+import { motion, AnimatePresence } from "framer-motion"
 import { useTrades, Trade } from "@/hooks/use-trades"
 import { useTradeStats } from "@/hooks/use-trade-stats"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
@@ -13,7 +14,8 @@ import { CloseTradeModal } from "@/components/journal/close-trade-modal"
 import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
 import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
-import { Plus, BarChart3, ListFilter } from "lucide-react"
+import { PageHeader, PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/pelican"
+import { Plus, ChartBar, Funnel } from "@phosphor-icons/react"
 
 const DashboardTab = dynamicImport(
   () => import("@/components/journal/dashboard-tab").then((m) => ({ default: m.DashboardTab })),
@@ -148,71 +150,57 @@ export default function JournalPage() {
 
   const showDetailPanel = activePanel === 'detail' && selectedTrade !== null
 
+  const filterButtons = ['all', 'real', 'paper'] as const
+  const filterLabels = { all: 'All', real: 'Real', paper: 'Simulated' }
+
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Header with subtle elevation */}
-      <div className="flex-shrink-0 px-4 sm:px-6 py-4 bg-gradient-to-b from-white/[0.03] to-transparent border-b border-white/[0.04]">
+    <motion.div
+      variants={pageEnter}
+      initial="hidden"
+      animate="visible"
+      className="flex flex-col h-full overflow-hidden"
+    >
+      {/* Header */}
+      <div className="flex-shrink-0 px-4 sm:px-6 py-4 bg-gradient-to-b from-white/[0.03] to-transparent border-b border-[var(--border-subtle)]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-foreground">Positions</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {trades.length} total positions • {stats?.win_rate.toFixed(1)}% win rate
+            <h1 className="text-lg sm:text-2xl font-semibold text-[var(--text-primary)]">Positions</h1>
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+              <span className="font-mono tabular-nums">{trades.length}</span> total positions
+              {stats?.win_rate != null && <> · <span className="font-mono tabular-nums">{stats.win_rate.toFixed(1)}%</span> win rate</>}
             </p>
           </div>
 
           {/* Actions - Desktop */}
           <div className="hidden sm:flex items-center gap-2">
             {/* Type Filter */}
-            <div className="flex items-center gap-1 bg-white/[0.02] border border-white/[0.06] rounded-lg p-0.5">
-              <button
-                onClick={() => setTradeTypeFilter('all')}
-                className={`
-                  px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-                  ${
-                    tradeTypeFilter === 'all'
-                      ? 'bg-[#8b5cf6]/20 text-[#8b5cf6] border border-[#8b5cf6]/30'
-                      : 'bg-transparent text-foreground/50 border border-transparent hover:text-foreground/70 hover:bg-white/[0.04]'
-                  }
-                `}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setTradeTypeFilter('real')}
-                className={`
-                  px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-                  ${
-                    tradeTypeFilter === 'real'
-                      ? 'bg-[#8b5cf6]/20 text-[#8b5cf6] border border-[#8b5cf6]/30'
-                      : 'bg-transparent text-foreground/50 border border-transparent hover:text-foreground/70 hover:bg-white/[0.04]'
-                  }
-                `}
-              >
-                Real
-              </button>
-              <button
-                onClick={() => setTradeTypeFilter('paper')}
-                className={`
-                  px-3 py-1.5 rounded-md text-xs font-medium transition-colors
-                  ${
-                    tradeTypeFilter === 'paper'
-                      ? 'bg-[#8b5cf6]/20 text-[#8b5cf6] border border-[#8b5cf6]/30'
-                      : 'bg-transparent text-foreground/50 border border-transparent hover:text-foreground/70 hover:bg-white/[0.04]'
-                  }
-                `}
-              >
-                Simulated
-              </button>
+            <div className="flex items-center gap-1 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg p-0.5">
+              {filterButtons.map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setTradeTypeFilter(type)}
+                  className={`
+                    px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150
+                    ${
+                      tradeTypeFilter === type
+                        ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] border border-[var(--accent-primary)]/30'
+                        : 'bg-transparent text-[var(--text-muted)] border border-transparent hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
+                    }
+                  `}
+                >
+                  {filterLabels[type]}
+                </button>
+              ))}
             </div>
 
-            {/* Log Trade Button */}
-            <button
+            <PelicanButton
+              variant="primary"
+              size="lg"
               onClick={() => setShowLogTradeModal(true)}
-              className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-500 active:scale-95 transition-colors font-medium flex items-center gap-2 min-h-[44px]"
             >
-              <Plus className="w-4 h-4" />
+              <Plus size={16} weight="bold" />
               Log Trade
-            </button>
+            </PelicanButton>
           </div>
         </div>
 
@@ -221,29 +209,29 @@ export default function JournalPage() {
           <button
             onClick={() => setActiveTab('dashboard')}
             className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 active:scale-95 min-h-[44px]
+              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
               ${
                 activeTab === 'dashboard'
-                  ? 'bg-white/[0.06] text-foreground'
-                  : 'text-foreground/60 hover:text-foreground hover:bg-white/[0.03]'
+                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
               }
             `}
           >
-            <BarChart3 className="w-4 h-4 inline mr-1.5" />
+            <ChartBar size={16} weight={activeTab === 'dashboard' ? 'fill' : 'regular'} />
             Dashboard
           </button>
           <button
             onClick={() => setActiveTab('trades')}
             className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 active:scale-95 min-h-[44px]
+              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
               ${
                 activeTab === 'trades'
-                  ? 'bg-white/[0.06] text-foreground'
-                  : 'text-foreground/60 hover:text-foreground hover:bg-white/[0.03]'
+                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
               }
             `}
           >
-            <ListFilter className="w-4 h-4 inline mr-1.5" />
+            <Funnel size={16} weight={activeTab === 'trades' ? 'fill' : 'regular'} />
             Trades
           </button>
         </div>
@@ -253,34 +241,52 @@ export default function JournalPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Main Content */}
         <div className="flex-1 overflow-auto p-4 sm:p-6">
-          {activeTab === 'dashboard' && (
-            <DashboardTab
-              stats={stats}
-              equityCurve={equityCurve}
-              isLoading={statsLoading}
-            />
-          )}
+          <AnimatePresence mode="wait">
+            {activeTab === 'dashboard' && (
+              <motion.div
+                key="dashboard"
+                variants={tabContent}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <DashboardTab
+                  stats={stats}
+                  equityCurve={equityCurve}
+                  isLoading={statsLoading}
+                />
+              </motion.div>
+            )}
 
-          {activeTab === 'trades' && (
-            <TradesTable
-              trades={filteredTrades}
-              onSelectTrade={handleSelectTrade}
-              onScanTrade={handleScanTrade}
-              selectedTradeId={selectedTrade?.id}
-            />
-          )}
+            {activeTab === 'trades' && (
+              <motion.div
+                key="trades"
+                variants={tabContent}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <TradesTable
+                  trades={filteredTrades}
+                  onSelectTrade={handleSelectTrade}
+                  onScanTrade={handleScanTrade}
+                  selectedTradeId={selectedTrade?.id}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {tradesLoading && trades.length === 0 && (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-2" />
-                <p className="text-foreground/50 text-sm">Loading trades...</p>
+                <div className="w-8 h-8 border-2 border-[var(--accent-primary)]/30 border-t-[var(--accent-primary)] rounded-full animate-spin mx-auto mb-2" />
+                <p className="text-[var(--text-muted)] text-sm">Loading trades...</p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Right Panel - Trade Detail (30% on desktop, hidden on mobile) */}
+        {/* Right Panel - Trade Detail */}
         {showDetailPanel && (
           <div className="hidden md:flex flex-shrink-0 w-[min(420px,30%)] h-full">
             <TradeDetailPanel
@@ -295,10 +301,10 @@ export default function JournalPage() {
       {/* Mobile FAB: Log Trade */}
       <button
         onClick={() => setShowLogTradeModal(true)}
-        className="sm:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#8b5cf6] rounded-full shadow-lg shadow-purple-500/25 flex items-center justify-center active:scale-95 transition-transform"
+        className="sm:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-[var(--accent-primary)] rounded-full shadow-lg shadow-[var(--accent-primary)]/25 flex items-center justify-center active:scale-95 transition-transform"
         aria-label="Log Trade"
       >
-        <Plus className="h-6 w-6 text-white" />
+        <Plus size={24} weight="bold" className="text-white" />
       </button>
 
       {/* Modals */}
@@ -318,21 +324,34 @@ export default function JournalPage() {
       )}
 
       {/* Mobile: Trade Detail Bottom Sheet */}
-      {showDetailPanel && selectedTrade && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/50" onClick={handleCloseDetailPanel}>
-          <div
-            className="absolute bottom-0 left-0 right-0 h-[80vh] bg-background rounded-t-2xl"
-            onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {showDetailPanel && selectedTrade && (
+          <motion.div
+            variants={backdrop}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="md:hidden fixed inset-0 z-50 bg-[var(--bg-overlay)]"
+            onClick={handleCloseDetailPanel}
           >
-            <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mt-3 mb-2" />
-            <TradeDetailPanel
-              trade={selectedTrade}
-              onClose={handleCloseDetailPanel}
-              onCloseTrade={handleOpenCloseTrade}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute bottom-0 left-0 right-0 h-[80vh] bg-[var(--bg-base)] rounded-t-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-12 h-1 bg-[var(--border-default)] rounded-full mx-auto mt-3 mb-2" />
+              <TradeDetailPanel
+                trade={selectedTrade}
+                onClose={handleCloseDetailPanel}
+                onCloseTrade={handleOpenCloseTrade}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }

@@ -3,14 +3,16 @@
 export const dynamic = "force-dynamic"
 
 import { useState, useRef, useEffect } from "react"
+import { motion } from "framer-motion"
 import { useHeatmap } from "@/hooks/use-heatmap"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { Treemap } from "@/components/heatmap/treemap"
 import { HeatmapGrid } from "@/components/heatmap/heatmap-grid"
 import { SectorLegend } from "@/components/heatmap/sector-legend"
 import { getSectors, type SP500Sector } from "@/lib/data/sp500-constituents"
-import { LayoutGrid, Grid3x3, RefreshCw, Sparkles } from "lucide-react"
+import { ArrowsClockwise, GridFour, SquaresFour, Lightning } from "@phosphor-icons/react"
 import { getMarketStatus } from "@/hooks/use-market-data"
+import { PageHeader, DataCell, pageEnter } from "@/components/ui/pelican"
 
 type ViewMode = "treemap" | "grid"
 
@@ -73,91 +75,96 @@ export default function HeatmapPage() {
   const marketStatus = getMarketStatus()
   const isMarketOpen = marketStatus === 'open'
 
+  const subtitleParts = [
+    `${filteredStocks.length} stocks`,
+    `${selectedSectors.length} sectors`,
+  ]
+  if (lastUpdated) {
+    subtitleParts.push(`Updated ${new Date(lastUpdated).toLocaleTimeString()}`)
+  }
+
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Header with subtle elevation */}
-      <div className="flex-shrink-0 px-6 py-4 bg-gradient-to-b from-white/[0.03] to-transparent border-b border-white/[0.04]">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h1 className="text-xl font-semibold text-foreground">S&P 500 Heatmap</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {filteredStocks.length} stocks • {selectedSectors.length} sectors
-              {lastUpdated && (
-                <span className="ml-2">
-                  • Updated {new Date(lastUpdated).toLocaleTimeString()}
-                </span>
-              )}
-            </p>
-          </div>
-
-          {/* Controls */}
-          <div className="flex items-center gap-2">
-            {/* Auto-refresh toggle */}
-            <button
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`
-                px-3 py-1.5 rounded-lg text-xs font-medium
-                flex items-center gap-1.5 transition-colors
-                ${
-                  autoRefresh
-                    ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30'
-                    : 'bg-white/[0.06] text-foreground/70 border border-white/[0.06] hover:bg-white/[0.08]'
-                }
-              `}
-            >
-              <Sparkles className="w-3 h-3" />
-              Auto-refresh
-            </button>
-
-            {/* Manual refresh */}
-            <button
-              onClick={() => refetch()}
-              disabled={isLoading}
-              className="px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/[0.06] hover:bg-white/[0.08] transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`w-4 h-4 text-foreground/70 ${isLoading ? 'animate-spin' : ''}`} />
-            </button>
-
-            {/* View mode toggle */}
-            <div className="flex items-center gap-1 bg-white/[0.06] border border-white/[0.06] rounded-lg p-1">
+    <motion.div
+      variants={pageEnter}
+      initial="hidden"
+      animate="visible"
+      className="flex flex-col h-full overflow-hidden"
+    >
+      {/* Header */}
+      <div className="flex-shrink-0 px-6 py-4 bg-gradient-to-b from-white/[0.03] to-transparent border-b border-[var(--border-subtle)]">
+        <PageHeader
+          title="S&P 500 Heatmap"
+          subtitle={subtitleParts.join(' • ')}
+          className="mb-3"
+          actions={
+            <div className="flex items-center gap-2">
+              {/* Auto-refresh toggle */}
               <button
-                onClick={() => setViewMode('treemap')}
+                onClick={() => setAutoRefresh(!autoRefresh)}
                 className={`
-                  px-3 py-1.5 rounded text-xs font-medium transition-colors
+                  px-3 py-1.5 rounded-lg text-xs font-medium
+                  flex items-center gap-1.5 transition-all duration-150
                   ${
-                    viewMode === 'treemap'
-                      ? 'bg-purple-600 text-white'
-                      : 'text-foreground/70 hover:text-foreground'
+                    autoRefresh
+                      ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] border border-[var(--accent-primary)]/30'
+                      : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-default)] hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)]'
                   }
                 `}
               >
-                <LayoutGrid className="w-4 h-4" />
+                <Lightning className="w-3 h-3" weight={autoRefresh ? "fill" : "regular"} />
+                Auto-refresh
               </button>
+
+              {/* Manual refresh */}
               <button
-                onClick={() => setViewMode('grid')}
-                className={`
-                  px-3 py-1.5 rounded text-xs font-medium transition-colors
-                  ${
-                    viewMode === 'grid'
-                      ? 'bg-purple-600 text-white'
-                      : 'text-foreground/70 hover:text-foreground'
-                  }
-                `}
+                onClick={() => refetch()}
+                disabled={isLoading}
+                className="px-3 py-1.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] hover:border-[var(--border-hover)] transition-all duration-150 disabled:opacity-50"
               >
-                <Grid3x3 className="w-4 h-4" />
+                <ArrowsClockwise className={`w-4 h-4 text-[var(--text-secondary)] ${isLoading ? 'animate-spin' : ''}`} />
               </button>
+
+              {/* View mode toggle */}
+              <div className="flex items-center gap-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('treemap')}
+                  className={`
+                    px-3 py-1.5 rounded text-xs font-medium transition-all duration-150
+                    ${
+                      viewMode === 'treemap'
+                        ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)]'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }
+                  `}
+                >
+                  <SquaresFour className="w-4 h-4" weight={viewMode === 'treemap' ? "fill" : "regular"} />
+                </button>
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`
+                    px-3 py-1.5 rounded text-xs font-medium transition-all duration-150
+                    ${
+                      viewMode === 'grid'
+                        ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)]'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }
+                  `}
+                >
+                  <GridFour className="w-4 h-4" weight={viewMode === 'grid' ? "fill" : "regular"} />
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
+          }
+        />
 
         {/* Market status indicator */}
         <div className="flex items-center gap-2">
           <div
             className={`w-2 h-2 rounded-full ${
-              isMarketOpen ? 'bg-green-500' : 'bg-yellow-500'
+              isMarketOpen ? 'bg-[var(--data-positive)]' : 'bg-[var(--data-warning)]'
             }`}
           />
-          <span className="text-xs text-foreground/60">
+          <span className="text-xs text-[var(--text-muted)]">
             Market {isMarketOpen ? 'Open' : marketStatus.replace('-', ' ')}
           </span>
         </div>
@@ -166,7 +173,7 @@ export default function HeatmapPage() {
       {/* Main content */}
       <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
         {/* Sidebar - Sector Legend (horizontal scroll on mobile, vertical on desktop) */}
-        <div className="flex-shrink-0 sm:w-64 border-b sm:border-b-0 sm:border-r border-white/[0.04] overflow-y-auto">
+        <div className="flex-shrink-0 sm:w-64 border-b sm:border-b-0 sm:border-r border-[var(--border-subtle)] overflow-y-auto">
           {/* Mobile: horizontal scrolling pills */}
           <div className="sm:hidden flex gap-2 overflow-x-auto scrollbar-hide p-3 pb-2">
             {getSectors().map((sector) => {
@@ -182,16 +189,23 @@ export default function HeatmapPage() {
                   onClick={() => handleToggleSector(sector)}
                   className={`
                     px-3 py-1.5 rounded-full text-[10px] whitespace-nowrap
-                    flex-shrink-0 border transition-colors
+                    flex-shrink-0 border transition-all duration-150
                     ${isSelected
-                      ? 'bg-purple-500/20 border-purple-500/30 text-purple-300'
-                      : 'bg-white/[0.02] border-white/[0.04] text-foreground/50'
+                      ? 'bg-[var(--accent-muted)] border-[var(--accent-primary)]/30 text-[var(--accent-primary)]'
+                      : 'bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-muted)]'
                     }
                   `}
                 >
                   {sector}
-                  <span className={`ml-1 font-mono ${avgChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {avgChange >= 0 ? '+' : ''}{avgChange.toFixed(2)}%
+                  <span className="ml-1">
+                    <DataCell
+                      value={avgChange.toFixed(2)}
+                      sentiment={avgChange >= 0 ? 'positive' : 'negative'}
+                      prefix={avgChange >= 0 ? '+' : ''}
+                      suffix="%"
+                      size="sm"
+                      className="text-[10px]"
+                    />
                   </span>
                 </button>
               )
@@ -213,10 +227,10 @@ export default function HeatmapPage() {
           {error && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <p className="text-red-400 text-sm mb-2">Failed to load heatmap data</p>
+                <p className="text-[var(--data-negative)] text-sm mb-2">Failed to load heatmap data</p>
                 <button
                   onClick={() => refetch()}
-                  className="text-xs text-purple-400 hover:text-purple-300"
+                  className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors duration-150"
                 >
                   Try again
                 </button>
@@ -227,15 +241,15 @@ export default function HeatmapPage() {
           {isLoading && stocks.length === 0 && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <RefreshCw className="w-8 h-8 text-purple-400 animate-spin mx-auto mb-2" />
-                <p className="text-foreground/50 text-sm">Loading heatmap data...</p>
+                <ArrowsClockwise className="w-8 h-8 text-[var(--accent-primary)] animate-spin mx-auto mb-2" />
+                <p className="text-[var(--text-muted)] text-sm">Loading heatmap data...</p>
               </div>
             </div>
           )}
 
           {!error && !isLoading && filteredStocks.length === 0 && (
             <div className="flex items-center justify-center h-full">
-              <p className="text-foreground/50 text-sm">No stocks to display</p>
+              <p className="text-[var(--text-muted)] text-sm">No stocks to display</p>
             </div>
           )}
 
@@ -262,10 +276,10 @@ export default function HeatmapPage() {
               {/* Mobile: Sorted list view */}
               <div className="sm:hidden space-y-1 p-3">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xs font-semibold text-foreground/50 uppercase">
+                  <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">
                     {selectedSectors.length === getSectors().length ? 'All Stocks' : `${selectedSectors.join(', ')}`} — Sorted by Change
                   </h3>
-                  <span className="text-[10px] text-foreground/30">
+                  <span className="text-[10px] font-mono tabular-nums text-[var(--text-muted)]">
                     {filteredStocks.length} stocks
                   </span>
                 </div>
@@ -276,26 +290,28 @@ export default function HeatmapPage() {
                     <button
                       key={stock.ticker}
                       onClick={() => handleStockClick(stock.ticker, stock.name)}
-                      className="w-full flex items-center justify-between p-2.5 rounded-lg hover:bg-white/[0.04] active:bg-white/[0.06] transition-colors min-h-[44px]"
+                      className="w-full flex items-center justify-between p-2.5 rounded-lg hover:bg-[var(--bg-elevated)] active:bg-[var(--bg-elevated)] transition-colors duration-150 min-h-[44px] cursor-pointer"
                     >
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-mono text-xs font-bold text-purple-400 w-12 text-left">
+                        <span className="font-mono text-xs font-bold text-[var(--accent-primary)] w-12 text-left tabular-nums">
                           {stock.ticker}
                         </span>
-                        <span className="text-[10px] text-foreground/40 truncate">
+                        <span className="text-[10px] text-[var(--text-muted)] truncate">
                           {stock.name}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <span className="text-[10px] font-mono text-foreground/50">
+                        <span className="text-[10px] font-mono tabular-nums text-[var(--text-secondary)]">
                           ${stock.price?.toFixed(2) ?? '—'}
                         </span>
-                        <span className={`text-xs font-mono font-semibold w-16 text-right ${
-                          (stock.changePercent ?? 0) >= 0 ? 'text-green-400' : 'text-red-400'
-                        }`}>
-                          {(stock.changePercent ?? 0) >= 0 ? '+' : ''}
-                          {stock.changePercent?.toFixed(2) ?? '0.00'}%
-                        </span>
+                        <DataCell
+                          value={stock.changePercent?.toFixed(2) ?? '0.00'}
+                          sentiment={(stock.changePercent ?? 0) >= 0 ? 'positive' : 'negative'}
+                          prefix={(stock.changePercent ?? 0) >= 0 ? '+' : ''}
+                          suffix="%"
+                          size="sm"
+                          className="w-16 text-right font-semibold"
+                        />
                       </div>
                     </button>
                   ))
@@ -305,6 +321,6 @@ export default function HeatmapPage() {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

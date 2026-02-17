@@ -3,11 +3,13 @@
 export const dynamic = "force-dynamic"
 
 import { useState, useMemo } from "react"
-import { Search, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react"
+import { motion } from "framer-motion"
+import { MagnifyingGlass, CaretLeft, CaretRight, ArrowsClockwise, Sun, Moon } from "@phosphor-icons/react"
 import { useEarnings, type EarningsEvent } from "@/hooks/use-earnings"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { cn } from "@/lib/utils"
 import { LogoImg } from "@/components/ui/logo-img"
+import { PageHeader, PelicanButton, staggerContainer, staggerItem } from "@/components/ui/pelican"
 
 const MAX_VISIBLE_BMO = 3  // Cap Before Open at 3 rows
 const MAX_VISIBLE_AMC = 8  // After Close shows 8 rows initially
@@ -25,18 +27,17 @@ function formatRevenue(value: number | null): string {
 // Loading skeleton for instant visual feedback
 function EarningsGridSkeleton() {
   return (
-    <div className="hidden md:grid grid-cols-5 gap-px bg-[rgba(139,92,246,0.08)] mx-4 sm:mx-6 rounded-xl overflow-hidden border border-[rgba(139,92,246,0.08)]">
+    <div className="hidden md:grid grid-cols-5 gap-px bg-[var(--border-subtle)] mx-4 sm:mx-6 rounded-xl overflow-hidden border border-[var(--border-subtle)]">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="bg-[var(--surface-0)] flex flex-col min-h-[400px]">
+        <div key={i} className="bg-[var(--bg-surface)] flex flex-col min-h-[400px]">
           {/* Day header skeleton */}
-          <div className="p-3 text-center border-b border-[rgba(139,92,246,0.08)]">
+          <div className="p-3 text-center border-b border-[var(--border-subtle)]">
             <div className="h-3 w-10 bg-white/5 rounded mx-auto mb-1 animate-pulse" />
             <div className="h-5 w-14 bg-white/5 rounded mx-auto mb-1 animate-pulse" />
             <div className="h-3 w-8 bg-white/5 rounded mx-auto animate-pulse" />
           </div>
           {/* Section skeletons */}
           <div className="px-2 pt-3 space-y-3">
-            {/* BMO section */}
             <div>
               <div className="h-3 w-20 bg-white/5 rounded animate-pulse mb-2" />
               <div className="space-y-1.5">
@@ -45,7 +46,6 @@ function EarningsGridSkeleton() {
                 ))}
               </div>
             </div>
-            {/* AMC section */}
             <div>
               <div className="h-3 w-20 bg-white/5 rounded animate-pulse mb-2" />
               <div className="space-y-1.5">
@@ -81,21 +81,32 @@ function EarningsCard({
   onClick: (e: EarningsEvent) => void
   highlighted?: boolean
 }) {
+  const epsBeat = event.epsActual !== null && event.epsEstimate !== null
+    ? event.epsActual > event.epsEstimate
+    : null
+  const epsMiss = event.epsActual !== null && event.epsEstimate !== null
+    ? event.epsActual < event.epsEstimate
+    : null
+  const revBeat = event.revenueActual !== null && event.revenueEstimate !== null
+    ? event.revenueActual > event.revenueEstimate
+    : null
+
   return (
-    <button
+    <motion.button
+      variants={staggerItem}
       onClick={() => onClick(event)}
       className={cn(
-        "w-full rounded-md border transition-colors text-left group px-3 py-2.5",
+        "w-full rounded-lg border transition-all duration-150 text-left group px-3 py-2.5 cursor-pointer",
         highlighted
-          ? "bg-[#8b5cf6]/10 border-[#8b5cf6]/40 ring-1 ring-[#8b5cf6]/20"
-          : "bg-[var(--surface-1)] border-[rgba(139,92,246,0.08)] hover:border-[#8b5cf6]/30 hover:bg-white/[0.04]"
+          ? "bg-[var(--accent-muted)] border-[var(--accent-primary)]/40 ring-1 ring-[var(--accent-primary)]/20"
+          : "bg-[var(--bg-surface)] border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)]"
       )}
     >
       <div className="flex items-center gap-2">
         {/* Left: logo + ticker */}
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
           <LogoImg symbol={event.symbol} size={20} />
-          <span className="font-mono font-bold text-sm font-semibold text-[#8b5cf6] group-hover:text-[#a78bfa] truncate">
+          <span className="font-mono font-semibold text-sm text-[var(--accent-primary)] group-hover:text-[var(--accent-hover)] truncate">
             {event.symbol}
           </span>
         </div>
@@ -105,14 +116,14 @@ function EarningsCard({
           <div className={cn(
             "font-mono tabular-nums whitespace-nowrap text-xs",
             event.epsActual !== null
-              ? event.epsActual > (event.epsEstimate || 0)
-                ? "text-green-400"
-                : event.epsActual < (event.epsEstimate || 0)
-                  ? "text-red-400"
-                  : "text-foreground/50"
-              : "text-foreground/40"
+              ? epsBeat
+                ? "text-[var(--data-positive)]"
+                : epsMiss
+                  ? "text-[var(--data-negative)]"
+                  : "text-[var(--text-muted)]"
+              : "text-[var(--text-disabled)]"
           )}>
-            <span className="text-foreground/25 mr-1">
+            <span className="text-[var(--text-disabled)] mr-1">
               {event.epsActual !== null ? 'EPS:' : 'Est. EPS:'}
             </span>
             {event.epsActual !== null
@@ -120,8 +131,7 @@ function EarningsCard({
               : event.epsEstimate?.toFixed(2)}
             {event.epsActual !== null && event.epsEstimate !== null && (
               <span className="ml-0.5 text-[10px]">
-                {event.epsActual > event.epsEstimate ? '▲' :
-                 event.epsActual < event.epsEstimate ? '▼' : ''}
+                {epsBeat ? '▲' : epsMiss ? '▼' : ''}
               </span>
             )}
           </div>
@@ -132,12 +142,12 @@ function EarningsCard({
           <div className={cn(
             "font-mono tabular-nums whitespace-nowrap text-xs",
             event.revenueActual !== null
-              ? event.revenueActual > (event.revenueEstimate || 0)
-                ? "text-green-400/70"
-                : "text-red-400/70"
-              : "text-foreground/25"
+              ? revBeat
+                ? "text-[var(--data-positive)]/70"
+                : "text-[var(--data-negative)]/70"
+              : "text-[var(--text-disabled)]"
           )}>
-            <span className="text-foreground/25 mr-1">
+            <span className="text-[var(--text-disabled)] mr-1">
               {event.revenueActual !== null ? 'Rev:' : 'Est. Rev:'}
             </span>
             {formatRevenue(event.revenueActual ?? event.revenueEstimate)}
@@ -150,7 +160,7 @@ function EarningsCard({
           </div>
         )}
       </div>
-    </button>
+    </motion.button>
   )
 }
 
@@ -184,18 +194,23 @@ function EarningsSection({
 
   return (
     <div className="px-2 pt-2">
-      <div className="flex items-center gap-1 mb-1.5 px-1">
-        <span
-          className={cn(
-            "text-[10px] font-semibold uppercase tracking-wider",
-            label === 'bmo' ? 'text-yellow-500/70' : 'text-purple-400/70'
-          )}
-        >
-          {label === 'bmo' ? '☀' : '🌙'} {label === 'bmo' ? 'Before Open' : 'After Close'}
+      <div className="flex items-center gap-1.5 mb-1.5 px-1">
+        {label === 'bmo' ? (
+          <Sun weight="bold" className="w-3 h-3 text-[var(--data-warning)]" />
+        ) : (
+          <Moon weight="bold" className="w-3 h-3 text-[var(--accent-primary)]" />
+        )}
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+          {label === 'bmo' ? 'Before Open' : 'After Close'}
         </span>
-        <span className="text-[10px] text-foreground/20">({events.length})</span>
+        <span className="text-[10px] font-mono tabular-nums text-[var(--text-disabled)]">({events.length})</span>
       </div>
-      <div className="space-y-1.5">
+      <motion.div
+        className="space-y-1.5"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {visible.map(event => (
           <EarningsCard
             key={event.symbol}
@@ -204,11 +219,11 @@ function EarningsSection({
             highlighted={searchMatch(event)}
           />
         ))}
-      </div>
+      </motion.div>
       {hasMore && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full mt-1 py-1 text-[10px] text-foreground/20 hover:text-foreground/40 transition-colors"
+          className="w-full mt-1 py-1 text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors duration-150"
         >
           {expanded ? '− collapse' : `+${events.length - maxVisible} more`}
         </button>
@@ -286,207 +301,177 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
     return `Week of ${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} — ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
   }
 
+  // Day column renderer (shared between desktop and mobile)
+  const renderDayColumn = (day: typeof weekDays[0], i: number) => {
+    const dayEvents = getEventsForDate(day.dateStr)
+    const bmo = sortByImportance(dayEvents.filter(e => e.hour === 'bmo'))
+    const amc = sortByImportance(dayEvents.filter(e => e.hour === 'amc' || e.hour === 'dmh' || !e.hour))
+    const isToday = day.dateStr === todayStr
+
+    return (
+      <motion.div
+        key={i}
+        variants={staggerItem}
+        className={cn(
+          "bg-[var(--bg-surface)] flex flex-col min-h-[400px]",
+          // Mobile: fixed width
+          "md:w-auto w-[200px] flex-shrink-0"
+        )}
+      >
+        {/* Day header */}
+        <div className={cn(
+          "p-3 text-center border-b border-[var(--border-subtle)]",
+          isToday && "bg-[var(--accent-muted)]"
+        )}>
+          {isToday && (
+            <div className="h-0.5 bg-[var(--accent-primary)] rounded-full -mt-3 mb-2 mx-auto w-8" />
+          )}
+          <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-semibold">
+            {day.dayName}
+          </div>
+          <div className={cn(
+            "text-sm font-bold font-mono tabular-nums",
+            isToday ? "text-[var(--accent-primary)]" : "text-[var(--text-primary)]"
+          )}>
+            {day.monthDay}
+          </div>
+          <div className="text-[10px] font-mono tabular-nums text-[var(--text-muted)]">
+            ({dayEvents.length})
+          </div>
+        </div>
+
+        {/* BMO Section */}
+        {bmo.length > 0 && (
+          <EarningsSection
+            events={bmo}
+            label="bmo"
+            onClick={handleClick}
+            searchTerm={search}
+            autoExpand={!!search}
+          />
+        )}
+
+        {/* Divider between sections */}
+        {bmo.length > 0 && amc.length > 0 && (
+          <div className="border-t border-[var(--border-subtle)] my-2 mx-2" />
+        )}
+
+        {/* AMC Section - The main event */}
+        {amc.length > 0 && (
+          <EarningsSection
+            events={amc}
+            label="amc"
+            onClick={handleClick}
+            searchTerm={search}
+            autoExpand={!!search}
+          />
+        )}
+
+        {/* Empty state */}
+        {dayEvents.length === 0 && (
+          <div className="flex-1 flex items-center justify-center">
+            <span className="text-xs text-[var(--text-disabled)]">No reports</span>
+          </div>
+        )}
+      </motion.div>
+    )
+  }
+
   return (
     <div className="h-full overflow-y-auto p-4 sm:p-6">
       {/* Header */}
-      <div className="mb-6 pb-5 px-4 pt-4 border-b border-white/[0.04]">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-bold text-white">Earnings Calendar</h1>
-            <p className="text-sm text-gray-400 mt-1">{totalReports} reports this week</p>
-          </div>
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          {/* Week navigator */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={prevWeek}
-              className="p-2 rounded-lg hover:bg-[#1e1e2e] text-gray-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <span className="text-sm font-medium text-white min-w-[220px] text-center">
-              {formatWeekRange()}
-            </span>
-            <button
-              onClick={nextWeek}
-              className="p-2 rounded-lg hover:bg-[#1e1e2e] text-gray-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            {weekOffset !== 0 && (
-              <button
-                onClick={goToThisWeek}
-                className="px-3 py-1.5 text-xs rounded-lg bg-[#1e1e2e] text-gray-300 hover:bg-[#2a2a3a] transition-colors min-h-[44px]"
+      <PageHeader
+        title="Earnings Calendar"
+        subtitle={`${totalReports} reports this week`}
+        actions={
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            {/* Week navigator */}
+            <div className="flex items-center gap-2">
+              <PelicanButton
+                variant="ghost"
+                size="sm"
+                onClick={prevWeek}
+                className="min-h-[44px] min-w-[44px]"
               >
-                This Week
-              </button>
-            )}
-          </div>
+                <CaretLeft weight="bold" className="h-4 w-4" />
+              </PelicanButton>
+              <span className="text-sm font-medium text-[var(--text-primary)] min-w-[220px] text-center">
+                {formatWeekRange()}
+              </span>
+              <PelicanButton
+                variant="ghost"
+                size="sm"
+                onClick={nextWeek}
+                className="min-h-[44px] min-w-[44px]"
+              >
+                <CaretRight weight="bold" className="h-4 w-4" />
+              </PelicanButton>
+              {weekOffset !== 0 && (
+                <PelicanButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={goToThisWeek}
+                  className="min-h-[44px]"
+                >
+                  This Week
+                </PelicanButton>
+              )}
+            </div>
 
-          {/* Search */}
-          <div className="relative flex-1 sm:flex-initial">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search ticker..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 w-full sm:w-48 rounded-lg bg-[#13131a] border border-white/[0.04] text-sm text-white placeholder-gray-500 focus:border-[#8b5cf6]/50 focus:outline-none min-h-[44px]"
-            />
-          </div>
+            {/* Search */}
+            <div className="relative flex-1 sm:flex-initial">
+              <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
+              <input
+                type="text"
+                placeholder="Search ticker..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-4 py-2 w-full sm:w-48 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:outline-none transition-colors duration-150 min-h-[44px]"
+              />
+            </div>
 
-          <button
-            onClick={() => refetch()}
-            disabled={isLoading}
-            className="p-2 rounded-lg bg-[#13131a] border border-white/[0.04] hover:bg-[#1a1a24] active:scale-95 transition-colors disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
-          >
-            <RefreshCw className={cn("h-4 w-4 text-gray-400", isLoading && "animate-spin")} />
-          </button>
-        </div>
-        </div>
-      </div>
+            <PelicanButton
+              variant="ghost"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="min-h-[44px] min-w-[44px]"
+            >
+              <ArrowsClockwise className={cn("h-4 w-4", isLoading && "animate-spin")} />
+            </PelicanButton>
+          </div>
+        }
+      />
 
       {isLoading ? (
         <EarningsGridSkeleton />
       ) : (
-        <div className="relative">
-          {/* Earnings grid */}
-          <div>
-            {/* Desktop: 5-column grid */}
-            <div className="hidden md:grid grid-cols-5 gap-px bg-[rgba(139,92,246,0.08)] rounded-xl overflow-hidden border border-[rgba(139,92,246,0.08)]">
-            {weekDays.map((day, i) => {
-              const dayEvents = getEventsForDate(day.dateStr)
-              const bmo = sortByImportance(dayEvents.filter(e => e.hour === 'bmo'))
-              const amc = sortByImportance(dayEvents.filter(e => e.hour === 'amc' || e.hour === 'dmh' || !e.hour))
-              const isToday = day.dateStr === todayStr
-
-              return (
-                <div key={i} className="bg-[var(--surface-0)] flex flex-col min-h-[400px]">
-                  {/* Day header */}
-                  <div className={cn(
-                    "p-3 text-center border-b border-white/[0.04]",
-                    isToday && "bg-[#8b5cf6]/10"
-                  )}>
-                    <div className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
-                      {day.dayName}
-                    </div>
-                    <div className={cn(
-                      "text-sm font-bold",
-                      isToday ? "text-[#8b5cf6]" : "text-white"
-                    )}>
-                      {day.monthDay}
-                    </div>
-                    <div className="text-[10px] text-gray-500">
-                      ({dayEvents.length})
-                    </div>
-                  </div>
-
-                  {/* BMO Section */}
-                  {bmo.length > 0 && (
-                    <EarningsSection
-                      events={bmo}
-                      label="bmo"
-                      onClick={handleClick}
-                      searchTerm={search}
-                      autoExpand={!!search}
-                    />
-                  )}
-
-                  {/* Divider between sections */}
-                  {bmo.length > 0 && amc.length > 0 && (
-                    <div className="border-t border-white/[0.04] my-2 mx-2" />
-                  )}
-
-                  {/* AMC Section - The main event */}
-                  {amc.length > 0 && (
-                    <EarningsSection
-                      events={amc}
-                      label="amc"
-                      onClick={handleClick}
-                      searchTerm={search}
-                      autoExpand={!!search}
-                    />
-                  )}
-
-                  {/* Empty state */}
-                  {dayEvents.length === 0 && (
-                    <div className="flex-1 flex items-center justify-center">
-                      <span className="text-xs text-gray-600">No reports</span>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+        <motion.div
+          className="relative"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+        >
+          {/* Desktop: 5-column grid */}
+          <motion.div
+            className="hidden md:grid grid-cols-5 gap-px bg-[var(--border-subtle)] rounded-xl overflow-hidden border border-[var(--border-subtle)]"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            {weekDays.map((day, i) => renderDayColumn(day, i))}
+          </motion.div>
 
           {/* Mobile: horizontal scroll */}
           <div className="md:hidden overflow-x-auto scrollbar-hide">
-            <div className="flex gap-px min-w-[1000px] bg-[rgba(139,92,246,0.08)] rounded-xl overflow-hidden border border-[rgba(139,92,246,0.08)]">
-              {weekDays.map((day, i) => {
-                const dayEvents = getEventsForDate(day.dateStr)
-                const bmo = sortByImportance(dayEvents.filter(e => e.hour === 'bmo'))
-                const amc = sortByImportance(dayEvents.filter(e => e.hour === 'amc' || e.hour === 'dmh' || !e.hour))
-                const isToday = day.dateStr === todayStr
-
-                return (
-                  <div key={i} className="w-[200px] flex-shrink-0 bg-[var(--surface-0)] flex flex-col min-h-[400px]">
-                    {/* Day header */}
-                    <div className={cn(
-                      "p-3 text-center border-b border-white/[0.04]",
-                      isToday && "bg-[#8b5cf6]/10"
-                    )}>
-                      <div className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
-                        {day.dayName}
-                      </div>
-                      <div className={cn(
-                        "text-sm font-bold",
-                        isToday ? "text-[#8b5cf6]" : "text-white"
-                      )}>
-                        {day.monthDay}
-                      </div>
-                      <div className="text-[10px] text-gray-500">
-                        ({dayEvents.length})
-                      </div>
-                    </div>
-
-                    {/* BMO Section */}
-                    {bmo.length > 0 && (
-                      <EarningsSection
-                        events={bmo}
-                        label="bmo"
-                        onClick={handleClick}
-                        searchTerm={search}
-                        autoExpand={!!search}
-                      />
-                    )}
-
-                    {/* Divider between sections */}
-                    {bmo.length > 0 && amc.length > 0 && (
-                      <div className="border-t border-white/[0.04] my-2 mx-2" />
-                    )}
-
-                    {/* AMC Section - The main event */}
-                    {amc.length > 0 && (
-                      <EarningsSection
-                        events={amc}
-                        label="amc"
-                        onClick={handleClick}
-                        searchTerm={search}
-                        autoExpand={!!search}
-                      />
-                    )}
-
-                    {/* Empty state */}
-                    {dayEvents.length === 0 && (
-                      <div className="flex-1 flex items-center justify-center">
-                        <span className="text-xs text-gray-600">No reports</span>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+            <motion.div
+              className="flex gap-px min-w-[1000px] bg-[var(--border-subtle)] rounded-xl overflow-hidden border border-[var(--border-subtle)]"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {weekDays.map((day, i) => renderDayColumn(day, i))}
+            </motion.div>
           </div>
 
           {/* Watermark - renders on top of grid content */}
@@ -498,8 +483,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
             draggable={false}
             aria-hidden="true"
           />
-          </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Attribution for Parqet logos */}
@@ -508,7 +492,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
           href="https://elbstream.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors"
+          className="text-[10px] text-[var(--text-disabled)] hover:text-[var(--text-muted)] transition-colors duration-150"
         >
           Logos provided by Elbstream
         </a>

@@ -148,14 +148,14 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
           <div
             className={cn(
               "relative flex items-center gap-2 px-4 py-2",
-              "bg-[var(--surface-1)]",
+              "bg-[var(--bg-surface)]",
               "rounded-2xl",
-              "border border-[rgba(139,92,246,0.10)]",
+              "border border-[var(--border-subtle)]",
               "transition-all duration-200",
               "min-h-[56px]",
               isFocused && [
-                "border-[rgba(139,92,246,0.25)]",
-                "shadow-[0_0_0_1px_rgba(139,92,246,0.10),var(--glow-purple-soft)]",
+                "border-[var(--accent-primary)]",
+                "shadow-[0_0_0_1px_rgba(139,92,246,0.10),0_0_12px_rgba(139,92,246,0.08)]",
               ],
             )}
           >

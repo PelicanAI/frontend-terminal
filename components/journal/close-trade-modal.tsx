@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Trade, CloseTradeData } from "@/hooks/use-trades"
+import { PelicanButton } from "@/components/ui/pelican"
 
 interface CloseTradeModalProps {
   open: boolean
@@ -74,36 +75,38 @@ export function CloseTradeModal({ open, onOpenChange, trade, onSubmit }: CloseTr
     }
   }
 
+  const inputClass = "w-full px-4 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/40 focus:border-[var(--accent-primary)] transition-colors"
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md bg-[var(--bg-elevated)] border-[var(--border-default)]">
         <DialogHeader>
-          <DialogTitle>Close Trade</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-[var(--text-primary)]">Close Trade</DialogTitle>
+          <DialogDescription className="text-[var(--text-secondary)]">
             Close {trade.ticker} {trade.direction} position
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           {/* Trade Summary */}
-          <div className="p-3 rounded-lg bg-white/[0.03] border border-border space-y-2">
+          <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-foreground/60">Entry Price</span>
-              <span className="font-mono font-medium text-foreground">
+              <span className="text-[var(--text-muted)]">Entry Price</span>
+              <span className="font-mono font-medium tabular-nums text-[var(--text-primary)]">
                 ${trade.entry_price.toFixed(2)}
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-foreground/60">Quantity</span>
-              <span className="font-mono font-medium text-foreground">{trade.quantity}</span>
+              <span className="text-[var(--text-muted)]">Quantity</span>
+              <span className="font-mono font-medium tabular-nums text-[var(--text-primary)]">{trade.quantity}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-foreground/60">Direction</span>
+              <span className="text-[var(--text-muted)]">Direction</span>
               <span
-                className={`font-medium uppercase text-xs px-2 py-0.5 rounded ${
+                className={`font-medium uppercase text-xs px-2 py-0.5 rounded-full ${
                   trade.direction === 'long'
-                    ? 'bg-green-600/20 text-green-400'
-                    : 'bg-red-600/20 text-red-400'
+                    ? 'bg-[var(--data-positive)]/20 text-[var(--data-positive)]'
+                    : 'bg-[var(--data-negative)]/20 text-[var(--data-negative)]'
                 }`}
               >
                 {trade.direction}
@@ -113,8 +116,8 @@ export function CloseTradeModal({ open, onOpenChange, trade, onSubmit }: CloseTr
 
           {/* Exit Price */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Exit Price <span className="text-red-400">*</span>
+            <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">
+              Exit Price <span className="text-[var(--data-negative)]">*</span>
             </label>
             <input
               type="number"
@@ -124,49 +127,49 @@ export function CloseTradeModal({ open, onOpenChange, trade, onSubmit }: CloseTr
               min="0"
               required
               autoFocus
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 font-mono"
+              className={`${inputClass} font-mono tabular-nums`}
               placeholder="155.00"
             />
           </div>
 
           {/* Exit Date */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Exit Date <span className="text-red-400">*</span>
+            <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">
+              Exit Date <span className="text-[var(--data-negative)]">*</span>
             </label>
             <input
               type="date"
               value={exitDate}
               onChange={(e) => setExitDate(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+              className={inputClass}
             />
           </div>
 
           {/* P&L Preview */}
           {pnl && (
             <div
-              className={`p-3 rounded-lg border ${
+              className={`p-3 rounded-xl border ${
                 pnl.pnlAmount >= 0
-                  ? 'bg-green-600/10 border-green-500/30'
-                  : 'bg-red-600/10 border-red-500/30'
+                  ? 'bg-[var(--data-positive)]/10 border-[var(--data-positive)]/30'
+                  : 'bg-[var(--data-negative)]/10 border-[var(--data-negative)]/30'
               }`}
             >
-              <div className="text-xs text-foreground/60 mb-1">Projected P&L</div>
+              <div className="text-xs text-[var(--text-muted)] mb-1">Projected P&L</div>
               <div
                 className={`text-2xl font-bold font-mono tabular-nums ${
-                  pnl.pnlAmount >= 0 ? 'text-green-400' : 'text-red-400'
+                  pnl.pnlAmount >= 0 ? 'text-[var(--data-positive)]' : 'text-[var(--data-negative)]'
                 }`}
               >
                 {pnl.pnlAmount >= 0 ? '+' : ''}${pnl.pnlAmount.toFixed(2)}
               </div>
-              <div className="flex items-center gap-3 mt-2 text-sm">
-                <span className={pnl.pnlPercent >= 0 ? 'text-green-400' : 'text-red-400'}>
+              <div className="flex items-center gap-3 mt-2 text-sm font-mono tabular-nums">
+                <span className={pnl.pnlPercent >= 0 ? 'text-[var(--data-positive)]' : 'text-[var(--data-negative)]'}>
                   {pnl.pnlPercent >= 0 ? '+' : ''}
                   {pnl.pnlPercent.toFixed(2)}%
                 </span>
                 {pnl.rMultiple !== null && (
-                  <span className="text-foreground/60">
+                  <span className="text-[var(--text-muted)]">
                     {pnl.rMultiple.toFixed(2)}R
                   </span>
                 )}
@@ -176,35 +179,39 @@ export function CloseTradeModal({ open, onOpenChange, trade, onSubmit }: CloseTr
 
           {/* Exit Notes */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
+            <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">
               Exit Notes
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 resize-none"
+              className="w-full px-4 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/40 focus:border-[var(--accent-primary)] transition-colors resize-none"
               placeholder="Why did you exit? What did you learn?"
             />
           </div>
 
           {/* Submit Buttons */}
           <div className="flex gap-3 pt-4">
-            <button
+            <PelicanButton
               type="button"
+              variant="secondary"
+              size="lg"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 rounded-lg bg-white/[0.06] border border-border text-foreground hover:bg-white/[0.08] transition-colors disabled:opacity-50"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </PelicanButton>
+            <PelicanButton
               type="submit"
+              variant="primary"
+              size="lg"
               disabled={isSubmitting || !exitPrice}
-              className="flex-1 px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="flex-1"
             >
               {isSubmitting ? 'Closing...' : 'Close Trade'}
-            </button>
+            </PelicanButton>
           </div>
         </form>
       </DialogContent>

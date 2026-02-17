@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { TickerAutocomplete } from "./ticker-autocomplete"
 import { TradeFormData } from "@/hooks/use-trades"
+import { PelicanButton } from "@/components/ui/pelican"
 
 interface LogTradeModalProps {
   open: boolean
@@ -110,12 +111,15 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
     }
   }
 
+  const inputClass = "w-full px-4 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-base text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/40 focus:border-[var(--accent-primary)] transition-colors min-h-[44px]"
+  const labelClass = "text-sm font-medium text-[var(--text-primary)] mb-1.5 block"
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto backdrop-blur-sm">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-[var(--bg-elevated)] border-[var(--border-default)] backdrop-blur-sm">
         <DialogHeader>
-          <DialogTitle>Log New Position</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-[var(--text-primary)]">Log New Position</DialogTitle>
+          <DialogDescription className="text-[var(--text-secondary)]">
             Record a new position with entry details
           </DialogDescription>
         </DialogHeader>
@@ -123,15 +127,15 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           {/* Error Message */}
           {error && (
-            <div className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
+            <div className="rounded-lg bg-[var(--data-negative)]/10 border border-[var(--data-negative)]/30 px-4 py-3 text-sm text-[var(--data-negative)]">
               {error}
             </div>
           )}
 
           {/* Ticker */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Ticker <span className="text-red-400">*</span>
+            <label className={labelClass}>
+              Ticker <span className="text-[var(--data-negative)]">*</span>
             </label>
             <TickerAutocomplete
               value={ticker}
@@ -162,31 +166,29 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
 
           {/* Asset Type */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Asset Type
-            </label>
+            <label className={labelClass}>Asset Type</label>
             <div className="flex gap-1.5 flex-wrap">
               {[
-                { type: 'stock', color: 'bg-[#8b5cf6]/20 border-[#8b5cf6]/40 text-purple-300' },
-                { type: 'option', color: 'bg-amber-500/20 border-amber-500/40 text-amber-300' },
-                { type: 'crypto', color: 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300' },
-                { type: 'etf', color: 'bg-blue-500/20 border-blue-500/40 text-blue-300' },
-                { type: 'forex', color: 'bg-green-500/20 border-green-500/40 text-green-300' },
-                { type: 'future', color: 'bg-orange-500/20 border-orange-500/40 text-orange-300' },
-              ].map(({ type, color }) => (
+                { type: 'stock', label: 'Stock' },
+                { type: 'option', label: 'Option' },
+                { type: 'crypto', label: 'Crypto' },
+                { type: 'etf', label: 'ETF' },
+                { type: 'forex', label: 'Forex' },
+                { type: 'future', label: 'Future' },
+              ].map(({ type, label }) => (
                 <button
                   key={type}
                   type="button"
                   onClick={() => setAssetType(type)}
                   className={`
-                    px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border
+                    px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 border
                     ${assetType === type
-                      ? color
-                      : 'bg-transparent border-white/[0.06] text-foreground/50 hover:bg-white/[0.03]'
+                      ? 'bg-[var(--accent-muted)] border-[var(--accent-primary)]/40 text-[var(--accent-primary)]'
+                      : 'bg-transparent border-[var(--border-subtle)] text-[var(--text-muted)] hover:bg-[var(--bg-elevated)]'
                     }
                   `}
                 >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                  {label}
                 </button>
               ))}
             </div>
@@ -194,19 +196,19 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
 
           {/* Direction */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Direction <span className="text-red-400">*</span>
+            <label className={labelClass}>
+              Direction <span className="text-[var(--data-negative)]">*</span>
             </label>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setDirection('long')}
                 className={`
-                  flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-colors border
+                  flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all duration-150 border
                   ${
                     direction === 'long'
-                      ? 'bg-green-500/20 border-green-500/40 text-green-400'
-                      : 'bg-transparent border-white/[0.06] text-foreground/70 hover:bg-white/[0.03]'
+                      ? 'bg-[var(--data-positive)]/20 border-[var(--data-positive)]/40 text-[var(--data-positive)]'
+                      : 'bg-transparent border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
                   }
                 `}
               >
@@ -216,11 +218,11 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                 type="button"
                 onClick={() => setDirection('short')}
                 className={`
-                  flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-colors border
+                  flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all duration-150 border
                   ${
                     direction === 'short'
-                      ? 'bg-red-500/20 border-red-500/40 text-red-400'
-                      : 'bg-transparent border-white/[0.06] text-foreground/70 hover:bg-white/[0.03]'
+                      ? 'bg-[var(--data-negative)]/20 border-[var(--data-negative)]/40 text-[var(--data-negative)]'
+                      : 'bg-transparent border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
                   }
                 `}
               >
@@ -230,13 +232,13 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
           </div>
 
           {/* Section Divider */}
-          <div className="border-t border-white/[0.04] my-2" />
+          <div className="border-t border-[var(--border-subtle)] my-2" />
 
           {/* Quantity & Entry Price */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Quantity <span className="text-red-400">*</span>
+              <label className={labelClass}>
+                Quantity <span className="text-[var(--data-negative)]">*</span>
               </label>
               <input
                 type="number"
@@ -245,13 +247,13 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                 step="any"
                 min="0"
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-base text-foreground focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/40 focus:border-[#8b5cf6]/60 min-h-[44px]"
+                className={inputClass}
                 placeholder="100"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Entry Price <span className="text-red-400">*</span>
+              <label className={labelClass}>
+                Entry Price <span className="text-[var(--data-negative)]">*</span>
               </label>
               <input
                 type="number"
@@ -260,7 +262,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                 step="any"
                 min="0"
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-base text-foreground focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/40 focus:border-[#8b5cf6]/60 min-h-[44px]"
+                className={inputClass}
                 placeholder="150.00"
               />
             </div>
@@ -268,9 +270,9 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
 
           {/* Position Size Calculation */}
           {quantity && entryPrice && (
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-purple-500/5 border border-purple-500/10">
-              <span className="text-xs text-foreground/60">Position Size</span>
-              <span className="text-sm font-mono font-semibold text-purple-300">
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--accent-glow)] border border-[var(--accent-primary)]/10">
+              <span className="text-xs text-[var(--text-muted)]">Position Size</span>
+              <span className="text-sm font-mono font-semibold tabular-nums text-[var(--accent-primary)]">
                 ${(parseFloat(quantity) * parseFloat(entryPrice)).toLocaleString(
                   'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }
                 )}
@@ -280,9 +282,9 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
 
           {/* Risk at Stop Calculation */}
           {quantity && entryPrice && stopLoss && (
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-red-500/5 border border-red-500/10">
-              <span className="text-xs text-red-300/70 font-medium">Risk at Stop</span>
-              <span className="text-sm font-mono font-semibold text-red-400 tabular-nums">
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--data-negative)]/5 border border-[var(--data-negative)]/10">
+              <span className="text-xs text-[var(--data-negative)]/70 font-medium">Risk at Stop</span>
+              <span className="text-sm font-mono font-semibold text-[var(--data-negative)] tabular-nums">
                 ${(() => {
                   const qty = parseFloat(quantity)
                   const entry = parseFloat(entryPrice)
@@ -298,9 +300,9 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
 
           {/* Profit at Target Calculation */}
           {quantity && entryPrice && takeProfit && (
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/30">
-              <span className="text-xs text-green-300/70 font-medium">Profit at Target</span>
-              <span className="text-sm font-mono font-semibold text-green-400 tabular-nums">
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--data-positive)]/10 border border-[var(--data-positive)]/30">
+              <span className="text-xs text-[var(--data-positive)]/70 font-medium">Profit at Target</span>
+              <span className="text-sm font-mono font-semibold text-[var(--data-positive)] tabular-nums">
                 ${(() => {
                   const qty = parseFloat(quantity)
                   const entry = parseFloat(entryPrice)
@@ -332,12 +334,12 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
             const ratio = riskAmount > 0 ? profitAmount / riskAmount : 0
 
             return ratio > 0 && (
-              <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#8b5cf6]/10 border border-[#8b5cf6]/30">
-                <span className="text-xs text-purple-300/70 font-medium">Risk / Reward</span>
+              <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--accent-muted)] border border-[var(--accent-primary)]/30">
+                <span className="text-xs text-[var(--accent-primary)]/70 font-medium">Risk / Reward</span>
                 <span className={`text-sm font-mono font-semibold tabular-nums ${
-                  ratio >= 2 ? 'text-green-400' :
-                  ratio >= 1 ? 'text-yellow-400' :
-                  'text-red-400'
+                  ratio >= 2 ? 'text-[var(--data-positive)]' :
+                  ratio >= 1 ? 'text-[var(--data-warning)]' :
+                  'text-[var(--data-negative)]'
                 }`}>
                   1:{ratio.toFixed(1)}
                 </span>
@@ -348,148 +350,140 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
           {/* Stop Loss & Take Profit */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Stop Loss
-              </label>
+              <label className={labelClass}>Stop Loss</label>
               <input
                 type="number"
                 value={stopLoss}
                 onChange={(e) => setStopLoss(e.target.value)}
                 step="any"
                 min="0"
-                className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-base text-foreground focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/40 focus:border-[#8b5cf6]/60 min-h-[44px]"
+                className={inputClass}
                 placeholder="140.00"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Take Profit
-              </label>
+              <label className={labelClass}>Take Profit</label>
               <input
                 type="number"
                 value={takeProfit}
                 onChange={(e) => setTakeProfit(e.target.value)}
                 step="any"
                 min="0"
-                className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-base text-foreground focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/40 focus:border-[#8b5cf6]/60 min-h-[44px]"
+                className={inputClass}
                 placeholder="160.00"
               />
             </div>
           </div>
 
           {/* Section Divider */}
-          <div className="border-t border-white/[0.04] my-2" />
+          <div className="border-t border-[var(--border-subtle)] my-2" />
 
           {/* Entry Date */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Entry Date <span className="text-red-400">*</span>
+            <label className={labelClass}>
+              Entry Date <span className="text-[var(--data-negative)]">*</span>
             </label>
             <input
               type="date"
               value={entryDate}
               onChange={(e) => setEntryDate(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-base text-foreground focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/40 focus:border-[#8b5cf6]/60 min-h-[44px]"
+              className={inputClass}
             />
           </div>
 
           {/* Section Divider */}
-          <div className="border-t border-white/[0.04] my-2" />
+          <div className="border-t border-[var(--border-subtle)] my-2" />
 
           {/* Thesis */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Trade Thesis
-            </label>
+            <label className={labelClass}>Trade Thesis</label>
             <textarea
               value={thesis}
               onChange={(e) => setThesis(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-foreground focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/40 focus:border-[#8b5cf6]/60 resize-none"
+              className="w-full px-4 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/40 focus:border-[var(--accent-primary)] transition-colors resize-none"
               placeholder="Why are you taking this trade?"
             />
           </div>
 
           {/* Notes */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Notes
-            </label>
+            <label className={labelClass}>Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-foreground focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/40 focus:border-[#8b5cf6]/60 resize-none"
+              className="w-full px-4 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/40 focus:border-[var(--accent-primary)] transition-colors resize-none"
               placeholder="Additional notes"
             />
           </div>
 
           {/* Setup Tags */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Setup Tags
-            </label>
+            <label className={labelClass}>Setup Tags</label>
             <input
               type="text"
               value={setupTags}
               onChange={(e) => setSetupTags(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-base text-foreground focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/40 focus:border-[#8b5cf6]/60 min-h-[44px]"
+              className={inputClass}
               placeholder="breakout, momentum, swing (comma-separated)"
             />
           </div>
 
           {/* Conviction */}
           <div>
-            <label className="text-sm font-medium text-foreground mb-1.5 block">
-              Conviction (1-10)
-            </label>
+            <label className={labelClass}>Conviction (1-10)</label>
             <input
               type="range"
               min="1"
               max="10"
               value={conviction}
               onChange={(e) => setConviction(e.target.value)}
-              className="w-full accent-purple-500"
+              className="w-full accent-[var(--accent-primary)]"
             />
-            <div className="flex justify-between text-xs text-foreground/50 mt-1">
+            <div className="flex justify-between text-xs text-[var(--text-muted)] mt-1">
               <span>Low</span>
-              <span className="text-purple-400 font-medium">{conviction}</span>
+              <span className="text-[var(--accent-primary)] font-mono font-medium tabular-nums">{conviction}</span>
               <span>High</span>
             </div>
           </div>
 
           {/* Paper Trading Toggle */}
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-border">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
             <input
               type="checkbox"
               id="isPaper"
               checked={isPaper}
               onChange={(e) => setIsPaper(e.target.checked)}
-              className="w-4 h-4 rounded border-border text-purple-600 focus:ring-purple-500 focus:ring-offset-0 bg-white/[0.06]"
+              className="w-4 h-4 rounded border-[var(--border-default)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)] focus:ring-offset-0 bg-[var(--bg-surface)]"
             />
-            <label htmlFor="isPaper" className="text-sm text-foreground cursor-pointer">
+            <label htmlFor="isPaper" className="text-sm text-[var(--text-primary)] cursor-pointer">
               Paper trade (simulated)
             </label>
           </div>
 
           {/* Submit Buttons */}
           <div className="flex gap-3 pt-4">
-            <button
+            <PelicanButton
               type="button"
+              variant="secondary"
+              size="lg"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-white/[0.06] border border-border text-foreground hover:bg-white/[0.08] active:scale-95 transition-colors disabled:opacity-50 min-h-[44px]"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </PelicanButton>
+            <PelicanButton
               type="submit"
+              variant="primary"
+              size="lg"
               disabled={isSubmitting || !ticker || !quantity || !entryPrice}
-              className="flex-1 py-2.5 rounded-lg bg-[#8b5cf6] text-white font-medium transition-all hover:bg-[#7c3aed] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+              className="flex-1"
             >
               {isSubmitting ? 'Logging...' : 'Log Trade'}
-            </button>
+            </PelicanButton>
           </div>
         </form>
       </DialogContent>

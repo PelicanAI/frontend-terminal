@@ -9,19 +9,19 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Textarea } from "@/components/ui/textarea"
 import {
   Copy,
-  RotateCcw,
+  ArrowsClockwise,
   Square,
-  Share,
-  MoreHorizontal,
+  ShareNetwork,
+  DotsThree,
   Check,
   GitBranch,
-  Edit3,
-  Trash2,
+  PencilSimple,
+  Trash,
   Star,
-  Loader2,
+  SpinnerGap,
   X,
-  Save,
-} from "lucide-react"
+  FloppyDisk,
+} from "@phosphor-icons/react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -201,11 +201,11 @@ export function MessageActions({
         />
         <div className="flex justify-end gap-2 mt-2">
           <Button variant="outline" size="sm" onClick={handleCancelEdit}>
-            <X className="w-3 h-3 mr-1" />
+            <X size={12} weight="bold" className="mr-1" />
             Cancel
           </Button>
           <Button size="sm" onClick={handleSaveEdit} disabled={!safeTrim(editContent)}>
-            <Save className="w-3 h-3 mr-1" />
+            <FloppyDisk size={12} weight="regular" className="mr-1" />
             Save
           </Button>
         </div>
@@ -221,7 +221,7 @@ export function MessageActions({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="sm" onClick={onStop} className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
-                  <Square className="w-4 h-4 sm:w-3 sm:h-3" />
+                  <Square size={16} weight="fill" className="sm:!w-3 sm:!h-3" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Stop generation</TooltipContent>
@@ -238,7 +238,7 @@ export function MessageActions({
                   disabled={isRegenerating || message.isStreaming}
                   className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 group/regen"
                 >
-                  {isRegenerating ? <Loader2 className="w-4 h-4 sm:w-3 sm:h-3 animate-spin" /> : <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3 transition-transform duration-200 group-hover/regen:-rotate-45" />}
+                  {isRegenerating ? <SpinnerGap size={16} weight="regular" className="sm:!w-3 sm:!h-3 animate-spin" /> : <ArrowsClockwise size={16} weight="regular" className="sm:!w-3 sm:!h-3 transition-transform duration-200 group-hover/regen:-rotate-45" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{isRegenerating ? "Regenerating..." : "Regenerate response"}</TooltipContent>
@@ -256,7 +256,7 @@ export function MessageActions({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="sm" onClick={onStop} className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0">
-                <Square className="w-4 h-4 sm:w-3 sm:h-3" />
+                <Square size={16} weight="fill" className="sm:!w-3 sm:!h-3" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>Stop generation</TooltipContent>
@@ -273,7 +273,7 @@ export function MessageActions({
               className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
               disabled={message.isStreaming}
             >
-              {copied ? <Check className="w-4 h-4 sm:w-3 sm:h-3" /> : <Copy className="w-4 h-4 sm:w-3 sm:h-3" />}
+              {copied ? <Check size={16} weight="regular" className="sm:!w-3 sm:!h-3" /> : <Copy size={16} weight="regular" className="sm:!w-3 sm:!h-3" />}
             </Button>
           </TooltipTrigger>
           <TooltipContent>Copy message</TooltipContent>
@@ -289,7 +289,7 @@ export function MessageActions({
                     className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                     disabled={message.isStreaming}
                   >
-                    <Star className={cn("w-4 h-4 sm:w-3 sm:h-3", message.isPinned && "fill-current text-yellow-500")} />
+                    <Star size={16} weight={message.isPinned ? "fill" : "regular"} className={cn("sm:!w-3 sm:!h-3", message.isPinned && "text-yellow-500")} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{message.isPinned ? "Unpin message" : "Pin message"}</TooltipContent>
@@ -306,7 +306,7 @@ export function MessageActions({
                     className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                     disabled={message.isStreaming}
                   >
-                    <Edit3 className="w-4 h-4 sm:w-3 sm:h-3" />
+                    <PencilSimple size={16} weight="regular" className="sm:!w-3 sm:!h-3" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Edit message</TooltipContent>
@@ -323,7 +323,7 @@ export function MessageActions({
                     disabled={isRegenerating || message.isStreaming}
                     className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 group/regen"
                   >
-                    {isRegenerating ? <Loader2 className="w-4 h-4 sm:w-3 sm:h-3 animate-spin" /> : <RotateCcw className="w-4 h-4 sm:w-3 sm:h-3 transition-transform duration-200 group-hover/regen:-rotate-45" />}
+                    {isRegenerating ? <SpinnerGap size={16} weight="regular" className="sm:!w-3 sm:!h-3 animate-spin" /> : <ArrowsClockwise size={16} weight="regular" className="sm:!w-3 sm:!h-3 transition-transform duration-200 group-hover/regen:-rotate-45" />}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{isRegenerating ? "Regenerating..." : "Regenerate response"}</TooltipContent>
@@ -338,19 +338,19 @@ export function MessageActions({
                   className="h-11 w-11 sm:h-7 sm:w-7 p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
                   disabled={message.isStreaming}
                 >
-                  <MoreHorizontal className="w-4 h-4 sm:w-3 sm:h-3" />
+                  <DotsThree size={16} weight="bold" className="sm:!w-3 sm:!h-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 {message.role === "assistant" && (
                   <DropdownMenuItem onClick={handleBranchChat}>
-                    <GitBranch className="w-4 h-4 mr-2" />
+                    <GitBranch size={16} weight="regular" className="mr-2" />
                     Branch into new chat
                   </DropdownMenuItem>
                 )}
 
                 <DropdownMenuItem onClick={handleShare}>
-                  <Share className="w-4 h-4 mr-2" />
+                  <ShareNetwork size={16} weight="regular" className="mr-2" />
                   Share
                 </DropdownMenuItem>
 
@@ -361,7 +361,7 @@ export function MessageActions({
                       onClick={() => setShowDeleteDialog(true)}
                       className="text-destructive focus:text-destructive"
                     >
-                      <Trash2 className="w-4 h-4 mr-2" />
+                      <Trash size={16} weight="regular" className="mr-2" />
                       Delete message
                     </DropdownMenuItem>
                   </>

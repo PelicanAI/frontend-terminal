@@ -34,8 +34,8 @@ export function SuggestedPrompts({ onSelect, disabled }: SuggestedPromptsProps) 
           >
             <span className={
               disabled
-                ? "text-sm text-muted-foreground/50 leading-snug"
-                : "text-sm text-muted-foreground group-hover:text-foreground transition-colors leading-snug"
+                ? "text-sm text-[var(--text-muted)] leading-snug"
+                : "text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-snug"
             }>
               {prompt}
             </span>

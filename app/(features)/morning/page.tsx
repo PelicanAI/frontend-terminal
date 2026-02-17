@@ -3,12 +3,26 @@
 export const dynamic = "force-dynamic"
 
 import { useMemo, useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { useTrades } from "@/hooks/use-trades"
 import { useMorningBrief } from "@/hooks/use-morning-brief"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
-import { PelicanCard } from "@/components/ui/pelican-card"
-import { Sparkles, RefreshCw, CalendarDays, Rocket } from "lucide-react"
+import {
+  PelicanCard,
+  PageHeader,
+  PelicanButton,
+  DataCell,
+  staggerContainer,
+  staggerItem,
+} from "@/components/ui/pelican"
+import {
+  ArrowsClockwise,
+  CalendarBlank,
+  RocketLaunch,
+  Sparkle,
+  Lightning,
+} from "@phosphor-icons/react"
 import { getMarketStatus } from "@/hooks/use-market-data"
 import { LogoImg } from "@/components/ui/logo-img"
 import { MessageContent } from "@/components/chat/message/message-content"
@@ -242,362 +256,387 @@ Please provide:
 
   return (
     <div className="h-full overflow-auto p-4 sm:p-6">
-      {/* Header with subtle elevation */}
-      <div className="mb-6 pb-5 rounded-xl bg-gradient-to-b from-white/[0.03] to-transparent px-4 pt-4 border-b border-white/[0.04]">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-foreground">Morning Brief</h1>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-            </p>
-          </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-white/[0.03] px-2 sm:px-3 py-1.5">
-            <div className={`h-2 w-2 rounded-full ${isMarketOpen ? "bg-green-500" : "bg-yellow-500"}`} />
-            <span className="text-xs text-foreground/70">{isMarketOpen ? "Market Open" : marketStatus.replace("-", " ")}</span>
-          </div>
-          <button
-            onClick={() => refetchMovers()}
-            disabled={moversLoading}
-            className="rounded-lg border border-border bg-white/[0.06] px-2 sm:px-3 py-1.5 transition-colors hover:bg-white/[0.08] active:scale-95 disabled:opacity-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            aria-label="Refresh movers"
-          >
-            <RefreshCw className={`h-4 w-4 text-foreground/70 ${moversLoading ? "animate-spin" : ""}`} />
-          </button>
-        </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 p-0 lg:grid-cols-2">
-        <PelicanCard className="p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-foreground">Active Exposure</h2>
-            <span className="text-xs text-muted-foreground">{openTrades.length} open</span>
-          </div>
-          {tradesLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-purple-500/30 border-t-purple-500" />
+      {/* Page Header */}
+      <PageHeader
+        title="Morning Brief"
+        subtitle={new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+        actions={
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-2 sm:px-3 py-1.5">
+              <div className={`h-2 w-2 rounded-full ${isMarketOpen ? "bg-[var(--data-positive)]" : "bg-[var(--data-warning)]"}`} />
+              <span className="text-xs text-[var(--text-secondary)]">{isMarketOpen ? "Market Open" : marketStatus.replace("-", " ")}</span>
             </div>
-          ) : openTrades.length === 0 ? (
-            <p className="text-sm text-foreground/50">No open positions.</p>
-          ) : (
-            <div className="space-y-3">
-              {openTrades.slice(0, 8).map((trade) => {
-                // Calculate unrealized P&L from live prices
-                const quote = quotes[trade.ticker]
-                const currentPrice = quote?.price
-                const direction = trade.direction === 'long' ? 1 : -1
+            <PelicanButton
+              variant="secondary"
+              size="sm"
+              onClick={() => refetchMovers()}
+              disabled={moversLoading}
+              aria-label="Refresh movers"
+            >
+              <ArrowsClockwise className={`h-4 w-4 ${moversLoading ? "animate-spin" : ""}`} weight="bold" />
+            </PelicanButton>
+          </div>
+        }
+      />
 
-                let unrealizedPnL: number | null = null
-                if (currentPrice) {
-                  unrealizedPnL = (currentPrice - trade.entry_price) * trade.quantity * direction
-                }
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 gap-4 sm:gap-6 p-0 lg:grid-cols-2"
+      >
+        {/* Active Exposure */}
+        <motion.div variants={staggerItem}>
+          <PelicanCard accentGlow className="p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-[var(--text-primary)]">Active Exposure</h2>
+              <span className="text-xs font-mono tabular-nums text-[var(--text-muted)]">{openTrades.length} open</span>
+            </div>
+            {tradesLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent-muted)] border-t-[var(--accent-primary)]" />
+              </div>
+            ) : openTrades.length === 0 ? (
+              <p className="text-sm text-[var(--text-muted)]">No open positions.</p>
+            ) : (
+              <div className="space-y-3">
+                {openTrades.slice(0, 8).map((trade) => {
+                  // Calculate unrealized P&L from live prices
+                  const quote = quotes[trade.ticker]
+                  const currentPrice = quote?.price
+                  const direction = trade.direction === 'long' ? 1 : -1
 
-                const pnl = unrealizedPnL ?? trade.pnl_amount ?? null
-                const pnlColor = pnl === null
-                  ? "text-foreground/40"
-                  : pnl >= 0
-                    ? "text-green-400"
-                    : "text-red-400"
+                  let unrealizedPnL: number | null = null
+                  if (currentPrice) {
+                    unrealizedPnL = (currentPrice - trade.entry_price) * trade.quantity * direction
+                  }
 
-                return (
-                  <button
-                    key={trade.id}
-                    onClick={() => handleAnalyzePosition(trade)}
-                    className="w-full rounded-lg border border-white/[0.04] bg-white/[0.03] p-3 text-left transition-colors hover:bg-white/[0.06] active:scale-[0.98] min-h-[44px]"
-                  >
-                    <div className="mb-1 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <LogoImg symbol={trade.ticker} size={20} />
-                        <span className="font-mono text-sm font-semibold text-foreground">{trade.ticker}</span>
+                  const pnl = unrealizedPnL ?? trade.pnl_amount ?? null
+
+                  return (
+                    <button
+                      key={trade.id}
+                      onClick={() => handleAnalyzePosition(trade)}
+                      className="w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 text-left transition-all duration-150 hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)] active:scale-[0.98] min-h-[44px]"
+                    >
+                      <div className="mb-1 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <LogoImg symbol={trade.ticker} size={20} />
+                          <span className="font-mono text-sm font-semibold text-[var(--text-primary)]">{trade.ticker}</span>
+                        </div>
+                        <span className={`text-xs font-medium uppercase ${trade.direction === "long" ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"}`}>
+                          {trade.direction}
+                        </span>
                       </div>
-                      <span className={`text-xs font-medium uppercase ${trade.direction === "long" ? "text-green-400" : "text-red-400"}`}>
-                        {trade.direction}
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-[var(--text-muted)]">
+                          Entry <span className="font-mono tabular-nums">${trade.entry_price.toFixed(2)}</span> · Qty <span className="font-mono tabular-nums">{trade.quantity}</span>
+                        </span>
+                        {pnl === null ? (
+                          <span className="font-mono tabular-nums text-[var(--text-disabled)]">—</span>
+                        ) : (
+                          <DataCell
+                            value={`${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)}`}
+                            sentiment={pnl >= 0 ? 'positive' : 'negative'}
+                            size="sm"
+                          />
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </PelicanCard>
+        </motion.div>
+
+        {/* Macro Pulse */}
+        <motion.div variants={staggerItem}>
+          <PelicanCard className="p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+                <CalendarBlank className="h-4 w-4 text-[var(--accent-primary)]" weight="regular" />
+                Macro Pulse
+              </h2>
+            </div>
+            {economicLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent-muted)] border-t-[var(--accent-primary)]" />
+              </div>
+            ) : macroEvents.length === 0 ? (
+              <p className="text-sm text-[var(--text-muted)]">
+                No upcoming economic events this week
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {macroEvents.map((event, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 transition-colors duration-150 hover:bg-[var(--bg-elevated)]"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-[var(--text-primary)]">{event.event}</span>
+                      <span className="text-xs text-[var(--text-muted)]">
+                        {new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                        {event.time ? ` · ${event.time} ET` : ''}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-foreground/60">Entry ${trade.entry_price.toFixed(2)} · Qty {trade.quantity}</span>
-                      <span className={`font-mono ${pnlColor}`}>
-                        {pnl === null ? "—" : `${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)}`}
+                    <div className="flex items-center gap-3">
+                      {/* Estimate vs Prior */}
+                      <div className="text-right">
+                        {event.estimate != null && (
+                          <span className="text-xs text-[var(--text-secondary)] block font-mono tabular-nums">Est: {event.estimate}{event.unit}</span>
+                        )}
+                        {event.prior != null && (
+                          <span className="text-xs text-[var(--text-muted)] block font-mono tabular-nums">Prior: {event.prior}{event.unit}</span>
+                        )}
+                      </div>
+                      {/* Impact badge */}
+                      <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded ${
+                        event.impact === 'high'
+                          ? 'bg-red-500/15 text-[var(--data-negative)]'
+                          : 'bg-amber-500/15 text-[var(--data-warning)]'
+                      }`}>
+                        {event.impact}
                       </span>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </PelicanCard>
+        </motion.div>
+
+        {/* Market Movers */}
+        <motion.div variants={staggerItem}>
+          <PelicanCard className="p-5">
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-semibold text-[var(--text-primary)]">Market Movers</h2>
+                <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-1">
+                  <button
+                    onClick={() => setMoversTab("gainers")}
+                    className={`rounded px-2 py-1 text-xs transition-colors duration-150 ${
+                      moversTab === "gainers"
+                        ? "bg-green-500/20 text-[var(--data-positive)] border border-green-500/30"
+                        : "text-[var(--text-muted)] border border-transparent"
+                    }`}
+                  >
+                    Gainers
                   </button>
-                )
-              })}
-            </div>
-          )}
-        </PelicanCard>
-
-        <PelicanCard className="p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <CalendarDays className="h-4 w-4 text-purple-300" />
-              Macro Pulse
-            </h2>
-          </div>
-          {economicLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-purple-500/30 border-t-purple-500" />
-            </div>
-          ) : macroEvents.length === 0 ? (
-            <p className="text-sm text-foreground/40">
-              No upcoming economic events this week
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {macroEvents.map((event, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-[#13131a] p-3"
-                >
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-white">{event.event}</span>
-                    <span className="text-xs text-gray-500">
-                      {new Date(event.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                      {event.time ? ` • ${event.time} ET` : ''}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {/* Estimate vs Prior */}
-                    <div className="text-right">
-                      {event.estimate != null && (
-                        <span className="text-xs text-gray-400 block">Est: {event.estimate}{event.unit}</span>
-                      )}
-                      {event.prior != null && (
-                        <span className="text-xs text-gray-500 block">Prior: {event.prior}{event.unit}</span>
-                      )}
-                    </div>
-                    {/* Impact badge */}
-                    <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded ${
-                      event.impact === 'high'
-                        ? 'bg-red-500/15 text-red-400'
-                        : 'bg-amber-500/15 text-amber-400'
-                    }`}>
-                      {event.impact}
-                    </span>
-                  </div>
+                  <button
+                    onClick={() => setMoversTab("losers")}
+                    className={`rounded px-2 py-1 text-xs transition-colors duration-150 ${
+                      moversTab === "losers"
+                        ? "bg-red-500/20 text-[var(--data-negative)] border border-red-500/30"
+                        : "text-[var(--text-muted)] border border-transparent"
+                    }`}
+                  >
+                    Losers
+                  </button>
                 </div>
-              ))}
-            </div>
-          )}
-        </PelicanCard>
+              </div>
 
-        <PelicanCard className="p-5">
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-foreground">Market Movers</h2>
-              <div className="rounded-lg border border-white/[0.06] bg-white/[0.06] p-1">
-                <button
-                  onClick={() => setMoversTab("gainers")}
-                  className={`rounded px-2 py-1 text-xs transition-colors ${
-                    moversTab === "gainers"
-                      ? "bg-green-500/20 text-green-300 border border-green-500/30"
-                      : "text-foreground/40 border border-transparent"
-                  }`}
-                >
-                  Gainers
-                </button>
-                <button
-                  onClick={() => setMoversTab("losers")}
-                  className={`rounded px-2 py-1 text-xs transition-colors ${
-                    moversTab === "losers"
-                      ? "bg-red-500/20 text-red-300 border border-red-500/30"
-                      : "text-foreground/40 border border-transparent"
-                  }`}
-                >
-                  Losers
-                </button>
+              {/* Price Tier Filter */}
+              <div className="flex gap-1 flex-wrap">
+                {PRICE_TIERS.map(tier => (
+                  <button
+                    key={tier.label}
+                    onClick={() => setPriceTier(tier)}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors duration-150 ${
+                      priceTier.label === tier.label
+                        ? "bg-[var(--accent-primary)] text-white"
+                        : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)]"
+                    }`}
+                  >
+                    {tier.label}
+                  </button>
+                ))}
               </div>
             </div>
-
-            {/* Price Tier Filter */}
-            <div className="flex gap-1 flex-wrap">
-              {PRICE_TIERS.map(tier => (
+            <div className="space-y-2">
+              {currentMovers.slice(0, 10).map((mover) => (
                 <button
-                  key={tier.label}
-                  onClick={() => setPriceTier(tier)}
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${
-                    priceTier.label === tier.label
-                      ? "bg-[#8b5cf6] text-white"
-                      : "bg-white/5 text-gray-400 hover:bg-white/10"
-                  }`}
+                  key={`${moversTab}-${mover.ticker}`}
+                  onClick={() => handleAnalyzeTicker(mover.ticker, mover.name, mover.price, mover.changePercent)}
+                  className="flex w-full items-center justify-between rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 transition-all duration-150 hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)] active:scale-[0.98] min-h-[44px]"
                 >
-                  {tier.label}
+                  <div className="flex items-center gap-2 text-left">
+                    <LogoImg symbol={mover.ticker} size={18} />
+                    <div>
+                      <div className="font-mono text-sm font-semibold text-[var(--text-primary)]">{mover.ticker}</div>
+                      <div className="text-xs font-mono tabular-nums text-[var(--text-muted)]">${mover.price.toFixed(2)}</div>
+                    </div>
+                  </div>
+                  <DataCell
+                    value={`${mover.changePercent >= 0 ? "+" : ""}${mover.changePercent.toFixed(2)}`}
+                    sentiment={mover.changePercent >= 0 ? 'positive' : 'negative'}
+                    suffix="%"
+                    size="sm"
+                  />
                 </button>
               ))}
+              {currentMovers.length === 0 && !moversLoading && (
+                <p className="text-sm text-[var(--text-muted)] text-center py-4">
+                  No {moversTab} in the {priceTier.label} range today
+                </p>
+              )}
             </div>
-          </div>
-          <div className="space-y-2">
-            {currentMovers.slice(0, 10).map((mover) => (
-              <button
-                key={`${moversTab}-${mover.ticker}`}
-                onClick={() => handleAnalyzeTicker(mover.ticker, mover.name, mover.price, mover.changePercent)}
-                className="flex w-full items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.03] p-3 transition-colors hover:bg-white/[0.06] active:scale-[0.98] min-h-[44px]"
-              >
-                <div className="flex items-center gap-2 text-left">
-                  <LogoImg symbol={mover.ticker} size={18} />
-                  <div>
-                    <div className="font-mono text-sm font-semibold text-foreground">{mover.ticker}</div>
-                    <div className="text-xs text-foreground/60">${mover.price.toFixed(2)}</div>
-                  </div>
-                </div>
-                <div className={`font-mono text-sm tabular-nums ${mover.changePercent >= 0 ? "stat-positive" : "stat-negative"}`}>
-                  {mover.changePercent >= 0 ? "+" : ""}
-                  {mover.changePercent.toFixed(2)}%
-                </div>
-              </button>
-            ))}
-            {currentMovers.length === 0 && !moversLoading && (
-              <p className="text-sm text-foreground/50 text-center py-4">
-                No {moversTab} in the {priceTier.label} range today
-              </p>
-            )}
-          </div>
-        </PelicanCard>
+          </PelicanCard>
+        </motion.div>
 
         {/* IPO Watch */}
-        <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Rocket className="h-4 w-4 text-cyan-400" />
-              <h3 className="font-semibold text-sm">IPO Watch</h3>
+        <motion.div variants={staggerItem}>
+          <PelicanCard className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <RocketLaunch className="h-4 w-4 text-[var(--accent-primary)]" weight="regular" />
+                <h3 className="font-semibold text-sm text-[var(--text-primary)]">IPO Watch</h3>
+              </div>
+              {ipos.length > 0 && (
+                <span className="text-xs font-mono tabular-nums text-[var(--text-muted)]">
+                  {ipos.length} upcoming
+                </span>
+              )}
             </div>
-            {ipos.length > 0 && (
-              <span className="text-xs text-foreground/30">
-                {ipos.length} upcoming
-              </span>
-            )}
-          </div>
 
-          {ipos.length === 0 ? (
-            <p className="text-xs text-foreground/30">
-              No upcoming IPOs this week
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {ipos.slice(0, 6).map((ipo, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-colors min-h-[44px]"
-                  onClick={() => {
-                    const prompt = `Tell me about the ${ipo.company} IPO` +
-                      (ipo.ticker ? ` (${ipo.ticker})` : '') +
-                      (ipo.priceRangeLow && ipo.priceRangeHigh
-                        ? ` pricing at $${ipo.priceRangeLow}-$${ipo.priceRangeHigh}`
-                        : '')
-                    openWithPrompt(ipo.ticker || ipo.company, prompt, 'morning')
-                  }}
-                >
-                  {/* Left: ticker/company + date */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      {ipo.ticker && (
-                        <span className="text-sm font-semibold text-cyan-400">
-                          {ipo.ticker}
+            {ipos.length === 0 ? (
+              <p className="text-xs text-[var(--text-muted)]">
+                No upcoming IPOs this week
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {ipos.slice(0, 6).map((ipo, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between py-2 px-3 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-colors duration-150 min-h-[44px]"
+                    onClick={() => {
+                      const prompt = `Tell me about the ${ipo.company} IPO` +
+                        (ipo.ticker ? ` (${ipo.ticker})` : '') +
+                        (ipo.priceRangeLow && ipo.priceRangeHigh
+                          ? ` pricing at $${ipo.priceRangeLow}-$${ipo.priceRangeHigh}`
+                          : '')
+                      openWithPrompt(ipo.ticker || ipo.company, prompt, 'morning')
+                    }}
+                  >
+                    {/* Left: ticker/company + date */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        {ipo.ticker && (
+                          <span className="text-sm font-semibold text-[var(--accent-primary)]">
+                            {ipo.ticker}
+                          </span>
+                        )}
+                        <span className="text-xs text-[var(--text-muted)] truncate">
+                          {ipo.company}
+                        </span>
+                      </div>
+                      {ipo.listingDate && (
+                        <span className="text-[10px] text-[var(--text-disabled)]">
+                          {formatIPODate(ipo.listingDate)}
                         </span>
                       )}
-                      <span className="text-xs text-foreground/50 truncate">
-                        {ipo.company}
-                      </span>
                     </div>
-                    {ipo.listingDate && (
-                      <span className="text-[10px] text-foreground/25">
-                        {formatIPODate(ipo.listingDate)}
-                      </span>
-                    )}
-                  </div>
 
-                  {/* Right: price range */}
-                  <div className="text-right flex-shrink-0 ml-3">
-                    {ipo.finalPrice ? (
-                      <span className="text-xs font-mono tabular-nums text-green-400">
-                        ${ipo.finalPrice}
-                      </span>
-                    ) : ipo.priceRangeLow && ipo.priceRangeHigh ? (
-                      <span className="text-xs font-mono tabular-nums text-foreground/40">
-                        ${ipo.priceRangeLow}–${ipo.priceRangeHigh}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-foreground/20">
-                        TBD
-                      </span>
-                    )}
+                    {/* Right: price range */}
+                    <div className="text-right flex-shrink-0 ml-3">
+                      {ipo.finalPrice ? (
+                        <DataCell
+                          value={ipo.finalPrice}
+                          sentiment="positive"
+                          prefix="$"
+                          size="sm"
+                        />
+                      ) : ipo.priceRangeLow && ipo.priceRangeHigh ? (
+                        <span className="text-xs font-mono tabular-nums text-[var(--text-secondary)]">
+                          ${ipo.priceRangeLow}–${ipo.priceRangeHigh}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-[var(--text-disabled)]">
+                          TBD
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="rounded-xl border border-white/[0.04] bg-white/[0.02] p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-purple-400" />
-              <h3 className="font-semibold text-lg text-foreground">Pelican Brief</h3>
-            </div>
-            {briefContent && !briefLoading && (
-              <button
-                onClick={handleGenerateBrief}
-                className="text-xs text-foreground/40 hover:text-foreground/60 transition-colors flex items-center gap-1"
-              >
-                <RefreshCw className="h-3 w-3" />
-                Regenerate
-              </button>
+                ))}
+              </div>
             )}
-          </div>
+          </PelicanCard>
+        </motion.div>
 
-          {/* Empty state */}
-          {!briefContent && !briefLoading && !briefError && (
-            <>
-              <p className="text-sm text-foreground/50 mb-4">
-                AI-generated morning intelligence across your positions, movers, and macro setup.
-              </p>
-              <button
-                onClick={handleGenerateBrief}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#8b5cf6] hover:bg-[#7c3aed] text-white text-sm font-medium transition-colors active:scale-95 min-h-[44px]"
-              >
-                <Sparkles className="h-4 w-4" />
-                Generate Brief
-              </button>
-            </>
-          )}
-
-          {/* Loading state */}
-          {briefLoading && (
-            <div className="flex items-center gap-3 py-8">
-              <div className="h-5 w-5 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
-              <span className="text-sm text-foreground/50">
-                Generating your morning brief...
-              </span>
+        {/* Pelican Brief */}
+        <motion.div variants={staggerItem} className="lg:col-span-2">
+          <PelicanCard accentGlow className="p-6">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Lightning className="h-5 w-5 text-[var(--accent-primary)]" weight="bold" />
+                <h3 className="font-semibold text-lg text-[var(--text-primary)]">Pelican Brief</h3>
+              </div>
+              {briefContent && !briefLoading && (
+                <PelicanButton
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleGenerateBrief}
+                >
+                  <ArrowsClockwise className="h-3 w-3" weight="regular" />
+                  Regenerate
+                </PelicanButton>
+              )}
             </div>
-          )}
 
-          {/* Streamed/completed content */}
-          {briefContent && (
-            <div className="text-foreground/80 leading-relaxed">
-              <MessageContent
-                content={briefContent}
-                isStreaming={briefLoading}
-                showSkeleton={false}
-              />
-            </div>
-          )}
+            {/* Empty state */}
+            {!briefContent && !briefLoading && !briefError && (
+              <>
+                <p className="text-sm text-[var(--text-muted)] mb-4">
+                  AI-generated morning intelligence across your positions, movers, and macro setup.
+                </p>
+                <PelicanButton
+                  onClick={handleGenerateBrief}
+                >
+                  <Sparkle className="h-4 w-4" weight="bold" />
+                  Generate Brief
+                </PelicanButton>
+              </>
+            )}
 
-          {/* Error state */}
-          {briefError && (
-            <div>
-              <p className="text-sm text-red-400 mb-3">{briefError}</p>
-              <button
-                onClick={handleGenerateBrief}
-                className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
-              >
-                Try again
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+            {/* Loading state */}
+            {briefLoading && (
+              <div className="flex items-center gap-3 py-8">
+                <div className="h-5 w-5 border-2 border-[var(--accent-muted)] border-t-[var(--accent-primary)] rounded-full animate-spin" />
+                <span className="text-sm text-[var(--text-muted)]">
+                  Generating your morning brief...
+                </span>
+              </div>
+            )}
+
+            {/* Streamed/completed content */}
+            {briefContent && (
+              <div className="text-[var(--text-secondary)] leading-relaxed">
+                <MessageContent
+                  content={briefContent}
+                  isStreaming={briefLoading}
+                  showSkeleton={false}
+                />
+              </div>
+            )}
+
+            {/* Error state */}
+            {briefError && (
+              <div>
+                <p className="text-sm text-[var(--data-negative)] mb-3">{briefError}</p>
+                <PelicanButton
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleGenerateBrief}
+                >
+                  Try again
+                </PelicanButton>
+              </div>
+            )}
+          </PelicanCard>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }

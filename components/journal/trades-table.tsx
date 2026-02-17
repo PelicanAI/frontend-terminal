@@ -1,10 +1,12 @@
 "use client"
 
 import { Trade } from "@/hooks/use-trades"
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react"
+import { CaretUp, CaretDown, CaretUpDown } from "@phosphor-icons/react"
 import { useState } from "react"
+import { motion } from "framer-motion"
 import { useLiveQuotes, type Quote } from "@/hooks/use-live-quotes"
 import { LogoImg } from "@/components/ui/logo-img"
+import { PelicanCard, PelicanButton, staggerContainer, staggerItem } from "@/components/ui/pelican"
 
 interface TradesTableProps {
   trades: Trade[]
@@ -100,71 +102,65 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
   })
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <ArrowUpDown className="w-3 h-3 text-foreground/30" />
+    if (sortField !== field) return <CaretUpDown size={12} className="text-[var(--text-disabled)]" />
     return sortDirection === 'asc' ? (
-      <ArrowUp className="w-3 h-3 text-purple-400" />
+      <CaretUp size={12} weight="bold" className="text-[var(--accent-primary)]" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-purple-400" />
+      <CaretDown size={12} weight="bold" className="text-[var(--accent-primary)]" />
     )
   }
 
   if (trades.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-foreground/50 text-sm">No trades to display</p>
+        <p className="text-[var(--text-muted)] text-sm">No trades to display</p>
       </div>
     )
   }
+
+  const thClass = "text-[var(--text-muted)] uppercase text-xs tracking-wider font-medium"
 
   return (
     <>
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
-        <thead className="border-b border-white/[0.04]">
+        <thead>
           <tr className="text-left">
             <th className="pb-3 px-4">
               <button
                 onClick={() => handleSort('ticker')}
-                className="flex items-center gap-1 text-[10px] font-semibold text-foreground/60 uppercase tracking-widest hover:text-foreground transition-colors"
+                className={`flex items-center gap-1 ${thClass} hover:text-[var(--text-secondary)] transition-colors`}
               >
                 Ticker
                 <SortIcon field="ticker" />
               </button>
             </th>
             <th className="pb-3 px-4">
-              <span className="text-[10px] font-semibold text-foreground/60 uppercase tracking-widest">
-                Direction
-              </span>
+              <span className={thClass}>Direction</span>
             </th>
             <th className="pb-3 px-4">
               <button
                 onClick={() => handleSort('entry_date')}
-                className="flex items-center gap-1 text-[10px] font-semibold text-foreground/60 uppercase tracking-widest hover:text-foreground transition-colors"
+                className={`flex items-center gap-1 ${thClass} hover:text-[var(--text-secondary)] transition-colors`}
               >
                 Entry Date
                 <SortIcon field="entry_date" />
               </button>
             </th>
             <th className="pb-3 px-4 text-right">
-              <span className="text-[10px] font-semibold text-foreground/60 uppercase tracking-widest">
-                Entry
-              </span>
+              <span className={thClass}>Entry</span>
             </th>
             <th className="pb-3 px-4 text-right">
-              <span className="text-[10px] font-semibold text-foreground/60 uppercase tracking-widest">
-                Current
-              </span>
+              <span className={thClass}>Current</span>
             </th>
             <th className="pb-3 px-4 text-right">
-              <span className="text-[10px] font-semibold text-foreground/60 uppercase tracking-widest">
-                Exit
-              </span>
+              <span className={thClass}>Exit</span>
             </th>
             <th className="pb-3 px-4 text-right">
               <button
                 onClick={() => handleSort('pnl_amount')}
-                className="flex items-center gap-1 ml-auto text-[10px] font-semibold text-foreground/60 uppercase tracking-widest hover:text-foreground transition-colors"
+                className={`flex items-center gap-1 ml-auto ${thClass} hover:text-[var(--text-secondary)] transition-colors`}
               >
                 P&L
                 <SortIcon field="pnl_amount" />
@@ -173,21 +169,17 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
             <th className="pb-3 px-4 text-right">
               <button
                 onClick={() => handleSort('pnl_percent')}
-                className="flex items-center gap-1 ml-auto text-[10px] font-semibold text-foreground/60 uppercase tracking-widest hover:text-foreground transition-colors"
+                className={`flex items-center gap-1 ml-auto ${thClass} hover:text-[var(--text-secondary)] transition-colors`}
               >
                 %
                 <SortIcon field="pnl_percent" />
               </button>
             </th>
             <th className="pb-3 px-4">
-              <span className="text-[10px] font-semibold text-foreground/60 uppercase tracking-widest">
-                Status
-              </span>
+              <span className={thClass}>Status</span>
             </th>
             <th className="pb-3 px-4 text-right">
-              <span className="text-[10px] font-semibold text-foreground/60 uppercase tracking-widest">
-                Actions
-              </span>
+              <span className={thClass}>Actions</span>
             </th>
           </tr>
         </thead>
@@ -209,9 +201,9 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                 key={trade.id}
                 onClick={() => onSelectTrade(trade)}
                 className={`
-                  border-b border-white/[0.04] cursor-pointer transition-colors
-                  ${isSelected ? 'bg-purple-600/10' : 'hover:bg-white/[0.03]'}
-                  ${trade.is_paper ? 'border-dashed' : ''}
+                  cursor-pointer transition-colors duration-150
+                  ${isSelected ? 'bg-[var(--accent-muted)]' : 'hover:bg-[var(--bg-elevated)]'}
+                  ${trade.is_paper ? 'border-b border-dashed border-[var(--border-subtle)]' : ''}
                 `}
               >
                 <td className="py-3 px-4">
@@ -222,12 +214,12 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                         e.stopPropagation()
                         onScanTrade?.(trade)
                       }}
-                      className="font-mono font-semibold text-foreground underline-offset-4 hover:text-primary hover:underline"
+                      className="font-mono font-semibold text-[var(--text-primary)] underline-offset-4 hover:text-[var(--accent-primary)] hover:underline"
                     >
                       {trade.ticker}
                     </button>
                     {trade.is_paper && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-600/20 text-yellow-400 font-medium">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--data-warning)]/20 text-[var(--data-warning)] font-medium">
                         P
                       </span>
                     )}
@@ -235,78 +227,80 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                 </td>
                 <td className="py-3 px-4">
                   <span
-                    className={`text-xs px-2 py-0.5 rounded border font-medium uppercase ${
+                    className={`text-xs px-2 py-0.5 rounded-full font-medium uppercase ${
                       trade.direction === 'long'
-                        ? 'bg-green-500/15 text-green-400 border-green-500/20'
-                        : 'bg-red-500/15 text-red-400 border-red-500/20'
+                        ? 'bg-[var(--data-positive)]/15 text-[var(--data-positive)] border border-[var(--data-positive)]/20'
+                        : 'bg-[var(--data-negative)]/15 text-[var(--data-negative)] border border-[var(--data-negative)]/20'
                     }`}
                   >
                     {trade.direction}
                   </span>
                 </td>
-                <td className="py-3 px-4 text-sm text-foreground/80">
+                <td className="py-3 px-4 text-sm font-mono tabular-nums text-[var(--text-secondary)]">
                   {new Date(trade.entry_date).toLocaleDateString()}
                 </td>
-                <td className="py-3 px-4 text-right font-mono text-sm text-foreground">
+                <td className="py-3 px-4 text-right font-mono tabular-nums text-sm text-[var(--text-primary)]">
                   ${trade.entry_price.toFixed(2)}
                 </td>
-                <td className="py-3 px-4 text-right font-mono text-sm text-foreground">
+                <td className="py-3 px-4 text-right font-mono tabular-nums text-sm">
                   {trade.status === 'open' && unrealized ? (
-                    <span className={unrealized.currentPrice > trade.entry_price ? 'text-green-400' : unrealized.currentPrice < trade.entry_price ? 'text-red-400' : 'text-foreground'}>
+                    <span className={unrealized.currentPrice > trade.entry_price ? 'text-[var(--data-positive)]' : unrealized.currentPrice < trade.entry_price ? 'text-[var(--data-negative)]' : 'text-[var(--text-primary)]'}>
                       ${unrealized.currentPrice.toFixed(2)}
                     </span>
                   ) : trade.status === 'open' ? (
-                    <span className="text-foreground/30" title="Price unavailable">—</span>
+                    <span className="text-[var(--text-disabled)]" title="Price unavailable">—</span>
                   ) : (
-                    <span className="text-foreground/30">—</span>
+                    <span className="text-[var(--text-disabled)]">—</span>
                   )}
                 </td>
-                <td className="py-3 px-4 text-right font-mono text-sm text-foreground">
-                  {trade.exit_price ? `$${trade.exit_price.toFixed(2)}` : '—'}
+                <td className="py-3 px-4 text-right font-mono tabular-nums text-sm text-[var(--text-primary)]">
+                  {trade.exit_price ? `$${trade.exit_price.toFixed(2)}` : <span className="text-[var(--text-disabled)]">—</span>}
                 </td>
-                <td className="py-3 px-4 text-right font-mono text-sm font-medium tabular-nums">
+                <td className="py-3 px-4 text-right font-mono tabular-nums text-sm font-medium">
                   {displayPnL.amount !== null ? (
-                    <span className={isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}>
+                    <span className={isWinner ? 'text-[var(--data-positive)]' : isLoser ? 'text-[var(--data-negative)]' : 'text-[var(--text-muted)]'}>
                       {displayPnL.amount >= 0 ? '+' : ''}${displayPnL.amount.toFixed(2)}
                     </span>
                   ) : (
-                    <span className="text-foreground/30">—</span>
+                    <span className="text-[var(--text-disabled)]">—</span>
                   )}
                 </td>
-                <td className="py-3 px-4 text-right font-mono text-sm font-medium tabular-nums">
+                <td className="py-3 px-4 text-right font-mono tabular-nums text-sm font-medium">
                   {displayPnL.percent !== null ? (
-                    <span className={isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}>
+                    <span className={isWinner ? 'text-[var(--data-positive)]' : isLoser ? 'text-[var(--data-negative)]' : 'text-[var(--text-muted)]'}>
                       {displayPnL.percent >= 0 ? '+' : ''}{displayPnL.percent.toFixed(2)}%
                     </span>
                   ) : (
-                    <span className="text-foreground/30">—</span>
+                    <span className="text-[var(--text-disabled)]">—</span>
                   )}
                 </td>
                 <td className="py-3 px-4">
                   <span
                     className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full font-medium uppercase ${
                       trade.status === 'open'
-                        ? 'bg-blue-600/20 text-blue-400'
+                        ? 'bg-[var(--status-open)]/15 text-[var(--status-open)]'
                         : trade.status === 'closed'
-                        ? 'bg-foreground/10 text-foreground/60'
-                        : 'bg-foreground/5 text-foreground/40'
+                        ? 'bg-[var(--text-muted)]/10 text-[var(--text-muted)]'
+                        : 'bg-[var(--text-disabled)]/10 text-[var(--text-disabled)]'
                     }`}
                   >
-                    {trade.status === 'open' && <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />}
+                    {trade.status === 'open' && <div className="w-1.5 h-1.5 rounded-full bg-[var(--status-open)] animate-pulse" />}
                     {trade.status}
                   </span>
                 </td>
                 <td className="py-3 px-4 text-right">
                   {onScanTrade && (
-                    <button
+                    <PelicanButton
+                      variant="secondary"
+                      size="sm"
                       onClick={(e) => {
                         e.stopPropagation()
                         onScanTrade(trade)
                       }}
-                      className="rounded border border-[#8b5cf6]/20 bg-[#8b5cf6]/15 px-3 py-1 text-[10px] font-bold text-[#8b5cf6] transition-colors hover:bg-[#8b5cf6]/25"
+                      className="text-[10px] font-bold"
                     >
                       SCAN
-                    </button>
+                    </PelicanButton>
                   )}
                 </td>
               </tr>
@@ -317,7 +311,12 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
       </div>
 
       {/* Mobile Card View */}
-      <div className="md:hidden space-y-3">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="md:hidden space-y-3"
+      >
         {sortedTrades.map((trade) => {
           const isSelected = selectedTradeId === trade.id
           const unrealized = getUnrealizedPnL(trade, quotes)
@@ -330,100 +329,104 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
           const isLoser = displayPnL.amount !== null && displayPnL.amount < 0
 
           return (
-            <div
-              key={trade.id}
-              onClick={() => onSelectTrade(trade)}
-              className={`
-                rounded-lg border cursor-pointer transition-colors p-4 min-h-[44px]
-                ${isSelected ? 'bg-purple-600/10 border-purple-500/30' : 'bg-white/[0.03] border-border hover:bg-white/[0.06]'}
-                ${trade.is_paper ? 'border-dashed' : ''}
-              `}
-            >
-              {/* Header Row */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <LogoImg symbol={trade.ticker} size={24} />
-                  <span className="font-mono font-semibold text-base text-purple-400">
-                    {trade.ticker}
-                  </span>
-                  {trade.is_paper && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-600/20 text-yellow-400 font-medium">
-                      P
+            <motion.div key={trade.id} variants={staggerItem}>
+              <PelicanCard
+                interactive
+                onClick={() => onSelectTrade(trade)}
+                className={`
+                  cursor-pointer min-h-[44px]
+                  ${isSelected ? 'ring-1 ring-[var(--accent-primary)]/30 bg-[var(--accent-muted)]' : ''}
+                  ${trade.is_paper ? 'border-dashed' : ''}
+                `}
+              >
+                {/* Header Row */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <LogoImg symbol={trade.ticker} size={24} />
+                    <span className="font-mono font-semibold text-base text-[var(--text-primary)]">
+                      {trade.ticker}
                     </span>
-                  )}
-                </div>
-                <span
-                  className={`text-xs px-2 py-0.5 rounded border font-medium uppercase ${
-                    trade.direction === 'long'
-                      ? 'bg-green-500/15 text-green-400 border-green-500/20'
-                      : 'bg-red-500/15 text-red-400 border-red-500/20'
-                  }`}
-                >
-                  {trade.direction}
-                </span>
-              </div>
-
-              {/* Stats Grid */}
-              <div className="grid grid-cols-3 gap-3 text-xs mb-3">
-                <div>
-                  <span className="text-foreground/40 block mb-0.5">Entry</span>
-                  <span className="font-mono text-foreground/90">${trade.entry_price.toFixed(2)}</span>
-                </div>
-                <div>
-                  <span className="text-foreground/40 block mb-0.5">Current</span>
-                  {trade.status === 'open' && unrealized ? (
-                    <span className={`font-mono ${unrealized.currentPrice > trade.entry_price ? 'text-green-400' : unrealized.currentPrice < trade.entry_price ? 'text-red-400' : 'text-foreground/90'}`}>
-                      ${unrealized.currentPrice.toFixed(2)}
-                    </span>
-                  ) : (
-                    <span className="text-foreground/40">—</span>
-                  )}
-                </div>
-                <div>
-                  <span className="text-foreground/40 block mb-0.5">P&L</span>
-                  {displayPnL.amount !== null ? (
-                    <span className={`font-mono ${isWinner ? 'text-green-400' : isLoser ? 'text-red-400' : 'text-foreground/60'}`}>
-                      {displayPnL.amount >= 0 ? '+' : ''}${displayPnL.amount.toFixed(2)}
-                    </span>
-                  ) : (
-                    <span className="text-foreground/40">—</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Footer Row */}
-              <div className="flex items-center justify-between">
-                <div className="text-xs text-foreground/60">{new Date(trade.entry_date).toLocaleDateString()}</div>
-                <div className="flex items-center gap-2">
+                    {trade.is_paper && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--data-warning)]/20 text-[var(--data-warning)] font-medium">
+                        P
+                      </span>
+                    )}
+                  </div>
                   <span
-                    className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full font-medium uppercase ${
-                      trade.status === 'open'
-                        ? 'bg-blue-600/20 text-blue-400'
-                        : trade.status === 'closed'
-                        ? 'bg-foreground/10 text-foreground/60'
-                        : 'bg-foreground/5 text-foreground/40'
+                    className={`text-xs px-2 py-0.5 rounded-full border font-medium uppercase ${
+                      trade.direction === 'long'
+                        ? 'bg-[var(--data-positive)]/15 text-[var(--data-positive)] border-[var(--data-positive)]/20'
+                        : 'bg-[var(--data-negative)]/15 text-[var(--data-negative)] border-[var(--data-negative)]/20'
                     }`}
                   >
-                    {trade.status === 'open' && <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />}
-                    {trade.status}
+                    {trade.direction}
                   </span>
-                  {onScanTrade && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onScanTrade(trade)
-                      }}
-                      className="rounded border border-[#8b5cf6]/20 bg-[#8b5cf6]/15 px-3 py-1 text-[10px] font-bold text-[#8b5cf6] transition-colors hover:bg-[#8b5cf6]/25 active:scale-95 min-h-[44px] flex items-center"
-                    >
-                      SCAN
-                    </button>
-                  )}
                 </div>
-              </div>
-            </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-3 gap-3 text-xs mb-3">
+                  <div>
+                    <span className="text-[var(--text-muted)] block mb-0.5">Entry</span>
+                    <span className="font-mono tabular-nums text-[var(--text-primary)]">${trade.entry_price.toFixed(2)}</span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--text-muted)] block mb-0.5">Current</span>
+                    {trade.status === 'open' && unrealized ? (
+                      <span className={`font-mono tabular-nums ${unrealized.currentPrice > trade.entry_price ? 'text-[var(--data-positive)]' : unrealized.currentPrice < trade.entry_price ? 'text-[var(--data-negative)]' : 'text-[var(--text-primary)]'}`}>
+                        ${unrealized.currentPrice.toFixed(2)}
+                      </span>
+                    ) : (
+                      <span className="text-[var(--text-disabled)]">—</span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="text-[var(--text-muted)] block mb-0.5">P&L</span>
+                    {displayPnL.amount !== null ? (
+                      <span className={`font-mono tabular-nums ${isWinner ? 'text-[var(--data-positive)]' : isLoser ? 'text-[var(--data-negative)]' : 'text-[var(--text-muted)]'}`}>
+                        {displayPnL.amount >= 0 ? '+' : ''}${displayPnL.amount.toFixed(2)}
+                      </span>
+                    ) : (
+                      <span className="text-[var(--text-disabled)]">—</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Footer Row */}
+                <div className="flex items-center justify-between">
+                  <div className="text-xs font-mono tabular-nums text-[var(--text-muted)]">{new Date(trade.entry_date).toLocaleDateString()}</div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full font-medium uppercase ${
+                        trade.status === 'open'
+                          ? 'bg-[var(--status-open)]/15 text-[var(--status-open)]'
+                          : trade.status === 'closed'
+                          ? 'bg-[var(--text-muted)]/10 text-[var(--text-muted)]'
+                          : 'bg-[var(--text-disabled)]/10 text-[var(--text-disabled)]'
+                      }`}
+                    >
+                      {trade.status === 'open' && <div className="w-1.5 h-1.5 rounded-full bg-[var(--status-open)] animate-pulse" />}
+                      {trade.status}
+                    </span>
+                    {onScanTrade && (
+                      <PelicanButton
+                        variant="secondary"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onScanTrade(trade)
+                        }}
+                        className="text-[10px] font-bold min-h-[44px]"
+                      >
+                        SCAN
+                      </PelicanButton>
+                    )}
+                  </div>
+                </div>
+              </PelicanCard>
+            </motion.div>
           )
         })}
-      </div>
+      </motion.div>
     </>
   )
 }

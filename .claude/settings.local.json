@@ -15,7 +15,7 @@
       "Bash(npm install:*)",
       "Bash(curl:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nFrontend audit: security, SEO, performance, cleanup\n\nSecurity:\n- Removed test-storage endpoint \\(exposed service role key\\)\n- Removed sentry monitoring endpoint \\(unauthenticated\\)\n- Fixed HelpChat XSS with DOMPurify\n- Consolidated X-Frame-Options headers \\(DENY + demos exception\\)\n\nSEO:\n- Added robots.txt\n- Added sitemap.ts\n- Fixed FAQ nav missing How to Use link\n\nPerformance:\n- Lazy loading for footer image\n- Mobile viewport fix \\(100dvh with 100vh fallback\\)\n- Reduced motion accessibility support\n- Re-enabled image optimization\n\nCleanup:\n- Deleted 5 test/demo pages\n- Deleted 7 dead chat components \\(~1,500 lines\\)\n- Removed unused imports\n- Fixed toast delay, broken links, wrong email\n- Updated app URL and package name\n\nCRO:\n- Beta → Early Access\n- Start Trading → Start Trading Smarter\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nFrontend audit: security, SEO, performance, cleanup\n\nSecurity:\n- Removed test-storage endpoint \\(exposed service role key\\)\n- Removed sentry monitoring endpoint \\(unauthenticated\\)\n- Fixed HelpChat XSS with DOMPurify\n- Consolidated X-Frame-Options headers \\(DENY + demos exception\\)\n\nSEO:\n- Added robots.txt\n- Added sitemap.ts\n- Fixed FAQ nav missing How to Use link\n\nPerformance:\n- Lazy loading for footer image\n- Mobile viewport fix \\(100dvh with 100vh fallback\\)\n- Reduced motion accessibility support\n- Re-enabled image optimization\n\nCleanup:\n- Deleted 5 test/demo pages\n- Deleted 7 dead chat components \\(~1,500 lines\\)\n- Removed unused imports\n- Fixed toast delay, broken links, wrong email\n- Updated app URL and package name\n\nCRO:\n- Beta \u2192 Early Access\n- Start Trading \u2192 Start Trading Smarter\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git rm:*)",
       "Bash(git commit:*)",
       "Bash(ls:*)",
@@ -25,5 +25,38 @@
     ],
     "deny": [],
     "ask": []
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13 /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/realign/claude_hooks/stop_hook.py  # aline-stop-hook"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13 /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/realign/claude_hooks/user_prompt_submit_hook.py  # aline-user-prompt-submit-hook"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13 /Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/realign/claude_hooks/permission_request_hook.py  # aline-permission-request-hook"
+          }
+        ]
+      }
+    ]
   }
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Zap } from 'lucide-react'
+import { Lightning } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useCreditsContext } from '@/providers/credits-provider'
 
@@ -40,7 +40,7 @@ export function ChatCreditCounter() {
   if (isFounder) {
     return (
       <div className="flex items-center gap-1.5 px-2 py-1 rounded-md text-amber-400">
-        <Zap className="w-3.5 h-3.5" />
+        <Lightning size={14} weight="fill" />
         <span className="text-xs font-medium">Founder</span>
       </div>
     )
@@ -57,8 +57,8 @@ export function ChatCreditCounter() {
           isLow ? 'text-amber-400' : 'text-muted-foreground'
         }`}
       >
-        <Zap className="w-3.5 h-3.5" />
-        <span className="text-xs font-medium">{remaining} free</span>
+        <Lightning size={14} weight="fill" />
+        <span className="text-xs font-medium font-mono tabular-nums">{remaining} free</span>
       </Link>
     )
   }
@@ -92,8 +92,8 @@ export function ChatCreditCounter() {
         className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors hover:bg-muted/50 ${colorClass}`}
         title="Credit balance"
       >
-        <Zap className="w-3.5 h-3.5" />
-        <span className="text-xs font-medium">{balance.toLocaleString()}</span>
+        <Lightning size={14} weight="fill" />
+        <span className="text-xs font-medium font-mono tabular-nums">{balance.toLocaleString()}</span>
       </button>
 
       {showPopover && (
@@ -115,19 +115,19 @@ export function ChatCreditCounter() {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">Remaining</span>
-              <span className={`font-semibold ${colorClass}`}>
+              <span className={`font-semibold font-mono tabular-nums ${colorClass}`}>
                 {balance.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">Used</span>
-              <span className="text-foreground">
+              <span className="text-foreground font-mono tabular-nums">
                 {credits.usedThisMonth.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">Allocation</span>
-              <span className="text-foreground">
+              <span className="text-foreground font-mono tabular-nums">
                 {credits.monthlyAllocation.toLocaleString()}/mo
               </span>
             </div>
@@ -137,12 +137,12 @@ export function ChatCreditCounter() {
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
-                  isExhausted ? 'bg-red-500' : isLow ? 'bg-amber-500' : 'bg-purple-500'
+                  isExhausted ? 'bg-[var(--data-negative)]' : isLow ? 'bg-[var(--data-warning)]' : 'bg-[var(--accent-primary)]'
                 }`}
                 style={{ width: `${usagePercent}%` }}
               />
             </div>
-            <p className="text-[10px] text-muted-foreground text-right">
+            <p className="text-[10px] text-muted-foreground text-right font-mono tabular-nums">
               {usagePercent}% used
             </p>
           </div>
@@ -150,7 +150,7 @@ export function ChatCreditCounter() {
           {(isLow || isExhausted) && (
             <Link
               href="/pricing"
-              className="block text-center text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors"
+              className="block text-center text-xs font-medium text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors"
               onClick={() => setShowPopover(false)}
             >
               Upgrade plan

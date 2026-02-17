@@ -5,7 +5,7 @@ import Image from "next/image"
 
 import { motion } from "framer-motion"
 import { useState, useCallback, useMemo, memo } from "react"
-import { Copy, Check, Pencil, RefreshCw, Loader2 } from "lucide-react"
+import { Copy, Check, PencilSimple, ArrowsClockwise, SpinnerGap } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { getMessageAnimationVariant } from "@/lib/animation-config"
@@ -135,7 +135,7 @@ export const MessageBubble = memo(function MessageBubble({
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
                     onKeyDown={handleEditKeyDown}
-                    className="w-full bg-white/[0.06] border border-border rounded-2xl px-4 py-3 text-[15px] sm:text-base leading-relaxed text-foreground resize-none focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-2xl px-4 py-3 text-[15px] sm:text-base leading-relaxed text-[var(--text-primary)] resize-none focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
                     rows={Math.min(10, Math.max(2, editContent.split('\n').length + 1))}
                     autoFocus
                   />
@@ -152,7 +152,7 @@ export const MessageBubble = memo(function MessageBubble({
                       size="sm"
                       onClick={handleSubmitEdit}
                       disabled={!editContent.trim() || editContent.trim() === message.content}
-                      className="h-8 px-3 text-xs bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white"
+                      className="h-8 px-3 text-xs bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed text-white"
                     >
                       Send
                     </Button>
@@ -160,7 +160,7 @@ export const MessageBubble = memo(function MessageBubble({
                 </div>
               ) : (
                 <>
-                  <div className="rounded-2xl bg-white/[0.06] px-4 py-3">
+                  <div className="rounded-2xl bg-[var(--accent-muted)] px-4 py-3">
                     <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
                       <AttachmentDisplay attachments={message.attachments} />
                       {message.content}
@@ -176,7 +176,7 @@ export const MessageBubble = memo(function MessageBubble({
                         className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                         title="Edit message"
                       >
-                        <Pencil className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />
+                        <PencilSimple size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" />
                         Edit
                       </Button>
                     )}
@@ -187,7 +187,7 @@ export const MessageBubble = memo(function MessageBubble({
                       className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                       title="Copy message"
                     >
-                      {copied ? <Check className="h-4 w-4 sm:h-3 sm:w-3 mr-1" /> : <Copy className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />}
+                      {copied ? <Check size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" /> : <Copy size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" />}
                       {copied ? "Copied" : "Copy"}
                     </Button>
                   </div>
@@ -244,7 +244,7 @@ export const MessageBubble = memo(function MessageBubble({
                 className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                 title="Copy message"
               >
-                {copied ? <Check className="h-4 w-4 sm:h-3 sm:w-3 mr-1" /> : <Copy className="h-4 w-4 sm:h-3 sm:w-3 mr-1" />}
+                {copied ? <Check size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" /> : <Copy size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" />}
                 {copied ? "Copied" : "Copy"}
               </Button>
 
@@ -254,13 +254,13 @@ export const MessageBubble = memo(function MessageBubble({
                   size="sm"
                   onClick={onRegenerate}
                   disabled={isRegenerating || message.isStreaming}
-                  className="h-11 sm:h-9 px-3 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-colors"
+                  className="h-11 sm:h-9 px-3 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] rounded-lg transition-colors duration-150"
                   title={isRegenerating ? "Regenerating..." : "Regenerate response"}
                 >
                   {isRegenerating ? (
-                    <Loader2 className="h-[18px] w-[18px] mr-1.5 animate-spin" />
+                    <SpinnerGap size={18} weight="regular" className="mr-1.5 animate-spin" />
                   ) : (
-                    <RefreshCw className="h-[18px] w-[18px] mr-1.5" />
+                    <ArrowsClockwise size={18} weight="regular" className="mr-1.5" />
                   )}
                   {isRegenerating ? "Regenerating..." : "Regenerate"}
                 </Button>

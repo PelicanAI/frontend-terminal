@@ -31,7 +31,7 @@ import { useCommandK } from '@/hooks/use-command-k'
 import { PelicanContainer } from '@/components/ui/pelican-container'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
-import { MessageSquare } from 'lucide-react'
+import { ChatCircle } from '@phosphor-icons/react'
 
 const PelicanChatPanel = dynamicImport(
   () => import('@/components/pelican-panel/pelican-chat-panel').then((m) => ({ default: m.PelicanChatPanel })),
@@ -96,7 +96,7 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 420, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="hidden lg:flex border-l border-white/[0.06] bg-[var(--surface-1)]/90 shadow-[0_0_50px_rgba(139,92,246,0.05)] backdrop-blur-2xl overflow-y-auto"
+              className="hidden lg:flex border-l border-[var(--border-subtle)] bg-[var(--bg-surface)]/90 shadow-[0_0_50px_rgba(139,92,246,0.05)] backdrop-blur-2xl overflow-y-auto"
               style={{ width: "30%", minWidth: "340px", maxWidth: "440px" }}
             >
               <PelicanChatPanel
@@ -112,17 +112,17 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Mobile Pelican FAB */}
       {!mobilePanelOpen && (
         <button
-          className="lg:hidden fixed bottom-6 left-6 z-40 w-12 h-12 bg-[#8b5cf6] rounded-full shadow-lg shadow-purple-500/25 flex items-center justify-center active:scale-95 transition-transform"
+          className="lg:hidden fixed bottom-6 left-6 z-40 w-12 h-12 bg-[var(--accent-primary)] rounded-full shadow-lg shadow-[var(--accent-primary)]/25 flex items-center justify-center active:scale-95 transition-transform"
           onClick={() => setMobilePanelOpen(true)}
         >
-          <MessageSquare className="h-5 w-5 text-white" />
+          <ChatCircle size={20} weight="fill" className="text-white" />
         </button>
       )}
 
       {/* Mobile Pelican Bottom Sheet */}
       <Sheet open={mobilePanelOpen && isMobile} onOpenChange={setMobilePanelOpen}>
-        <SheetContent side="bottom" className="h-[75vh] p-0 rounded-t-2xl bg-[var(--background)] border-t border-white/[0.08]">
-          <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mt-3 mb-2" />
+        <SheetContent side="bottom" className="h-[75vh] p-0 rounded-t-2xl bg-[var(--background)] border-t border-[var(--border-subtle)]">
+          <div className="w-12 h-1 bg-[var(--text-muted)] rounded-full mx-auto mt-3 mb-2" />
           <PelicanChatPanel
             onConversationSelect={() => {
               window.dispatchEvent(new CustomEvent("pelican:conversation-created"))

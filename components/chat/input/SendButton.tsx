@@ -1,6 +1,6 @@
 "use client"
 
-import { Send, Square } from "lucide-react"
+import { PaperPlaneRight, Square } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -22,10 +22,10 @@ export function SendButton({ isAIResponding, isSendDisabled, onStop, onSend }: S
         "flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
         "transition-all duration-200",
         isAIResponding
-          ? "bg-red-500 hover:bg-red-600 text-white"
+          ? "bg-[var(--data-negative)] hover:bg-red-600 text-white"
           : isSendDisabled
             ? "bg-muted text-muted-foreground cursor-not-allowed"
-            : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/20",
+            : "bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white shadow-md shadow-[var(--accent-primary)]/20",
       )}
     >
       <AnimatePresence mode="wait" initial={false}>
@@ -36,7 +36,7 @@ export function SendButton({ isAIResponding, isSendDisabled, onStop, onSend }: S
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ duration: 0.1, ease: 'easeOut' }}
         >
-          {isAIResponding ? <Square className="h-5 w-5" /> : <Send className="h-5 w-5" />}
+          {isAIResponding ? <Square size={20} weight="fill" /> : <PaperPlaneRight size={20} weight="fill" />}
         </motion.div>
       </AnimatePresence>
     </motion.button>

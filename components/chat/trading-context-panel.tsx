@@ -1,7 +1,7 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { TrendingUp, TrendingDown, Activity, Star, ChevronDown, ChevronUp, GraduationCap } from "lucide-react"
+import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, GraduationCap, ChartBar, CalendarBlank, BookOpen } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -112,13 +112,13 @@ export function TradingContextPanel({
   }
 
   const getChangeColor = (value: number | null) => {
-    if (value === null) return "text-muted-foreground"
-    return value >= 0 ? "text-green-500" : "text-red-500"
+    if (value === null) return "text-[var(--text-muted)]"
+    return value >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"
   }
 
   const getChangeBg = (value: number | null) => {
-    if (value === null) return "bg-muted/30"
-    return value >= 0 ? "bg-green-500/10" : "bg-red-500/10"
+    if (value === null) return "bg-[var(--bg-elevated)]"
+    return value >= 0 ? "bg-[var(--data-positive)]/10" : "bg-[var(--data-negative)]/10"
   }
 
   const tabs = [
@@ -132,9 +132,9 @@ export function TradingContextPanel({
   // Chart, calendar, and learn modes get a full-height card
   if (activeMode === "chart" || activeMode === "calendar" || activeMode === "learn") {
     return (
-      <Card className="border-l-0 rounded-l-none bg-[var(--surface-0)]/60 backdrop-blur-xl border-l border-[rgba(139,92,246,0.06)] rounded-none border-y-0 border-r-0 overflow-hidden h-full flex flex-col">
+      <Card className="border-l-0 rounded-l-none bg-[var(--bg-surface)]/60 backdrop-blur-xl border-l border-[var(--border-subtle)] rounded-none border-y-0 border-r-0 overflow-hidden h-full flex flex-col">
         {activeMode === "learn" && (
-          <div className="flex items-center border-b border-white/5 shrink-0">
+          <div className="flex items-center border-b border-[var(--border-subtle)] shrink-0">
             <div className="flex flex-1">
               {tabs.map((tab) => {
                 const isActive = tab.key === "learn"
@@ -156,17 +156,17 @@ export function TradingContextPanel({
                     className={cn(
                       "flex-1 py-2.5 text-xs font-medium transition-all duration-150 border-b-2 relative",
                       isActive
-                        ? tab.key === "learn"
-                          ? "text-[var(--accent-purple)] border-[var(--accent-purple)] shadow-[0_2px_8px_rgba(139,92,246,0.3)]"
-                          : "text-teal-400 border-teal-400 shadow-[0_2px_8px_rgba(45,212,191,0.3)]"
-                        : "text-muted-foreground border-transparent hover:text-foreground hover:border-white/10"
+                        ? "text-[var(--accent-primary)] border-[var(--accent-primary)]"
+                        : "text-[var(--text-muted)] border-transparent hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]"
                     )}
                   >
                     <span className="flex items-center justify-center gap-1">
-                      {tab.key === "learn" && <GraduationCap className="h-3 w-3" />}
+                      {tab.key === "market" && <ChartBar size={12} weight={isActive ? "fill" : "regular"} />}
+                      {tab.key === "calendar" && <CalendarBlank size={12} weight={isActive ? "fill" : "regular"} />}
+                      {tab.key === "learn" && <GraduationCap size={12} weight={isActive ? "fill" : "regular"} />}
                       {tab.label}
                       {tab.key === "learn" && selectedTerm && !learnTabActive && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" />
                       )}
                     </span>
                   </button>
@@ -192,8 +192,8 @@ export function TradingContextPanel({
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                  <GraduationCap className="h-10 w-10 text-purple-500/40 mb-3" />
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <GraduationCap size={40} weight="thin" className="text-[var(--accent-primary)]/40 mb-3" />
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                     Toggle on Learn mode to see trading terms highlighted in Pelican&apos;s responses and get the definitions.
                   </p>
                 </div>
@@ -210,9 +210,9 @@ export function TradingContextPanel({
   }
 
   return (
-    <Card className="border-l-0 rounded-l-none bg-[var(--surface-0)]/60 backdrop-blur-xl border-l border-[rgba(139,92,246,0.06)] rounded-none border-y-0 border-r-0 overflow-hidden">
+    <Card className="border-l-0 rounded-l-none bg-[var(--bg-surface)]/60 backdrop-blur-xl border-l border-[var(--border-subtle)] rounded-none border-y-0 border-r-0 overflow-hidden">
       {/* Tab bar */}
-      <div className="flex items-center border-b border-white/5">
+      <div className="flex items-center border-b border-[var(--border-subtle)]">
         <div className="flex flex-1">
           {tabs.map((tab) => {
             const isActive =
@@ -235,19 +235,19 @@ export function TradingContextPanel({
                   }
                 }}
                 className={cn(
-                  "flex-1 py-2.5 text-xs font-medium transition-colors border-b-2 relative",
+                  "flex-1 py-2.5 text-xs font-medium transition-colors duration-150 border-b-2 relative",
                   isActive
-                    ? tab.key === "learn"
-                      ? "text-purple-500 border-purple-500"
-                      : "text-teal-500 border-teal-500"
-                    : "text-muted-foreground border-transparent hover:text-foreground hover:border-white/10"
+                    ? "text-[var(--accent-primary)] border-[var(--accent-primary)]"
+                    : "text-[var(--text-muted)] border-transparent hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]"
                 )}
               >
                 <span className="flex items-center justify-center gap-1">
-                  {tab.key === "learn" && <GraduationCap className="h-3 w-3" />}
+                  {tab.key === "market" && <ChartBar size={12} weight={isActive ? "fill" : "regular"} />}
+                  {tab.key === "calendar" && <CalendarBlank size={12} weight={isActive ? "fill" : "regular"} />}
+                  {tab.key === "learn" && <GraduationCap size={12} weight={isActive ? "fill" : "regular"} />}
                   {tab.label}
                   {tab.key === "learn" && selectedTerm && !learnTabActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" />
                   )}
                 </span>
               </button>
@@ -257,15 +257,15 @@ export function TradingContextPanel({
         <div className="flex items-center gap-1 px-2">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted/50 rounded"
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-150 p-1 hover:bg-[var(--bg-elevated)] rounded"
             title={isCollapsed ? "Expand sections" : "Collapse sections"}
           >
-            {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {isCollapsed ? <CaretUp size={16} weight="regular" /> : <CaretDown size={16} weight="regular" />}
           </button>
           {onToggleCollapse && (
             <button
               onClick={onToggleCollapse}
-              className="text-muted-foreground hover:text-foreground transition-colors p-1 hover:bg-muted/50 rounded"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-150 p-1 hover:bg-[var(--bg-elevated)] rounded"
               title="Hide Market Overview"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,30 +300,30 @@ export function TradingContextPanel({
             <div className="p-4 space-y-4">
               {/* Major Indices */}
               <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Indices</h4>
+                <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Indices</h4>
                 <div className="space-y-2">
                   {defaultIndices.map((index) => (
                     <div
                       key={index.symbol}
                       className={cn(
-                        "flex items-center justify-between p-2 rounded-lg bg-[var(--surface-1)] border border-[rgba(139,92,246,0.06)] hover:border-[rgba(139,92,246,0.15)] hover:shadow-[var(--glow-purple-soft)] cursor-pointer transition-all duration-200",
+                        "flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150",
                         "border-l-2",
                         index.changePercent !== null && index.changePercent >= 0
-                          ? "border-l-emerald-500/40"
+                          ? "border-l-[var(--data-positive)]/40"
                           : index.changePercent !== null
-                          ? "border-l-red-500/40"
-                          : "border-l-gray-500/20"
+                          ? "border-l-[var(--data-negative)]/40"
+                          : "border-l-[var(--text-muted)]/20"
                       )}
                     >
                       <div className="flex flex-col">
-                        <span className="text-xs font-medium text-foreground">{index.symbol}</span>
-                        <span className="text-[10px] text-muted-foreground">{index.name}</span>
+                        <span className="text-xs font-medium text-[var(--text-primary)]">{index.symbol}</span>
+                        <span className="text-[10px] text-[var(--text-muted)]">{index.name}</span>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="text-xs font-semibold text-foreground">
+                        <span className="text-xs font-semibold font-mono tabular-nums text-[var(--text-primary)]">
                           {formatPrice(index.price)}
                         </span>
-                        <span className={cn("text-[10px] font-medium", getChangeColor(index.changePercent))}>
+                        <span className={cn("text-[10px] font-medium font-mono tabular-nums", getChangeColor(index.changePercent))}>
                           {formatPercent(index.changePercent)}
                         </span>
                       </div>
@@ -334,18 +334,18 @@ export function TradingContextPanel({
 
               {/* VIX */}
               <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Volatility</h4>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--surface-2)] border border-white/5">
+                <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Volatility</h4>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                   <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-orange-500" />
+                    <Pulse size={16} weight="regular" className="text-[var(--data-warning)]" />
                     <div className="flex flex-col">
-                      <span className="text-xs font-medium text-foreground">VIX</span>
-                      <span className="text-[10px] text-muted-foreground">Fear Index</span>
+                      <span className="text-xs font-medium text-[var(--text-primary)]">VIX</span>
+                      <span className="text-[10px] text-[var(--text-muted)]">Fear Index</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-sm font-bold text-foreground">{formatPrice(defaultVix)}</span>
-                    <span className={cn("text-[10px] font-medium", getChangeColor(defaultVixChange))}>
+                    <span className="text-sm font-bold font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(defaultVix)}</span>
+                    <span className={cn("text-[10px] font-medium font-mono tabular-nums", getChangeColor(defaultVixChange))}>
                       {formatPercent(defaultVixChange)}
                     </span>
                   </div>
@@ -354,31 +354,31 @@ export function TradingContextPanel({
 
               {/* Sectors */}
               <div className="space-y-2">
-                <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   Sector Performance
                 </h4>
                 <div className="space-y-1.5">
                   {defaultSectors.map((sector) => (
                     <div
                       key={sector.name}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/30 transition-colors"
+                      className="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors duration-150"
                     >
-                      <span className="text-xs text-foreground">{sector.name}</span>
+                      <span className="text-xs text-[var(--text-primary)]">{sector.name}</span>
                       <div className="flex items-center gap-1.5">
-                        <span className={cn("text-xs font-medium", getChangeColor(sector.changePercent))}>
+                        <span className={cn("text-xs font-medium font-mono tabular-nums", getChangeColor(sector.changePercent))}>
                           {formatPercent(sector.changePercent)}
                         </span>
                         {sector.changePercent !== null && (
                           <div
                             className={cn(
                               "p-0.5 rounded",
-                              sector.changePercent >= 0 ? "bg-green-500/10" : "bg-red-500/10",
+                              sector.changePercent >= 0 ? "bg-[var(--data-positive)]/10" : "bg-[var(--data-negative)]/10",
                             )}
                           >
                             {sector.changePercent >= 0 ? (
-                              <TrendingUp className="h-3 w-3 text-green-500" />
+                              <TrendUp size={12} weight="regular" className="text-[var(--data-positive)]" />
                             ) : (
-                              <TrendingDown className="h-3 w-3 text-red-500" />
+                              <TrendDown size={12} weight="regular" className="text-[var(--data-negative)]" />
                             )}
                           </div>
                         )}
@@ -391,11 +391,11 @@ export function TradingContextPanel({
               {/* Watchlist */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                    <Star className="h-3 w-3" />
+                  <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
+                    <Star size={12} weight="regular" />
                     Watchlist
                   </h4>
-                  <button className="text-[10px] text-purple-500 hover:text-purple-400 transition-colors font-medium">
+                  <button className="text-[10px] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors duration-150 font-medium">
                     Edit
                   </button>
                 </div>
@@ -404,14 +404,14 @@ export function TradingContextPanel({
                     <div
                       key={ticker.symbol}
                       onClick={() => showChart(ticker.symbol)}
-                      className="flex items-center justify-between p-2 rounded-lg bg-[var(--surface-1)] border border-[rgba(139,92,246,0.06)] hover:border-[rgba(139,92,246,0.15)] hover:shadow-[var(--glow-purple-soft)] cursor-pointer transition-all duration-200"
+                      className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150"
                     >
-                      <span className="text-xs font-semibold text-foreground">{ticker.symbol}</span>
+                      <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
                       <div className="flex flex-col items-end">
-                        <span className="text-xs font-medium text-foreground">{formatPrice(ticker.price)}</span>
+                        <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price)}</span>
                         <div
                           className={cn(
-                            "text-[10px] font-medium px-1.5 py-0.5 rounded",
+                            "text-[10px] font-medium font-mono tabular-nums px-1.5 py-0.5 rounded",
                             getChangeBg(ticker.changePercent),
                             getChangeColor(ticker.changePercent),
                           )}
@@ -427,13 +427,13 @@ export function TradingContextPanel({
               {/* Refresh indicator */}
               {isLoading && (
                 <div className="flex items-center justify-center py-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--accent-primary)]"></div>
                 </div>
               )}
 
               {/* Last updated */}
-              <div className="text-center pt-2 border-t border-white/5">
-                <span className="text-[10px] text-muted-foreground">
+              <div className="text-center pt-2 border-t border-[var(--border-subtle)]">
+                <span className="text-[10px] text-[var(--text-muted)]">
                   {isLoading ? "Updating..." : "Market data delayed"}
                 </span>
               </div>

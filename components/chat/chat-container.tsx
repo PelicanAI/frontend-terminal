@@ -316,22 +316,22 @@ export function ChatContainer({
           aria-label="Chat messages"
         >
           {/* Conversation Header - Sticky */}
-          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-4 sm:pt-6 border-b border-white/5 bg-transparent backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
+          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-4 sm:pt-6 border-b border-[var(--border-subtle)] bg-transparent backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex flex-col">
-                <h2 className="text-sm font-medium text-foreground">
+                <h2 className="text-sm font-medium text-[var(--text-primary)]">
                   Trading Assistant
                 </h2>
-                <p className="text-xs text-muted-foreground hidden sm:block">
+                <p className="text-xs text-[var(--text-muted)] hidden sm:block">
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <LearningModeToggle />
-              <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-green-100 dark:bg-green-900/30">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                <span className="text-[10px] sm:text-xs font-medium text-green-700 dark:text-green-400">Open</span>
+              <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-[var(--data-positive)]/10">
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--data-positive)] animate-pulse"></div>
+                <span className="text-[10px] sm:text-xs font-medium text-[var(--data-positive)]">Open</span>
               </div>
             </div>
           </div>
@@ -408,7 +408,7 @@ export function ChatContainer({
                 height={32}
                 className="w-7 h-7 sm:w-8 sm:h-8 object-contain opacity-80"
               />
-              <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl border border-white/5 backdrop-blur-sm bg-white/[0.03]">
+              <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl border border-[var(--border-subtle)] backdrop-blur-sm bg-[var(--bg-surface)]">
                 <EnhancedTypingDots
                   variant="thinking"
                   userMessage={[...messages].reverse().find(m => m.role === 'user')?.content || ''}

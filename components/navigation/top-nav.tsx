@@ -57,7 +57,7 @@ export function TopNav({ className }: TopNavProps) {
 
   return (
     <nav className={cn(
-      "sticky top-0 z-40 w-full border-b border-[rgba(139,92,246,0.06)] bg-[var(--surface-0)]/90 backdrop-blur-xl",
+      "sticky top-0 z-40 w-full border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/90 backdrop-blur-xl",
       className
     )}>
       <div className="flex items-center justify-between h-14 px-4">
@@ -75,7 +75,7 @@ export function TopNav({ className }: TopNavProps) {
               height={40}
               className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
             />
-            <span className="hidden sm:inline text-base font-bold text-white tracking-tight">
+            <span className="hidden sm:inline text-base font-bold text-[var(--text-primary)] tracking-tight">
               Pelican AI
             </span>
           </Link>
@@ -103,15 +103,15 @@ export function TopNav({ className }: TopNavProps) {
                     }
                   }}
                   className={cn(
-                    "relative px-3 py-1.5 md:py-4 text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 rounded-lg md:rounded-none active:scale-95",
+                    "relative px-3 py-1.5 md:py-4 text-sm font-medium transition-colors duration-150 whitespace-nowrap flex-shrink-0 rounded-lg md:rounded-none active:scale-95",
                     isActive
-                      ? "text-white brightness-110 bg-white/[0.06] md:bg-transparent"
-                      : "text-gray-400 hover:text-gray-200 active:bg-white/[0.03]"
+                      ? "text-[var(--text-primary)] bg-white/[0.06] md:bg-transparent"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-white/[0.03]"
                   )}
                 >
                   {tab.label}
                   {isActive && (
-                    <span className="hidden md:block absolute bottom-0 left-0 right-0 h-0.5 bg-[#8b5cf6] rounded-full shadow-[0_0_8px_rgba(139,92,246,0.4)]" />
+                    <span className="hidden md:block absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)] rounded-full shadow-[0_0_8px_rgba(139,92,246,0.4)]" />
                   )}
                 </Link>
               )
@@ -122,16 +122,16 @@ export function TopNav({ className }: TopNavProps) {
         {/* Right: Streak + Credits */}
         <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
           {/* Streak */}
-          <div className="flex items-center gap-1 sm:gap-1.5 text-sm text-gray-400">
+          <div className="flex items-center gap-1 sm:gap-1.5 text-sm text-[var(--text-secondary)]">
             <span className={`${journalStreak > 0 ? 'text-base sm:text-lg filter drop-shadow-[0_0_6px_rgba(251,146,60,0.4)]' : ''}`}>🔥</span>
-            <span className="font-mono font-medium text-white tabular-nums text-sm sm:text-base">{journalStreak}</span>
+            <span className="font-mono font-medium text-[var(--text-primary)] tabular-nums text-sm sm:text-base">{journalStreak}</span>
             <span className="text-xs hidden sm:inline">days</span>
           </div>
 
           {/* Credits */}
           <Link
             href="/pricing"
-            className="px-2 sm:px-3 py-1 rounded-full border border-[rgba(139,92,246,0.10)] bg-[var(--surface-1)] text-xs sm:text-sm font-mono text-white hover:border-[rgba(139,92,246,0.25)] hover:bg-[var(--surface-2)] active:scale-95 transition-all tabular-nums"
+            className="px-2 sm:px-3 py-1 rounded-full border border-[rgba(139,92,246,0.10)] bg-[var(--bg-surface)] text-xs sm:text-sm font-mono text-[var(--text-primary)] hover:border-[rgba(139,92,246,0.25)] hover:bg-[var(--bg-elevated)] active:scale-95 transition-all tabular-nums"
           >
             <span className="hidden sm:inline">{(credits?.balance ?? 0).toLocaleString()} credits</span>
             <span className="sm:hidden">{(credits?.balance ?? 0).toLocaleString()}</span>

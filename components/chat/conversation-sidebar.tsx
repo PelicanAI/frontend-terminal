@@ -17,15 +17,15 @@ import {
 } from "@/components/ui/alert-dialog"
 import {
   Plus,
-  Search,
-  MessageSquare,
-  Trash2,
-  Edit3,
-  Settings,
+  MagnifyingGlass,
+  ChatCircle,
+  Trash,
+  PencilSimple,
+  Gear,
   User,
-  LogOut,
+  SignOut,
   Shield,
-} from "lucide-react"
+} from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
 import Link from "next/link"
@@ -126,10 +126,10 @@ const ConversationItem = React.memo(function ConversationItem({
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="text-sm text-gray-200 truncate font-medium">
+          <div className="text-sm text-[var(--text-primary)] truncate font-medium">
             {conversation.title || newChatLabel}
           </div>
-          <div className="text-[10px] text-gray-500 mt-0.5">
+          <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
             {getRelativeTime(conversation.updated_at)}
           </div>
         </div>
@@ -140,11 +140,11 @@ const ConversationItem = React.memo(function ConversationItem({
               e.stopPropagation()
               onStartEdit(conversation.id, conversation.title || newChatLabel)
             }}
-            className="p-1 rounded hover:bg-white/[0.08] transition-colors text-gray-400 hover:text-gray-300"
+            className="p-1 rounded hover:bg-[var(--bg-elevated)] transition-colors duration-150 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             title="Rename conversation"
             aria-label="Rename conversation"
           >
-            <Edit3 className="h-3.5 w-3.5" />
+            <PencilSimple size={14} weight="regular" />
           </button>
 
           <button
@@ -156,7 +156,7 @@ const ConversationItem = React.memo(function ConversationItem({
             title="Delete conversation"
             aria-label="Delete conversation"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash size={14} weight="regular" />
           </button>
         </div>
       </div>
@@ -308,7 +308,7 @@ export function ConversationSidebar({
     <div
       className={cn(
         "relative z-20",
-        isMobileSheet ? "w-full h-full" : "w-[280px] h-screen border-r border-white/[0.04]",
+        isMobileSheet ? "w-full h-full" : "w-[280px] h-screen border-r border-[var(--border-subtle)]",
         "flex flex-col bg-sidebar",
         className,
       )}
@@ -322,7 +322,7 @@ export function ConversationSidebar({
             className="flex-1 h-8 bg-[var(--accent-purple-muted)] hover:bg-[rgba(139,92,246,0.22)] text-[var(--accent-purple-hover)] border border-[rgba(139,92,246,0.20)] hover:border-[rgba(139,92,246,0.35)] hover:shadow-[var(--glow-purple-soft)] transition-all duration-200"
             variant="outline"
           >
-            <Plus className="w-4 h-4 mr-1.5" />
+            <Plus size={16} weight="bold" className="mr-1.5" />
             <span className="text-xs font-medium">New chat</span>
           </Button>
           <Button
@@ -331,17 +331,17 @@ export function ConversationSidebar({
             onClick={() => setSearchExpanded(!searchExpanded)}
             className={cn(
               "h-8 w-8 flex-shrink-0 transition-colors",
-              searchExpanded ? "bg-[var(--surface-2)] text-[var(--accent-purple)]" : "bg-[var(--surface-1)] text-gray-400 hover:text-gray-300"
+              searchExpanded ? "bg-[var(--surface-2)] text-[var(--accent-purple)]" : "bg-[var(--surface-1)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             )}
           >
-            <Search className="h-4 w-4" />
+            <MagnifyingGlass size={16} weight="regular" />
           </Button>
         </div>
 
         {/* Expandable Search Input */}
         {searchExpanded && (
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <MagnifyingGlass size={16} weight="regular" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
               placeholder={t.common.search}
               value={searchQuery}
@@ -369,7 +369,7 @@ export function ConversationSidebar({
             </div>
           ) : filteredConversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 px-6 text-center">
-              <MessageSquare className="h-8 w-8 mb-2 text-muted-foreground/20" />
+              <ChatCircle size={32} weight="regular" className="mb-2 text-muted-foreground/20" />
               <p className="text-xs font-medium text-muted-foreground/60">
                 {t.chat.emptyConversations}
               </p>
@@ -382,7 +382,7 @@ export function ConversationSidebar({
               {/* Today */}
               {groupedConversations.today.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
                     Today
                   </h4>
                   <div className="space-y-1">
@@ -410,7 +410,7 @@ export function ConversationSidebar({
               {/* Yesterday */}
               {groupedConversations.yesterday.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
                     Yesterday
                   </h4>
                   <div className="space-y-1">
@@ -438,7 +438,7 @@ export function ConversationSidebar({
               {/* Previous 7 Days */}
               {groupedConversations.previous7Days.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
                     Previous 7 Days
                   </h4>
                   <div className="space-y-1">
@@ -466,7 +466,7 @@ export function ConversationSidebar({
               {/* Previous 30 Days */}
               {groupedConversations.previous30Days.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
                     Previous 30 Days
                   </h4>
                   <div className="space-y-1">
@@ -494,7 +494,7 @@ export function ConversationSidebar({
               {/* Older */}
               {groupedConversations.older.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
                     Older
                   </h4>
                   <div className="space-y-1">
@@ -547,9 +547,9 @@ export function ConversationSidebar({
         {isAdmin && (
           <Link
             href="/admin/dashboard"
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-purple-400 hover:bg-purple-500/10 transition-colors"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors duration-150"
           >
-            <Shield className="h-4 w-4" />
+            <Shield size={16} weight="regular" />
             <span>Admin Panel</span>
           </Link>
         )}
@@ -564,7 +564,7 @@ export function ConversationSidebar({
               <Avatar className="w-8 h-8 ring-2 ring-sidebar-border/50">
                 <AvatarImage src="/placeholder-user.jpg" />
                 <AvatarFallback className="bg-primary/20 text-primary">
-                  <User className="w-4 h-4" />
+                  <User size={16} weight="regular" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 text-left min-w-0">
@@ -580,7 +580,7 @@ export function ConversationSidebar({
             className="h-10 w-10 hover:bg-sidebar-accent/50"
           >
             <Link href="/settings" aria-label="Settings">
-              <Settings className="h-4 w-4" />
+              <Gear size={16} weight="regular" />
             </Link>
           </Button>
           <Tooltip>
@@ -591,7 +591,7 @@ export function ConversationSidebar({
                 onClick={() => setShowSignOutDialog(true)}
                 className="h-10 w-10 hover:bg-sidebar-accent/50"
               >
-                <LogOut className="h-4 w-4" />
+                <SignOut size={16} weight="regular" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -629,7 +629,7 @@ export function ConversationSidebar({
         <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <Trash2 className="h-5 w-5 text-destructive" />
+              <Trash size={20} weight="regular" className="text-destructive" />
               Delete Conversation
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base">

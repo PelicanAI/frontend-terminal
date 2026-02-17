@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useRef } from "react"
-import { Paperclip } from "lucide-react"
+import { Paperclip } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 import { useT } from "@/lib/providers/translation-provider"
@@ -34,12 +34,12 @@ export function AttachButton({ disabled, onFileSelect }: AttachButtonProps) {
         className={cn(
           "flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
           "transition-all duration-200",
-          "hover:bg-muted",
+          "hover:bg-[var(--bg-elevated)]",
           disabled && "opacity-50 cursor-not-allowed",
         )}
         title={t.chat.attachFile}
       >
-        <Paperclip className="h-5 w-5 text-muted-foreground" />
+        <Paperclip size={20} weight="regular" className="text-muted-foreground" />
       </motion.button>
 
       <input
