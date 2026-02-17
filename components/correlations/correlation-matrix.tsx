@@ -103,7 +103,7 @@ export const CorrelationMatrix = React.memo(function CorrelationMatrix({
       <div
         className="inline-grid gap-[2px] min-w-max"
         style={{
-          gridTemplateColumns: `90px repeat(${n}, minmax(48px, 1fr))`,
+          gridTemplateColumns: `90px repeat(${n}, minmax(52px, 1fr))`,
         }}
       >
         {/* Top-left empty cell */}
@@ -113,9 +113,9 @@ export const CorrelationMatrix = React.memo(function CorrelationMatrix({
         {sortedAssets.map((asset, colIdx) => (
           <div
             key={`col-${asset.ticker}`}
-            className="flex items-end justify-center pb-1 px-0.5 cursor-default select-none"
+            className="flex items-center justify-center cursor-default select-none"
             style={{
-              height: '64px',
+              height: '40px',
               borderLeft: groupBoundaries.has(colIdx) ? '2px solid var(--border-default)' : undefined,
               background: highlightedIndex === colIdx ? 'var(--accent-muted)' : undefined,
             }}
@@ -123,12 +123,8 @@ export const CorrelationMatrix = React.memo(function CorrelationMatrix({
             onMouseLeave={() => setHighlightedIndex(null)}
           >
             <span
-              className="text-[10px] font-mono font-semibold whitespace-nowrap origin-bottom-left"
-              style={{
-                color: 'var(--text-muted)',
-                writingMode: 'vertical-lr',
-                transform: 'rotate(180deg)',
-              }}
+              className="text-[10px] font-mono font-semibold"
+              style={{ color: 'var(--text-muted)' }}
             >
               {asset.ticker}
             </span>
@@ -192,7 +188,7 @@ export const CorrelationMatrix = React.memo(function CorrelationMatrix({
                 return (
                   <button
                     key={`cell-${rowIdx}-${colIdx}`}
-                    className="flex items-center justify-center rounded text-[10px] font-mono tabular-nums transition-all duration-100 cursor-pointer"
+                    className={`correlation-cell flex items-center justify-center rounded text-[10px] font-mono tabular-nums${isSelected ? ' correlation-cell--selected' : ''}`}
                     style={{
                       aspectRatio: '1',
                       background: bgColor,
@@ -232,7 +228,7 @@ export const CorrelationMatrix = React.memo(function CorrelationMatrix({
               return (
                 <button
                   key={`cell-${rowIdx}-${colIdx}`}
-                  className="flex flex-col items-center justify-center rounded text-[9px] font-mono tabular-nums transition-all duration-100 cursor-pointer gap-0.5"
+                  className={`correlation-cell flex flex-col items-center justify-center rounded text-[9px] font-mono tabular-nums gap-0.5${isSelected ? ' correlation-cell--selected' : ''}`}
                   style={{
                     aspectRatio: '1',
                     background: isHighlighted ? 'var(--bg-elevated)' : 'var(--bg-surface)',

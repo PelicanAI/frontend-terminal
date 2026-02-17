@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowsClockwise, Warning, TrendUp, TrendDown, Minus, Shuffle } from '@phosphor-icons/react'
 import { useCorrelationMatrix } from '@/hooks/use-correlations'
@@ -25,7 +25,17 @@ export default function CorrelationsPageClient() {
   const [beginnerMode, setBeginnerMode] = useBeginnerMode()
   const [calculating, setCalculating] = useState(false)
 
+  const detailPanelRef = useRef<HTMLDivElement>(null)
+
   const { data, isLoading, error, refetch } = useCorrelationMatrix(period)
+
+  useEffect(() => {
+    if (selectedPair && detailPanelRef.current) {
+      setTimeout(() => {
+        detailPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }, [selectedPair])
 
   const handleCalculate = async () => {
     setCalculating(true)
@@ -42,15 +52,6 @@ export default function CorrelationsPageClient() {
   const rs = regime ? regimeConfig[regime.overall_regime] : undefined
   const regimeStyle = rs ?? NEUTRAL_REGIME
   const RegimeIcon = regimeStyle.Icon
-
-  // Get all period data for selected pair detail panel
-  const selectedPairData = useMemo(() => {
-    if (!selectedPair || !data) return []
-    return data.correlations.filter(c =>
-      (c.asset_a === selectedPair.assetA && c.asset_b === selectedPair.assetB) ||
-      (c.asset_a === selectedPair.assetB && c.asset_b === selectedPair.assetA),
-    )
-  }, [selectedPair, data])
 
   // Empty state
   if (!isLoading && data && data.correlations.length === 0) {
@@ -196,14 +197,15 @@ export default function CorrelationsPageClient() {
             </div>
 
             {selectedPair && (
-              <PairDetailPanel
-                assetA={selectedPair.assetA}
-                assetB={selectedPair.assetB}
-                correlations={selectedPairData}
-                assets={data.assets}
-                beginnerMode={beginnerMode}
-                onClose={() => setSelectedPair(null)}
-              />
+              <div ref={detailPanelRef}>
+                <PairDetailPanel
+                  assetA={selectedPair.assetA}
+                  assetB={selectedPair.assetB}
+                  assets={data.assets}
+                  beginnerMode={beginnerMode}
+                  onClose={() => setSelectedPair(null)}
+                />
+              </div>
             )}
           </>
         )}

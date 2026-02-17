@@ -199,6 +199,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
             return (
               <tr
                 key={trade.id}
+                data-trade-id={trade.id}
                 onClick={() => onSelectTrade(trade)}
                 className={`
                   cursor-pointer transition-colors duration-150
@@ -329,7 +330,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
           const isLoser = displayPnL.amount !== null && displayPnL.amount < 0
 
           return (
-            <motion.div key={trade.id} variants={staggerItem}>
+            <motion.div key={trade.id} variants={staggerItem} data-trade-id={trade.id}>
               <PelicanCard
                 interactive
                 onClick={() => onSelectTrade(trade)}

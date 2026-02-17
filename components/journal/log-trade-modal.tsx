@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { TickerAutocomplete } from "./ticker-autocomplete"
 import { TradeFormData } from "@/hooks/use-trades"
@@ -18,6 +18,13 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
   const [error, setError] = useState<string | null>(null)
   const [ticker, setTicker] = useState(initialTicker)
   const [assetType, setAssetType] = useState('stock')
+
+  // Sync ticker when initialTicker changes (e.g., opened from different action buttons)
+  useEffect(() => {
+    if (open && initialTicker) {
+      setTicker(initialTicker)
+    }
+  }, [open, initialTicker])
   const [direction, setDirection] = useState<'long' | 'short'>('long')
   const [quantity, setQuantity] = useState("")
   const [entryPrice, setEntryPrice] = useState("")

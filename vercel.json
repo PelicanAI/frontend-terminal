@@ -22,11 +22,29 @@
       "memory": 1024,
       "maxDuration": 30
     },
+    "app/api/correlations/calculate/route.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "app/api/cron/correlations/route.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
     "app/api/**/*.ts": {
       "memory": 1024,
       "maxDuration": 10
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/correlations",
+      "schedule": "0 14 * * 1-5"
+    },
+    {
+      "path": "/api/cron/correlations",
+      "schedule": "0 23 * * 1-5"
+    }
+  ],
   "headers": [
     {
       "source": "/demos/(.*)",

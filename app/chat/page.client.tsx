@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ConversationSidebar } from "@/components/chat/conversation-sidebar"
 import { ChatContainer } from "@/components/chat/chat-container"
@@ -30,8 +30,13 @@ import { ChartProvider, useChart } from "@/providers/chart-provider"
 import { LearningModeProvider, useLearningMode } from "@/providers/learning-mode-provider"
 import { LearningModeToggle } from "@/components/chat/LearningModeToggle"
 import { ChatCreditCounter } from "@/components/chat/credit-counter"
+import { useTrades } from "@/hooks/use-trades"
+import { useWatchlist } from "@/hooks/use-watchlist"
+import type { ActionTrade } from "@/types/action-buttons"
 
 const SettingsModal = dynamic(() => import("@/components/settings-modal").then(m => ({ default: m.SettingsModal })))
+const LogTradeModal = dynamic(() => import("@/components/journal/log-trade-modal").then(m => ({ default: m.LogTradeModal })))
+const CloseTradeModal = dynamic(() => import("@/components/journal/close-trade-modal").then(m => ({ default: m.CloseTradeModal })))
 const TrialExhaustedModal = dynamic(() => import("@/components/trial-exhausted-modal").then(m => ({ default: m.TrialExhaustedModal })))
 const InsufficientCreditsModal = dynamic(() => import("@/components/insufficient-credits-modal").then(m => ({ default: m.InsufficientCreditsModal })))
 const TradingViewChart = dynamic(() => import("@/components/chat/TradingViewChart").then(m => ({ default: m.TradingViewChart })), { ssr: false })
@@ -96,6 +101,12 @@ function MobileChartSheet() {
   )
 }
 
+// Bridge useChart into ChatContainer (useChart must be inside ChartProvider)
+function ChatContainerWithChart(props: React.ComponentProps<typeof ChatContainer>) {
+  const { showChart } = useChart()
+  return <ChatContainer {...props} onOpenChart={showChart} />
+}
+
 function LearningAwareTradingPanel(props: React.ComponentProps<typeof TradingContextPanel>) {
   const { enabled, selectedTerm, clearTerm, learnTabActive, setLearnTabActive } = useLearningMode()
   return (
@@ -122,6 +133,44 @@ export default function ChatPage() {
   const [showOfflineBanner, setShowOfflineBanner] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [tradingPanelCollapsed, setTradingPanelCollapsed] = useState(false)
+
+  // Action buttons — shared state
+  const { trades: allTradesRaw, closeTrade: closeTradeAction, logTrade: logTradeAction } = useTrades()
+  const { asActionItems: watchlistItems, addToWatchlist, removeFromWatchlist } = useWatchlist()
+  const allTrades: ActionTrade[] = useMemo(
+    () => allTradesRaw.map(t => ({
+      id: t.id,
+      ticker: t.ticker,
+      direction: t.direction,
+      status: t.status,
+      entry_price: t.entry_price,
+      stop_loss: t.stop_loss,
+      take_profit: t.take_profit,
+      thesis: t.thesis,
+      pnl_amount: t.pnl_amount,
+      pnl_percent: t.pnl_percent,
+    })),
+    [allTradesRaw]
+  )
+
+  // Log Trade modal state
+  const [logTradeOpen, setLogTradeOpen] = useState(false)
+  const [logTradeInitialTicker, setLogTradeInitialTicker] = useState("")
+
+  // Close Trade modal state
+  const [closeTradeOpen, setCloseTradeOpen] = useState(false)
+  const [closeTradeTarget, setCloseTradeTarget] = useState<typeof allTradesRaw[0] | null>(null)
+
+  const handleOpenLogTrade = useCallback((ticker: string) => {
+    setLogTradeInitialTicker(ticker)
+    setLogTradeOpen(true)
+  }, [])
+
+  const handleOpenCloseTrade = useCallback((tradeId: string) => {
+    const trade = allTradesRaw.find(t => t.id === tradeId) || null
+    setCloseTradeTarget(trade)
+    setCloseTradeOpen(true)
+  }, [allTradesRaw])
 
   // Resizable trading panel width
   const PANEL_MIN = 280
@@ -623,7 +672,7 @@ export default function ChatPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto overscroll-none pb-[120px] md:pb-0 chat-scroll-area">
             <div className="max-w-5xl mx-auto w-full px-4 sm:px-6">
-              <ChatContainer
+              <ChatContainerWithChart
                 messages={messages}
                 isLoading={chatLoading}
                 isLoadingHistory={isLoadingMessages}
@@ -634,6 +683,14 @@ export default function ChatPage() {
                 onFileUpload={handleFileUploadWithCapture}
                 onSettingsClick={handleSettingsClick}
                 outOfCredits={outOfCredits}
+                conversationId={conversationIdFromUrl || undefined}
+                allTrades={allTrades}
+                watchlistItems={watchlistItems}
+                onAddToWatchlist={addToWatchlist}
+                onRemoveFromWatchlist={removeFromWatchlist}
+                onOpenLogTrade={handleOpenLogTrade}
+                onOpenCloseTrade={handleOpenCloseTrade}
+                onSubmitPrompt={messageHandler.handleSendMessage}
               />
             </div>
           </div>
@@ -753,6 +810,29 @@ export default function ChatPage() {
         onClose={() => setInsufficientCreditsOpen(false)}
       />
       <MobileChartSheet />
+      <LogTradeModal
+        open={logTradeOpen}
+        onOpenChange={(open) => {
+          setLogTradeOpen(open)
+          if (!open) setLogTradeInitialTicker("")
+        }}
+        onSubmit={async (data) => {
+          await logTradeAction(data)
+        }}
+        initialTicker={logTradeInitialTicker}
+      />
+      <CloseTradeModal
+        open={closeTradeOpen}
+        onOpenChange={setCloseTradeOpen}
+        trade={closeTradeTarget}
+        onSubmit={async (data) => {
+          if (closeTradeTarget) {
+            await closeTradeAction(closeTradeTarget.id, data)
+            setCloseTradeOpen(false)
+            setCloseTradeTarget(null)
+          }
+        }}
+      />
         </div>
         </LearningModeProvider>
         </ChartProvider>

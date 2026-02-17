@@ -2,7 +2,8 @@
 
 export const dynamic = "force-dynamic"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import dynamicImport from "next/dynamic"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTrades, Trade } from "@/hooks/use-trades"
@@ -26,6 +27,7 @@ type TabKey = 'dashboard' | 'trades'
 type ActivePanel = 'detail' | 'pelican' | null
 
 export default function JournalPage() {
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState<TabKey>('trades')
   const [activePanel, setActivePanel] = useState<ActivePanel>(null)
   const [showLogTradeModal, setShowLogTradeModal] = useState(false)
@@ -34,6 +36,30 @@ export default function JournalPage() {
   const [tradeTypeFilter, setTradeTypeFilter] = useState<'all' | 'real' | 'paper'>('all')
 
   const { trades, isLoading: tradesLoading, logTrade, closeTrade, refetch, updateTrade } = useTrades()
+
+  // Handle ?highlight=tradeId from chat action buttons
+  const highlightTradeId = searchParams.get('highlight')
+  useEffect(() => {
+    if (!highlightTradeId || tradesLoading) return
+
+    const trade = trades.find(t => t.id === highlightTradeId)
+    if (trade) {
+      setSelectedTrade(trade)
+      setActivePanel('detail')
+      setActiveTab('trades')
+    }
+
+    const timer = setTimeout(() => {
+      const row = document.querySelector(`[data-trade-id="${highlightTradeId}"]`)
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        row.classList.add('highlight-pulse')
+        setTimeout(() => row.classList.remove('highlight-pulse'), 2500)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [highlightTradeId, trades, tradesLoading])
   const { stats, equityCurve, isLoading: statsLoading } = useTradeStats()
   const { openWithPrompt } = usePelicanPanelContext()
 

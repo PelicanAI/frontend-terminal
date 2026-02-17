@@ -9,6 +9,7 @@ import { WelcomeScreen } from "./welcome-screen"
 import { ScrollContainer } from "./scroll-container"
 import { useSmartScroll } from "@/hooks/use-smart-scroll"
 import type { Message } from "@/lib/chat-utils"
+import type { ActionTrade, ActionWatchlistItem } from "@/types/action-buttons"
 import { useToast } from "@/hooks/use-toast"
 import { useResponseTimer } from '@/hooks/use-response-timer'
 import { DragDropOverlay } from "./drag-drop-overlay"
@@ -35,6 +36,16 @@ interface ChatContainerProps {
   onSettingsClick?: () => void
   networkError?: string | null
   outOfCredits?: boolean
+  // Action bar props
+  conversationId?: string
+  allTrades?: ActionTrade[]
+  watchlistItems?: ActionWatchlistItem[]
+  onAddToWatchlist?: (ticker: string, conversationId?: string) => Promise<boolean>
+  onRemoveFromWatchlist?: (ticker: string) => Promise<boolean>
+  onOpenLogTrade?: (ticker: string) => void
+  onOpenCloseTrade?: (tradeId: string) => void
+  onSubmitPrompt?: (prompt: string) => void
+  onOpenChart?: (ticker: string) => void
 }
 
 export function ChatContainer({
@@ -51,6 +62,15 @@ export function ChatContainer({
   onSettingsClick,
   networkError,
   outOfCredits,
+  conversationId,
+  allTrades,
+  watchlistItems,
+  onAddToWatchlist,
+  onRemoveFromWatchlist,
+  onOpenLogTrade,
+  onOpenCloseTrade,
+  onSubmitPrompt,
+  onOpenChart,
 }: ChatContainerProps) {
   const { toast } = useToast()
   const elapsedSeconds = useResponseTimer(isLoading)
@@ -392,6 +412,15 @@ export function ChatContainer({
                     onDelete={onDeleteMessage}
                     onPin={onPinMessage}
                     showActions={index === messages.length - 1}
+                    conversationId={conversationId}
+                    allTrades={allTrades}
+                    watchlistItems={watchlistItems}
+                    onAddToWatchlist={onAddToWatchlist}
+                    onRemoveFromWatchlist={onRemoveFromWatchlist}
+                    onOpenLogTrade={onOpenLogTrade}
+                    onOpenCloseTrade={onOpenCloseTrade}
+                    onSubmitPrompt={onSubmitPrompt}
+                    onOpenChart={onOpenChart}
                   />
                 </motion.div>
               )

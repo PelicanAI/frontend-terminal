@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import { MessageBubble } from "./message-bubble"
 import type { Message } from "@/lib/chat-utils"
+import type { ActionTrade, ActionWatchlistItem } from "@/types/action-buttons"
 
 interface StreamingMessageProps {
   message: Message
@@ -16,6 +17,16 @@ interface StreamingMessageProps {
   onPin?: (id: string) => void
   showActions?: boolean
   isDarkMode?: boolean
+  // Action bar props (passed through to MessageBubble)
+  conversationId?: string
+  allTrades?: ActionTrade[]
+  watchlistItems?: ActionWatchlistItem[]
+  onAddToWatchlist?: (ticker: string, conversationId?: string) => Promise<boolean>
+  onRemoveFromWatchlist?: (ticker: string) => Promise<boolean>
+  onOpenLogTrade?: (ticker: string) => void
+  onOpenCloseTrade?: (tradeId: string) => void
+  onSubmitPrompt?: (prompt: string) => void
+  onOpenChart?: (ticker: string) => void
 }
 
 export const StreamingMessage = React.memo(function StreamingMessage({
@@ -28,6 +39,15 @@ export const StreamingMessage = React.memo(function StreamingMessage({
   onDelete,
   onPin,
   isDarkMode,
+  conversationId,
+  allTrades,
+  watchlistItems,
+  onAddToWatchlist,
+  onRemoveFromWatchlist,
+  onOpenLogTrade,
+  onOpenCloseTrade,
+  onSubmitPrompt,
+  onOpenChart,
 }: StreamingMessageProps) {
   // Defensive check - ensure content is always a string
   const safeContent = typeof message.content === 'string' ? message.content : String(message.content || '')
@@ -99,6 +119,15 @@ export const StreamingMessage = React.memo(function StreamingMessage({
         onEdit={onEdit}
         onDelete={onDelete}
         onPin={onPin}
+        conversationId={conversationId}
+        allTrades={allTrades}
+        watchlistItems={watchlistItems}
+        onAddToWatchlist={onAddToWatchlist}
+        onRemoveFromWatchlist={onRemoveFromWatchlist}
+        onOpenLogTrade={onOpenLogTrade}
+        onOpenCloseTrade={onOpenCloseTrade}
+        onSubmitPrompt={onSubmitPrompt}
+        onOpenChart={onOpenChart}
       />
     </motion.div>
   )

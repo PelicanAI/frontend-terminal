@@ -73,7 +73,7 @@ export function SignalCards({ correlations, beginnerMode, onSelectPair }: Signal
                   r = {pair.correlation.toFixed(2)}
                 </span>
                 <span className="text-xs font-mono tabular-nums" style={{ color: config.color }}>
-                  {pair.z_score > 0 ? '+' : ''}{pair.z_score.toFixed(1)}\u03C3
+                  {pair.z_score > 0 ? '+' : ''}{pair.z_score.toFixed(1)}σ
                 </span>
               </div>
 

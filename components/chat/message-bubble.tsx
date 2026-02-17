@@ -13,6 +13,8 @@ import type { Message } from "@/lib/chat-utils"
 import { MessageContent } from "./message/message-content"
 import { AttachmentDisplay } from "./message/attachment-display"
 import { extractTradingMetadata } from "@/lib/trading-metadata"
+import { MessageActionBar } from "./message-action-bar"
+import type { ActionTrade, ActionWatchlistItem } from "@/types/action-buttons"
 
 function formatMessageTime(date: Date): string {
   const now = new Date()
@@ -37,6 +39,16 @@ interface MessageBubbleProps {
   onEdit?: (id: string, content: string) => void
   onDelete?: (id: string) => void
   onPin?: (id: string) => void
+  // Action bar props
+  conversationId?: string
+  allTrades?: ActionTrade[]
+  watchlistItems?: ActionWatchlistItem[]
+  onAddToWatchlist?: (ticker: string, conversationId?: string) => Promise<boolean>
+  onRemoveFromWatchlist?: (ticker: string) => Promise<boolean>
+  onOpenLogTrade?: (ticker: string) => void
+  onOpenCloseTrade?: (tradeId: string) => void
+  onSubmitPrompt?: (prompt: string) => void
+  onOpenChart?: (ticker: string) => void
 }
 
 export const MessageBubble = memo(function MessageBubble({
@@ -47,6 +59,15 @@ export const MessageBubble = memo(function MessageBubble({
   onRegenerate,
   isRegenerating = false,
   onEdit,
+  conversationId,
+  allTrades,
+  watchlistItems,
+  onAddToWatchlist,
+  onRemoveFromWatchlist,
+  onOpenLogTrade,
+  onOpenCloseTrade,
+  onSubmitPrompt,
+  onOpenChart,
 }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -266,6 +287,25 @@ export const MessageBubble = memo(function MessageBubble({
                 </Button>
               )}
             </div>
+
+            {/* Action buttons — only for completed assistant messages */}
+            {!isStreaming && allTrades && watchlistItems && onAddToWatchlist && onRemoveFromWatchlist && onOpenLogTrade && onOpenCloseTrade && onSubmitPrompt && onOpenChart && (
+              <MessageActionBar
+                content={message.content}
+                role={message.role}
+                isStreaming={isStreaming}
+                messageId={message.id}
+                conversationId={conversationId}
+                allTrades={allTrades}
+                watchlistItems={watchlistItems}
+                onAddToWatchlist={onAddToWatchlist}
+                onRemoveFromWatchlist={onRemoveFromWatchlist}
+                onOpenLogTrade={onOpenLogTrade}
+                onOpenCloseTrade={onOpenCloseTrade}
+                onSubmitPrompt={onSubmitPrompt}
+                onOpenChart={onOpenChart}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -281,6 +321,8 @@ export const MessageBubble = memo(function MessageBubble({
     prevProps.showSkeleton === nextProps.showSkeleton &&
     prevProps.isRegenerating === nextProps.isRegenerating &&
     !!prevProps.onRegenerate === !!nextProps.onRegenerate &&
-    !!prevProps.onEdit === !!nextProps.onEdit
+    !!prevProps.onEdit === !!nextProps.onEdit &&
+    prevProps.allTrades === nextProps.allTrades &&
+    prevProps.watchlistItems === nextProps.watchlistItems
   )
 })

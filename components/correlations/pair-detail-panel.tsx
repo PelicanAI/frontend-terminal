@@ -1,15 +1,16 @@
 "use client"
 
 import { useState } from 'react'
-import { X, TrendUp, TrendDown, CalendarBlank } from '@phosphor-icons/react'
+import { useRouter } from 'next/navigation'
+import { X, TrendUp, TrendDown, CalendarBlank, ChatCircleDots } from '@phosphor-icons/react'
 import { RollingChart } from './rolling-chart'
 import { findSignalForPair } from '@/lib/correlation-signals'
-import type { CorrelationPair, CorrelationAsset } from '@/types/correlations'
+import { useCorrelationPair } from '@/hooks/use-correlations'
+import type { CorrelationAsset } from '@/types/correlations'
 
 interface PairDetailPanelProps {
   assetA: string
   assetB: string
-  correlations: CorrelationPair[]
   assets: CorrelationAsset[]
   beginnerMode: boolean
   onClose: () => void
@@ -22,10 +23,60 @@ const regimeColors: Record<string, string> = {
   inversion: 'var(--data-warning)',
 }
 
+function generateInterpretation(
+  assetA: string,
+  assetB: string,
+  correlation: number,
+  zScore: number,
+  mean: number,
+  regime: string,
+  beginnerMode: boolean,
+): string {
+  const direction = correlation > 0 ? 'positive' : 'negative'
+  const strength = Math.abs(correlation) > 0.7 ? 'strong'
+    : Math.abs(correlation) > 0.3 ? 'moderate' : 'weak'
+  const unusual = Math.abs(zScore) > 1.5
+
+  if (beginnerMode) {
+    let text = `${assetA} and ${assetB} have a ${strength} ${direction} relationship right now. `
+    if (correlation > 0.5) {
+      text += 'They tend to move in the same direction. When one goes up, the other usually follows. '
+    } else if (correlation < -0.5) {
+      text += 'They tend to move in opposite directions. When one goes up, the other usually goes down. '
+    } else {
+      text += 'Their movements are mostly independent of each other right now. '
+    }
+    if (unusual) {
+      text += `This is unusual compared to historical norms (${zScore > 0 ? 'stronger' : 'weaker'} than normal by ${Math.abs(zScore).toFixed(1)} standard deviations). Worth monitoring.`
+    } else {
+      text += 'This is within the normal historical range.'
+    }
+    return text
+  }
+
+  let text = `${strength.charAt(0).toUpperCase() + strength.slice(1)} ${direction} correlation at ${correlation.toFixed(3)}. `
+  text += `Historical mean: ${mean > 0 ? '+' : ''}${mean.toFixed(3)}. `
+  if (unusual) {
+    text += `Currently ${Math.abs(zScore).toFixed(1)}σ ${zScore > 0 ? 'above' : 'below'} the mean — ${regime} regime. `
+    if (regime === 'inversion') {
+      text += 'The historical relationship has flipped sign. This typically signals a regime change.'
+    } else if (regime === 'breakdown') {
+      text += 'Significant deviation from normal behavior. Monitor for potential mean reversion or structural shift.'
+    }
+  } else {
+    text += 'Within normal range. No actionable signal.'
+  }
+  return text
+}
+
 export function PairDetailPanel({
-  assetA, assetB, correlations, assets, beginnerMode, onClose,
+  assetA, assetB, assets, beginnerMode, onClose,
 }: PairDetailPanelProps) {
   const [activePeriod, setActivePeriod] = useState<'30d' | '90d' | '1y'>('30d')
+  const router = useRouter()
+
+  const { data: pairData, isLoading } = useCorrelationPair(assetA, assetB)
+  const correlations = pairData?.pair ?? []
 
   const currentData = correlations.find(c => c.period === activePeriod)
   const found = findSignalForPair(assetA, assetB)
@@ -34,7 +85,26 @@ export function PairDetailPanel({
   const nameA = assets.find(a => a.ticker === assetA)?.display_name || assetA
   const nameB = assets.find(a => a.ticker === assetB)?.display_name || assetB
 
+  if (isLoading) {
+    return (
+      <div className="pelican-card mt-4 flex items-center justify-center py-12" style={{ borderTop: '2px solid var(--accent-indigo)' }}>
+        <div className="animate-pulse text-sm" style={{ color: 'var(--text-muted)' }}>
+          Loading pair data...
+        </div>
+      </div>
+    )
+  }
+
   if (!currentData) return null
+
+  const handleAskPelican = () => {
+    const prompt = `Analyze the current ${assetA}/${assetB} correlation for me. ` +
+      `The ${activePeriod} correlation is ${currentData.correlation.toFixed(3)} ` +
+      `(historical mean: ${currentData.historical_mean.toFixed(3)}, z-score: ${currentData.z_score.toFixed(1)}σ, regime: ${currentData.regime}). ` +
+      `What does this tell us about current market conditions? Any actionable implications for traders?`
+    sessionStorage.setItem('pelican_chat_prompt', prompt)
+    router.push('/chat')
+  }
 
   return (
     <div className="pelican-card mt-4" style={{ borderTop: '2px solid var(--accent-indigo)' }}>
@@ -93,7 +163,7 @@ export function PairDetailPanel({
             className="text-lg font-mono font-bold tabular-nums"
             style={{ color: Math.abs(currentData.z_score) > 1.5 ? 'var(--data-negative)' : 'var(--text-primary)' }}
           >
-            {currentData.z_score > 0 ? '+' : ''}{currentData.z_score.toFixed(1)}&sigma;
+            {currentData.z_score > 0 ? '+' : ''}{currentData.z_score.toFixed(1)}σ
           </p>
         </div>
         <div>
@@ -122,7 +192,7 @@ export function PairDetailPanel({
             <>
               <div>
                 <h4 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
-                  What This Means
+                  {signal.name}
                 </h4>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   {beginnerMode ? signal.beginner_explanation : signal.description}
@@ -183,15 +253,32 @@ export function PairDetailPanel({
               <h4 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
                 Correlation Summary
               </h4>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                Current: {currentData.correlation.toFixed(3)}.
-                Historical average: {currentData.historical_mean.toFixed(3)}.
-                {Math.abs(currentData.z_score) > 1.5
-                  ? ` Currently ${currentData.z_score.toFixed(1)}\u03C3 from the mean, indicating unusual behavior.`
-                  : ' Within normal range.'}
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                {generateInterpretation(
+                  assetA, assetB,
+                  currentData.correlation,
+                  currentData.z_score,
+                  currentData.historical_mean,
+                  currentData.regime,
+                  beginnerMode,
+                )}
               </p>
             </div>
           )}
+
+          {/* Ask Pelican button */}
+          <button
+            onClick={handleAskPelican}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors w-full"
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <ChatCircleDots weight="bold" className="w-3.5 h-3.5" style={{ color: 'var(--accent-indigo)' }} />
+            Ask Pelican About This
+          </button>
         </div>
       </div>
     </div>
