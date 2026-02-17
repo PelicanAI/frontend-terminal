@@ -1,10 +1,8 @@
 "use client"
 
 import React, { useState, useMemo, useEffect, useCallback } from "react"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,14 +23,17 @@ import {
   User,
   SignOut,
   Shield,
+  CaretLeft,
+  Sun,
+  Moon,
 } from "@phosphor-icons/react"
+import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
 import Link from "next/link"
 import { useT } from "@/lib/providers/translation-provider"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { createClient } from "@/lib/supabase/client"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 
 interface Conversation {
   id: string
@@ -115,8 +116,8 @@ const ConversationItem = React.memo(function ConversationItem({
       data-conversation-id={conversation.id}
       className={cn(
         "w-full text-left px-3 py-2 rounded-lg transition-all duration-150 group relative mx-2",
-        isActive && "bg-[var(--accent-purple-subtle)] border border-[rgba(139,92,246,0.12)]",
-        !isActive && "hover:bg-[var(--accent-purple-subtle)] border border-transparent",
+        isActive && "bg-[rgba(139,92,246,0.10)] border-l-2 border-l-[var(--accent-purple)] border-y border-r border-y-transparent border-r-transparent",
+        !isActive && "hover:bg-white/[0.05] border border-transparent",
         isNavigatingToThis && "opacity-50 cursor-wait",
       )}
       onClick={() => {
@@ -178,6 +179,23 @@ const getRelativeTime = (date: string): string => {
   if (diffDays === 1) return "Yesterday"
   if (diffDays < 7) return `${diffDays}d ago`
   return then.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+function ThemeRow() {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  if (!mounted) return null
+  const isDark = resolvedTheme === 'dark'
+  return (
+    <button
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/[0.05] transition-colors"
+    >
+      {isDark ? <Sun size={14} weight="regular" /> : <Moon size={14} weight="regular" />}
+      {isDark ? 'Light Mode' : 'Dark Mode'}
+    </button>
+  )
 }
 
 export function ConversationSidebar({
@@ -315,27 +333,33 @@ export function ConversationSidebar({
     >
       {/* Header */}
       <div className="p-3 space-y-2 border-b border-sidebar-border/30">
-        {/* New Chat + Search Row */}
-        <div className="flex gap-2">
-          <Button
+        {/* New Chat + Search + Collapse Row */}
+        <div className="flex gap-2 items-center">
+          <button
             onClick={onNewConversation}
-            className="flex-1 h-8 bg-[var(--accent-purple-muted)] hover:bg-[rgba(139,92,246,0.22)] text-[var(--accent-purple-hover)] border border-[rgba(139,92,246,0.20)] hover:border-[rgba(139,92,246,0.35)] hover:shadow-[var(--glow-purple-soft)] transition-all duration-200"
-            variant="outline"
+            className="flex items-center gap-1.5 h-7 px-3 rounded-md bg-[var(--accent-purple-muted)] text-[var(--accent-purple-hover)] text-xs font-medium hover:bg-[rgba(139,92,246,0.22)] border border-[rgba(139,92,246,0.15)] hover:border-[rgba(139,92,246,0.30)] transition-all duration-200"
           >
-            <Plus size={16} weight="bold" className="mr-1.5" />
-            <span className="text-xs font-medium">New chat</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
+            <Plus size={14} weight="bold" />
+            New
+          </button>
+          <button
             onClick={() => setSearchExpanded(!searchExpanded)}
             className={cn(
-              "h-8 w-8 flex-shrink-0 transition-colors",
-              searchExpanded ? "bg-[var(--surface-2)] text-[var(--accent-purple)]" : "bg-[var(--surface-1)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              "h-7 w-7 flex items-center justify-center rounded-md flex-shrink-0 transition-colors",
+              searchExpanded ? "bg-[var(--surface-2)] text-[var(--accent-purple)]" : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-1)]"
             )}
           >
-            <MagnifyingGlass size={16} weight="regular" />
-          </Button>
+            <MagnifyingGlass size={14} weight="regular" />
+          </button>
+          {onToggleCollapse && !isMobileSheet && (
+            <button
+              onClick={onToggleCollapse}
+              className="h-7 w-7 flex items-center justify-center rounded-md flex-shrink-0 text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-1)] transition-colors ml-auto"
+              title="Collapse sidebar"
+            >
+              <CaretLeft size={14} weight="regular" />
+            </button>
+          )}
         </div>
 
         {/* Expandable Search Input */}
@@ -382,7 +406,7 @@ export function ConversationSidebar({
               {/* Today */}
               {groupedConversations.today.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                     Today
                   </h4>
                   <div className="space-y-1">
@@ -410,7 +434,7 @@ export function ConversationSidebar({
               {/* Yesterday */}
               {groupedConversations.yesterday.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                     Yesterday
                   </h4>
                   <div className="space-y-1">
@@ -438,7 +462,7 @@ export function ConversationSidebar({
               {/* Previous 7 Days */}
               {groupedConversations.previous7Days.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                     Previous 7 Days
                   </h4>
                   <div className="space-y-1">
@@ -466,7 +490,7 @@ export function ConversationSidebar({
               {/* Previous 30 Days */}
               {groupedConversations.previous30Days.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                     Previous 30 Days
                   </h4>
                   <div className="space-y-1">
@@ -494,7 +518,7 @@ export function ConversationSidebar({
               {/* Older */}
               {groupedConversations.older.length > 0 && (
                 <div>
-                  <h4 className="px-4 py-2 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">
+                  <h4 className="px-4 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
                     Older
                   </h4>
                   <div className="space-y-1">
@@ -522,19 +546,20 @@ export function ConversationSidebar({
               {/* Load More */}
               {hasMore && (
                 <div className="px-4 py-3">
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <button
                     onClick={loadMore}
                     disabled={loadingMore}
-                    className="w-full text-xs text-muted-foreground hover:text-foreground"
+                    className="w-full py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-1)]/60 transition-colors rounded-md disabled:opacity-50"
                   >
                     {loadingMore ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="w-3 h-3 border-2 border-[var(--text-muted)] border-t-transparent rounded-full animate-spin" />
+                        Loading...
+                      </span>
                     ) : (
-                      "Load more conversations"
+                      'Load older conversations'
                     )}
-                  </Button>
+                  </button>
                 </div>
               )}
             </div>
@@ -543,62 +568,43 @@ export function ConversationSidebar({
       </ScrollArea>
 
       {/* Footer */}
-      <div className="px-3 py-3 border-t border-sidebar-border/30 space-y-2">
+      <div className="shrink-0 px-3 py-3 border-t border-sidebar-border/30 space-y-1">
+        {/* Theme toggle */}
+        <ThemeRow />
+
+        {/* Admin panel link — only for admins */}
         {isAdmin && (
           <Link
             href="/admin/dashboard"
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors duration-150"
+            className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-xs font-medium text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors duration-150"
           >
             <Shield size={16} weight="regular" />
             <span>Admin Panel</span>
           </Link>
         )}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className="flex-1 justify-start h-10 px-3 hover:bg-sidebar-accent/50"
-          >
-            <Link href="/profile" className="flex items-center gap-3">
-              <Avatar className="w-8 h-8 ring-2 ring-sidebar-border/50">
-                <AvatarImage src="/placeholder-user.jpg" />
-                <AvatarFallback className="bg-primary/20 text-primary">
-                  <User size={16} weight="regular" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 text-left min-w-0">
-                <p className="text-sm font-medium text-sidebar-foreground truncate">{t.common.account}</p>
-                <p className="text-[10px] text-muted-foreground">{t.common.viewProfile}</p>
-              </div>
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            asChild
-            className="h-10 w-10 hover:bg-sidebar-accent/50"
-          >
-            <Link href="/settings" aria-label="Settings">
-              <Gear size={16} weight="regular" />
-            </Link>
-          </Button>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowSignOutDialog(true)}
-                className="h-10 w-10 hover:bg-sidebar-accent/50"
-              >
-                <SignOut size={16} weight="regular" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Logout</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
+
+        {/* User profile row */}
+        <Link
+          href="/settings"
+          className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-white/[0.05] transition-colors cursor-pointer group"
+        >
+          <div className="w-7 h-7 rounded-full bg-[var(--accent-purple-muted)] flex items-center justify-center text-xs font-medium text-[var(--accent-purple-hover)]">
+            <User size={14} weight="regular" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-[var(--text-primary)] truncate">{t.common.account}</p>
+          </div>
+          <Gear size={14} weight="regular" className="text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors" />
+        </Link>
+
+        {/* Sign out */}
+        <button
+          onClick={() => setShowSignOutDialog(true)}
+          className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-white/[0.05] transition-colors"
+        >
+          <SignOut size={14} weight="regular" />
+          Sign out
+        </button>
       </div>
 
       {/* Sign Out Confirmation Dialog */}

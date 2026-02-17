@@ -17,6 +17,7 @@ import { uploadChatImage } from "@/lib/upload-image"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
+import { CaretRight, Plus as PlusIcon } from "@phosphor-icons/react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import Image from "next/image"
@@ -531,8 +532,26 @@ export default function ChatPage() {
         </div>
       )}
 
-      {!sidebarCollapsed && (
-        <div className="hidden xl:block">
+      {/* Desktop sidebar — full or collapsed strip */}
+      <div className="hidden xl:block flex-shrink-0">
+        {sidebarCollapsed ? (
+          <div className="w-12 h-full flex flex-col items-center pt-3 gap-3 border-r border-[var(--border-subtle)] bg-sidebar">
+            <button
+              onClick={handleSidebarToggle}
+              className="h-8 w-8 flex items-center justify-center rounded-md text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-white/[0.05] transition-colors"
+              title="Open sidebar"
+            >
+              <CaretRight size={16} weight="regular" />
+            </button>
+            <button
+              onClick={handleNewConversation}
+              className="h-8 w-8 flex items-center justify-center rounded-md text-[var(--accent-purple)] hover:bg-[var(--accent-purple-muted)] transition-colors"
+              title="New chat"
+            >
+              <PlusIcon size={16} weight="bold" />
+            </button>
+          </div>
+        ) : (
           <ConversationSidebar
             currentConversationId={conversationRouter.currentConversationId || undefined}
             onConversationSelect={handleConversationSelect}
@@ -540,8 +559,8 @@ export default function ChatPage() {
             isCollapsed={sidebarCollapsed}
             onToggleCollapse={handleSidebarToggle}
           />
-        </div>
-      )}
+        )}
+      </div>
 
       <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
         <SheetContent

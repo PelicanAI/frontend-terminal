@@ -91,13 +91,13 @@
   --bg-overlay: rgba(10, 8, 16, 0.75);
 
   /* Borders — purple tint on hover ties to accent */
-  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.09);
   --border-default: rgba(255, 255, 255, 0.13);
   --border-hover: rgba(139, 92, 246, 0.25);
 
   /* Text — bright enough to pop on any surface */
-  --text-primary: #f0f0f4;
-  --text-secondary: #a8a8ba;
+  --text-primary: #f4f4f8;
+  --text-secondary: #b0b0c0;
   --text-muted: #6e6e88;
   --text-disabled: #44445a;
 
@@ -119,8 +119,8 @@
   --status-cancelled: #ef4444;
 
   /* Shadows — visible depth + purple glow on hover */
-  --shadow-card: 0 2px 8px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.04);
-  --shadow-card-hover: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(139,92,246,0.12), 0 0 30px rgba(139,92,246,0.06);
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05);
+  --shadow-card-hover: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.15), 0 0 30px rgba(139,92,246,0.08);
   --shadow-elevated: 0 4px 12px rgba(0,0,0,0.5), 0 20px 60px rgba(0,0,0,0.3);
 
   /* Spacing */
@@ -153,20 +153,21 @@
 
   /* Borders — purple accent on interaction */
   --border: 252 18% 24%;                 /* subtle purple-gray border for Tailwind */
-  --border-subtle: rgba(139, 92, 246, 0.07);
+  --border-subtle: rgba(139, 92, 246, 0.10);
   --border-hover: rgba(139, 92, 246, 0.25);
   --border-active: rgba(139, 92, 246, 0.35);
   --ring: 252 50% 50% / 0.5;             /* purple focus ring */
 
   /* Text colors - bright for pop */
-  --text-primary: #f0f0f4;
-  --text-secondary: #a8a8be;
+  --text-primary: #f4f4f8;
+  --text-secondary: #b0b0c0;
   --text-muted: #6a6a8c;
   --text-ghost: #46465e;
 
   /* Accent purple */
   --accent-purple: #8b5cf6;
   --accent-purple-hover: #a78bfa;
+  --bg-sidebar: #13101d;
   --accent-purple-muted: rgba(139, 92, 246, 0.15);
   --accent-purple-subtle: rgba(139, 92, 246, 0.12);
 
