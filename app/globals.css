@@ -84,28 +84,28 @@
   --sidebar-ring: oklch(0.45 0.01 240 / 0.3);
   /* ===== PELICAN DESIGN SYSTEM V3 TOKENS ===== */
 
-  /* Backgrounds — lifted dark mode with visible layer separation */
-  --bg-base: #13131a;
-  --bg-surface: #1c1c26;
-  --bg-elevated: #252530;
-  --bg-overlay: rgba(0, 0, 0, 0.65);
+  /* Backgrounds — purple undertone through layers (17→27→35 blue channel) */
+  --bg-base: #111117;
+  --bg-surface: #1a1a27;
+  --bg-elevated: #242435;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
 
-  /* Borders — adjusted for lifted palette */
+  /* Borders — purple tint on hover ties to accent */
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-default: rgba(255, 255, 255, 0.12);
-  --border-hover: rgba(255, 255, 255, 0.18);
+  --border-default: rgba(255, 255, 255, 0.13);
+  --border-hover: rgba(139, 92, 246, 0.25);
 
-  /* Text — bumped for contrast on new backgrounds */
-  --text-primary: #ededf0;
-  --text-secondary: #a0a0b0;
-  --text-muted: #6a6a82;
-  --text-disabled: #3e3e50;
+  /* Text — bright enough to pop on any surface */
+  --text-primary: #f0f0f4;
+  --text-secondary: #a8a8ba;
+  --text-muted: #6e6e88;
+  --text-disabled: #44445a;
 
   /* Accent */
   --accent-primary: #8b5cf6;
   --accent-hover: #9d74f7;
   --accent-muted: rgba(139, 92, 246, 0.15);
-  --accent-glow: rgba(139, 92, 246, 0.08);
+  --accent-glow: rgba(139, 92, 246, 0.12);
 
   /* Data Colors — ONLY for financial data */
   --data-positive: #22c55e;
@@ -118,10 +118,10 @@
   --status-closed: #6b7280;
   --status-cancelled: #ef4444;
 
-  /* Shadows — stronger for visible depth on lifted palette */
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.2);
-  --shadow-card-hover: 0 2px 6px rgba(0,0,0,0.6), 0 10px 32px rgba(0,0,0,0.25);
-  --shadow-elevated: 0 4px 8px rgba(0,0,0,0.6), 0 16px 48px rgba(0,0,0,0.3);
+  /* Shadows — visible depth + purple glow on hover */
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.6), 0 6px 20px rgba(0,0,0,0.25);
+  --shadow-card-hover: 0 2px 8px rgba(0,0,0,0.7), 0 12px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(139,92,246,0.1);
+  --shadow-elevated: 0 4px 12px rgba(0,0,0,0.7), 0 20px 60px rgba(0,0,0,0.35);
 
   /* Spacing */
   --space-page-x: 2rem;
@@ -138,41 +138,41 @@
 
 /* Fixed dark mode selector to work properly with next-themes */
 .dark {
-  /* Purple-tinted dark mode - lifted palette with visible layer separation */
+  /* Purple-tinted dark mode — more pop, purple undertone through layers */
   /* HSL format for shadcn/Tailwind compatibility */
-  --background: 252 20% 9%;              /* lifted from 5% — dark but not void */
-  --foreground: 252 10% 93%;             /* light purple-tinted white */
-  --muted: 252 22% 15%;                  /* purple-tinted muted backgrounds */
-  --muted-foreground: 252 8% 66%;        /* muted text */
+  --background: 245 25% 8%;              /* matches --bg-base undertone */
+  --foreground: 245 10% 95%;             /* bright, almost white */
+  --muted: 245 20% 16%;                  /* purple-tinted muted backgrounds */
+  --muted-foreground: 245 8% 55%;        /* muted text */
 
-  /* Layered surfaces - lifted with purple saturation */
-  --surface-0: #1a1830;                  /* lifted from #13112a */
-  --surface-1: #201e38;                  /* lifted from #181630 */
-  --surface-2: #272440;                  /* lifted from #1e1b38 */
-  --surface-3: #2e2b48;                  /* lifted from #252240 */
+  /* Layered surfaces - purple undertone, clear separation */
+  --surface-0: #111117;                  /* = bg-base */
+  --surface-1: #1a1a27;                  /* = bg-surface */
+  --surface-2: #242435;                  /* = bg-elevated */
+  --surface-3: #2e2e42;                  /* extra step for deep nesting */
 
-  /* Purple-tinted borders - slightly more visible */
-  --border: 252 20% 22%;                 /* subtle purple-gray border for Tailwind */
-  --border-subtle: rgba(139, 92, 246, 0.06);
-  --border-hover: rgba(139, 92, 246, 0.20);
-  --border-active: rgba(139, 92, 246, 0.32);
+  /* Borders — purple accent on interaction */
+  --border: 252 18% 24%;                 /* subtle purple-gray border for Tailwind */
+  --border-subtle: rgba(139, 92, 246, 0.07);
+  --border-hover: rgba(139, 92, 246, 0.25);
+  --border-active: rgba(139, 92, 246, 0.35);
   --ring: 252 50% 50% / 0.5;             /* purple focus ring */
 
-  /* Text colors - bumped for contrast */
-  --text-primary: #ededf0;
-  --text-secondary: #a2a2ba;
-  --text-muted: #65658a;
-  --text-ghost: #42425c;
+  /* Text colors - bright for pop */
+  --text-primary: #f0f0f4;
+  --text-secondary: #a8a8be;
+  --text-muted: #6a6a8c;
+  --text-ghost: #46465e;
 
   /* Accent purple */
   --accent-purple: #8b5cf6;
   --accent-purple-hover: #a78bfa;
   --accent-purple-muted: rgba(139, 92, 246, 0.15);
-  --accent-purple-subtle: rgba(139, 92, 246, 0.08);
+  --accent-purple-subtle: rgba(139, 92, 246, 0.12);
 
-  /* Glows */
-  --glow-purple-soft: 0 0 20px rgba(139, 92, 246, 0.08);
-  --glow-purple-medium: 0 0 30px rgba(139, 92, 246, 0.12);
+  /* Glows — stronger for more pop */
+  --glow-purple-soft: 0 0 20px rgba(139, 92, 246, 0.12);
+  --glow-purple-medium: 0 0 30px rgba(139, 92, 246, 0.18);
 
   /* Brand - Vibrant Purple */
   --primary: oklch(0.60 0.25 280);
@@ -192,18 +192,18 @@
   --chart-4: oklch(0.70 0.15 280);
   --chart-5: oklch(0.50 0.28 275);
 
-  /* Components with futuristic styling - HSL format (lifted) */
-  --card: 252 22% 12%;                   /* purple-tinted cards — lifted from 8% */
-  --card-foreground: 252 10% 93%;        /* light text on cards */
-  --popover: 252 22% 12%;               /* same as card */
-  --popover-foreground: 252 10% 93%;     /* light text */
-  --sidebar: 252 28% 9%;                 /* darker purple for sidebar — lifted from 6% */
+  /* Components — aligned to design token layers */
+  --card: 245 22% 13%;                   /* ~bg-surface */
+  --card-foreground: 245 10% 95%;        /* bright text */
+  --popover: 245 20% 15%;               /* ~bg-elevated */
+  --popover-foreground: 245 10% 95%;     /* bright text */
+  --sidebar: 245 25% 8%;                 /* ~bg-base */
   --sidebar-foreground: 252 10% 92%;     /* light text */
   --sidebar-primary: oklch(0.60 0.25 280);
   --sidebar-primary-foreground: oklch(0.98 0.002 280);
-  --sidebar-accent: rgba(139, 92, 246, 0.08);
+  --sidebar-accent: rgba(139, 92, 246, 0.12);
   --sidebar-accent-foreground: oklch(0.95 0.004 280);
-  --sidebar-border: rgba(139, 92, 246, 0.06);
+  --sidebar-border: rgba(139, 92, 246, 0.08);
   --sidebar-ring: rgba(139, 92, 246, 0.5);
 }
 
@@ -629,20 +629,38 @@
 
   /* ========== V2 Visual Polish Utilities ========== */
 
-  /* Card with subtle glow on hover */
+  /* Card with top highlight and purple glow on hover */
   .pelican-card {
+    position: relative;
     background: var(--bg-surface);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
     padding: var(--space-card);
-    transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out, transform 0.2s ease-out;
+    transition: all 0.2s ease-out;
+  }
+
+  .pelican-card::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 20%,
+      rgba(255, 255, 255, 0.09) 50%,
+      rgba(255, 255, 255, 0.06) 80%,
+      transparent 100%
+    );
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    pointer-events: none;
   }
 
   .pelican-card:hover {
     box-shadow: var(--shadow-card-hover);
     border-color: var(--border-hover);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
   }
 
   /* Interactive card (clickable) */
