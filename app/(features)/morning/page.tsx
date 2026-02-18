@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic"
 
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import { useTrades } from "@/hooks/use-trades"
 import { useMorningBrief } from "@/hooks/use-morning-brief"
@@ -25,9 +25,12 @@ import {
 import { getMarketStatus } from "@/hooks/use-market-data"
 import { LogoImg } from "@/components/ui/logo-img"
 import { MessageContent } from "@/components/chat/message/message-content"
+import { MarketSessions } from "@/components/morning/market-sessions"
 import type { IPOEntry } from "@/app/api/ipos/route"
+import type { Mover } from "@/hooks/use-morning-brief"
 
 type MoversTab = "gainers" | "losers"
+type AssetClass = "stocks" | "crypto" | "forex" | "etfs"
 
 interface PriceTier {
   label: string
@@ -43,6 +46,34 @@ const PRICE_TIERS: PriceTier[] = [
   { label: '$10–$50', min: 10, max: 50 },
   { label: 'Penny Stocks', min: 0, max: 10 },
 ]
+
+const CRYPTO_CATEGORIES: Record<string, string[]> = {
+  'Top 20': [],
+  'DeFi': ['UNI', 'AAVE', 'MKR', 'COMP', 'CRV', 'SNX', 'SUSHI', 'YFI', 'DYDX', 'LDO'],
+  'L1/L2': ['ETH', 'SOL', 'ADA', 'AVAX', 'DOT', 'NEAR', 'ATOM', 'APT', 'SUI', 'SEI', 'MATIC', 'ARB', 'OP'],
+  'Meme': ['DOGE', 'SHIB', 'PEPE', 'WIF', 'FLOKI', 'BONK'],
+}
+
+const FOREX_CATEGORIES: Record<string, string[]> = {
+  'Majors': ['EURUSD', 'GBPUSD', 'USDJPY', 'USDCHF', 'AUDUSD', 'USDCAD', 'NZDUSD'],
+  'Crosses': ['EURGBP', 'EURJPY', 'GBPJPY', 'AUDNZD', 'EURCHF', 'CADJPY', 'AUDJPY'],
+  'Exotic': ['USDMXN', 'USDZAR', 'USDTRY', 'USDBRL', 'USDSGD', 'USDHKD'],
+}
+
+const ETF_CATEGORIES: Record<string, string[]> = {
+  'Sector': ['XLK', 'XLF', 'XLE', 'XLV', 'XLI', 'XLP', 'XLU', 'XLY', 'XLC', 'XLB', 'XLRE'],
+  'Thematic': ['ARKK', 'TAN', 'LIT', 'HACK', 'ROBO', 'SKYY', 'DRIV', 'SMH', 'CIBR'],
+  'Bond': ['TLT', 'IEF', 'SHY', 'HYG', 'LQD', 'BND', 'AGG', 'TIPS', 'BNDX'],
+  'Commodity': ['GLD', 'SLV', 'USO', 'UNG', 'DBA', 'PDBC', 'COPX', 'WEAT'],
+  'Leveraged': ['TQQQ', 'SQQQ', 'UPRO', 'SPXU', 'SOXL', 'SOXS', 'UVXY', 'SVXY'],
+}
+
+const ASSET_FILTER_OPTIONS: Record<AssetClass, string[]> = {
+  stocks: ['All', '$200+', '$100\u2013$200', '$50\u2013$100', '$10\u2013$50', 'Penny Stocks'],
+  crypto: ['All', 'Top 20', 'DeFi', 'L1/L2', 'Meme'],
+  forex: ['All', 'Majors', 'Crosses', 'Exotic'],
+  etfs: ['All', 'Sector', 'Thematic', 'Bond', 'Commodity', 'Leveraged'],
+}
 
 interface EconomicEvent {
   event: string
@@ -82,6 +113,12 @@ export default function MorningPage() {
   const [briefContent, setBriefContent] = useState<string>('')
   const [briefLoading, setBriefLoading] = useState(false)
   const [briefError, setBriefError] = useState<string | null>(null)
+  const [assetClass, setAssetClass] = useState<AssetClass>('stocks')
+  const [activeFilter, setActiveFilter] = useState('All')
+  const [cryptoMovers, setCryptoMovers] = useState<Mover[]>([])
+  const [forexMovers, setForexMovers] = useState<Mover[]>([])
+  const [etfMovers, setEtfMovers] = useState<Mover[]>([])
+  const [assetLoading, setAssetLoading] = useState(false)
 
   const { openTrades, isLoading: tradesLoading } = useTrades({ status: 'open' })
   const { movers, isLoading: moversLoading, refetch: refetchMovers } = useMorningBrief()
@@ -129,6 +166,33 @@ export default function MorningPage() {
       .catch(() => setIpos([]))
   }, [])
 
+  // Reset filter when switching asset class
+  useEffect(() => {
+    setPriceTier(PRICE_TIERS[0]!)
+    setActiveFilter('All')
+  }, [assetClass])
+
+  // Fetch non-stock movers when asset class changes
+  useEffect(() => {
+    if (assetClass === 'stocks') return
+
+    const endpoint = assetClass === 'crypto' ? '/api/movers/crypto'
+      : assetClass === 'forex' ? '/api/movers/forex'
+      : '/api/movers/etfs'
+
+    setAssetLoading(true)
+    fetch(endpoint)
+      .then(r => r.json())
+      .then(data => {
+        const tickers = data.tickers || []
+        if (assetClass === 'crypto') setCryptoMovers(tickers)
+        else if (assetClass === 'forex') setForexMovers(tickers)
+        else setEtfMovers(tickers)
+      })
+      .catch(() => {})
+      .finally(() => setAssetLoading(false))
+  }, [assetClass])
+
   // Filter to only HIGH and MEDIUM impact events, sorted by date/time
   const macroEvents = useMemo(() => {
     return economicEvents
@@ -137,13 +201,49 @@ export default function MorningPage() {
       .slice(0, 6)
   }, [economicEvents])
 
-  // Sort movers by price (highest first) and filter by price tier
+  // Sort and filter movers by asset class, direction, and category
   const currentMovers = useMemo(() => {
-    const moversToSort = moversTab === "gainers" ? movers.gainers : movers.losers
-    return [...moversToSort]
-      .filter(m => m.price >= priceTier.min && m.price < priceTier.max)
-      .sort((a, b) => (b.price || 0) - (a.price || 0))
-  }, [moversTab, movers.gainers, movers.losers, priceTier])
+    let data: Mover[] = []
+
+    if (assetClass === 'stocks') {
+      data = moversTab === 'gainers' ? [...movers.gainers] : [...movers.losers]
+      data = data.filter(m => m.price >= priceTier.min && m.price < priceTier.max)
+    } else {
+      const source = assetClass === 'crypto' ? cryptoMovers
+        : assetClass === 'forex' ? forexMovers
+        : etfMovers
+      data = [...source]
+
+      // Apply category filter
+      if (activeFilter !== 'All') {
+        const categories = assetClass === 'crypto' ? CRYPTO_CATEGORIES
+          : assetClass === 'forex' ? FOREX_CATEGORIES
+          : ETF_CATEGORIES
+
+        if (activeFilter === 'Top 20') {
+          data = data.sort((a, b) => b.volume - a.volume).slice(0, 20)
+        } else if (categories[activeFilter]) {
+          data = data.filter(m => categories[activeFilter]!.includes(m.ticker))
+        }
+      }
+
+      // For non-stock assets, filter by direction
+      if (moversTab === 'gainers') {
+        data = data.filter(m => m.changePercent >= 0)
+      } else {
+        data = data.filter(m => m.changePercent < 0)
+      }
+    }
+
+    // Sort by change percent
+    if (moversTab === 'gainers') {
+      data.sort((a, b) => b.changePercent - a.changePercent)
+    } else {
+      data.sort((a, b) => a.changePercent - b.changePercent)
+    }
+
+    return data.slice(0, 10)
+  }, [assetClass, moversTab, movers.gainers, movers.losers, cryptoMovers, forexMovers, etfMovers, priceTier, activeFilter])
 
   const handleAnalyzeTicker = async (ticker: string, name?: string, price?: number, changePercent?: number) => {
     let prompt = `Analyze ${ticker}${name ? ` (${name})` : ""}`
@@ -436,51 +536,114 @@ Please provide:
                 </div>
               </div>
 
-              {/* Price Tier Filter */}
-              <div className="flex gap-1 flex-wrap">
-                {PRICE_TIERS.map(tier => (
+              {/* Asset Class Tabs */}
+              <div className="flex gap-1 mb-3">
+                {(['stocks', 'crypto', 'forex', 'etfs'] as const).map(tab => (
                   <button
-                    key={tier.label}
-                    onClick={() => setPriceTier(tier)}
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors duration-150 ${
-                      priceTier.label === tier.label
-                        ? "bg-[var(--accent-primary)] text-white"
-                        : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)]"
+                    key={tab}
+                    onClick={() => setAssetClass(tab)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      assetClass === tab
+                        ? 'bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/30'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
                     }`}
                   >
-                    {tier.label}
+                    {tab === 'etfs' ? 'ETFs' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                   </button>
                 ))}
               </div>
+
+              {/* Dynamic Filters */}
+              <div className="flex gap-1 flex-wrap">
+                {assetClass === 'stocks' ? (
+                  PRICE_TIERS.map(tier => (
+                    <button
+                      key={tier.label}
+                      onClick={() => setPriceTier(tier)}
+                      className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors duration-150 ${
+                        priceTier.label === tier.label
+                          ? "bg-[var(--accent-primary)] text-white"
+                          : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)]"
+                      }`}
+                    >
+                      {tier.label}
+                    </button>
+                  ))
+                ) : (
+                  ASSET_FILTER_OPTIONS[assetClass].map(filter => (
+                    <button
+                      key={filter}
+                      onClick={() => setActiveFilter(filter)}
+                      className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors duration-150 ${
+                        activeFilter === filter
+                          ? "bg-[var(--accent-primary)] text-white"
+                          : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)]"
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
-              {currentMovers.slice(0, 10).map((mover) => (
-                <button
-                  key={`${moversTab}-${mover.ticker}`}
-                  onClick={() => handleAnalyzeTicker(mover.ticker, mover.name, mover.price, mover.changePercent)}
-                  className="flex w-full items-center justify-between rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 transition-all duration-150 hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)] active:scale-[0.98] min-h-[44px]"
-                >
-                  <div className="flex items-center gap-2 text-left">
-                    <LogoImg symbol={mover.ticker} size={18} />
-                    <div>
-                      <div className="font-mono text-sm font-semibold text-[var(--text-primary)]">{mover.ticker}</div>
-                      <div className="text-xs font-mono tabular-nums text-[var(--text-muted)]">${mover.price.toFixed(2)}</div>
+
+            {/* Loading state for non-stock data */}
+            {(assetClass !== 'stocks' && assetLoading) ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent-muted)] border-t-[var(--accent-primary)]" />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {currentMovers.map((mover) => (
+                  <button
+                    key={`${assetClass}-${moversTab}-${mover.ticker}`}
+                    onClick={() => {
+                      const prompts: Record<AssetClass, string> = {
+                        stocks: `Analyze ${mover.ticker} — it's ${mover.changePercent >= 0 ? 'up' : 'down'} ${Math.abs(mover.changePercent).toFixed(2)}% today at $${mover.price.toFixed(2)}. What's driving this move? Is there follow-through potential or is this a fade?`,
+                        crypto: `Analyze ${mover.ticker} — it's ${mover.changePercent >= 0 ? 'up' : 'down'} ${Math.abs(mover.changePercent).toFixed(2)}% today. What's driving the move in crypto?`,
+                        forex: `Analyze ${mover.ticker.slice(0, 3)}/${mover.ticker.slice(3)} — the pair is ${mover.changePercent >= 0 ? 'up' : 'down'} ${Math.abs(mover.changePercent).toFixed(2)}%. What's the macro driver?`,
+                        etfs: `Analyze ${mover.ticker} (${mover.name}) — the ETF is ${mover.changePercent >= 0 ? 'up' : 'down'} ${Math.abs(mover.changePercent).toFixed(2)}%. What sectors or themes is this reflecting?`,
+                      }
+                      openWithPrompt(mover.ticker, prompts[assetClass], 'morning')
+                    }}
+                    className="flex w-full items-center justify-between rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 transition-all duration-150 hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)] active:scale-[0.98] min-h-[44px]"
+                  >
+                    <div className="flex items-center gap-2 text-left">
+                      {assetClass === 'stocks' ? (
+                        <LogoImg symbol={mover.ticker} size={18} />
+                      ) : (
+                        <div className="w-[18px] h-[18px] rounded-full bg-[var(--accent-primary)]/20 flex items-center justify-center text-[10px] font-bold text-[var(--accent-primary)]">
+                          {assetClass === 'forex' ? mover.ticker.slice(0, 2) : mover.ticker.slice(0, 1)}
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-mono text-sm font-semibold text-[var(--text-primary)]">
+                          {assetClass === 'forex' ? `${mover.ticker.slice(0, 3)}/${mover.ticker.slice(3)}` : mover.ticker}
+                        </div>
+                        <div className="text-xs font-mono tabular-nums text-[var(--text-muted)]">
+                          {assetClass === 'forex'
+                            ? mover.price.toFixed(4)
+                            : mover.price < 1
+                              ? `$${mover.price.toFixed(4)}`
+                              : `$${mover.price.toFixed(2)}`}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <DataCell
-                    value={`${mover.changePercent >= 0 ? "+" : ""}${mover.changePercent.toFixed(2)}`}
-                    sentiment={mover.changePercent >= 0 ? 'positive' : 'negative'}
-                    suffix="%"
-                    size="sm"
-                  />
-                </button>
-              ))}
-              {currentMovers.length === 0 && !moversLoading && (
-                <p className="text-sm text-[var(--text-muted)] text-center py-4">
-                  No {moversTab} in the {priceTier.label} range today
-                </p>
-              )}
-            </div>
+                    <DataCell
+                      value={`${mover.changePercent >= 0 ? "+" : ""}${mover.changePercent.toFixed(2)}`}
+                      sentiment={mover.changePercent >= 0 ? 'positive' : 'negative'}
+                      suffix="%"
+                      size="sm"
+                    />
+                  </button>
+                ))}
+                {currentMovers.length === 0 && !moversLoading && !assetLoading && (
+                  <p className="text-sm text-[var(--text-muted)] text-center py-4">
+                    No {moversTab} in {assetClass === 'stocks' ? `the ${priceTier.label} range` : `${activeFilter}`} right now
+                  </p>
+                )}
+              </div>
+            )}
           </PelicanCard>
         </motion.div>
 
@@ -561,6 +724,11 @@ Please provide:
               </div>
             )}
           </PelicanCard>
+        </motion.div>
+
+        {/* Market Sessions */}
+        <motion.div variants={staggerItem}>
+          <MarketSessions />
         </motion.div>
 
         {/* Pelican Brief */}
