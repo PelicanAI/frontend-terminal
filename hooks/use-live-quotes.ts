@@ -35,7 +35,7 @@ function isMarketHours(): boolean {
 }
 
 export function useLiveQuotes(tickers: string[]): UseLiveQuotesReturn {
-  const tickerKey = tickers.sort().join(',')
+  const tickerKey = [...tickers].sort().join(',')
 
   const { data, error, isLoading, mutate } = useSWR<Record<string, Quote>>(
     tickerKey ? ['live-quotes', tickerKey] : null,
@@ -48,8 +48,8 @@ export function useLiveQuotes(tickers: string[]): UseLiveQuotesReturn {
     },
     {
       refreshInterval: isMarketHours() ? 60000 : 300000, // 60s market hours, 5min after
-      revalidateOnFocus: true,
-      dedupingInterval: 15000,
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
     }
   )
 

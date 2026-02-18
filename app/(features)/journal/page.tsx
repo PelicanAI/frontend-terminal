@@ -16,14 +16,19 @@ import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
 import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
 import { PageHeader, PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/pelican"
-import { Plus, ChartBar, Funnel } from "@phosphor-icons/react"
+import { Plus, ChartBar, Funnel, CalendarBlank } from "@phosphor-icons/react"
 
 const PositionsDashboardTab = dynamicImport(
   () => import("@/components/positions/positions-dashboard-tab").then((m) => ({ default: m.PositionsDashboardTab })),
   { ssr: false }
 )
 
-type TabKey = 'dashboard' | 'trades'
+const CalendarTab = dynamicImport(
+  () => import("@/components/positions/calendar-tab").then((m) => ({ default: m.CalendarTab })),
+  { ssr: false }
+)
+
+type TabKey = 'dashboard' | 'trades' | 'calendar'
 type ActivePanel = 'detail' | 'pelican' | null
 
 export default function JournalPage() {
@@ -260,6 +265,20 @@ export default function JournalPage() {
             <Funnel size={16} weight={activeTab === 'trades' ? 'fill' : 'regular'} />
             Trades
           </button>
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={`
+              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
+              ${
+                activeTab === 'calendar'
+                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
+              }
+            `}
+          >
+            <CalendarBlank size={16} weight={activeTab === 'calendar' ? 'fill' : 'regular'} />
+            Calendar
+          </button>
         </div>
       </div>
 
@@ -308,6 +327,22 @@ export default function JournalPage() {
                   onSelectTrade={handleSelectTrade}
                   onScanTrade={handleScanTrade}
                   selectedTradeId={selectedTrade?.id}
+                />
+              </motion.div>
+            )}
+
+            {activeTab === 'calendar' && (
+              <motion.div
+                key="calendar"
+                variants={tabContent}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <CalendarTab
+                  trades={filteredTrades}
+                  isLoading={tradesLoading}
+                  onOpenLogTrade={() => setShowLogTradeModal(true)}
                 />
               </motion.div>
             )}

@@ -102,8 +102,8 @@ export function useTrades({
       return data as Trade[]
     },
     {
-      revalidateOnFocus: true,
-      dedupingInterval: 5000,
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
     }
   )
 
