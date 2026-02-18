@@ -53,6 +53,20 @@ export interface UseTradeStatsReturn {
   refetch: () => void
 }
 
+// Shared SWR config for RPC-backed hooks.
+// Prevents infinite retry loops when PostgREST returns 404 (stale schema cache)
+// or 403 (auth issue). Caps other errors at 3 retries with exponential backoff.
+const rpcSwrConfig = {
+  revalidateOnFocus: false,
+  dedupingInterval: 30000,
+  onErrorRetry: (error: any, _key: string, _config: any, revalidate: any, { retryCount }: { retryCount: number }) => {
+    if (error?.status === 404) return
+    if (error?.status === 403) return
+    if (retryCount >= 3) return
+    setTimeout(() => revalidate({ retryCount }), 5000 * Math.pow(2, retryCount))
+  },
+}
+
 /**
  * Hook for fetching trade statistics
  *
@@ -76,10 +90,7 @@ export function useTradeStats({
       if (error) throw error
       return data as TradeStats
     },
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000,
-    }
+    rpcSwrConfig,
   )
 
   // Fetch setup stats
@@ -93,10 +104,7 @@ export function useTradeStats({
       if (error) throw error
       return (data as SetupStats[]) || []
     },
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000,
-    }
+    rpcSwrConfig,
   )
 
   // Fetch day of week stats
@@ -110,10 +118,7 @@ export function useTradeStats({
       if (error) throw error
       return (data as DayOfWeekStats[]) || []
     },
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000,
-    }
+    rpcSwrConfig,
   )
 
   // Fetch equity curve
@@ -127,10 +132,7 @@ export function useTradeStats({
       if (error) throw error
       return (data as EquityCurvePoint[]) || []
     },
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 30000,
-    }
+    rpcSwrConfig,
   )
 
   const isLoading = statsLoading || setupLoading || dayLoading || curveLoading
