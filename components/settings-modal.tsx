@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { User } from "@phosphor-icons/react"
+import { User, UserCircle, ClipboardText } from "@phosphor-icons/react"
 
 interface SettingsModalProps {
   open: boolean
@@ -74,14 +74,28 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
 
           <Separator className="bg-[var(--border-subtle)]" />
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <h3 className="text-sm font-medium text-[var(--foreground)]">Account</h3>
             <button
               onClick={() => { onOpenChange(false); router.push('/profile') }}
               className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
             >
               <User weight="regular" className="w-4 h-4" />
-              Profile
+              Account
+            </button>
+            <button
+              onClick={() => { onOpenChange(false); router.push('/journal?tab=profile') }}
+              className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
+            >
+              <UserCircle weight="regular" className="w-4 h-4" />
+              Trader Profile
+            </button>
+            <button
+              onClick={() => { onOpenChange(false); router.push('/journal?tab=plan') }}
+              className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
+            >
+              <ClipboardText weight="regular" className="w-4 h-4" />
+              Trading Plan
             </button>
           </div>
 

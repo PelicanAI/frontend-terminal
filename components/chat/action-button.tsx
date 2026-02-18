@@ -12,6 +12,9 @@ import {
   ClipboardText,
   SquaresFour,
   GitBranch,
+  Brain,
+  Shield,
+  ChartLineUp,
 } from '@phosphor-icons/react'
 import type { MessageAction, ActionType } from '@/types/action-buttons'
 import type { IconWeight } from '@phosphor-icons/react'
@@ -29,6 +32,9 @@ const ACTION_ICONS: Record<ActionType, { icon: React.ElementType; weight?: IconW
   show_heatmap: { icon: SquaresFour },
   show_correlations: { icon: GitBranch },
   save_insight: { icon: ClipboardText },
+  analyze_behavior: { icon: Brain },
+  check_plan: { icon: Shield },
+  review_trade_vs_plan: { icon: ChartLineUp },
 }
 
 interface ActionButtonProps {

@@ -16,7 +16,7 @@ import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
 import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
 import { PageHeader, PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/pelican"
-import { Plus, ChartBar, Funnel, CalendarBlank } from "@phosphor-icons/react"
+import { Plus, ChartBar, Funnel, CalendarBlank, UserCircle, ClipboardText } from "@phosphor-icons/react"
 
 const PositionsDashboardTab = dynamicImport(
   () => import("@/components/positions/positions-dashboard-tab").then((m) => ({ default: m.PositionsDashboardTab })),
@@ -28,7 +28,17 @@ const CalendarTab = dynamicImport(
   { ssr: false }
 )
 
-type TabKey = 'dashboard' | 'trades' | 'calendar'
+const TraderProfileTab = dynamicImport(
+  () => import("@/components/journal/trader-profile-tab"),
+  { ssr: false }
+)
+
+const TradingPlanTab = dynamicImport(
+  () => import("@/components/journal/trading-plan-tab").then((m) => ({ default: m.TradingPlanTab })),
+  { ssr: false }
+)
+
+type TabKey = 'dashboard' | 'trades' | 'calendar' | 'profile' | 'plan'
 type ActivePanel = 'detail' | 'pelican' | null
 
 export default function JournalPage() {
@@ -41,6 +51,14 @@ export default function JournalPage() {
   const [tradeTypeFilter, setTradeTypeFilter] = useState<'all' | 'real' | 'paper'>('all')
 
   const { trades, isLoading: tradesLoading, logTrade, closeTrade, refetch, updateTrade } = useTrades()
+
+  // Handle ?tab= from settings modal links
+  const tabParam = searchParams.get('tab') as TabKey | null
+  useEffect(() => {
+    if (tabParam && ['dashboard', 'trades', 'calendar', 'profile', 'plan'].includes(tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam])
 
   // Handle ?highlight=tradeId from chat action buttons
   const highlightTradeId = searchParams.get('highlight')
@@ -179,6 +197,10 @@ export default function JournalPage() {
     handleCloseDetailPanel()
   }
 
+  const handleAskPelican = async (prompt: string) => {
+    await openWithPrompt(null, prompt, "journal")
+  }
+
   const showDetailPanel = activePanel === 'detail' && selectedTrade !== null
 
   const filterButtons = ['all', 'real', 'paper'] as const
@@ -279,6 +301,34 @@ export default function JournalPage() {
             <CalendarBlank size={16} weight={activeTab === 'calendar' ? 'fill' : 'regular'} />
             Calendar
           </button>
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`
+              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
+              ${
+                activeTab === 'profile'
+                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
+              }
+            `}
+          >
+            <UserCircle size={16} weight={activeTab === 'profile' ? 'fill' : 'regular'} />
+            Profile
+          </button>
+          <button
+            onClick={() => setActiveTab('plan')}
+            className={`
+              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
+              ${
+                activeTab === 'plan'
+                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
+              }
+            `}
+          >
+            <ClipboardText size={16} weight={activeTab === 'plan' ? 'fill' : 'regular'} />
+            Plan
+          </button>
         </div>
       </div>
 
@@ -343,6 +393,38 @@ export default function JournalPage() {
                   trades={filteredTrades}
                   isLoading={tradesLoading}
                   onOpenLogTrade={() => setShowLogTradeModal(true)}
+                />
+              </motion.div>
+            )}
+
+            {activeTab === 'profile' && (
+              <motion.div
+                key="profile"
+                variants={tabContent}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <TraderProfileTab
+                  trades={trades}
+                  stats={stats}
+                  isLoading={tradesLoading || statsLoading}
+                  onAskPelican={handleAskPelican}
+                />
+              </motion.div>
+            )}
+
+            {activeTab === 'plan' && (
+              <motion.div
+                key="plan"
+                variants={tabContent}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <TradingPlanTab
+                  trades={trades}
+                  onAskPelican={handleAskPelican}
                 />
               </motion.div>
             )}

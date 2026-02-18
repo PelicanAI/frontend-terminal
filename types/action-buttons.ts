@@ -11,6 +11,9 @@ export type ActionType =
   | 'show_heatmap'
   | 'show_correlations'
   | 'save_insight'
+  | 'analyze_behavior'
+  | 'check_plan'
+  | 'review_trade_vs_plan'
 
 export interface MessageAction {
   id: string

@@ -170,6 +170,21 @@ export function resolveActions(
     })
   }
 
+  // Plan & profile actions (always available)
+  actions.push({
+    id: 'analyze-behavior',
+    type: 'analyze_behavior',
+    label: 'Analyze My Trading',
+    priority: 15,
+  })
+
+  actions.push({
+    id: 'check-plan',
+    type: 'check_plan',
+    label: 'Check My Plan',
+    priority: 16,
+  })
+
   // Always available
   actions.push({
     id: 'save-insight',

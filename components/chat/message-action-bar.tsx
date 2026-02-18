@@ -173,6 +173,24 @@ export function MessageActionBar({
           })
           break
         }
+
+        case 'analyze_behavior': {
+          onSubmitPrompt('Analyze my recent trading behavior. Look at my win rate, risk management, streaks, and any patterns you notice. Give me specific, actionable feedback.')
+          break
+        }
+
+        case 'check_plan': {
+          onSubmitPrompt('Check my current trading plan compliance. Am I following my rules? How many open positions do I have vs my limits? Have I hit any daily loss limits?')
+          break
+        }
+
+        case 'review_trade_vs_plan': {
+          const reviewTrade = allTrades.find(t => t.id === action.tradeId)
+          if (reviewTrade) {
+            onSubmitPrompt(`Review my ${reviewTrade.ticker} ${reviewTrade.direction} trade against my trading plan. Did I follow my rules? Was the position sizing appropriate? Grade this trade.`)
+          }
+          break
+        }
       }
     } catch (err) {
       console.error(`Action ${action.type} failed:`, err)

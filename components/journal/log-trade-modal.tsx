@@ -1,10 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { TickerAutocomplete } from "./ticker-autocomplete"
-import { TradeFormData } from "@/hooks/use-trades"
+import { TradeFormData, useTrades } from "@/hooks/use-trades"
+import { useTradingPlan } from "@/hooks/use-trading-plan"
+import { checkTradeAgainstPlan } from "@/lib/trading/plan-check"
 import { PelicanButton } from "@/components/ui/pelican"
+import { Warning, Shield, Check } from "@phosphor-icons/react"
+import type { PlanViolation } from "@/types/trading"
 
 interface LogTradeModalProps {
   open: boolean
@@ -18,6 +22,11 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
   const [error, setError] = useState<string | null>(null)
   const [ticker, setTicker] = useState(initialTicker)
   const [assetType, setAssetType] = useState('stock')
+  const [checklistChecked, setChecklistChecked] = useState<boolean[]>([])
+
+  // Plan integration
+  const { plan } = useTradingPlan()
+  const { trades: existingTrades } = useTrades()
 
   // Sync ticker when initialTicker changes (e.g., opened from different action buttons)
   useEffect(() => {
@@ -470,6 +479,23 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
             </label>
           </div>
 
+          {/* Plan Violations & Checklist */}
+          <PlanCheckSection
+            plan={plan}
+            existingTrades={existingTrades}
+            ticker={ticker}
+            assetType={assetType}
+            direction={direction}
+            quantity={quantity}
+            entryPrice={entryPrice}
+            stopLoss={stopLoss}
+            takeProfit={takeProfit}
+            thesis={thesis}
+            setupTags={setupTags}
+            checklistChecked={checklistChecked}
+            onChecklistChange={setChecklistChecked}
+          />
+
           {/* Submit Buttons */}
           <div className="flex gap-3 pt-4">
             <PelicanButton
@@ -495,5 +521,130 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+// ── Plan Check Section (inline sub-component) ──
+
+function PlanCheckSection({
+  plan,
+  existingTrades,
+  ticker,
+  assetType,
+  direction,
+  quantity,
+  entryPrice,
+  stopLoss,
+  takeProfit,
+  thesis,
+  setupTags,
+  checklistChecked,
+  onChecklistChange,
+}: {
+  plan: ReturnType<typeof useTradingPlan>['plan']
+  existingTrades: ReturnType<typeof useTrades>['trades']
+  ticker: string
+  assetType: string
+  direction: 'long' | 'short'
+  quantity: string
+  entryPrice: string
+  stopLoss: string
+  takeProfit: string
+  thesis: string
+  setupTags: string
+  checklistChecked: boolean[]
+  onChecklistChange: (checked: boolean[]) => void
+}) {
+  const planCheck = useMemo(() => {
+    if (!plan || !ticker || !quantity || !entryPrice) return null
+
+    const tags = setupTags.split(',').map(t => t.trim()).filter(Boolean)
+
+    return checkTradeAgainstPlan(
+      {
+        ticker,
+        asset_type: assetType,
+        direction,
+        quantity: parseFloat(quantity),
+        entry_price: parseFloat(entryPrice),
+        stop_loss: stopLoss ? parseFloat(stopLoss) : null,
+        take_profit: takeProfit ? parseFloat(takeProfit) : null,
+        entry_date: new Date().toISOString(),
+        thesis: thesis || null,
+        setup_tags: tags.length > 0 ? tags : undefined,
+      },
+      plan,
+      existingTrades,
+    )
+  }, [plan, existingTrades, ticker, assetType, direction, quantity, entryPrice, stopLoss, takeProfit, thesis, setupTags])
+
+  // Initialize checklist state when plan changes
+  useEffect(() => {
+    if (planCheck?.checklistItems) {
+      onChecklistChange(new Array(planCheck.checklistItems.length).fill(false))
+    }
+  }, [planCheck?.checklistItems.length])
+
+  if (!plan || !planCheck) return null
+
+  const hasViolations = planCheck.violations.length > 0
+  const hasChecklist = planCheck.checklistItems.length > 0
+
+  if (!hasViolations && !hasChecklist) return null
+
+  return (
+    <>
+      {/* Plan Violations */}
+      {hasViolations && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)]">
+            <Shield size={14} weight="bold" />
+            Plan Check: &ldquo;{plan.name}&rdquo;
+          </div>
+          {planCheck.violations.map((v, i) => (
+            <div
+              key={i}
+              className={`flex items-start gap-2 px-3 py-2 rounded-lg text-xs ${
+                v.severity === 'violation'
+                  ? 'bg-[var(--data-negative)]/10 border border-[var(--data-negative)]/20 text-[var(--data-negative)]'
+                  : 'bg-[var(--data-warning)]/10 border border-[var(--data-warning)]/20 text-[var(--data-warning)]'
+              }`}
+            >
+              <Warning size={14} weight="bold" className="flex-shrink-0 mt-0.5" />
+              <span>{v.rule_text}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Pre-Entry Checklist */}
+      {hasChecklist && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)]">
+            <Check size={14} weight="bold" />
+            Pre-Entry Checklist
+          </div>
+          <div className="space-y-1.5 p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+            {planCheck.checklistItems.map((item, i) => (
+              <label key={i} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={checklistChecked[i] ?? false}
+                  onChange={(e) => {
+                    const next = [...checklistChecked]
+                    next[i] = e.target.checked
+                    onChecklistChange(next)
+                  }}
+                  className="w-3.5 h-3.5 rounded border-[var(--border-default)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)] focus:ring-offset-0 bg-[var(--bg-surface)]"
+                />
+                <span className={`text-xs ${checklistChecked[i] ? 'text-[var(--text-muted)] line-through' : 'text-[var(--text-primary)]'}`}>
+                  {item.text}
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   )
 }
