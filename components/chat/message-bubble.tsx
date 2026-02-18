@@ -48,7 +48,7 @@ interface MessageBubbleProps {
   onOpenLogTrade?: (ticker: string) => void
   onOpenCloseTrade?: (tradeId: string) => void
   onSubmitPrompt?: (prompt: string) => void
-  onOpenChart?: (ticker: string) => void
+  onSaveInsight?: (content: string, tickers: string[]) => Promise<boolean>
 }
 
 export const MessageBubble = memo(function MessageBubble({
@@ -67,7 +67,7 @@ export const MessageBubble = memo(function MessageBubble({
   onOpenLogTrade,
   onOpenCloseTrade,
   onSubmitPrompt,
-  onOpenChart,
+  onSaveInsight,
 }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -289,7 +289,7 @@ export const MessageBubble = memo(function MessageBubble({
             </div>
 
             {/* Action buttons — only for completed assistant messages */}
-            {!isStreaming && allTrades && watchlistItems && onAddToWatchlist && onRemoveFromWatchlist && onOpenLogTrade && onOpenCloseTrade && onSubmitPrompt && onOpenChart && (
+            {!isStreaming && allTrades && watchlistItems && onAddToWatchlist && onRemoveFromWatchlist && onOpenLogTrade && onOpenCloseTrade && onSubmitPrompt && onSaveInsight && (
               <MessageActionBar
                 content={message.content}
                 role={message.role}
@@ -303,7 +303,7 @@ export const MessageBubble = memo(function MessageBubble({
                 onOpenLogTrade={onOpenLogTrade}
                 onOpenCloseTrade={onOpenCloseTrade}
                 onSubmitPrompt={onSubmitPrompt}
-                onOpenChart={onOpenChart}
+                onSaveInsight={onSaveInsight}
               />
             )}
           </div>

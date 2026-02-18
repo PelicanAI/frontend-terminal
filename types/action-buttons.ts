@@ -6,9 +6,10 @@ export type ActionType =
   | 'log_trade'
   | 'add_watchlist'
   | 'remove_watchlist'
-  | 'open_chart'
   | 'deep_dive'
   | 'compare'
+  | 'show_heatmap'
+  | 'show_correlations'
   | 'save_insight'
 
 export interface MessageAction {

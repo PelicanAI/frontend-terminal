@@ -7,10 +7,11 @@ import {
   ClockCounterClockwise,
   NotePencil,
   Star,
-  ChartLineUp,
   ArrowsOutSimple,
   ArrowsLeftRight,
   ClipboardText,
+  SquaresFour,
+  GitBranch,
 } from '@phosphor-icons/react'
 import type { MessageAction, ActionType } from '@/types/action-buttons'
 import type { IconWeight } from '@phosphor-icons/react'
@@ -23,9 +24,10 @@ const ACTION_ICONS: Record<ActionType, { icon: React.ElementType; weight?: IconW
   log_trade: { icon: NotePencil },
   add_watchlist: { icon: Star },
   remove_watchlist: { icon: Star, weight: 'fill' },
-  open_chart: { icon: ChartLineUp },
   deep_dive: { icon: ArrowsOutSimple },
   compare: { icon: ArrowsLeftRight },
+  show_heatmap: { icon: SquaresFour },
+  show_correlations: { icon: GitBranch },
   save_insight: { icon: ClipboardText },
 }
 

@@ -26,10 +26,14 @@ import {
   CaretLeft,
   Sun,
   Moon,
+  BookmarkSimple,
+  CaretDown,
+  CaretUp,
 } from "@phosphor-icons/react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { useConversations } from "@/hooks/use-conversations"
+import { useSavedInsights } from "@/hooks/use-saved-insights"
 import Link from "next/link"
 import { useT } from "@/lib/providers/translation-provider"
 import { useAuth } from "@/lib/providers/auth-provider"
@@ -218,6 +222,8 @@ export function ConversationSidebar({
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [showSignOutDialog, setShowSignOutDialog] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [insightsExpanded, setInsightsExpanded] = useState(false)
+  const { items: savedInsights, deleteInsight } = useSavedInsights()
 
   useEffect(() => {
     const supabase = createClient()
@@ -376,6 +382,57 @@ export function ConversationSidebar({
           </div>
         )}
       </div>
+
+      {/* Saved Insights */}
+      {savedInsights.length > 0 && (
+        <div className="border-b border-sidebar-border/30">
+          <button
+            onClick={() => setInsightsExpanded(!insightsExpanded)}
+            className="flex items-center justify-between w-full px-4 py-2 text-[10px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider hover:bg-[var(--surface-hover)] transition-colors"
+          >
+            <span className="flex items-center gap-1.5">
+              <BookmarkSimple size={12} weight="bold" />
+              Saved Insights ({savedInsights.length})
+            </span>
+            {insightsExpanded ? <CaretUp size={10} /> : <CaretDown size={10} />}
+          </button>
+          {insightsExpanded && (
+            <div className="px-2 pb-2 space-y-1 max-h-[200px] overflow-y-auto">
+              {savedInsights.slice(0, 10).map(insight => (
+                <div
+                  key={insight.id}
+                  className="group flex items-start gap-2 px-2 py-1.5 rounded-md hover:bg-[var(--surface-hover)] transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-[var(--text-primary)] line-clamp-2 leading-snug">
+                      {insight.content.slice(0, 120)}{insight.content.length > 120 ? '…' : ''}
+                    </p>
+                    {insight.tickers.length > 0 && (
+                      <div className="flex gap-1 mt-0.5">
+                        {insight.tickers.slice(0, 3).map(t => (
+                          <span key={t} className="text-[10px] font-mono text-[var(--accent-indigo)]">
+                            ${t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      deleteInsight(insight.id)
+                    }}
+                    className="p-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity text-[var(--text-muted)] hover:text-red-400"
+                    title="Remove insight"
+                  >
+                    <Trash size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Conversations List */}
       <ScrollArea className="flex-1 min-h-0">

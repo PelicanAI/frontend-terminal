@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { X, TrendUp, TrendDown, CalendarBlank, ChatCircleDots } from '@phosphor-icons/react'
 import { RollingChart } from './rolling-chart'
 import { findSignalForPair } from '@/lib/correlation-signals'
 import { useCorrelationPair } from '@/hooks/use-correlations'
+import { usePelicanPanelContext } from '@/providers/pelican-panel-provider'
 import type { CorrelationAsset } from '@/types/correlations'
 
 interface PairDetailPanelProps {
@@ -73,7 +73,7 @@ export function PairDetailPanel({
   assetA, assetB, assets, beginnerMode, onClose,
 }: PairDetailPanelProps) {
   const [activePeriod, setActivePeriod] = useState<'30d' | '90d' | '1y'>('30d')
-  const router = useRouter()
+  const { openWithPrompt } = usePelicanPanelContext()
 
   const { data: pairData, isLoading } = useCorrelationPair(assetA, assetB)
   const correlations = pairData?.pair ?? []
@@ -98,12 +98,20 @@ export function PairDetailPanel({
   if (!currentData) return null
 
   const handleAskPelican = () => {
-    const prompt = `Analyze the current ${assetA}/${assetB} correlation for me. ` +
-      `The ${activePeriod} correlation is ${currentData.correlation.toFixed(3)} ` +
-      `(historical mean: ${currentData.historical_mean.toFixed(3)}, z-score: ${currentData.z_score.toFixed(1)}σ, regime: ${currentData.regime}). ` +
-      `What does this tell us about current market conditions? Any actionable implications for traders?`
-    sessionStorage.setItem('pelican_chat_prompt', prompt)
-    router.push('/chat')
+    const visibleMessage = `Analyze the ${nameA} / ${nameB} correlation`
+    const fullPrompt = [
+      `Analyze the current ${nameA} (${assetA}) / ${nameB} (${assetB}) correlation.`,
+      `Period: ${activePeriod === '1y' ? '1 Year' : activePeriod === '90d' ? '90 Day' : '30 Day'}.`,
+      `Current correlation: ${currentData.correlation.toFixed(3)}.`,
+      `Historical mean: ${currentData.historical_mean.toFixed(3)}.`,
+      `Z-Score: ${currentData.z_score.toFixed(1)}σ.`,
+      `Regime: ${currentData.regime}.`,
+      signal ? `Known signal: "${signal.name}" — ${signal.description}` : null,
+      signal ? `Bullish when: ${signal.bullish_when}. Bearish when: ${signal.bearish_when}.` : null,
+      `What does this tell us about current market conditions? Is this a normal relationship or an anomaly worth monitoring? Any actionable implications for traders?`,
+    ].filter(Boolean).join(' ')
+
+    openWithPrompt(null, { visibleMessage, fullPrompt }, 'correlations')
   }
 
   return (

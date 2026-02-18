@@ -26,7 +26,7 @@ import type { Message } from '@/lib/chat-utils'
 // TYPES
 // =============================================================================
 
-export type PelicanPanelContext = 'heatmap' | 'earnings' | 'journal' | 'morning' | 'brief' | 'search' | null
+export type PelicanPanelContext = 'heatmap' | 'earnings' | 'journal' | 'morning' | 'brief' | 'search' | 'correlations' | null
 
 interface PelicanPanelState {
   isOpen: boolean

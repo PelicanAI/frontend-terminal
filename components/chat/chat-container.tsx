@@ -45,7 +45,7 @@ interface ChatContainerProps {
   onOpenLogTrade?: (ticker: string) => void
   onOpenCloseTrade?: (tradeId: string) => void
   onSubmitPrompt?: (prompt: string) => void
-  onOpenChart?: (ticker: string) => void
+  onSaveInsight?: (content: string, tickers: string[]) => Promise<boolean>
 }
 
 export function ChatContainer({
@@ -70,7 +70,7 @@ export function ChatContainer({
   onOpenLogTrade,
   onOpenCloseTrade,
   onSubmitPrompt,
-  onOpenChart,
+  onSaveInsight,
 }: ChatContainerProps) {
   const { toast } = useToast()
   const elapsedSeconds = useResponseTimer(isLoading)
@@ -420,7 +420,7 @@ export function ChatContainer({
                     onOpenLogTrade={onOpenLogTrade}
                     onOpenCloseTrade={onOpenCloseTrade}
                     onSubmitPrompt={onSubmitPrompt}
-                    onOpenChart={onOpenChart}
+                    onSaveInsight={onSaveInsight}
                   />
                 </motion.div>
               )

@@ -32,6 +32,7 @@ import { LearningModeToggle } from "@/components/chat/LearningModeToggle"
 import { ChatCreditCounter } from "@/components/chat/credit-counter"
 import { useTrades } from "@/hooks/use-trades"
 import { useWatchlist } from "@/hooks/use-watchlist"
+import { useSavedInsights } from "@/hooks/use-saved-insights"
 import type { ActionTrade } from "@/types/action-buttons"
 
 const SettingsModal = dynamic(() => import("@/components/settings-modal").then(m => ({ default: m.SettingsModal })))
@@ -101,11 +102,7 @@ function MobileChartSheet() {
   )
 }
 
-// Bridge useChart into ChatContainer (useChart must be inside ChartProvider)
-function ChatContainerWithChart(props: React.ComponentProps<typeof ChatContainer>) {
-  const { showChart } = useChart()
-  return <ChatContainer {...props} onOpenChart={showChart} />
-}
+// ChatContainerWithChart removed — onOpenChart prop eliminated (tickers are clickable inline)
 
 function LearningAwareTradingPanel(props: React.ComponentProps<typeof TradingContextPanel>) {
   const { enabled, selectedTerm, clearTerm, learnTabActive, setLearnTabActive } = useLearningMode()
@@ -137,6 +134,7 @@ export default function ChatPage() {
   // Action buttons — shared state
   const { trades: allTradesRaw, closeTrade: closeTradeAction, logTrade: logTradeAction } = useTrades()
   const { asActionItems: watchlistItems, addToWatchlist, removeFromWatchlist } = useWatchlist()
+  const { saveInsight } = useSavedInsights()
   const allTrades: ActionTrade[] = useMemo(
     () => allTradesRaw.map(t => ({
       id: t.id,
@@ -300,6 +298,13 @@ export default function ChatPage() {
 
   // Get conversation ID from URL
   const conversationIdFromUrl = searchParams.get("conversation")
+
+  const handleSaveInsight = useCallback(async (content: string, tickers: string[]) => {
+    return saveInsight(content, {
+      tickers,
+      conversationId: conversationIdFromUrl || undefined,
+    })
+  }, [saveInsight, conversationIdFromUrl])
 
   const {
     messages,
@@ -672,7 +677,7 @@ export default function ChatPage() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto overscroll-none pb-[120px] md:pb-0 chat-scroll-area">
             <div className="max-w-5xl mx-auto w-full px-4 sm:px-6">
-              <ChatContainerWithChart
+              <ChatContainer
                 messages={messages}
                 isLoading={chatLoading}
                 isLoadingHistory={isLoadingMessages}
@@ -691,6 +696,7 @@ export default function ChatPage() {
                 onOpenLogTrade={handleOpenLogTrade}
                 onOpenCloseTrade={handleOpenCloseTrade}
                 onSubmitPrompt={messageHandler.handleSendMessage}
+                onSaveInsight={handleSaveInsight}
               />
             </div>
           </div>

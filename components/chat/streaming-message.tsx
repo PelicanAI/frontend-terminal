@@ -26,7 +26,7 @@ interface StreamingMessageProps {
   onOpenLogTrade?: (ticker: string) => void
   onOpenCloseTrade?: (tradeId: string) => void
   onSubmitPrompt?: (prompt: string) => void
-  onOpenChart?: (ticker: string) => void
+  onSaveInsight?: (content: string, tickers: string[]) => Promise<boolean>
 }
 
 export const StreamingMessage = React.memo(function StreamingMessage({
@@ -47,7 +47,7 @@ export const StreamingMessage = React.memo(function StreamingMessage({
   onOpenLogTrade,
   onOpenCloseTrade,
   onSubmitPrompt,
-  onOpenChart,
+  onSaveInsight,
 }: StreamingMessageProps) {
   // Defensive check - ensure content is always a string
   const safeContent = typeof message.content === 'string' ? message.content : String(message.content || '')
@@ -127,7 +127,7 @@ export const StreamingMessage = React.memo(function StreamingMessage({
         onOpenLogTrade={onOpenLogTrade}
         onOpenCloseTrade={onOpenCloseTrade}
         onSubmitPrompt={onSubmitPrompt}
-        onOpenChart={onOpenChart}
+        onSaveInsight={onSaveInsight}
       />
     </motion.div>
   )

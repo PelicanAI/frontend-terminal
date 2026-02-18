@@ -127,17 +127,9 @@ export function resolveActions(
     }
 
     actions.push({
-      id: `chart-${upper}`,
-      type: 'open_chart',
-      label: `Chart`,
-      ticker: upper,
-      priority: 4,
-    })
-
-    actions.push({
       id: `dive-${upper}`,
       type: 'deep_dive',
-      label: `Deep Dive`,
+      label: `Deep Dive ${upper}`,
       ticker: upper,
       priority: 6,
     })
@@ -153,6 +145,28 @@ export function resolveActions(
       label: `Compare ${t0} vs ${t1}`,
       compareTickers: [t0, t1],
       priority: 3,
+    })
+  }
+
+  // Cross-feature navigation
+  if (tickers.length > 0) {
+    actions.push({
+      id: 'show-heatmap',
+      type: 'show_heatmap',
+      label: 'Heatmap',
+      priority: 10,
+    })
+  }
+
+  if (tickers.length >= 2) {
+    const c0 = tickers[0]!
+    const c1 = tickers[1]!
+    actions.push({
+      id: `correlations-${c0}-${c1}`,
+      type: 'show_correlations',
+      label: `Correlations`,
+      compareTickers: [c0, c1],
+      priority: 10,
     })
   }
 

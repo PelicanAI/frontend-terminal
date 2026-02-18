@@ -66,8 +66,12 @@ export function useWatchlist() {
     mutate([optimistic, ...items], false)
 
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
+
       const insertData: Record<string, string | null> = {
         ticker: upper,
+        user_id: user.id,
       }
       if (conversationId) {
         insertData.conversation_id = conversationId

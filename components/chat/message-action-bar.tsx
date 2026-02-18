@@ -31,8 +31,8 @@ interface MessageActionBarProps {
   // Chat actions
   onSubmitPrompt: (prompt: string) => void
 
-  // Sidebar actions
-  onOpenChart: (ticker: string) => void
+  // Save insight
+  onSaveInsight: (content: string, tickers: string[]) => Promise<boolean>
 }
 
 export function MessageActionBar({
@@ -47,7 +47,7 @@ export function MessageActionBar({
   onOpenLogTrade,
   onOpenCloseTrade,
   onSubmitPrompt,
-  onOpenChart,
+  onSaveInsight,
 }: MessageActionBarProps) {
   const router = useRouter()
   const { toast } = useToast()
@@ -140,13 +140,6 @@ export function MessageActionBar({
           break
         }
 
-        case 'open_chart': {
-          if (action.ticker) {
-            onOpenChart(action.ticker)
-          }
-          break
-        }
-
         case 'deep_dive': {
           const prompt = `Give me a comprehensive deep dive on ${action.ticker}. Cover: current price action and trend, key support/resistance levels, recent news and catalysts, upcoming earnings or events, and your overall outlook with bull and bear cases.`
           onSubmitPrompt(prompt)
@@ -162,19 +155,22 @@ export function MessageActionBar({
           break
         }
 
+        case 'show_heatmap': {
+          router.push('/heatmap')
+          break
+        }
+
+        case 'show_correlations': {
+          router.push('/correlations')
+          break
+        }
+
         case 'save_insight': {
-          try {
-            await navigator.clipboard.writeText(content)
-            toast({ title: 'Insight copied to clipboard', duration: 2000 })
-          } catch {
-            const textarea = document.createElement('textarea')
-            textarea.value = content
-            document.body.appendChild(textarea)
-            textarea.select()
-            document.execCommand('copy')
-            document.body.removeChild(textarea)
-            toast({ title: 'Insight copied to clipboard', duration: 2000 })
-          }
+          const success = await onSaveInsight(content, detectedTickers)
+          toast({
+            title: success ? 'Insight saved' : 'Failed to save insight',
+            duration: 2000,
+          })
           break
         }
       }
@@ -184,9 +180,9 @@ export function MessageActionBar({
       setLoadingId(null)
     }
   }, [
-    router, allTrades, conversationId, content, toast,
+    router, allTrades, conversationId, content, toast, detectedTickers,
     onSubmitPrompt, onOpenLogTrade, onOpenCloseTrade,
-    onAddToWatchlist, onRemoveFromWatchlist, onOpenChart,
+    onAddToWatchlist, onRemoveFromWatchlist, onSaveInsight,
   ])
 
   if (actions.length === 0) return null
