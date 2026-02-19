@@ -107,8 +107,8 @@ export function TopNav({ className }: TopNavProps) {
                   className={cn(
                     "relative px-3 py-1.5 md:py-4 text-sm font-medium transition-colors duration-150 whitespace-nowrap flex-shrink-0 rounded-lg md:rounded-none active:scale-95",
                     isActive
-                      ? "text-[var(--text-primary)] bg-white/[0.06] md:bg-transparent"
-                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-white/[0.03]"
+                      ? "text-[var(--text-primary)] bg-[var(--surface-hover)] md:bg-transparent"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--surface-hover)]"
                   )}
                 >
                   {tab.label}

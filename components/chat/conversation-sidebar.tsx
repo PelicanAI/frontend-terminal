@@ -124,8 +124,8 @@ const ConversationItem = React.memo(function ConversationItem({
       data-conversation-id={conversation.id}
       className={cn(
         "w-full text-left px-3 py-2 rounded-lg transition-all duration-150 group relative mx-2",
-        isActive && "bg-white/[0.06] border-l-2 border-l-primary border-y border-r border-y-transparent border-r-transparent",
-        !isActive && "hover:bg-white/[0.04] border border-transparent",
+        isActive && "bg-[var(--surface-hover)] border-l-2 border-l-primary border-y border-r border-y-transparent border-r-transparent",
+        !isActive && "hover:bg-[var(--surface-hover)] border border-transparent",
         isNavigatingToThis && "opacity-50 cursor-wait",
       )}
       onClick={() => {
@@ -135,10 +135,10 @@ const ConversationItem = React.memo(function ConversationItem({
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="text-sm text-white/90 truncate font-medium">
+          <div className="text-sm text-foreground truncate font-medium">
             {conversation.title || newChatLabel}
           </div>
-          <div className="text-[10px] text-white/30 mt-0.5">
+          <div className="text-[10px] text-muted-foreground mt-0.5">
             {getRelativeTime(conversation.updated_at)}
           </div>
         </div>
@@ -461,7 +461,7 @@ export function ConversationSidebar({
         <div className="border-b border-sidebar-border/30">
           <button
             onClick={() => setSidebarView(sidebarView === 'insights' ? 'conversations' : 'insights')}
-            className="flex items-center justify-between w-full px-4 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider hover:bg-[var(--surface-hover)] transition-colors"
+            className="flex items-center justify-between w-full px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider hover:bg-[var(--surface-hover)] transition-colors"
           >
             <span className="flex items-center gap-1.5">
               <BookmarkSimple size={12} weight={sidebarView === 'insights' ? 'fill' : 'bold'} />
@@ -518,7 +518,7 @@ export function ConversationSidebar({
                 {/* Today */}
                 {groupedConversations.today.length > 0 && (
                   <div>
-                    <h4 className="px-4 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+                    <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Today
                     </h4>
                     <div className="space-y-1">
@@ -546,7 +546,7 @@ export function ConversationSidebar({
                 {/* Yesterday */}
                 {groupedConversations.yesterday.length > 0 && (
                   <div>
-                    <h4 className="px-4 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+                    <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Yesterday
                     </h4>
                     <div className="space-y-1">
@@ -574,7 +574,7 @@ export function ConversationSidebar({
                 {/* Previous 7 Days */}
                 {groupedConversations.previous7Days.length > 0 && (
                   <div>
-                    <h4 className="px-4 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+                    <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Previous 7 Days
                     </h4>
                     <div className="space-y-1">
@@ -602,7 +602,7 @@ export function ConversationSidebar({
                 {/* Previous 30 Days */}
                 {groupedConversations.previous30Days.length > 0 && (
                   <div>
-                    <h4 className="px-4 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+                    <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Previous 30 Days
                     </h4>
                     <div className="space-y-1">
@@ -630,7 +630,7 @@ export function ConversationSidebar({
                 {/* Older */}
                 {groupedConversations.older.length > 0 && (
                   <div>
-                    <h4 className="px-4 py-2 text-[11px] font-semibold text-white/40 uppercase tracking-wider">
+                    <h4 className="px-4 py-2 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Older
                     </h4>
                     <div className="space-y-1">

@@ -34,7 +34,7 @@ export function WelcomeScreen({ onQuickStart, disabled }: WelcomeScreenProps) {
           />
         </div>
 
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-balance text-white tracking-tight h-auto">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-balance text-foreground tracking-tight h-auto">
           {t.chat.welcomeTitle}
         </h1>
         <p className="text-base sm:text-lg text-foreground/70">
