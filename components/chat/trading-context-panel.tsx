@@ -1,7 +1,7 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, GraduationCap, ChartBar, CalendarBlank, BookOpen } from "@phosphor-icons/react"
+import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, GraduationCap } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -134,7 +134,7 @@ export function TradingContextPanel({
     return (
       <Card className="border-l-0 rounded-l-none bg-[var(--bg-surface)]/60 backdrop-blur-xl border-l border-[var(--border-subtle)] rounded-none border-y-0 border-r-0 overflow-hidden h-full flex flex-col">
         {activeMode === "learn" && (
-          <div className="flex items-center border-b border-[var(--border-subtle)] shrink-0">
+          <div className="flex items-center border-b border-border/20 shrink-0">
             <div className="flex flex-1">
               {tabs.map((tab) => {
                 const isActive = tab.key === "learn"
@@ -154,19 +154,16 @@ export function TradingContextPanel({
                       }
                     }}
                     className={cn(
-                      "flex-1 py-2.5 text-xs font-medium transition-all duration-150 border-b-2 relative",
+                      "flex-1 py-2.5 text-xs transition-colors duration-150 border-b-2 relative",
                       isActive
-                        ? "text-[var(--accent-primary)] border-[var(--accent-primary)]"
-                        : "text-[var(--text-muted)] border-transparent hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]"
+                        ? "text-foreground font-medium border-primary"
+                        : "text-muted-foreground border-transparent hover:text-foreground"
                     )}
                   >
-                    <span className="flex items-center justify-center gap-1">
-                      {tab.key === "market" && <ChartBar size={12} weight={isActive ? "fill" : "regular"} />}
-                      {tab.key === "calendar" && <CalendarBlank size={12} weight={isActive ? "fill" : "regular"} />}
-                      {tab.key === "learn" && <GraduationCap size={12} weight={isActive ? "fill" : "regular"} />}
+                    <span className="flex items-center justify-center gap-1.5">
                       {tab.label}
                       {tab.key === "learn" && selectedTerm && !learnTabActive && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                       )}
                     </span>
                   </button>
@@ -212,7 +209,7 @@ export function TradingContextPanel({
   return (
     <Card className="border-l-0 rounded-l-none bg-[var(--bg-surface)]/60 backdrop-blur-xl border-l border-[var(--border-subtle)] rounded-none border-y-0 border-r-0 overflow-hidden">
       {/* Tab bar */}
-      <div className="flex items-center border-b border-[var(--border-subtle)]">
+      <div className="flex items-center border-b border-border/20">
         <div className="flex flex-1">
           {tabs.map((tab) => {
             const isActive =
@@ -235,40 +232,37 @@ export function TradingContextPanel({
                   }
                 }}
                 className={cn(
-                  "flex-1 py-2.5 text-xs font-medium transition-colors duration-150 border-b-2 relative",
+                  "flex-1 py-2.5 text-xs transition-colors duration-150 border-b-2 relative",
                   isActive
-                    ? "text-[var(--accent-primary)] border-[var(--accent-primary)]"
-                    : "text-[var(--text-muted)] border-transparent hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]"
+                    ? "text-foreground font-medium border-primary"
+                    : "text-muted-foreground border-transparent hover:text-foreground"
                 )}
               >
-                <span className="flex items-center justify-center gap-1">
-                  {tab.key === "market" && <ChartBar size={12} weight={isActive ? "fill" : "regular"} />}
-                  {tab.key === "calendar" && <CalendarBlank size={12} weight={isActive ? "fill" : "regular"} />}
-                  {tab.key === "learn" && <GraduationCap size={12} weight={isActive ? "fill" : "regular"} />}
+                <span className="flex items-center justify-center gap-1.5">
                   {tab.label}
                   {tab.key === "learn" && selectedTerm && !learnTabActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                   )}
                 </span>
               </button>
             )
           })}
         </div>
-        <div className="flex items-center gap-1 px-2">
+        <div className="flex items-center gap-0.5 px-1.5">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-150 p-1 hover:bg-[var(--bg-elevated)] rounded"
+            className="text-muted-foreground hover:text-foreground transition-colors duration-150 p-0.5"
             title={isCollapsed ? "Expand sections" : "Collapse sections"}
           >
-            {isCollapsed ? <CaretUp size={16} weight="regular" /> : <CaretDown size={16} weight="regular" />}
+            {isCollapsed ? <CaretUp size={14} weight="regular" /> : <CaretDown size={14} weight="regular" />}
           </button>
           {onToggleCollapse && (
             <button
               onClick={onToggleCollapse}
-              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors duration-150 p-1 hover:bg-[var(--bg-elevated)] rounded"
+              className="text-muted-foreground hover:text-foreground transition-colors duration-150 p-0.5"
               title="Hide Market Overview"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
