@@ -1,14 +1,11 @@
 'use client'
 
-import { useMemo, useState, useCallback, useRef, useEffect } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { ActionButton } from './action-button'
 import { extractTickers, resolveActions } from '@/lib/chat/detect-actions'
-import { DotsThree } from "@phosphor-icons/react"
 import type { MessageAction, ActionTrade, ActionWatchlistItem } from '@/types/action-buttons'
 import { useToast } from '@/hooks/use-toast'
-
-const MAX_VISIBLE = 5
 
 interface MessageActionBarProps {
   content: string
@@ -52,8 +49,6 @@ export function MessageActionBar({
 }: MessageActionBarProps) {
   const router = useRouter()
   const { toast } = useToast()
-  const [showMore, setShowMore] = useState(false)
-  const moreRef = useRef<HTMLDivElement>(null)
   const [loadingId, setLoadingId] = useState<string | null>(null)
 
   // Layer 1: ticker extraction (pure function of content, never re-runs)
@@ -74,18 +69,6 @@ export function MessageActionBar({
     ),
     [detectedTickers, allTrades, watchlistItems, role, isStreaming, content]
   )
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
-        setShowMore(false)
-      }
-    }
-    if (showMore) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showMore])
 
   const handleAction = useCallback(async (action: MessageAction) => {
     setLoadingId(action.id)
@@ -219,12 +202,9 @@ export function MessageActionBar({
 
   if (actions.length === 0) return null
 
-  const visible = actions.slice(0, MAX_VISIBLE)
-  const overflow = actions.slice(MAX_VISIBLE)
-
   return (
     <div className="flex flex-wrap items-center gap-1.5 mt-3 pt-3 border-t border-border/20">
-      {visible.map((action, i) => (
+      {actions.map((action, i) => (
         <div
           key={action.id}
           className="action-button-enter"
@@ -237,34 +217,6 @@ export function MessageActionBar({
           />
         </div>
       ))}
-
-      {overflow.length > 0 && (
-        <div className="relative" ref={moreRef}>
-          <button
-            onClick={() => setShowMore(!showMore)}
-            className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs transition-all duration-150 active:scale-95 bg-transparent border border-border/30 text-muted-foreground hover:text-foreground hover:border-border/50"
-          >
-            <DotsThree size={16} weight="bold" />
-            <span>More</span>
-          </button>
-
-          {showMore && (
-            <div className="absolute bottom-full left-0 mb-1 rounded-lg border border-border/30 bg-popover shadow-lg p-2 z-50 flex flex-col gap-1">
-              {overflow.map((action) => (
-                <ActionButton
-                  key={action.id}
-                  action={action}
-                  onClick={(a) => {
-                    handleAction(a)
-                    setShowMore(false)
-                  }}
-                  loading={loadingId === action.id}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }
