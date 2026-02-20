@@ -131,8 +131,8 @@ const ConversationItem = React.memo(function ConversationItem({
       data-conversation-id={conversation.id}
       className={cn(
         "w-full text-left px-2 py-1.5 rounded-lg transition-all duration-150 group relative mx-1 overflow-hidden",
-        isActive && "bg-black/[0.08] dark:bg-white/[0.12] text-foreground",
-        !isActive && "hover:bg-black/[0.06] dark:hover:bg-white/[0.08] text-muted-foreground hover:text-foreground",
+        isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
+        !isActive && "hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground",
         isNavigatingToThis && "opacity-50 cursor-wait",
       )}
       onClick={() => {
