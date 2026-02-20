@@ -2,13 +2,14 @@
 
 export const dynamic = "force-dynamic"
 
-import { useMemo, useState, useEffect, useCallback } from "react"
+import { useMemo, useState, useEffect, useCallback, useRef } from "react"
 import { motion } from "framer-motion"
 import { useTrades } from "@/hooks/use-trades"
 import { useMorningBrief } from "@/hooks/use-morning-brief"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
 import { useWatchlist } from "@/hooks/use-watchlist"
+import { createClient } from "@/lib/supabase/client"
 import {
   PelicanCard,
   PageHeader,
@@ -362,25 +363,48 @@ Generate my personalized morning brief covering ALL of the following sections. B
 Keep it dense, actionable, and personalized to MY positions and watchlist. Use markdown headers for each section.`
   }, [openTrades, watchlistItems, movers.gainers, movers.losers])
 
+  const supabase = useMemo(() => createClient(), [])
+  const briefAbortRef = useRef<AbortController | null>(null)
+
   const handleGenerateBrief = useCallback(async () => {
+    // Abort any in-flight brief request
+    briefAbortRef.current?.abort()
+    briefAbortRef.current = new AbortController()
+    const { signal } = briefAbortRef.current
+
     setBriefLoading(true)
     setBriefError(null)
     setBriefContent('')
 
     const prompt = buildMorningBriefPrompt()
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://pelican-backend.fly.dev'
 
     try {
-      const response = await fetch('/api/chat/stream', {
+      // Get auth token
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
+      const response = await fetch(`${backendUrl}/api/pelican_stream`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
         body: JSON.stringify({
           message: prompt,
-          conversation_id: null,
+          conversationHistory: [],
+          conversation_history: [],
+          conversationId: null,
+          files: [],
+          timestamp: new Date().toISOString(),
+          stream: true,
         }),
+        signal,
       })
 
       if (!response.ok) {
-        throw new Error('Failed to generate brief')
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
 
       const reader = response.body?.getReader()
@@ -404,16 +428,18 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
           const trimmed = line.trim()
           if (!trimmed || !trimmed.startsWith('data: ')) continue
 
-          const data = trimmed.slice(6)
-          if (data === '[DONE]') continue
+          const jsonStr = trimmed.slice(6).trim()
+          if (!jsonStr) continue
 
           try {
-            const parsed = JSON.parse(data)
+            const parsed = JSON.parse(jsonStr)
             if (parsed.error) {
-              throw new Error(parsed.error)
+              throw new Error(parsed.message || parsed.error)
             }
-            if (parsed.content) {
-              fullContent += parsed.content
+            // Backend sends "delta" for content chunks
+            const chunk = parsed.delta || parsed.content
+            if (chunk) {
+              fullContent += chunk
               setBriefContent(fullContent)
             }
           } catch (e) {
@@ -428,12 +454,13 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
       const today = new Date().toISOString().split('T')[0]
       localStorage.setItem(`pelican-brief-${today}`, fullContent)
     } catch (err) {
+      if (signal.aborted) return // Intentional abort, no error
       console.error('Brief generation error:', err)
       setBriefError('Failed to generate brief. Please try again.')
     } finally {
       setBriefLoading(false)
     }
-  }, [buildMorningBriefPrompt])
+  }, [buildMorningBriefPrompt, supabase])
 
   // Auto-generate brief if no cache exists (runs once on mount)
   const [autoGenTriggered, setAutoGenTriggered] = useState(false)
