@@ -197,14 +197,14 @@ export function useSmartScroll(options: SmartScrollOptions = {}) {
 
       // SCENARIO 1: When user sends a message
       if (isUserMessage) {
-        // Always scroll to show the user message at top of viewport
-        // This mimics Claude's behavior: you see your message + thinking indicator
-        createTimeout(() => {
-          scrollToUserMessage(messageId)
-        }, 50) // Very short delay - the scroll function has retry logic built in
-
-        // Reset auto-scroll state
+        // Scroll to bottom so the user message + AI thinking indicator are visible.
+        // For sidebar-triggered sends (watchlist, positions) the user may be scrolled
+        // far up; scrollToUserMessage alone can leave us away from the bottom, which
+        // then prevents streaming auto-scroll from kicking in.
         shouldAutoScrollRef.current = true
+        createTimeout(() => {
+          scrollToBottom("smooth")
+        }, 50)
       }
       // SCENARIO 5: When new conversation starts (non-streaming, non-user message)
       else if (!isStreaming && !isUserMessage) {
