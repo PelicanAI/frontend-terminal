@@ -181,7 +181,7 @@ export const MessageBubble = memo(function MessageBubble({
                 </div>
               ) : (
                 <>
-                  <div className="rounded-2xl bg-accent/8 px-4 py-3">
+                  <div className="rounded-2xl rounded-br-sm bg-primary/10 border border-primary/15 px-4 py-3">
                     <div className="text-[15px] sm:text-base leading-relaxed break-words text-foreground">
                       <AttachmentDisplay attachments={message.attachments} />
                       {message.content}
