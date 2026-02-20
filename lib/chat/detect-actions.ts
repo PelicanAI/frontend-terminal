@@ -4,6 +4,7 @@ import type {
   ActionWatchlistItem,
 } from '@/types/action-buttons'
 import { extractTradingMetadata, TRADING_ACRONYMS } from '@/lib/trading-metadata'
+import { normalizeTicker } from '@/lib/utils'
 
 /**
  * Extract tickers from a message.
@@ -51,7 +52,7 @@ export function resolveActions(
   for (const t of trades) {
     tradeMap.set(t.ticker.toUpperCase(), t)
   }
-  const watchlistSet = new Set(watchlist.map(w => w.ticker.toUpperCase()))
+  const watchlistSet = new Set(watchlist.map(w => normalizeTicker(w.ticker)))
 
   for (const ticker of tickers) {
     const upper = ticker.toUpperCase()
@@ -107,7 +108,7 @@ export function resolveActions(
 
     // Watchlist: only if NOT an open position
     if (!trade || trade.status !== 'open') {
-      if (watchlistSet.has(upper)) {
+      if (watchlistSet.has(normalizeTicker(upper))) {
         actions.push({
           id: `unwatch-${upper}`,
           type: 'remove_watchlist',

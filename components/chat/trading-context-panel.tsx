@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, CaretRight, GraduationCap, X, Plus, ChartLineUp, ChatCircle, Briefcase, Trash, MagnifyingGlass } from "@phosphor-icons/react"
-import { cn } from "@/lib/utils"
+import { cn, normalizeTicker } from "@/lib/utils"
 import { useState, useRef } from "react"
 import type { Trade } from "@/hooks/use-trades"
 import { motion, AnimatePresence } from "framer-motion"
@@ -149,8 +149,13 @@ export function TradingContextPanel({
   }
 
   const handleAddTicker = async () => {
-    const ticker = addTickerInput.trim().toUpperCase()
+    const ticker = normalizeTicker(addTickerInput)
     if (!ticker) return
+    // Duplicate check with normalization
+    if (watchlistItems.some(item => normalizeTicker(item.ticker) === ticker)) {
+      setAddTickerInput("")
+      return
+    }
     await addToWatchlist(ticker)
     setAddTickerInput("")
     addInputRef.current?.focus()

@@ -3,6 +3,7 @@
 import useSWR from "swr"
 import { useMemo, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { normalizeTicker } from "@/lib/utils"
 import type { ActionWatchlistItem } from "@/types/action-buttons"
 
 interface WatchlistItem {
@@ -27,7 +28,24 @@ export function useWatchlist() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      return data as WatchlistItem[]
+      const rows = data as WatchlistItem[]
+
+      // One-time dedup: remove rows that are duplicates after normalization
+      const seen = new Set<string>()
+      const dupeIds: string[] = []
+      for (const row of rows) {
+        const norm = normalizeTicker(row.ticker)
+        if (seen.has(norm)) {
+          dupeIds.push(row.id)
+        }
+        seen.add(norm)
+      }
+      if (dupeIds.length > 0) {
+        await supabase.from('watchlist').delete().in('id', dupeIds)
+        return rows.filter(r => !dupeIds.includes(r.id))
+      }
+
+      return rows
     },
     {
       revalidateOnFocus: true,
@@ -38,17 +56,17 @@ export function useWatchlist() {
   const items = data || []
 
   const addToWatchlist = useCallback(async (
-    ticker: string,
+    rawTicker: string,
     conversationId?: string
   ): Promise<boolean> => {
-    const upper = ticker.toUpperCase()
+    const ticker = normalizeTicker(rawTicker)
 
-    if (pendingOps.current.has(`add-${upper}`)) return false
-    pendingOps.current.add(`add-${upper}`)
+    if (pendingOps.current.has(`add-${ticker}`)) return false
+    pendingOps.current.add(`add-${ticker}`)
 
-    // Already on watchlist
-    if (items.some(i => i.ticker === upper)) {
-      pendingOps.current.delete(`add-${upper}`)
+    // Already on watchlist (normalized comparison)
+    if (items.some(i => normalizeTicker(i.ticker) === ticker)) {
+      pendingOps.current.delete(`add-${ticker}`)
       return true
     }
 
@@ -56,7 +74,7 @@ export function useWatchlist() {
     const tempId = crypto.randomUUID()
     const optimistic: WatchlistItem = {
       id: tempId,
-      ticker: upper,
+      ticker,
       notes: null,
       alert_price_above: null,
       alert_price_below: null,
@@ -70,7 +88,7 @@ export function useWatchlist() {
       if (!user) throw new Error('Not authenticated')
 
       const insertData: Record<string, string | null> = {
-        ticker: upper,
+        ticker,
         user_id: user.id,
       }
       if (conversationId) {
@@ -91,32 +109,33 @@ export function useWatchlist() {
       mutate(items, false)
       return false
     } finally {
-      pendingOps.current.delete(`add-${upper}`)
+      pendingOps.current.delete(`add-${ticker}`)
     }
   }, [items, mutate, supabase])
 
   const removeFromWatchlist = useCallback(async (
-    ticker: string
+    rawTicker: string
   ): Promise<boolean> => {
-    const upper = ticker.toUpperCase()
+    const ticker = normalizeTicker(rawTicker)
 
-    if (pendingOps.current.has(`remove-${upper}`)) return false
-    pendingOps.current.add(`remove-${upper}`)
+    if (pendingOps.current.has(`remove-${ticker}`)) return false
+    pendingOps.current.add(`remove-${ticker}`)
 
-    const existing = items.find(i => i.ticker === upper)
+    const existing = items.find(i => normalizeTicker(i.ticker) === ticker)
     if (!existing) {
-      pendingOps.current.delete(`remove-${upper}`)
+      pendingOps.current.delete(`remove-${ticker}`)
       return true
     }
 
-    // Optimistic remove
-    mutate(items.filter(i => i.ticker !== upper), false)
+    // Optimistic remove — filter by normalized comparison
+    mutate(items.filter(i => normalizeTicker(i.ticker) !== ticker), false)
 
     try {
+      // Delete the actual row by its stored ticker value
       const { error } = await supabase
         .from('watchlist')
         .delete()
-        .eq('ticker', upper)
+        .eq('ticker', existing.ticker)
 
       if (error) throw error
 
@@ -127,12 +146,13 @@ export function useWatchlist() {
       mutate(items, false)
       return false
     } finally {
-      pendingOps.current.delete(`remove-${upper}`)
+      pendingOps.current.delete(`remove-${ticker}`)
     }
   }, [items, mutate, supabase])
 
-  const isOnWatchlist = useCallback((ticker: string): boolean => {
-    return items.some(i => i.ticker === ticker.toUpperCase())
+  const isOnWatchlist = useCallback((rawTicker: string): boolean => {
+    const ticker = normalizeTicker(rawTicker)
+    return items.some(i => normalizeTicker(i.ticker) === ticker)
   }, [items])
 
   const asActionItems: ActionWatchlistItem[] = useMemo(
