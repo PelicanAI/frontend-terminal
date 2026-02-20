@@ -45,7 +45,7 @@ export function UpgradeModal({ isOpen, onClose, required, balance }: UpgradeModa
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -55,23 +55,23 @@ export function UpgradeModal({ isOpen, onClose, required, balance }: UpgradeModa
             <Zap className="w-7 h-7 text-amber-400" />
           </div>
           <h2 className="text-xl font-bold text-[var(--text-primary)]">Not Enough Credits</h2>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             You need more credits to run this query
           </p>
         </div>
 
         <div className="bg-[var(--bg-surface)]/50 border border-[var(--border-default)] rounded-lg p-4 mb-6">
           <div className="flex justify-between items-center text-sm mb-3">
-            <span className="text-gray-400">Query cost</span>
+            <span className="text-muted-foreground">Query cost</span>
             <span className="text-[var(--text-primary)] font-medium">{required} credits</span>
           </div>
           <div className="flex justify-between items-center text-sm mb-3">
-            <span className="text-gray-400">Your balance</span>
+            <span className="text-muted-foreground">Your balance</span>
             <span className="text-red-400 font-medium">{balance} credits</span>
           </div>
           <div className="border-t border-[var(--border-subtle)] my-3" />
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-400">You need</span>
+            <span className="text-muted-foreground">You need</span>
             <span className="text-amber-400 font-semibold">{shortfall} more credits</span>
           </div>
         </div>
@@ -79,7 +79,7 @@ export function UpgradeModal({ isOpen, onClose, required, balance }: UpgradeModa
         <div className="space-y-3">
           <Link
             href="/pricing"
-            className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+            className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-3 px-4 rounded-lg transition-colors"
           >
             <span>Upgrade Plan</span>
             <ArrowRight className="w-4 h-4" />
@@ -93,7 +93,7 @@ export function UpgradeModal({ isOpen, onClose, required, balance }: UpgradeModa
           </button>
         </div>
 
-        <p className="text-xs text-gray-500 text-center mt-4">
+        <p className="text-xs text-muted-foreground text-center mt-4">
           Credits reset monthly. Upgrade anytime for instant access.
         </p>
       </div>

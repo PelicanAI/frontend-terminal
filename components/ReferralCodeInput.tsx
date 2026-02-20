@@ -86,7 +86,7 @@ export function ReferralCodeInput({ onReferralReady }: ReferralCodeInputProps) {
 
   return (
     <div className="space-y-1.5">
-      <label htmlFor="referral-code" className="text-sm font-medium text-gray-300 ml-1">
+      <label htmlFor="referral-code" className="text-sm font-medium text-muted-foreground ml-1">
         Referral Code (Optional)
       </label>
       <div className="relative">
@@ -96,11 +96,11 @@ export function ReferralCodeInput({ onReferralReady }: ReferralCodeInputProps) {
           value={code}
           onChange={handleChange}
           placeholder="MAZER"
-          className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl py-3 px-4 pr-11 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all uppercase"
+          className="w-full bg-background border border-border rounded-xl py-3 px-4 pr-11 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all uppercase"
         />
         <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
           {validationState === "loading" && (
-            <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           )}
           {validationState === "valid" && (
             <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -111,7 +111,7 @@ export function ReferralCodeInput({ onReferralReady }: ReferralCodeInputProps) {
         </div>
       </div>
       {validationState === "valid" && validatedInfo && (
-        <p className="text-xs text-green-500 ml-1">
+        <p className="text-xs text-green-600 ml-1">
           {validatedInfo.type === "affiliate" && validatedInfo.affiliate_name
             ? `Code from ${validatedInfo.affiliate_name}`
             : "Valid referral code"}
@@ -121,7 +121,7 @@ export function ReferralCodeInput({ onReferralReady }: ReferralCodeInputProps) {
         </p>
       )}
       {validationState === "invalid" && validatedInfo?.error && (
-        <p className="text-xs text-red-500 ml-1">{validatedInfo.error}</p>
+        <p className="text-xs text-destructive ml-1">{validatedInfo.error}</p>
       )}
     </div>
   );

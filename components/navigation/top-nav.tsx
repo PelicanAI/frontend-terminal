@@ -113,7 +113,7 @@ export function TopNav({ className }: TopNavProps) {
                 >
                   {tab.label}
                   {isActive && (
-                    <span className="hidden md:block absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)] rounded-full shadow-[0_0_8px_rgba(59,130,246,0.4)]" />
+                    <span className="hidden md:block absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)] rounded-full shadow-[0_0_8px_var(--accent-muted)]" />
                   )}
                 </Link>
               )
@@ -133,7 +133,7 @@ export function TopNav({ className }: TopNavProps) {
           {/* Credits */}
           <Link
             href="/pricing"
-            className="px-2 sm:px-3 py-1 rounded-full border border-[rgba(59,130,246,0.10)] bg-[var(--bg-surface)] text-xs sm:text-sm font-mono text-[var(--text-primary)] hover:border-[rgba(59,130,246,0.25)] hover:bg-[var(--bg-elevated)] active:scale-95 transition-all tabular-nums"
+            className="px-2 sm:px-3 py-1 rounded-full border border-[var(--border-default)] bg-[var(--bg-surface)] text-xs sm:text-sm font-mono text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] active:scale-95 transition-all tabular-nums"
           >
             <span className="hidden sm:inline">{(credits?.balance ?? 0).toLocaleString()} credits</span>
             <span className="sm:hidden">{(credits?.balance ?? 0).toLocaleString()}</span>

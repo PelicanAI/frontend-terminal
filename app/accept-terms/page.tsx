@@ -61,28 +61,26 @@ export default function AcceptTermsPage() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-[var(--bg-base)]">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+      <div className="min-h-screen w-full flex items-center justify-center bg-background">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[var(--bg-base)] relative overflow-hidden font-sans text-white p-4">
-      {/* Background effects matching login page */}
+    <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden font-sans p-4">
+      {/* Background effects */}
       <div
-        className="absolute inset-0 z-0 opacity-20"
+        className="absolute inset-0 z-0 opacity-[0.04]"
         style={{
-          backgroundImage: "linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)",
+          backgroundImage: "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)",
           backgroundSize: "50px 50px",
           maskImage: "radial-gradient(circle at center, black 40%, transparent 100%)",
         }}
       />
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900/40 blur-[120px] rounded-full mix-blend-screen" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-900/30 blur-[120px] rounded-full mix-blend-screen" />
 
       <div className="w-full max-w-[420px] relative z-10 flex flex-col">
-        <div className="bg-[var(--bg-surface)]/80 backdrop-blur-xl border-t border-t-white/20 border-b border-b-black/50 border-x border-x-white/10 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-card border border-border rounded-3xl p-8 shadow-xl">
           <div className="flex flex-col items-center text-center mb-8">
             <div className="w-20 h-20 mb-4 relative">
               <Image
@@ -90,13 +88,13 @@ export default function AcceptTermsPage() {
                 alt="Pelican Logo"
                 width={80}
                 height={80}
-                className="object-contain drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]"
+                className="object-contain"
               />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Terms of Service
             </h1>
-            <p className="text-sm text-gray-400 mt-2">
+            <p className="text-sm text-muted-foreground mt-2">
               To continue, please accept our Terms of Service.
             </p>
           </div>
@@ -106,29 +104,29 @@ export default function AcceptTermsPage() {
               <input
                 id="terms"
                 type="checkbox"
-                className="mt-1 w-5 h-5 bg-[var(--bg-elevated)] border-[var(--border-default)] rounded text-blue-600 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer accent-blue-600"
+                className="mt-1 w-5 h-5 bg-background border-border rounded text-primary focus:ring-primary focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer accent-primary"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
               />
-              <label htmlFor="terms" className="text-sm text-gray-300 leading-relaxed">
+              <label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed">
                 I have read and agree to the{" "}
                 <Link
                   href="/terms"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors underline underline-offset-2"
+                  className="text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
                 >
                   Terms of Service
                 </Link>
               </label>
             </div>
 
-            {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+            {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
 
             <button
               type="submit"
               disabled={!agreed || isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-600 disabled:active:scale-100"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Saving..." : "Continue"}
             </button>

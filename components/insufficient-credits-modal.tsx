@@ -42,7 +42,7 @@ export function InsufficientCreditsModal({
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -52,7 +52,7 @@ export function InsufficientCreditsModal({
             <Zap className="w-7 h-7 text-amber-400" />
           </div>
           <h2 className="text-xl font-bold text-[var(--text-primary)]">Not enough credits</h2>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             {message || `This query requires ${required ?? 0} credits. You have ${balance ?? 0}.`}
           </p>
         </div>
@@ -60,7 +60,7 @@ export function InsufficientCreditsModal({
         <div className="space-y-3">
           <Link
             href="/pricing"
-            className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+            className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-3 px-4 rounded-lg transition-colors"
           >
             <span>Upgrade Plan</span>
             <ArrowRight className="w-4 h-4" />
@@ -74,7 +74,7 @@ export function InsufficientCreditsModal({
           </button>
         </div>
 
-        <p className="text-xs text-gray-500 text-center mt-4">
+        <p className="text-xs text-muted-foreground text-center mt-4">
           Credits reset monthly. Upgrade anytime for instant access.
         </p>
       </div>

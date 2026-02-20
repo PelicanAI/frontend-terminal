@@ -64,28 +64,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[var(--bg-base)] relative overflow-hidden font-sans text-white p-4">
-      {/* --- BACKGROUND EFFECTS (CSS Only - No Images Needed) --- */}
+    <div className="min-h-screen w-full flex items-center justify-center bg-background relative overflow-hidden font-sans p-4">
+      {/* --- BACKGROUND EFFECTS --- */}
       <div
-        className="absolute inset-0 z-0 opacity-20"
+        className="absolute inset-0 z-0 opacity-[0.04]"
         style={{
-          backgroundImage: `linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)`,
           backgroundSize: '50px 50px',
           maskImage: 'radial-gradient(circle at center, black 40%, transparent 100%)',
         }}
       />
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-900/40 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-[4s]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-900/30 blur-[120px] rounded-full mix-blend-screen" />
 
       <div className="w-full max-w-[420px] relative z-10 flex flex-col">
         <div className="mb-6 self-start">
-          <Link href="/" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors">
+          <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Link>
         </div>
 
-        <div className="bg-[var(--bg-surface)]/80 backdrop-blur-xl border-t border-t-white/20 border-b border-b-black/50 border-x border-x-white/10 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-card border border-border rounded-3xl p-8 shadow-xl">
           <div className="flex flex-col items-center text-center mb-8">
             <div className="w-20 h-20 mb-4 relative">
               <Image
@@ -93,25 +91,25 @@ export default function LoginPage() {
                 alt="Pelican Logo"
                 width={80}
                 height={80}
-                className="object-contain drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]"
+                className="object-contain"
               />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">Welcome back</h1>
-            <p className="text-sm text-gray-400 mt-2">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome back</h1>
+            <p className="text-sm text-muted-foreground mt-2">
               Enter your details to access your dashboard.
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-1.5">
-              <label htmlFor="email" className="text-xs font-semibold text-gray-300 ml-1 uppercase tracking-wider">Email</label>
+              <label htmlFor="email" className="text-xs font-semibold text-muted-foreground ml-1 uppercase tracking-wider">Email</label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+                <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   type="email"
                   id="email"
                   placeholder="trader@example.com"
-                  className="w-full bg-[var(--bg-base)]/50 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all hover:bg-[var(--bg-base)]/80"
+                  className="w-full bg-background border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -121,20 +119,20 @@ export default function LoginPage() {
 
             <div className="space-y-1.5">
               <div className="flex justify-between items-center ml-1">
-                <label htmlFor="password" className="text-xs font-semibold text-gray-300 uppercase tracking-wider">Password</label>
+                <label htmlFor="password" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Password</label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  className="text-xs text-primary hover:text-primary/80 transition-colors"
                 >
                   Forgot?
                 </Link>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+                <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   type="password"
                   id="password"
-                  className="w-full bg-[var(--bg-base)]/50 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all hover:bg-[var(--bg-base)]/80"
+                  className="w-full bg-background border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -142,11 +140,11 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+            {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] mt-2"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] mt-2"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
@@ -155,17 +153,17 @@ export default function LoginPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="px-2 bg-[var(--bg-elevated)] text-gray-500">Or continue with</span>
+              <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
             </div>
           </div>
 
           <button
             type="button"
             onClick={signInWithGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white font-medium py-3 rounded-xl transition-all hover:bg-white/10 hover:border-white/20 active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-3 bg-background border border-border text-foreground font-medium py-3 rounded-xl transition-all hover:bg-muted active:scale-[0.98]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -176,9 +174,9 @@ export default function LoginPage() {
             Google
           </button>
 
-          <p className="mt-8 text-center text-sm text-gray-400">
+          <p className="mt-8 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+            <Link href="/auth/signup" className="text-primary hover:text-primary/80 font-medium transition-colors">
               Sign up
             </Link>
           </p>

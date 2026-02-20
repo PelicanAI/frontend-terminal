@@ -38,12 +38,12 @@ describe("SuggestedPrompts", () => {
     expect(onSelect).toHaveBeenCalledTimes(2)
   })
 
-  it("renders with grid layout classes", () => {
+  it("renders with flex layout classes", () => {
     const { container } = render(<SuggestedPrompts onSelect={vi.fn()} />)
-    const grid = container.querySelector(".grid")
-    expect(grid).toBeInTheDocument()
-    expect(grid?.className).toContain("grid-cols-2")
-    expect(grid?.className).toContain("md:grid-cols-3")
+    const wrapper = container.firstElementChild
+    expect(wrapper).toBeInTheDocument()
+    expect(wrapper?.className).toContain("flex")
+    expect(wrapper?.className).toContain("flex-wrap")
   })
 
   it("does not call onSelect when disabled", () => {

@@ -15,15 +15,17 @@ export const LearningModeToggle = React.memo(function LearningModeToggle() {
       size="sm"
       onClick={() => setEnabled(!enabled)}
       className={cn(
-        "h-8 px-2 gap-1.5 text-xs font-medium transition-colors",
+        "relative h-9 w-9 min-w-[36px] min-h-[36px] p-0 rounded-full flex items-center justify-center transition-colors",
         enabled
           ? "text-[var(--accent-primary)] bg-[var(--accent-muted)] hover:bg-[var(--accent-glow)]"
-          : "text-muted-foreground hover:text-foreground"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
       )}
-      title="Highlight trading terms in chat responses"
+      title={enabled ? "Learning Mode on — click to disable" : "Learning Mode — highlight trading terms"}
     >
-      <GraduationCap size={16} weight={enabled ? "fill" : "regular"} />
-      <span className="hidden sm:inline">Learn</span>
+      <GraduationCap size={18} weight={enabled ? "fill" : "regular"} />
+      {enabled && (
+        <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)]" />
+      )}
     </Button>
   )
 })

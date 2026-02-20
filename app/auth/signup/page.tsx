@@ -112,44 +112,35 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[var(--bg-base)] flex flex-col items-center justify-center relative overflow-hidden font-sans text-white">
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,_#1e1b4b_0%,_transparent_50%)] opacity-20 pointer-events-none" />
-
+    <div className="min-h-screen w-full bg-background flex flex-col items-center justify-center relative overflow-hidden font-sans">
       <div className="absolute top-6 left-6 z-30 pointer-events-auto">
         <Link
           href="/"
           aria-label="Back to home"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-gray-300 transition-colors hover:text-white hover:border-white/20 hover:bg-white/5"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:text-foreground hover:border-border hover:bg-muted"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
       </div>
 
-      <div className="w-full min-h-screen bg-[var(--bg-surface)] rounded-none shadow-none overflow-hidden flex flex-col md:flex-row border-0 z-10">
-        {/* LEFT SIDE: Visual & Branding (CSS-Only Version) */}
+      <div className="w-full min-h-screen bg-card rounded-none shadow-none overflow-hidden flex flex-col md:flex-row border-0 z-10">
+        {/* LEFT SIDE: Visual & Branding — intentionally dark decorative panel */}
         <div className="flex w-full md:w-1/2 relative flex-col justify-between p-8 md:p-12 overflow-hidden bg-[#0a0a10] min-h-[320px] md:min-h-full">
             {/* BACKGROUND: Glowing Data Landscape (CSS Only) */}
             <div className="absolute inset-0 z-0 overflow-hidden">
-               {/* 1. The Dark Base */}
                <div className="absolute inset-0 bg-[#08080e]"></div>
-               
-               {/* 2. The "Mountain" Glows */}
                <div className="absolute bottom-[-10%] left-[-10%] w-[80%] h-[60%] bg-blue-900/40 blur-[80px] rounded-full mix-blend-screen"></div>
                <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[60%] bg-blue-900/30 blur-[80px] rounded-full mix-blend-screen"></div>
-               
-               {/* 3. The Grid Floor (Perspective) */}
-               <div 
-                 className="absolute inset-0 opacity-30" 
+               <div
+                 className="absolute inset-0 opacity-30"
                  style={{
                     backgroundImage: 'linear-gradient(rgba(37, 99, 235, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(37, 99, 235, 0.3) 1px, transparent 1px)',
                     backgroundSize: '40px 40px',
                     transform: 'perspective(500px) rotateX(60deg) translateY(100px) scale(2)',
                     transformOrigin: 'bottom center',
                     maskImage: 'linear-gradient(to top, black 0%, transparent 100%)'
-                 }} 
+                 }}
                />
-               
-               {/* 4. Rising "Candlestick" Bars (Simulated with spans) */}
                <div className="absolute bottom-0 left-10 w-4 h-32 bg-gradient-to-t from-blue-600 to-transparent opacity-50 blur-sm"></div>
                <div className="absolute bottom-0 left-20 w-4 h-48 bg-gradient-to-t from-blue-500 to-transparent opacity-60 blur-sm"></div>
                <div className="absolute bottom-0 left-32 w-4 h-24 bg-gradient-to-t from-blue-600 to-transparent opacity-40 blur-sm"></div>
@@ -159,17 +150,17 @@ export default function SignUpPage() {
             {/* Logo */}
             <div className="relative z-10 mb-6 md:mb-12">
               <div className="w-40 h-40 md:w-72 md:h-72 relative">
-                 <Image 
-                   src="/pelican-logo-transparent.webp" 
-                   alt="Pelican Logo" 
-                   width={288} 
-                   height={288} 
-                   className="object-contain" 
+                 <Image
+                   src="/pelican-logo-transparent.webp"
+                   alt="Pelican Logo"
+                   width={288}
+                   height={288}
+                   className="object-contain"
                  />
               </div>
             </div>
 
-            {/* Hero Text */}
+            {/* Hero Text — white text is intentional on this dark panel */}
             <div className="relative z-10 mt-auto mb-6">
               <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-4 tracking-tight text-white drop-shadow-lg">
                 Unlock Your Trading <br />
@@ -181,21 +172,22 @@ export default function SignUpPage() {
             </div>
         </div>
 
-        <div className="w-full md:w-1/2 bg-[var(--bg-surface)] p-10 md:p-14 flex flex-col justify-center relative z-10 pointer-events-auto">
+        {/* RIGHT SIDE: Sign Up Form */}
+        <div className="w-full md:w-1/2 bg-card p-10 md:p-14 flex flex-col justify-center relative z-10 pointer-events-auto">
           <div className="max-w-md w-full mx-auto">
-            <h2 className="text-3xl font-semibold mb-2 text-white">Create your account</h2>
-            <p className="text-gray-400 mb-8">Start trading smarter in minutes.</p>
+            <h2 className="text-3xl font-semibold mb-2 text-foreground">Create your account</h2>
+            <p className="text-muted-foreground mb-8">Start trading smarter in minutes.</p>
 
             <form onSubmit={handleSignUp} className="space-y-5">
               <div className="space-y-1.5">
-                <label htmlFor="email" className="text-sm font-medium text-gray-300 ml-1">Email</label>
+                <label htmlFor="email" className="text-sm font-medium text-muted-foreground ml-1">Email</label>
                 <div className="relative group">
-                  <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+                  <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                   <input
                     type="email"
                     id="email"
                     placeholder="trader@example.com"
-                    className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    className="w-full bg-background border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -204,13 +196,13 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="password" className="text-sm font-medium text-gray-300 ml-1">Password</label>
+                <label htmlFor="password" className="text-sm font-medium text-muted-foreground ml-1">Password</label>
                 <div className="relative group">
-                  <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+                  <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                   <input
                     type="password"
                     id="password"
-                    className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    className="w-full bg-background border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -219,13 +211,13 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="repeat-password" className="text-sm font-medium text-gray-300 ml-1">Repeat Password</label>
+                <label htmlFor="repeat-password" className="text-sm font-medium text-muted-foreground ml-1">Repeat Password</label>
                 <div className="relative group">
-                  <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+                  <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                   <input
                     type="password"
                     id="repeat-password"
-                    className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    className="w-full bg-background border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all"
                     required
                     value={repeatPassword}
                     onChange={(e) => setRepeatPassword(e.target.value)}
@@ -239,45 +231,45 @@ export default function SignUpPage() {
                 <input
                   id="terms"
                   type="checkbox"
-                  className="w-5 h-5 bg-[var(--bg-elevated)] border-[var(--border-default)] rounded text-blue-600 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer accent-blue-600"
+                  className="w-5 h-5 bg-background border-border rounded text-primary focus:ring-primary focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer accent-primary"
                   checked={agreedToTerms}
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
                 />
-                <label htmlFor="terms" className="ml-3 text-sm text-gray-400">
-                  I agree to the <Link href="/terms" className="text-blue-400 hover:text-blue-300 transition-colors">Terms of Service</Link>
+                <label htmlFor="terms" className="ml-3 text-sm text-muted-foreground">
+                  I agree to the <Link href="/terms" className="text-primary hover:text-primary/80 transition-colors">Terms of Service</Link>
                 </label>
               </div>
 
-              {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+              {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
 
               <button
                 type="submit"
-                className="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 text-white font-semibold py-3.5 rounded-full transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]"
+                className="w-full mt-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3.5 rounded-full transition-all active:scale-[0.98]"
                 disabled={isLoading}
               >
                 {isLoading ? "Creating account..." : "Create account"}
               </button>
 
               <div className="text-center pt-4 pointer-events-auto">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Already have an account?{" "}
-                  <Link href="/auth/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                  <Link href="/auth/login" className="text-primary hover:text-primary/80 font-medium transition-colors">
                     Sign in
                   </Link>
                 </p>
               </div>
             </form>
 
-            <div className="my-6 flex items-center gap-4 text-xs text-gray-500">
-              <div className="h-px flex-1 bg-white/10" />
+            <div className="my-6 flex items-center gap-4 text-xs text-muted-foreground">
+              <div className="h-px flex-1 bg-border" />
               <span>or continue with</span>
-              <div className="h-px flex-1 bg-white/10" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <button
               type="button"
               onClick={signInWithGoogle}
-              className="w-full rounded-xl border border-white/10 bg-white px-4 py-3 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-100 flex items-center justify-center gap-3"
+              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted flex items-center justify-center gap-3"
             >
               <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
                 <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.655 32.657 29.196 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.272 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20c0-1.341-.138-2.65-.389-3.917Z"/>

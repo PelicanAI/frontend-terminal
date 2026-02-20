@@ -13,6 +13,7 @@ import {
   AttachmentsPreview,
   DraftIndicator,
 } from "./input"
+import { LearningModeToggle } from "./LearningModeToggle"
 import type { InputTextareaRef } from "./input"
 
 // Re-export types so external consumers are unaffected
@@ -157,6 +158,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               isFocused && "border-border/60 shadow-[0_1px_4px_rgba(0,0,0,0.2)]",
             )}
           >
+            <LearningModeToggle />
             <AttachButton disabled={disabled} onFileSelect={handleFileSelect} />
 
             <InputTextarea

@@ -20,7 +20,6 @@ import { SystemMessage } from "./SystemMessage"
 import { ConversationHistorySkeleton } from "./conversation-history-skeleton"
 import { NewMessagesPill } from "./new-messages-pill"
 import { ErrorMessage } from "./error-message"
-import { LearningModeToggle } from "./LearningModeToggle"
 
 interface ChatContainerProps {
   messages: Message[]
@@ -335,27 +334,6 @@ export function ChatContainer({
           aria-live="polite"
           aria-label="Chat messages"
         >
-          {/* Conversation Header - Sticky */}
-          <div className="sticky top-0 z-10 flex items-center justify-between pb-2 pt-4 sm:pt-6 border-b border-[var(--border-subtle)] bg-transparent backdrop-blur-sm -mx-4 sm:-mx-6 px-4 sm:px-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="flex flex-col">
-                <h2 className="text-sm font-medium text-[var(--text-primary)]">
-                  Trading Assistant
-                </h2>
-                <p className="text-xs text-[var(--text-muted)] hidden sm:block">
-                  {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <LearningModeToggle />
-              <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-[var(--data-positive)]/10">
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--data-positive)] animate-pulse"></div>
-                <span className="text-[10px] sm:text-xs font-medium text-[var(--data-positive)]">Open</span>
-              </div>
-            </div>
-          </div>
-
           {/* Loading skeleton when switching conversations */}
           {isLoadingHistory && messages.length === 0 && (
             <div className="space-y-6">

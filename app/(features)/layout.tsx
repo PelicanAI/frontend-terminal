@@ -96,7 +96,7 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 420, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="hidden lg:flex border-l border-[var(--border-subtle)] bg-[var(--bg-surface)]/90 shadow-[0_0_50px_rgba(59,130,246,0.05)] backdrop-blur-2xl overflow-hidden h-full"
+              className="hidden lg:flex border-l border-[var(--border-subtle)] bg-[var(--bg-surface)]/90 shadow-[0_0_50px_rgba(0,0,0,0.08)] backdrop-blur-2xl overflow-hidden h-full"
               style={{ width: "30%", minWidth: "340px", maxWidth: "440px" }}
             >
               <PelicanChatPanel
