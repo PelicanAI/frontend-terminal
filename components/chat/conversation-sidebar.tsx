@@ -124,8 +124,8 @@ const ConversationItem = React.memo(function ConversationItem({
       data-conversation-id={conversation.id}
       className={cn(
         "w-full text-left px-3 py-2 rounded-lg transition-all duration-150 group relative mx-2",
-        isActive && "bg-[var(--surface-hover)] border-l-2 border-l-primary border-y border-r border-y-transparent border-r-transparent",
-        !isActive && "hover:bg-[var(--surface-hover)] border border-transparent",
+        isActive && "bg-accent/8 text-foreground",
+        !isActive && "hover:bg-accent/5 text-muted-foreground hover:text-foreground",
         isNavigatingToThis && "opacity-50 cursor-wait",
       )}
       onClick={() => {
@@ -138,7 +138,7 @@ const ConversationItem = React.memo(function ConversationItem({
           <div className="text-sm text-foreground truncate font-medium">
             {conversation.title || newChatLabel}
           </div>
-          <div className="text-[10px] text-muted-foreground mt-0.5">
+          <div className="text-[10px] text-muted-foreground/50 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
             {getRelativeTime(conversation.updated_at)}
           </div>
         </div>
@@ -230,6 +230,8 @@ export function ConversationSidebar({
   const [showSignOutDialog, setShowSignOutDialog] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [sidebarView, setSidebarView] = useState<'conversations' | 'insights'>('conversations')
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
   const { items: savedInsights, deleteInsight } = useSavedInsights()
 
   // Drag-to-resize
@@ -279,6 +281,18 @@ export function ConversationSidebar({
       document.body.style.userSelect = ''
     }
   }, [isDragging])
+
+  // Close profile menu on click outside
+  useEffect(() => {
+    if (!showProfileMenu) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showProfileMenu])
 
   useEffect(() => {
     const supabase = createClient()
@@ -416,7 +430,7 @@ export function ConversationSidebar({
         <div className="flex gap-2 items-center">
           <button
             onClick={onNewConversation}
-            className="flex items-center gap-1.5 h-7 px-3 rounded-md bg-[var(--accent-indigo-muted)] text-[var(--accent-indigo-hover)] text-xs font-medium hover:bg-[rgba(59,130,246,0.22)] border border-[rgba(59,130,246,0.15)] hover:border-[rgba(59,130,246,0.30)] transition-all duration-200"
+            className="flex items-center gap-1.5 h-7 px-3 rounded-md text-muted-foreground text-xs font-medium hover:text-foreground hover:bg-accent/10 border border-border/30 hover:border-border/50 transition-all duration-150"
           >
             <Plus size={14} weight="bold" />
             New
@@ -466,13 +480,7 @@ export function ConversationSidebar({
             <span className="flex items-center gap-1.5">
               <BookmarkSimple size={12} weight={sidebarView === 'insights' ? 'fill' : 'bold'} />
               Saved Insights
-              <span
-                className="px-1.5 py-0.5 rounded-full text-[10px]"
-                style={{
-                  background: 'rgba(59,130,246,0.1)',
-                  color: 'var(--accent-indigo, #3B82F6)',
-                }}
-              >
+              <span className="text-[10px] text-muted-foreground">
                 {savedInsights.length}
               </span>
             </span>
@@ -770,43 +778,58 @@ export function ConversationSidebar({
         )}
       </ScrollArea>
 
-      {/* Footer */}
-      <div className="shrink-0 px-3 py-3 border-t border-sidebar-border/30 space-y-1">
-        {/* Theme toggle */}
-        <ThemeRow />
-
-        {/* Admin panel link — only for admins */}
-        {isAdmin && (
-          <Link
-            href="/admin/dashboard"
-            className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-xs font-medium text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors duration-150"
-          >
-            <Shield size={16} weight="regular" />
-            <span>Admin Panel</span>
-          </Link>
+      {/* Footer — Profile dropdown */}
+      <div className="shrink-0 border-t border-sidebar-border/30 relative" ref={profileMenuRef}>
+        {/* Profile menu popover */}
+        {showProfileMenu && (
+          <div className="absolute bottom-full left-2 right-2 mb-1 rounded-lg border border-border/30 bg-popover shadow-lg py-1 z-50">
+            <ThemeRow />
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs font-medium text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors duration-150"
+                onClick={() => setShowProfileMenu(false)}
+              >
+                <Shield size={14} weight="regular" />
+                <span>Admin Panel</span>
+              </Link>
+            )}
+            <Link
+              href="/settings"
+              className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors"
+              onClick={() => setShowProfileMenu(false)}
+            >
+              <Gear size={14} weight="regular" />
+              Settings
+            </Link>
+            <button
+              onClick={() => {
+                setShowProfileMenu(false)
+                setShowSignOutDialog(true)
+              }}
+              className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
+            >
+              <SignOut size={14} weight="regular" />
+              Sign out
+            </button>
+          </div>
         )}
 
-        {/* User profile row */}
-        <Link
-          href="/settings"
-          className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-[var(--surface-hover)] transition-colors cursor-pointer group"
-        >
-          <div className="w-7 h-7 rounded-full bg-[var(--accent-indigo-muted)] flex items-center justify-center text-xs font-medium text-[var(--accent-indigo-hover)]">
-            <User size={14} weight="regular" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-[var(--text-primary)] truncate">{t.common.account}</p>
-          </div>
-          <Gear size={14} weight="regular" className="text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors" />
-        </Link>
-
-        {/* Sign out */}
+        {/* Account button */}
         <button
-          onClick={() => setShowSignOutDialog(true)}
-          className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
+          onClick={() => setShowProfileMenu(!showProfileMenu)}
+          className="flex items-center gap-2.5 w-full px-3 py-3 text-xs text-muted-foreground hover:text-foreground hover:bg-accent/5 transition-colors"
         >
-          <SignOut size={14} weight="regular" />
-          Sign out
+          <User size={14} weight="regular" />
+          <span className="flex-1 text-left font-medium">{t.common.account}</span>
+          <CaretUp
+            size={12}
+            weight="regular"
+            className={cn(
+              "transition-transform duration-150",
+              showProfileMenu ? "rotate-180" : "rotate-0"
+            )}
+          />
         </button>
       </div>
 
