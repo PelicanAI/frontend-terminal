@@ -1,9 +1,9 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, CaretRight, GraduationCap, X, Plus, ChartLineUp, ChatCircle, Briefcase, Trash, MagnifyingGlass, SlidersHorizontal, ArrowUp, ArrowDown, DotsSixVertical } from "@phosphor-icons/react"
+import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, CaretRight, GraduationCap, X, Plus, ChartLineUp, ChatCircle, Briefcase, Trash, MagnifyingGlass } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef } from "react"
 import type { Trade } from "@/hooks/use-trades"
 import { motion, AnimatePresence } from "framer-motion"
 import { useChart } from "@/providers/chart-provider"
@@ -146,54 +146,6 @@ export function TradingContextPanel({
       trade.conviction ? `Conviction: ${trade.conviction}/10` : null,
       'Give me updated analysis: price action, key levels, news catalysts, and whether my thesis still holds.',
     ].filter(Boolean).join(' ')
-  }
-
-  // Section reorder state
-  type SidebarSection = 'watchlist' | 'positions' | 'sectors' | 'volatility' | 'indices'
-  const DEFAULT_SECTION_ORDER: SidebarSection[] = ['watchlist', 'positions', 'sectors', 'volatility', 'indices']
-
-  const [sectionOrder, setSectionOrder] = useState<SidebarSection[]>(() => {
-    if (typeof window === 'undefined') return DEFAULT_SECTION_ORDER
-    try {
-      const saved = localStorage.getItem('pelican-sidebar-order')
-      return saved ? JSON.parse(saved) : DEFAULT_SECTION_ORDER
-    } catch {
-      return DEFAULT_SECTION_ORDER
-    }
-  })
-  const [isReorderMode, setIsReorderMode] = useState(false)
-
-  useEffect(() => {
-    localStorage.setItem('pelican-sidebar-order', JSON.stringify(sectionOrder))
-  }, [sectionOrder])
-
-  const moveSection = useCallback((id: SidebarSection, direction: 'up' | 'down') => {
-    setSectionOrder(prev => {
-      const idx = prev.indexOf(id)
-      if (direction === 'up' && idx > 0) {
-        const next = [...prev]
-        const temp = next[idx - 1]!
-        next[idx - 1] = next[idx]!
-        next[idx] = temp
-        return next
-      }
-      if (direction === 'down' && idx < prev.length - 1) {
-        const next = [...prev]
-        const temp = next[idx]!
-        next[idx] = next[idx + 1]!
-        next[idx + 1] = temp
-        return next
-      }
-      return prev
-    })
-  }, [])
-
-  const sectionLabels: Record<SidebarSection, string> = {
-    watchlist: 'Watchlist',
-    positions: 'Active Positions',
-    sectors: 'Sector Performance',
-    volatility: 'Volatility',
-    indices: 'Indices',
   }
 
   const handleAddTicker = async () => {
@@ -354,16 +306,6 @@ export function TradingContextPanel({
         </div>
         <div className="flex items-center gap-0.5 px-1.5">
           <button
-            onClick={() => setIsReorderMode(!isReorderMode)}
-            className={cn(
-              "text-muted-foreground hover:text-foreground transition-colors duration-150 p-0.5",
-              isReorderMode && "text-[var(--accent-primary)]"
-            )}
-            title={isReorderMode ? "Done customizing" : "Customize section order"}
-          >
-            <SlidersHorizontal size={14} weight="regular" />
-          </button>
-          <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-muted-foreground hover:text-foreground transition-colors duration-150 p-0.5"
             title={isCollapsed ? "Expand sections" : "Collapse sections"}
@@ -406,298 +348,265 @@ export function TradingContextPanel({
             className="overflow-hidden"
           >
             <div className="p-4 space-y-4">
-              {/* Reorderable sections */}
-              {sectionOrder.map((sectionId) => {
-                // Positions section hidden when no open trades
-                if (sectionId === 'positions' && openTrades.length === 0) return null
+              {/* Watchlist */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
+                    <Star size={12} weight="regular" />
+                    Watchlist
+                  </h4>
+                  <button
+                    onClick={() => setEditingWatchlist(!editingWatchlist)}
+                    className="text-[10px] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors duration-150 font-medium"
+                  >
+                    {editingWatchlist ? "Done" : "Edit"}
+                  </button>
+                </div>
 
-                const reorderBar = isReorderMode && (
-                  <div className="flex items-center justify-between px-3 py-1 bg-[var(--bg-elevated)] rounded-md mb-1 border border-dashed border-[var(--border-default)]">
-                    <div className="flex items-center gap-1.5 text-[var(--text-muted)] text-xs">
-                      <DotsSixVertical size={12} weight="regular" />
-                      {sectionLabels[sectionId]}
+                {/* Loading state */}
+                {watchlistLoading && watchlistTickers.length === 0 && (
+                  <div className="space-y-1.5">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-10 rounded-lg bg-[var(--bg-surface)] animate-pulse" />
+                    ))}
+                  </div>
+                )}
+
+                {/* Empty state */}
+                {!watchlistLoading && watchlistTickers.length === 0 && !editingWatchlist && (
+                  <div className="p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-center">
+                    <Star size={20} weight="thin" className="text-[var(--text-muted)] mx-auto mb-1.5" />
+                    <p className="text-[10px] text-[var(--text-muted)] leading-relaxed">
+                      No tickers on your watchlist.<br />Use chat to add stocks or click Edit.
+                    </p>
+                  </div>
+                )}
+
+                {/* Ticker list */}
+                <div className="space-y-1.5">
+                  {watchlistTickers.map((ticker) => (
+                    <div key={ticker.symbol} className="flex items-center gap-1">
+                      {editingWatchlist ? (
+                        <>
+                          <div className="flex-1 flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+                            <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
+                            <div className="flex flex-col items-end">
+                              <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price)}</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => removeFromWatchlist(ticker.symbol)}
+                            className="p-1.5 rounded-md text-[var(--data-negative)] hover:bg-[var(--data-negative)]/10 transition-colors duration-150"
+                          >
+                            <X size={14} weight="bold" />
+                          </button>
+                        </>
+                      ) : (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="w-full flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150 text-left">
+                              <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
+                              <div className="flex flex-col items-end">
+                                <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price)}</span>
+                                <div
+                                  className={cn(
+                                    "text-[10px] font-medium font-mono tabular-nums px-1.5 py-0.5 rounded",
+                                    getChangeBg(ticker.changePercent),
+                                    getChangeColor(ticker.changePercent),
+                                  )}
+                                >
+                                  {formatPercent(ticker.changePercent)}
+                                </div>
+                              </div>
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => showChart(ticker.symbol)}>
+                              <ChartLineUp size={14} weight="regular" className="mr-2" />
+                              Open Chart
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onPrefillChat?.(`Analyze ${ticker.symbol}`)}>
+                              <ChatCircle size={14} weight="regular" className="mr-2" />
+                              Ask Pelican
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => onPrefillChat?.(`Deep dive on ${ticker.symbol} — technicals, fundamentals, and sentiment`)}>
+                              <MagnifyingGlass size={14} weight="regular" className="mr-2" />
+                              Deep Dive
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => removeFromWatchlist(ticker.symbol)}
+                              className="text-[var(--data-negative)] focus:text-[var(--data-negative)]"
+                            >
+                              <Trash size={14} weight="regular" className="mr-2" />
+                              Remove
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
-                    <div className="flex gap-1">
-                      <button onClick={() => moveSection(sectionId, 'up')} className="p-0.5 hover:bg-[var(--accent-muted)] rounded transition-colors">
-                        <ArrowUp size={12} weight="regular" className="text-[var(--text-secondary)]" />
-                      </button>
-                      <button onClick={() => moveSection(sectionId, 'down')} className="p-0.5 hover:bg-[var(--accent-muted)] rounded transition-colors">
-                        <ArrowDown size={12} weight="regular" className="text-[var(--text-secondary)]" />
-                      </button>
+                  ))}
+                </div>
+
+                {/* Add ticker input (edit mode) */}
+                {editingWatchlist && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex-1 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] focus-within:border-[var(--accent-primary)] transition-colors duration-150">
+                      <Plus size={12} weight="regular" className="text-[var(--text-muted)] shrink-0" />
+                      <input
+                        ref={addInputRef}
+                        type="text"
+                        value={addTickerInput}
+                        onChange={(e) => setAddTickerInput(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAddTicker()
+                        }}
+                        placeholder="Add symbol..."
+                        className="flex-1 bg-transparent text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none"
+                        maxLength={10}
+                      />
+                    </div>
+                    <button
+                      onClick={handleAddTicker}
+                      disabled={!addTickerInput.trim()}
+                      className="px-2.5 py-1.5 rounded-lg text-[10px] font-medium bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
+                    >
+                      Add
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Active Positions */}
+              {openTrades.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
+                      <Briefcase size={12} weight="regular" />
+                      Active Positions
+                    </h4>
+                    <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">{openTrades.length}</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {openTrades.map((trade) => (
+                      <div
+                        key={trade.id}
+                        onClick={() => onPrefillChat?.(buildPositionReviewPrompt(trade))}
+                        className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className={cn(
+                            "text-[9px] font-semibold px-1.5 py-0.5 rounded uppercase",
+                            trade.direction === 'long'
+                              ? "bg-[var(--data-positive)]/10 text-[var(--data-positive)]"
+                              : "bg-[var(--data-negative)]/10 text-[var(--data-negative)]"
+                          )}>
+                            {trade.direction}
+                          </span>
+                          <span className="text-xs font-semibold text-[var(--text-primary)]">{trade.ticker}</span>
+                        </div>
+                        <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">
+                          ${trade.entry_price.toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Sector Performance */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+                  Sector Performance
+                </h4>
+                <div className="space-y-1.5">
+                  {defaultSectors.map((sector) => (
+                    <button
+                      key={sector.name}
+                      onClick={() => {
+                        const sp500Name = sectorToSP500[sector.name] || sector.name
+                        router.push(`/heatmap?sector=${encodeURIComponent(sp500Name)}`)
+                      }}
+                      className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors duration-150 cursor-pointer group"
+                    >
+                      <span className="text-xs text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors duration-150">{sector.name}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className={cn("text-xs font-medium font-mono tabular-nums", getChangeColor(sector.changePercent))}>
+                          {formatPercent(sector.changePercent)}
+                        </span>
+                        {sector.changePercent !== null && (
+                          <div
+                            className={cn(
+                              "p-0.5 rounded",
+                              sector.changePercent >= 0 ? "bg-[var(--data-positive)]/10" : "bg-[var(--data-negative)]/10",
+                            )}
+                          >
+                            {sector.changePercent >= 0 ? (
+                              <TrendUp size={12} weight="regular" className="text-[var(--data-positive)]" />
+                            ) : (
+                              <TrendDown size={12} weight="regular" className="text-[var(--data-negative)]" />
+                            )}
+                          </div>
+                        )}
+                        <CaretRight size={12} weight="regular" className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Volatility */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Volatility</h4>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
+                  <div className="flex items-center gap-2">
+                    <Pulse size={16} weight="regular" className="text-[var(--data-warning)]" />
+                    <div className="flex flex-col">
+                      <span className="text-xs font-medium text-[var(--text-primary)]">VIX</span>
+                      <span className="text-[10px] text-[var(--text-muted)]">Fear Index</span>
                     </div>
                   </div>
-                )
-
-                if (sectionId === 'indices') return (
-                  <div key={sectionId} className="space-y-2">
-                    {reorderBar}
-                    <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Indices</h4>
-                    <div className="space-y-2">
-                      {defaultIndices.map((index) => (
-                        <div
-                          key={index.symbol}
-                          className={cn(
-                            "flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150",
-                            "border-l-2",
-                            index.changePercent !== null && index.changePercent >= 0
-                              ? "border-l-[var(--data-positive)]/40"
-                              : index.changePercent !== null
-                              ? "border-l-[var(--data-negative)]/40"
-                              : "border-l-[var(--text-muted)]/20"
-                          )}
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-xs font-medium text-[var(--text-primary)]">{index.symbol}</span>
-                            <span className="text-[10px] text-[var(--text-muted)]">{index.name}</span>
-                          </div>
-                          <div className="flex flex-col items-end">
-                            <span className="text-xs font-semibold font-mono tabular-nums text-[var(--text-primary)]">
-                              {formatPrice(index.price)}
-                            </span>
-                            <span className={cn("text-[10px] font-medium font-mono tabular-nums", getChangeColor(index.changePercent))}>
-                              {formatPercent(index.changePercent)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm font-bold font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(defaultVix)}</span>
+                    <span className={cn("text-[10px] font-medium font-mono tabular-nums", getChangeColor(defaultVixChange))}>
+                      {formatPercent(defaultVixChange)}
+                    </span>
                   </div>
-                )
+                </div>
+              </div>
 
-                if (sectionId === 'volatility') return (
-                  <div key={sectionId} className="space-y-2">
-                    {reorderBar}
-                    <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Volatility</h4>
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
-                      <div className="flex items-center gap-2">
-                        <Pulse size={16} weight="regular" className="text-[var(--data-warning)]" />
-                        <div className="flex flex-col">
-                          <span className="text-xs font-medium text-[var(--text-primary)]">VIX</span>
-                          <span className="text-[10px] text-[var(--text-muted)]">Fear Index</span>
-                        </div>
+              {/* Indices */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Indices</h4>
+                <div className="space-y-2">
+                  {defaultIndices.map((index) => (
+                    <div
+                      key={index.symbol}
+                      className={cn(
+                        "flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150",
+                        "border-l-2",
+                        index.changePercent !== null && index.changePercent >= 0
+                          ? "border-l-[var(--data-positive)]/40"
+                          : index.changePercent !== null
+                          ? "border-l-[var(--data-negative)]/40"
+                          : "border-l-[var(--text-muted)]/20"
+                      )}
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-xs font-medium text-[var(--text-primary)]">{index.symbol}</span>
+                        <span className="text-[10px] text-[var(--text-muted)]">{index.name}</span>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="text-sm font-bold font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(defaultVix)}</span>
-                        <span className={cn("text-[10px] font-medium font-mono tabular-nums", getChangeColor(defaultVixChange))}>
-                          {formatPercent(defaultVixChange)}
+                        <span className="text-xs font-semibold font-mono tabular-nums text-[var(--text-primary)]">
+                          {formatPrice(index.price)}
+                        </span>
+                        <span className={cn("text-[10px] font-medium font-mono tabular-nums", getChangeColor(index.changePercent))}>
+                          {formatPercent(index.changePercent)}
                         </span>
                       </div>
                     </div>
-                  </div>
-                )
-
-                if (sectionId === 'sectors') return (
-                  <div key={sectionId} className="space-y-2">
-                    {reorderBar}
-                    <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
-                      Sector Performance
-                    </h4>
-                    <div className="space-y-1.5">
-                      {defaultSectors.map((sector) => (
-                        <button
-                          key={sector.name}
-                          onClick={() => {
-                            const sp500Name = sectorToSP500[sector.name] || sector.name
-                            router.push(`/heatmap?sector=${encodeURIComponent(sp500Name)}`)
-                          }}
-                          className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors duration-150 cursor-pointer group"
-                        >
-                          <span className="text-xs text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors duration-150">{sector.name}</span>
-                          <div className="flex items-center gap-1.5">
-                            <span className={cn("text-xs font-medium font-mono tabular-nums", getChangeColor(sector.changePercent))}>
-                              {formatPercent(sector.changePercent)}
-                            </span>
-                            {sector.changePercent !== null && (
-                              <div
-                                className={cn(
-                                  "p-0.5 rounded",
-                                  sector.changePercent >= 0 ? "bg-[var(--data-positive)]/10" : "bg-[var(--data-negative)]/10",
-                                )}
-                              >
-                                {sector.changePercent >= 0 ? (
-                                  <TrendUp size={12} weight="regular" className="text-[var(--data-positive)]" />
-                                ) : (
-                                  <TrendDown size={12} weight="regular" className="text-[var(--data-negative)]" />
-                                )}
-                              </div>
-                            )}
-                            <CaretRight size={12} weight="regular" className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )
-
-                if (sectionId === 'positions') return (
-                  <div key={sectionId} className="space-y-2">
-                    {reorderBar}
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-                        <Briefcase size={12} weight="regular" />
-                        Active Positions
-                      </h4>
-                      <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">{openTrades.length}</span>
-                    </div>
-                    <div className="space-y-1.5">
-                      {openTrades.map((trade) => (
-                        <div
-                          key={trade.id}
-                          onClick={() => onPrefillChat?.(buildPositionReviewPrompt(trade))}
-                          className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className={cn(
-                              "text-[9px] font-semibold px-1.5 py-0.5 rounded uppercase",
-                              trade.direction === 'long'
-                                ? "bg-[var(--data-positive)]/10 text-[var(--data-positive)]"
-                                : "bg-[var(--data-negative)]/10 text-[var(--data-negative)]"
-                            )}>
-                              {trade.direction}
-                            </span>
-                            <span className="text-xs font-semibold text-[var(--text-primary)]">{trade.ticker}</span>
-                          </div>
-                          <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">
-                            ${trade.entry_price.toFixed(2)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-
-                if (sectionId === 'watchlist') return (
-                  <div key={sectionId} className="space-y-2">
-                    {reorderBar}
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-                        <Star size={12} weight="regular" />
-                        Watchlist
-                      </h4>
-                      <button
-                        onClick={() => setEditingWatchlist(!editingWatchlist)}
-                        className="text-[10px] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors duration-150 font-medium"
-                      >
-                        {editingWatchlist ? "Done" : "Edit"}
-                      </button>
-                    </div>
-
-                    {/* Loading state */}
-                    {watchlistLoading && watchlistTickers.length === 0 && (
-                      <div className="space-y-1.5">
-                        {[1, 2, 3].map((i) => (
-                          <div key={i} className="h-10 rounded-lg bg-[var(--bg-surface)] animate-pulse" />
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Empty state */}
-                    {!watchlistLoading && watchlistTickers.length === 0 && !editingWatchlist && (
-                      <div className="p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-center">
-                        <Star size={20} weight="thin" className="text-[var(--text-muted)] mx-auto mb-1.5" />
-                        <p className="text-[10px] text-[var(--text-muted)] leading-relaxed">
-                          No tickers on your watchlist.<br />Use chat to add stocks or click Edit.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Ticker list */}
-                    <div className="space-y-1.5">
-                      {watchlistTickers.map((ticker) => (
-                        <div key={ticker.symbol} className="flex items-center gap-1">
-                          {editingWatchlist ? (
-                            <>
-                              <div className="flex-1 flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
-                                <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
-                                <div className="flex flex-col items-end">
-                                  <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price)}</span>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => removeFromWatchlist(ticker.symbol)}
-                                className="p-1.5 rounded-md text-[var(--data-negative)] hover:bg-[var(--data-negative)]/10 transition-colors duration-150"
-                              >
-                                <X size={14} weight="bold" />
-                              </button>
-                            </>
-                          ) : (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button className="w-full flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150 text-left">
-                                  <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
-                                  <div className="flex flex-col items-end">
-                                    <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price)}</span>
-                                    <div
-                                      className={cn(
-                                        "text-[10px] font-medium font-mono tabular-nums px-1.5 py-0.5 rounded",
-                                        getChangeBg(ticker.changePercent),
-                                        getChangeColor(ticker.changePercent),
-                                      )}
-                                    >
-                                      {formatPercent(ticker.changePercent)}
-                                    </div>
-                                  </div>
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="w-48">
-                                <DropdownMenuItem onClick={() => showChart(ticker.symbol)}>
-                                  <ChartLineUp size={14} weight="regular" className="mr-2" />
-                                  Open Chart
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onPrefillChat?.(`Analyze ${ticker.symbol}`)}>
-                                  <ChatCircle size={14} weight="regular" className="mr-2" />
-                                  Ask Pelican
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onPrefillChat?.(`Deep dive on ${ticker.symbol} — technicals, fundamentals, and sentiment`)}>
-                                  <MagnifyingGlass size={14} weight="regular" className="mr-2" />
-                                  Deep Dive
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => removeFromWatchlist(ticker.symbol)}
-                                  className="text-[var(--data-negative)] focus:text-[var(--data-negative)]"
-                                >
-                                  <Trash size={14} weight="regular" className="mr-2" />
-                                  Remove
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Add ticker input (edit mode) */}
-                    {editingWatchlist && (
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex-1 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] focus-within:border-[var(--accent-primary)] transition-colors duration-150">
-                          <Plus size={12} weight="regular" className="text-[var(--text-muted)] shrink-0" />
-                          <input
-                            ref={addInputRef}
-                            type="text"
-                            value={addTickerInput}
-                            onChange={(e) => setAddTickerInput(e.target.value.toUpperCase())}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") handleAddTicker()
-                            }}
-                            placeholder="Add symbol..."
-                            className="flex-1 bg-transparent text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none"
-                            maxLength={10}
-                          />
-                        </div>
-                        <button
-                          onClick={handleAddTicker}
-                          disabled={!addTickerInput.trim()}
-                          className="px-2.5 py-1.5 rounded-lg text-[10px] font-medium bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-150"
-                        >
-                          Add
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )
-
-                return null
-              })}
+                  ))}
+                </div>
+              </div>
 
               {/* Refresh indicator */}
               {isLoading && (
