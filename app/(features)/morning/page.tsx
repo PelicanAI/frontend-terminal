@@ -8,6 +8,7 @@ import { useTrades } from "@/hooks/use-trades"
 import { useMorningBrief } from "@/hooks/use-morning-brief"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
+import { useWatchlist } from "@/hooks/use-watchlist"
 import {
   PelicanCard,
   PageHeader,
@@ -123,6 +124,7 @@ export default function MorningPage() {
   const { openTrades, isLoading: tradesLoading } = useTrades({ status: 'open' })
   const { movers, isLoading: moversLoading, refetch: refetchMovers } = useMorningBrief()
   const { openWithPrompt } = usePelicanPanelContext()
+  const { items: watchlistItems } = useWatchlist()
 
   // Get live quotes for open positions to calculate unrealized P&L
   const openTickersWithTypes = openTrades
@@ -263,29 +265,102 @@ export default function MorningPage() {
     await openWithPrompt(trade.ticker, prompt, "morning")
   }
 
-  const handleGenerateBrief = async () => {
+  const buildMorningBriefPrompt = useCallback(() => {
+    const now = new Date()
+    const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
+
+    const positionsSummary = openTrades.length > 0
+      ? openTrades.map(t =>
+          `${t.direction.toUpperCase()} ${t.ticker} @ ${t.entry_price}${t.stop_loss ? ` (stop: ${t.stop_loss})` : ''}${t.take_profit ? ` (target: ${t.take_profit})` : ''}${t.pnl_percent != null ? ` P&L: ${t.pnl_percent >= 0 ? '+' : ''}${t.pnl_percent.toFixed(1)}%` : ''}`
+        ).join('\n')
+      : 'No open positions'
+
+    const watchlistSummary = watchlistItems.length > 0
+      ? watchlistItems.map(w => w.ticker).join(', ')
+      : 'No watchlist items'
+
+    const topMovers = [...movers.gainers, ...movers.losers]
+      .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
+    const moversSummary = topMovers.slice(0, 10).map(m =>
+      `${m.ticker}: ${m.changePercent >= 0 ? '+' : ''}${m.changePercent.toFixed(1)}%`
+    ).join(', ')
+
+    return `You are Pelican, an institutional-grade AI trading assistant delivering a comprehensive morning briefing.
+
+Date: ${dateStr}
+Time: ${timeStr}
+
+MY OPEN POSITIONS:
+${positionsSummary}
+
+MY WATCHLIST:
+${watchlistSummary}
+
+TODAY'S TOP MOVERS:
+${moversSummary || 'Loading...'}
+
+Generate my personalized morning brief covering ALL of the following sections. Be specific with numbers, levels, and tickers. No fluff — write like a Goldman Sachs morning note meets a trading desk briefing.
+
+**1. MARKET OVERNIGHT RECAP**
+- How did futures trade overnight? Where are S&P, Nasdaq, Dow futures right now?
+- What happened in Asia and Europe sessions?
+- Any overnight gaps or significant moves?
+
+**2. KEY LEVELS TODAY**
+- S&P 500: support, resistance, and pivot levels
+- Nasdaq: support, resistance, and pivot levels
+- VIX: current level and what it signals
+- DXY (dollar index): direction and impact
+
+**3. MY POSITIONS UPDATE**
+- For each of my open positions: current price vs my entry, how far from stop/target, any overnight news affecting them
+- Risk assessment: which positions need attention today?
+- Any positions approaching stop loss or take profit?
+
+**4. WATCHLIST OPPORTUNITIES**
+- For each ticker on my watchlist: current setup, key levels to watch, any catalysts today
+- Which watchlist items have the best risk/reward for entry today?
+
+**5. MACRO & CATALYSTS**
+- Economic data releases today (times, consensus, potential impact)
+- Fed speakers or central bank events
+- Earnings reports today (pre-market and after-hours)
+- Any geopolitical developments affecting markets
+
+**6. SECTOR ROTATION**
+- Which sectors are showing relative strength/weakness?
+- Any notable sector divergences from the broad market?
+- Money flow signals
+
+**7. TOP MOVERS ANALYSIS**
+- Why are today's biggest movers moving? (earnings, news, technical breakouts)
+- Any of these relevant to my positions or watchlist?
+
+**8. TRADE IDEAS**
+- 1-2 high-conviction trade ideas based on today's setup
+- Entry, stop, target for each
+- Thesis and catalyst
+
+**9. RISK WARNINGS**
+- What could go wrong today? Key risk events
+- Unusual options activity or volatility signals
+- Any signs of market stress?
+
+**10. GAME PLAN**
+- Summarize: what am I doing today?
+- Key price alerts to set
+- Times to pay attention to (data releases, market open, power hour)
+
+Keep it dense, actionable, and personalized to MY positions and watchlist. Use markdown headers for each section.`
+  }, [openTrades, watchlistItems, movers.gainers, movers.losers])
+
+  const handleGenerateBrief = useCallback(async () => {
     setBriefLoading(true)
     setBriefError(null)
     setBriefContent('')
 
-    const prompt = `Generate my morning trading brief for ${new Date().toLocaleDateString()}:
-
-**My Open Positions** (${openTrades.length} trades):
-${openTrades.map((t) => `- ${t.ticker} ${t.direction.toUpperCase()} @ $${t.entry_price} (${t.quantity} shares)`).join('\n') || 'No open positions'}
-
-**Top Gainers**:
-${movers.gainers.slice(0, 5).map((m) => `- ${m.ticker}: +${m.changePercent.toFixed(2)}% @ $${m.price.toFixed(2)}`).join('\n')}
-
-**Top Losers**:
-${movers.losers.slice(0, 5).map((m) => `- ${m.ticker}: ${m.changePercent.toFixed(2)}% @ $${m.price.toFixed(2)}`).join('\n')}
-
-**Market Status**: ${marketStatus}
-
-Please provide:
-1. Key market themes for today
-2. Analysis of my open positions with risk/opportunity assessment
-3. Notable movers and what's driving them
-4. 2-3 actionable insights for today's session`
+    const prompt = buildMorningBriefPrompt()
 
     try {
       const response = await fetch('/api/chat/stream', {
@@ -351,7 +426,19 @@ Please provide:
     } finally {
       setBriefLoading(false)
     }
-  }
+  }, [buildMorningBriefPrompt])
+
+  // Auto-generate brief if no cache exists (runs once on mount)
+  const [autoGenTriggered, setAutoGenTriggered] = useState(false)
+  useEffect(() => {
+    if (autoGenTriggered || briefLoading || briefContent) return
+    const today = new Date().toISOString().split('T')[0]
+    const cached = localStorage.getItem(`pelican-brief-${today}`)
+    if (!cached) {
+      setAutoGenTriggered(true)
+      handleGenerateBrief()
+    }
+  }, [autoGenTriggered, briefLoading, briefContent, handleGenerateBrief])
 
   return (
     <div className="h-full overflow-auto p-4 sm:p-6">
@@ -377,6 +464,85 @@ Please provide:
           </div>
         }
       />
+
+      {/* Pelican Brief — full width, above the grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+        className="mt-6"
+      >
+        <PelicanCard accentGlow className="p-6">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Lightning className="h-5 w-5 text-[var(--accent-primary)]" weight="bold" />
+              <h3 className="font-semibold text-lg text-[var(--text-primary)]">Pelican Brief</h3>
+            </div>
+            {briefContent && !briefLoading && (
+              <PelicanButton
+                variant="ghost"
+                size="sm"
+                onClick={handleGenerateBrief}
+              >
+                <ArrowsClockwise className="h-3 w-3" weight="regular" />
+                Regenerate
+              </PelicanButton>
+            )}
+          </div>
+
+          {/* Empty state */}
+          {!briefContent && !briefLoading && !briefError && (
+            <>
+              <p className="text-sm text-[var(--text-muted)] mb-4">
+                AI-generated morning intelligence across your positions, movers, and macro setup.
+              </p>
+              <PelicanButton
+                variant="primary"
+                onClick={handleGenerateBrief}
+              >
+                <Lightning className="h-4 w-4" weight="bold" />
+                Generate Brief
+              </PelicanButton>
+            </>
+          )}
+
+          {/* Loading state */}
+          {briefLoading && !briefContent && (
+            <div className="flex items-center gap-3 py-8">
+              <div className="h-5 w-5 border-2 border-[var(--accent-muted)] border-t-[var(--accent-primary)] rounded-full animate-spin" />
+              <span className="text-sm text-[var(--text-muted)]">
+                Generating your morning brief...
+              </span>
+            </div>
+          )}
+
+          {/* Streamed/completed content */}
+          {briefContent && (
+            <div className="text-[var(--text-secondary)] leading-relaxed">
+              <MessageContent
+                content={briefContent}
+                isStreaming={briefLoading}
+                showSkeleton={false}
+              />
+            </div>
+          )}
+
+          {/* Error state */}
+          {briefError && (
+            <div>
+              <p className="text-sm text-[var(--data-negative)] mb-3">{briefError}</p>
+              <PelicanButton
+                variant="ghost"
+                size="sm"
+                onClick={handleGenerateBrief}
+              >
+                Try again
+              </PelicanButton>
+            </div>
+          )}
+        </PelicanCard>
+      </motion.div>
 
       <motion.div
         variants={staggerContainer}
@@ -731,79 +897,6 @@ Please provide:
           <MarketSessions />
         </motion.div>
 
-        {/* Pelican Brief */}
-        <motion.div variants={staggerItem} className="lg:col-span-2 mt-4">
-          <PelicanCard accentGlow className="p-6">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Lightning className="h-5 w-5 text-[var(--accent-primary)]" weight="bold" />
-                <h3 className="font-semibold text-lg text-[var(--text-primary)]">Pelican Brief</h3>
-              </div>
-              {briefContent && !briefLoading && (
-                <PelicanButton
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleGenerateBrief}
-                >
-                  <ArrowsClockwise className="h-3 w-3" weight="regular" />
-                  Regenerate
-                </PelicanButton>
-              )}
-            </div>
-
-            {/* Empty state */}
-            {!briefContent && !briefLoading && !briefError && (
-              <>
-                <p className="text-sm text-[var(--text-muted)] mb-4">
-                  AI-generated morning intelligence across your positions, movers, and macro setup.
-                </p>
-                <PelicanButton
-                  variant="primary"
-                  onClick={handleGenerateBrief}
-                >
-                  <Lightning className="h-4 w-4" weight="bold" />
-                  Generate Brief
-                </PelicanButton>
-              </>
-            )}
-
-            {/* Loading state */}
-            {briefLoading && (
-              <div className="flex items-center gap-3 py-8">
-                <div className="h-5 w-5 border-2 border-[var(--accent-muted)] border-t-[var(--accent-primary)] rounded-full animate-spin" />
-                <span className="text-sm text-[var(--text-muted)]">
-                  Generating your morning brief...
-                </span>
-              </div>
-            )}
-
-            {/* Streamed/completed content */}
-            {briefContent && (
-              <div className="text-[var(--text-secondary)] leading-relaxed">
-                <MessageContent
-                  content={briefContent}
-                  isStreaming={briefLoading}
-                  showSkeleton={false}
-                />
-              </div>
-            )}
-
-            {/* Error state */}
-            {briefError && (
-              <div>
-                <p className="text-sm text-[var(--data-negative)] mb-3">{briefError}</p>
-                <PelicanButton
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleGenerateBrief}
-                >
-                  Try again
-                </PelicanButton>
-              </div>
-            )}
-          </PelicanCard>
-        </motion.div>
       </motion.div>
     </div>
   )
