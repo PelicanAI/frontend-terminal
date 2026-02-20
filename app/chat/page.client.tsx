@@ -538,8 +538,8 @@ export default function ChatPage() {
 
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto overscroll-none pb-[120px] md:pb-0 chat-scroll-area">
-            <div className="max-w-5xl mx-auto w-full px-4 sm:px-6">
+          <div className="flex-1 overflow-y-auto overscroll-none pb-[120px] md:pb-0 chat-scroll-area flex flex-col">
+            <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 flex-1 flex flex-col">
               <OnboardingSkipBanner />
               {tiltAlerts.length > 0 && (
                 <div className="mb-4">
