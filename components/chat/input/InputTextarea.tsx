@@ -72,6 +72,11 @@ export const InputTextarea = forwardRef<InputTextareaRef, InputTextareaProps>(
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault()
+        // During streaming: Enter queues the message instead of blocking
+        if ((isAIResponding || disabledSend) && queueEnabled) {
+          onQueueMessage?.()
+          return
+        }
         if (isAIResponding || disabledSend) {
           showThinkingNoteRef.current = true
           setTimeout(() => {
@@ -80,11 +85,6 @@ export const InputTextarea = forwardRef<InputTextareaRef, InputTextareaProps>(
           return
         }
         onSubmit()
-      }
-
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && queueEnabled && disabledSend) {
-        e.preventDefault()
-        onQueueMessage?.()
       }
     }
 

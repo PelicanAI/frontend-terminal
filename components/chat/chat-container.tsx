@@ -45,6 +45,7 @@ interface ChatContainerProps {
   onOpenCloseTrade?: (tradeId: string) => void
   onSubmitPrompt?: (prompt: string) => void
   onSaveInsight?: (content: string, tickers: string[]) => Promise<boolean>
+  pendingDraft?: string | null
 }
 
 export function ChatContainer({
@@ -70,6 +71,7 @@ export function ChatContainer({
   onOpenCloseTrade,
   onSubmitPrompt,
   onSaveInsight,
+  pendingDraft,
 }: ChatContainerProps) {
   const { toast } = useToast()
   const elapsedSeconds = useResponseTimer(isLoading)
@@ -439,6 +441,19 @@ export function ChatContainer({
               <span className="text-xs text-muted-foreground/50 font-mono tabular-nums">
                 {elapsedSeconds}s
               </span>
+            </div>
+          )}
+
+          {/* Ghost bubble for queued message */}
+          {pendingDraft && (
+            <div className="flex justify-end px-4 sm:px-8 max-w-3xl mx-auto w-full opacity-50 pb-2">
+              <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-[var(--accent-primary)]/10 border border-dashed border-[var(--accent-primary)]/20 px-4 py-3">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--data-warning)] animate-pulse" />
+                  <span className="text-[10px] uppercase tracking-wider text-[var(--data-warning)] font-medium">Queued</span>
+                </div>
+                <p className="text-sm text-[var(--text-secondary)]">{pendingDraft}</p>
+              </div>
             </div>
           )}
 

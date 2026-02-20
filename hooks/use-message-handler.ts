@@ -99,6 +99,14 @@ export function useMessageHandler({
     [draftConversationId],
   )
 
+  const cancelPendingMessage = useCallback(() => {
+    const cancelled = pendingMessage?.content || null
+    setPendingMessage(null)
+    setIsQueueingMessage(false)
+    setIsDraftWhileStreaming(false)
+    return cancelled
+  }, [pendingMessage])
+
   const resetDraftState = useCallback(() => {
     setIsDraftWhileStreaming(false)
     setIsTypingDuringResponse(false)
@@ -111,6 +119,7 @@ export function useMessageHandler({
     handleForceQueue,
     handleMessageFinish,
     clearDraftForConversation,
+    cancelPendingMessage,
     resetDraftState,
     pendingDraft: pendingMessage?.content || null,
     isDraftWhileStreaming,

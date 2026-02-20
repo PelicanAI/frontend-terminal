@@ -28,6 +28,7 @@ export interface ChatInputProps {
   pendingAttachments?: PendingAttachment[]
   onRetryAttachment?: (id: string) => void
   pendingDraft?: string | null
+  onCancelDraft?: () => void
   onStopResponse?: () => void
 }
 

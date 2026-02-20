@@ -565,6 +565,7 @@ export default function ChatPage() {
                 onOpenCloseTrade={handleOpenCloseTrade}
                 onSubmitPrompt={messageHandler.handleSendMessage}
                 onSaveInsight={handleSaveInsight}
+                pendingDraft={messageHandler.pendingDraft}
               />
             </div>
           </div>
@@ -598,7 +599,10 @@ export default function ChatPage() {
                 placeholder={outOfCredits ? "Upgrade to continue..." : "Ask Pelican anything..."}
                 onTypingDuringResponse={messageHandler.handleTypingDuringResponse}
                 isAIResponding={chatLoading}
+                onQueueMessage={messageHandler.handleForceQueue}
+                queueEnabled={chatLoading}
                 pendingDraft={messageHandler.pendingDraft}
+                onCancelDraft={messageHandler.cancelPendingMessage}
                 attachments={fileUpload.uploadedFiles.map((f) => ({
                   name: f.name,
                   type: f.type,

@@ -39,12 +39,16 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       pendingAttachments = [],
       onRetryAttachment,
       pendingDraft,
+      onCancelDraft,
       onStopResponse,
     },
     ref,
   ) => {
     const t = useT()
-    const actualPlaceholder = placeholder || t.chat.messagePlaceholder
+    const streamingPlaceholder = "Type to queue next message..."
+    const actualPlaceholder = isAIResponding && queueEnabled
+      ? streamingPlaceholder
+      : (placeholder || t.chat.messagePlaceholder)
     const [isDragOver, setIsDragOver] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
     const [message, setMessage] = useState("")
@@ -68,6 +72,15 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
       if (message.trim() && onQueueMessage) {
         onQueueMessage(message.trim())
         setMessage("")
+      }
+    }
+
+    const handleEditDraft = () => {
+      if (pendingDraft && onCancelDraft) {
+        const content = pendingDraft
+        onCancelDraft()
+        setMessage(content)
+        textareaRef.current?.focus()
       }
     }
 
@@ -146,6 +159,19 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
             {isDragOver && <DragOverlay />}
           </AnimatePresence>
 
+          {/* Queued message banner — above input */}
+          <AnimatePresence mode="wait">
+            {pendingDraft && (
+              <div className="mb-2 flex justify-center">
+                <DraftIndicator
+                  pendingDraft={pendingDraft}
+                  onCancel={onCancelDraft}
+                  onEdit={handleEditDraft}
+                />
+              </div>
+            )}
+          </AnimatePresence>
+
           <div
             className={cn(
               "relative flex items-center gap-2 px-4 py-2",
@@ -203,8 +229,6 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
               />
             )}
           </AnimatePresence>
-
-          {pendingDraft && <DraftIndicator pendingDraft={pendingDraft} />}
         </div>
 
       </div>
