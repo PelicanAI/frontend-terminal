@@ -27,9 +27,10 @@ const tooltipFormatter: any = (value: number | undefined, name: string | undefin
 
 interface TimeOfDayChartProps {
   data: TimeOfDayInsight[]
+  onAskPelican?: (prompt: string) => void
 }
 
-export function TimeOfDayChart({ data }: TimeOfDayChartProps) {
+export function TimeOfDayChart({ data, onAskPelican }: TimeOfDayChartProps) {
   const chartData = data.map((d) => ({
     name: SESSION_LABELS[d.session] ?? d.session,
     winRate: Number(d.win_rate.toFixed(1)),
@@ -77,12 +78,25 @@ export function TimeOfDayChart({ data }: TimeOfDayChartProps) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex items-center gap-4 mt-3 text-xs text-[var(--text-muted)]">
-        {chartData.map((d) => (
-          <span key={d.name}>
-            {d.name}: <span className="font-mono tabular-nums">{d.trades}</span> trades
-          </span>
-        ))}
+      <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
+          {chartData.map((d) => (
+            <span key={d.name}>
+              {d.name}: <span className="font-mono tabular-nums">{d.trades}</span> trades
+            </span>
+          ))}
+        </div>
+        {onAskPelican && (
+          <button
+            onClick={() => {
+              const summary = chartData.map(d => `${d.name}: ${d.winRate}% WR (${d.trades} trades)`).join(', ')
+              onAskPelican(`Analyze my time-of-day trading patterns: ${summary}. Which sessions should I focus on? Which should I avoid?`)
+            }}
+            className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors whitespace-nowrap"
+          >
+            Ask Pelican &rarr;
+          </button>
+        )}
       </div>
     </PelicanCard>
   )

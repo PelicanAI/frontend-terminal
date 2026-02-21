@@ -14,6 +14,7 @@ interface TradesTableProps {
   onSelectTrade: (trade: Trade) => void
   selectedTradeId?: string | null
   onScanTrade?: (trade: Trade) => void
+  onAskPelican?: (prompt: string) => void
 }
 
 function getUnrealizedPnL(trade: Trade, quotes: Record<string, Quote>) {
@@ -41,7 +42,7 @@ function getUnrealizedPnL(trade: Trade, quotes: Record<string, Quote>) {
 type SortField = 'entry_date' | 'ticker' | 'pnl_amount' | 'pnl_percent'
 type SortDirection = 'asc' | 'desc'
 
-export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrade }: TradesTableProps) {
+export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrade, onAskPelican }: TradesTableProps) {
   const [sortField, setSortField] = useState<SortField>('entry_date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
@@ -296,12 +297,37 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                 <td className="py-3 px-4 text-center">
                   {trade.ai_grade && (trade.ai_grade as Record<string, unknown>).overall_grade ? (
                     <GradeBadge grade={String((trade.ai_grade as Record<string, unknown>).overall_grade)} />
+                  ) : trade.status === 'closed' && onAskPelican ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onAskPelican(
+                          `Grade my ${trade.ticker} ${trade.direction.toUpperCase()} trade. ` +
+                          `Entry: $${trade.entry_price}, Exit: $${trade.exit_price}. ` +
+                          `P&L: ${trade.pnl_amount != null ? `$${trade.pnl_amount.toFixed(2)}` : 'N/A'}. ` +
+                          (trade.thesis ? `Thesis: "${trade.thesis}". ` : '') +
+                          (trade.r_multiple != null ? `R-Multiple: ${trade.r_multiple.toFixed(2)}. ` : '') +
+                          `Grade this trade A through F. What did I do right? What should I improve?`
+                        )
+                      }}
+                      className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors whitespace-nowrap"
+                    >
+                      Grade &rarr;
+                    </button>
                   ) : (
                     <span className="text-[var(--text-disabled)]">—</span>
                   )}
                 </td>
                 <td className="py-3 px-4 text-right">
-                  {onScanTrade && (
+                  {trade.status === 'open' ? (
+                    <a
+                      href="/positions"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors whitespace-nowrap"
+                    >
+                      Monitor &rarr;
+                    </a>
+                  ) : onScanTrade ? (
                     <PelicanButton
                       variant="secondary"
                       size="sm"
@@ -313,7 +339,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                     >
                       SCAN
                     </PelicanButton>
-                  )}
+                  ) : null}
                 </td>
               </tr>
             )
@@ -407,9 +433,24 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                 <div className="flex items-center justify-between">
                   <div className="text-xs font-mono tabular-nums text-[var(--text-muted)]">{new Date(trade.entry_date).toLocaleDateString()}</div>
                   <div className="flex items-center gap-2">
-                    {trade.ai_grade && String((trade.ai_grade as Record<string, unknown>).overall_grade || '') !== '' && (
+                    {trade.ai_grade && String((trade.ai_grade as Record<string, unknown>).overall_grade || '') !== '' ? (
                       <GradeBadge grade={String((trade.ai_grade as Record<string, unknown>).overall_grade)} />
-                    )}
+                    ) : trade.status === 'closed' && onAskPelican ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onAskPelican(
+                            `Grade my ${trade.ticker} ${trade.direction.toUpperCase()} trade. ` +
+                            `Entry: $${trade.entry_price}, Exit: $${trade.exit_price}. ` +
+                            `P&L: ${trade.pnl_amount != null ? `$${trade.pnl_amount.toFixed(2)}` : 'N/A'}. ` +
+                            `Grade this trade A through F.`
+                          )
+                        }}
+                        className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors"
+                      >
+                        Grade &rarr;
+                      </button>
+                    ) : null}
                     <span
                       className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded-full font-medium uppercase ${
                         trade.status === 'open'
@@ -422,7 +463,15 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                       {trade.status === 'open' && <div className="w-1.5 h-1.5 rounded-full bg-[var(--status-open)] animate-pulse" />}
                       {trade.status}
                     </span>
-                    {onScanTrade && (
+                    {trade.status === 'open' ? (
+                      <a
+                        href="/positions"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors"
+                      >
+                        Monitor &rarr;
+                      </a>
+                    ) : onScanTrade ? (
                       <PelicanButton
                         variant="secondary"
                         size="sm"
@@ -434,7 +483,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                       >
                         SCAN
                       </PelicanButton>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               </PelicanCard>

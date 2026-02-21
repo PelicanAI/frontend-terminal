@@ -28,9 +28,10 @@ const tooltipFormatter: any = (value: number | undefined, name: string | undefin
 
 interface HoldingPeriodChartProps {
   data: HoldingPeriodInsight[]
+  onAskPelican?: (prompt: string) => void
 }
 
-export function HoldingPeriodChart({ data }: HoldingPeriodChartProps) {
+export function HoldingPeriodChart({ data, onAskPelican }: HoldingPeriodChartProps) {
   const chartData = data.map((d) => ({
     name: PERIOD_LABELS[d.period] ?? d.period,
     winRate: Number(d.win_rate.toFixed(1)),
@@ -78,12 +79,25 @@ export function HoldingPeriodChart({ data }: HoldingPeriodChartProps) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex items-center gap-4 mt-3 text-xs text-[var(--text-muted)]">
-        {chartData.map((d) => (
-          <span key={d.name}>
-            {d.name}: <span className="font-mono tabular-nums">{d.trades}</span> trades
-          </span>
-        ))}
+      <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
+          {chartData.map((d) => (
+            <span key={d.name}>
+              {d.name}: <span className="font-mono tabular-nums">{d.trades}</span> trades
+            </span>
+          ))}
+        </div>
+        {onAskPelican && (
+          <button
+            onClick={() => {
+              const summary = chartData.map(d => `${d.name}: ${d.winRate}% WR (${d.trades} trades)`).join(', ')
+              onAskPelican(`Analyze my holding period patterns: ${summary}. What's my optimal holding period? Am I holding too long or cutting too early?`)
+            }}
+            className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors whitespace-nowrap"
+          >
+            Ask Pelican &rarr;
+          </button>
+        )}
       </div>
     </PelicanCard>
   )

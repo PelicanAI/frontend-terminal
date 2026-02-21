@@ -451,10 +451,22 @@ export function TradingPlanTab({ trades, onAskPelican }: TradingPlanTabProps) {
         <p className="text-sm text-[var(--text-secondary)] max-w-sm mb-6">
           Define your risk rules, requirements, and discipline guidelines to keep yourself accountable.
         </p>
-        <PelicanButton onClick={startCreate} variant="primary">
-          <Plus size={16} weight="bold" />
-          Create Trading Plan
-        </PelicanButton>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <PelicanButton onClick={startCreate} variant="primary">
+            <Plus size={16} weight="bold" />
+            Create Trading Plan
+          </PelicanButton>
+          <PelicanButton
+            onClick={() => onAskPelican(
+              'Help me build a trading plan. Ask me about my experience level, risk tolerance, account size, ' +
+              'preferred asset types, and trading style. Then create a comprehensive plan with: max risk per trade, ' +
+              'daily loss limit, max positions, R:R requirements, and discipline rules. Be specific with numbers.'
+            )}
+            variant="secondary"
+          >
+            Build My Plan with Pelican
+          </PelicanButton>
+        </div>
       </motion.div>
     )
   }

@@ -7,6 +7,7 @@ import type { CalendarInsight } from "@/hooks/use-behavioral-insights"
 
 interface CalendarCardProps {
   data: CalendarInsight
+  onAskPelican?: (prompt: string) => void
 }
 
 function StatRow({
@@ -54,7 +55,7 @@ function StatRow({
   )
 }
 
-export function CalendarCard({ data }: CalendarCardProps) {
+export function CalendarCard({ data, onAskPelican }: CalendarCardProps) {
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-4">
@@ -104,6 +105,21 @@ export function CalendarCard({ data }: CalendarCardProps) {
             Not enough calendar data yet
           </p>
         )}
+      {onAskPelican && (data.mondays.total_trades > 0 || data.fridays.total_trades > 0) && (
+        <button
+          onClick={() => {
+            const parts: string[] = []
+            if (data.mondays.total_trades > 0) parts.push(`Mondays: ${data.mondays.win_rate.toFixed(1)}% WR (${data.mondays.total_trades} trades)`)
+            if (data.fridays.total_trades > 0) parts.push(`Fridays: ${data.fridays.win_rate.toFixed(1)}% WR (${data.fridays.total_trades} trades)`)
+            if (data.opex_fridays.total_trades > 0) parts.push(`OPEX Fridays: ${data.opex_fridays.win_rate.toFixed(1)}% WR (${data.opex_fridays.total_trades} trades)`)
+            if (data.first_trade_of_day.total_trades > 0) parts.push(`First Trade: ${data.first_trade_of_day.win_rate.toFixed(1)}% WR`)
+            onAskPelican(`Analyze my calendar patterns: ${parts.join('. ')}. Are there days I should avoid trading? Any patterns to exploit?`)
+          }}
+          className="mt-3 text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors"
+        >
+          Ask Pelican &rarr;
+        </button>
+      )}
     </PelicanCard>
   )
 }

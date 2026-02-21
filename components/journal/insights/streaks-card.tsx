@@ -7,9 +7,10 @@ import type { StreakInsight } from "@/hooks/use-behavioral-insights"
 
 interface StreaksCardProps {
   data: StreakInsight
+  onAskPelican?: (prompt: string) => void
 }
 
-export function StreaksCard({ data }: StreaksCardProps) {
+export function StreaksCard({ data, onAskPelican }: StreaksCardProps) {
   const isWinning = data.current_streak_type === "winning"
   const isLosing = data.current_streak_type === "losing"
 
@@ -97,6 +98,19 @@ export function StreaksCard({ data }: StreaksCardProps) {
           </div>
         )}
       </div>
+      {onAskPelican && (
+        <button
+          onClick={() => onAskPelican(
+            `Analyze my streak patterns. Current: ${data.current_streak_count} ${data.current_streak_type === 'winning' ? 'wins' : data.current_streak_type === 'losing' ? 'losses' : 'flat'}. ` +
+            `Best win streak: ${data.max_win_streak}. Worst loss streak: ${data.max_loss_streak}. ` +
+            `After 2 consecutive losses: ${data.after_2_consecutive_losses.win_rate.toFixed(1)}% WR. ` +
+            `What does this tell you about my psychology? Should I adjust my sizing after streaks?`
+          )}
+          className="mt-3 text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors"
+        >
+          Ask Pelican &rarr;
+        </button>
+      )}
     </PelicanCard>
   )
 }

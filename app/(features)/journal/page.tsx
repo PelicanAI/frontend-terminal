@@ -16,17 +16,12 @@ import { CloseTradeModal } from "@/components/journal/close-trade-modal"
 import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
 import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
-import { PageHeader, PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/pelican"
-import { Plus, ChartBar, Funnel, CalendarBlank, UserCircle, ClipboardText, Brain } from "@phosphor-icons/react"
+import { PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/pelican"
+import { Plus, ChartBar, Funnel, ClipboardText, Brain, UserCircle } from "@phosphor-icons/react"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 
-const PositionsDashboardTab = dynamicImport(
-  () => import("@/components/positions/positions-dashboard-tab").then((m) => ({ default: m.PositionsDashboardTab })),
-  { ssr: false }
-)
-
-const CalendarTab = dynamicImport(
-  () => import("@/components/positions/calendar-tab").then((m) => ({ default: m.CalendarTab })),
+const PerformanceTab = dynamicImport(
+  () => import("@/components/journal/performance-tab").then((m) => ({ default: m.PerformanceTab })),
   { ssr: false }
 )
 
@@ -45,8 +40,15 @@ const InsightsTab = dynamicImport(
   { ssr: false }
 )
 
-type TabKey = 'dashboard' | 'trades' | 'calendar' | 'profile' | 'plan' | 'insights'
+type TabKey = 'performance' | 'trades' | 'plan' | 'insights'
 type ActivePanel = 'detail' | 'pelican' | null
+
+// Backward-compat: old tab names → new tab names
+const TAB_ALIASES: Record<string, TabKey> = {
+  dashboard: 'performance',
+  calendar: 'performance',
+  profile: 'performance', // profile moved to header modal
+}
 
 export default function JournalPage() {
   const searchParams = useSearchParams()
@@ -56,16 +58,39 @@ export default function JournalPage() {
   const [showCloseTradeModal, setShowCloseTradeModal] = useState(false)
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null)
   const [tradeTypeFilter, setTradeTypeFilter] = useState<'all' | 'real' | 'paper'>('all')
+  const [showProfileModal, setShowProfileModal] = useState(false)
 
   const { trades, isLoading: tradesLoading, logTrade, closeTrade, refetch, updateTrade } = useTrades()
 
-  // Handle ?tab= from settings modal links
-  const tabParam = searchParams.get('tab') as TabKey | null
+  // Handle ?tab= from settings modal links (with backward compat)
+  const tabParam = searchParams.get('tab')
   useEffect(() => {
-    if (tabParam && ['dashboard', 'trades', 'calendar', 'profile', 'plan', 'insights'].includes(tabParam)) {
-      setActiveTab(tabParam)
+    if (!tabParam) return
+    // Check if it's a valid new tab
+    if (['performance', 'trades', 'plan', 'insights'].includes(tabParam)) {
+      setActiveTab(tabParam as TabKey)
+    }
+    // Check backward-compat aliases
+    else if (tabParam in TAB_ALIASES) {
+      setActiveTab(TAB_ALIASES[tabParam]!)
+      // If old "profile" tab was requested, open the profile modal
+      if (tabParam === 'profile') {
+        setShowProfileModal(true)
+      }
     }
   }, [tabParam])
+
+  // Handle ?ticker= param — switch to trades tab and highlight
+  const tickerParam = searchParams.get('ticker')
+  useEffect(() => {
+    if (!tickerParam || tradesLoading) return
+    const trade = trades.find(t => t.ticker.toLowerCase() === tickerParam.toLowerCase())
+    if (trade) {
+      setSelectedTrade(trade)
+      setActivePanel('detail')
+      setActiveTab('trades')
+    }
+  }, [tickerParam, trades, tradesLoading])
 
   // Handle ?highlight=tradeId from chat action buttons
   const highlightTradeId = searchParams.get('highlight')
@@ -220,6 +245,13 @@ export default function JournalPage() {
   const filterButtons = ['all', 'real', 'paper'] as const
   const filterLabels = { all: 'All', real: 'Real', paper: 'Simulated' }
 
+  const tabs: { key: TabKey; label: string; icon: typeof ChartBar }[] = [
+    { key: 'performance', label: 'Performance', icon: ChartBar },
+    { key: 'trades', label: 'Trades', icon: Funnel },
+    { key: 'plan', label: 'Plan', icon: ClipboardText },
+    { key: 'insights', label: 'Insights', icon: Brain },
+  ]
+
   return (
     <motion.div
       variants={pageEnter}
@@ -244,6 +276,15 @@ export default function JournalPage() {
 
           {/* Actions - Desktop */}
           <div className="hidden sm:flex items-center gap-2">
+            {/* Profile link */}
+            <button
+              onClick={() => setShowProfileModal(true)}
+              className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+              aria-label="Trader Profile"
+            >
+              <UserCircle size={20} weight="regular" />
+            </button>
+
             {/* Type Filter */}
             <div className="flex items-center gap-1 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg p-0.5">
               {filterButtons.map((type) => (
@@ -275,92 +316,25 @@ export default function JournalPage() {
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs — 4 tabs */}
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
-              ${
-                activeTab === 'dashboard'
-                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-              }
-            `}
-          >
-            <ChartBar size={16} weight={activeTab === 'dashboard' ? 'fill' : 'regular'} />
-            Dashboard
-          </button>
-          <button
-            onClick={() => setActiveTab('trades')}
-            className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
-              ${
-                activeTab === 'trades'
-                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-              }
-            `}
-          >
-            <Funnel size={16} weight={activeTab === 'trades' ? 'fill' : 'regular'} />
-            Trades
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
-              ${
-                activeTab === 'calendar'
-                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-              }
-            `}
-          >
-            <CalendarBlank size={16} weight={activeTab === 'calendar' ? 'fill' : 'regular'} />
-            Calendar
-          </button>
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
-              ${
-                activeTab === 'profile'
-                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-              }
-            `}
-          >
-            <UserCircle size={16} weight={activeTab === 'profile' ? 'fill' : 'regular'} />
-            Profile
-          </button>
-          <button
-            onClick={() => setActiveTab('plan')}
-            className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
-              ${
-                activeTab === 'plan'
-                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-              }
-            `}
-          >
-            <ClipboardText size={16} weight={activeTab === 'plan' ? 'fill' : 'regular'} />
-            Plan
-          </button>
-          <button
-            onClick={() => setActiveTab('insights')}
-            className={`
-              px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
-              ${
-                activeTab === 'insights'
-                  ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
-              }
-            `}
-          >
-            <Brain size={16} weight={activeTab === 'insights' ? 'fill' : 'regular'} />
-            Insights
-          </button>
+          {tabs.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`
+                px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap flex-shrink-0 active:scale-[0.98] min-h-[44px] flex items-center gap-1.5
+                ${
+                  activeTab === key
+                    ? 'bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
+                }
+              `}
+            >
+              <Icon size={16} weight={activeTab === key ? 'fill' : 'regular'} />
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -369,15 +343,15 @@ export default function JournalPage() {
         {/* Main Content */}
         <div className="flex-1 overflow-auto p-4 sm:p-6">
           <AnimatePresence mode="wait">
-            {activeTab === 'dashboard' && (
+            {activeTab === 'performance' && (
               <motion.div
-                key="dashboard"
+                key="performance"
                 variants={tabContent}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
               >
-                <PositionsDashboardTab
+                <PerformanceTab
                   trades={filteredTrades}
                   quotes={quotes}
                   stats={stats}
@@ -392,6 +366,7 @@ export default function JournalPage() {
                       setActivePanel('detail')
                     }
                   }}
+                  onAskPelican={handleAskPelican}
                 />
               </motion.div>
             )}
@@ -409,38 +384,6 @@ export default function JournalPage() {
                   onSelectTrade={handleSelectTrade}
                   onScanTrade={handleScanTrade}
                   selectedTradeId={selectedTrade?.id}
-                />
-              </motion.div>
-            )}
-
-            {activeTab === 'calendar' && (
-              <motion.div
-                key="calendar"
-                variants={tabContent}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-              >
-                <CalendarTab
-                  trades={filteredTrades}
-                  isLoading={tradesLoading}
-                  onOpenLogTrade={() => setShowLogTradeModal(true)}
-                />
-              </motion.div>
-            )}
-
-            {activeTab === 'profile' && (
-              <motion.div
-                key="profile"
-                variants={tabContent}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-              >
-                <TraderProfileTab
-                  trades={trades}
-                  stats={stats}
-                  isLoading={tradesLoading || statsLoading}
                   onAskPelican={handleAskPelican}
                 />
               </motion.div>
@@ -523,6 +466,47 @@ export default function JournalPage() {
           onSubmit={handleCloseTrade}
         />
       )}
+
+      {/* Profile Modal */}
+      <AnimatePresence>
+        {showProfileModal && (
+          <motion.div
+            variants={backdrop}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-50 bg-[var(--bg-overlay)]"
+            onClick={() => setShowProfileModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[min(640px,90vw)] sm:max-h-[80vh] bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-subtle)]">
+                <h2 className="text-base font-semibold text-[var(--text-primary)]">Trader Profile</h2>
+                <button
+                  onClick={() => setShowProfileModal(false)}
+                  className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition-colors"
+                >
+                  <Plus size={16} weight="bold" className="rotate-45" />
+                </button>
+              </div>
+              <div className="p-5">
+                <TraderProfileTab
+                  trades={trades}
+                  stats={stats}
+                  isLoading={tradesLoading || statsLoading}
+                  onAskPelican={handleAskPelican}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile: Trade Detail Bottom Sheet */}
       <AnimatePresence>

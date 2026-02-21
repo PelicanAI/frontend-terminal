@@ -198,8 +198,8 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
 
       {/* Row 2: Time of Day + Holding Period charts */}
       <motion.div variants={staggerItem} className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <TimeOfDayChart data={insights.time_of_day} />
-        <HoldingPeriodChart data={insights.holding_period} />
+        <TimeOfDayChart data={insights.time_of_day} onAskPelican={onAskPelican} />
+        <HoldingPeriodChart data={insights.holding_period} onAskPelican={onAskPelican} />
       </motion.div>
 
       {/* Row 3: Ticker Scorecard (full width) */}
@@ -209,8 +209,8 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
 
       {/* Row 4: Streaks + Calendar Patterns */}
       <motion.div variants={staggerItem} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <StreaksCard data={insights.streaks} />
-        <CalendarCard data={insights.calendar_patterns} />
+        <StreaksCard data={insights.streaks} onAskPelican={onAskPelican} />
+        <CalendarCard data={insights.calendar_patterns} onAskPelican={onAskPelican} />
       </motion.div>
     </motion.div>
   )
