@@ -28,7 +28,6 @@ import { useCreditsContext } from "@/providers/credits-provider"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { ChartProvider, useChart } from "@/providers/chart-provider"
 import { LearningModeProvider, useLearningMode } from "@/providers/learning-mode-provider"
-import { LearningModeToggle } from "@/components/chat/LearningModeToggle"
 import { ChatCreditCounter } from "@/components/chat/credit-counter"
 import { useTrades } from "@/hooks/use-trades"
 import { useWatchlist } from "@/hooks/use-watchlist"
@@ -549,7 +548,6 @@ export default function ChatPage() {
           <div className="flex items-center gap-1 sm:gap-2">
             <TiltIndicator isOnTilt={isOnTilt} alertCount={tiltAlerts.length} />
             <ChatCreditCounter />
-            <LearningModeToggle />
             <ThemeToggle />
           </div>
         </div>

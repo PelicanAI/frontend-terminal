@@ -10,6 +10,7 @@ import {
   Lightning,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import { useLearningMode } from "@/providers/learning-mode-provider"
 import type { ExpanderKey } from "./action-expanders"
 
 // ============================================================================
@@ -44,6 +45,8 @@ export function ActionBar({
   disabled = false,
   isAIResponding = false,
 }: ActionBarProps) {
+  const { enabled: learningEnabled, setEnabled: setLearningEnabled } = useLearningMode()
+
   if (isAIResponding) return null
 
   const actions: ActionButton[] = [
@@ -66,7 +69,7 @@ export function ActionBar({
     >
       {visibleActions.map((action) => {
         const Icon = action.icon
-        const isActive = active === action.key
+        const isActive = active === action.key || (action.key === "learn" && learningEnabled)
         const isQuick = action.key === "quick"
 
         return (
@@ -78,7 +81,11 @@ export function ActionBar({
                 onFocusInput()
                 return
               }
-              onToggle(isActive ? null : (action.key as ExpanderKey))
+              const nextState = isActive ? null : (action.key as ExpanderKey)
+              onToggle(nextState)
+              if (action.key === "learn") {
+                setLearningEnabled(nextState === "learn")
+              }
             }}
             disabled={disabled}
             title={action.label}

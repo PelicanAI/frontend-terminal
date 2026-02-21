@@ -29,10 +29,10 @@ interface NavTab {
 const NAV_TABS: NavTab[] = [
   { key: 'brief', label: 'Brief', href: '/morning' },
   { key: 'chat', label: 'Chat', href: '/chat' },
-  { key: 'heatmap', label: 'Heatmap', href: '/heatmap' },
-  { key: 'correlations', label: 'Correlations', href: '/correlations' },
   { key: 'positions', label: 'Positions', href: '/positions' },
   { key: 'journal', label: 'Journal', href: '/journal' },
+  { key: 'heatmap', label: 'Heatmap', href: '/heatmap' },
+  { key: 'correlations', label: 'Correlations', href: '/correlations' },
   { key: 'earnings', label: 'Earnings', href: '/earnings' },
 ]
 

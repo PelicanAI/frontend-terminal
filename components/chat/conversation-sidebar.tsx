@@ -563,7 +563,7 @@ export function ConversationSidebar({
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-1">
                 {/* Today */}
                 {groupedConversations.today.length > 0 && (
                   <div>
