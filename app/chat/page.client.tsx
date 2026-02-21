@@ -583,7 +583,16 @@ export default function ChatPage() {
                 onSubmitPrompt={messageHandler.handleSendMessage}
                 onSaveInsight={handleSaveInsight}
                 pendingDraft={messageHandler.pendingDraft}
-                onPrefillInput={(text) => chatInputRef.current?.setMessage(text)}
+                onPrefillInput={(text) => {
+                  chatInputRef.current?.setMessage(text)
+                  // Scroll chat area to bottom so user sees the prefilled input
+                  requestAnimationFrame(() => {
+                    const scrollArea = document.querySelector('.chat-scroll-area')
+                    if (scrollArea) {
+                      scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' })
+                    }
+                  })
+                }}
               />
             </div>
           </div>
