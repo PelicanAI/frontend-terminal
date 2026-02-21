@@ -38,11 +38,15 @@ export default function CorrelationsPageClient() {
   // Fetch 90d data for cross-period signal detection when viewing 30d
   const { data: data90d } = useCorrelationMatrix('90d')
 
+  // On mobile (no xl grid), scroll detail panel into view; on desktop it's in the right column
   useEffect(() => {
     if (selectedPair && detailPanelRef.current) {
-      setTimeout(() => {
-        detailPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 100)
+      const isDesktop = window.matchMedia('(min-width: 1280px)').matches
+      if (!isDesktop) {
+        setTimeout(() => {
+          detailPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+      }
     }
   }, [selectedPair])
 
@@ -274,7 +278,18 @@ export default function CorrelationsPageClient() {
                     </div>
                   </div>
 
-                  <div className="xl:col-span-1">
+                  <div className="xl:col-span-1 flex flex-col gap-4 xl:max-h-[calc(100vh-220px)] xl:overflow-y-auto">
+                    {selectedPair && (
+                      <div ref={detailPanelRef} className="flex-shrink-0">
+                        <PairDetailPanel
+                          assetA={selectedPair.assetA}
+                          assetB={selectedPair.assetB}
+                          assets={data.assets}
+                          beginnerMode={beginnerMode}
+                          onClose={() => setSelectedPair(null)}
+                        />
+                      </div>
+                    )}
                     <SignalCards
                       correlations={data.correlations}
                       correlations90d={period === '30d' ? data90d?.correlations : undefined}
@@ -284,18 +299,6 @@ export default function CorrelationsPageClient() {
                     />
                   </div>
                 </div>
-
-                {selectedPair && (
-                  <div ref={detailPanelRef}>
-                    <PairDetailPanel
-                      assetA={selectedPair.assetA}
-                      assetB={selectedPair.assetB}
-                      assets={data.assets}
-                      beginnerMode={beginnerMode}
-                      onClose={() => setSelectedPair(null)}
-                    />
-                  </div>
-                )}
               </motion.div>
             ) : (
               <motion.div
