@@ -1,11 +1,13 @@
 "use client"
 
 import { useState } from 'react'
-import { X, TrendUp, TrendDown, CalendarBlank, ChatCircleDots } from '@phosphor-icons/react'
+import { X, TrendUp, TrendDown, Minus, CalendarBlank, ChatCircleDots, Briefcase } from '@phosphor-icons/react'
 import { RollingChart } from './rolling-chart'
 import { findSignalForPair } from '@/lib/correlation-signals'
 import { useCorrelationPair } from '@/hooks/use-correlations'
 import { usePelicanPanelContext } from '@/providers/pelican-panel-provider'
+import { useTrades } from '@/hooks/use-trades'
+import { interpretCorrelation, getStrengthLabel, getCorrelationTrend } from '@/lib/correlations/interpret'
 import type { CorrelationAsset } from '@/types/correlations'
 
 interface PairDetailPanelProps {
@@ -23,50 +25,18 @@ const regimeColors: Record<string, string> = {
   inversion: 'var(--data-warning)',
 }
 
-function generateInterpretation(
-  assetA: string,
-  assetB: string,
-  correlation: number,
-  zScore: number,
-  mean: number,
-  regime: string,
-  beginnerMode: boolean,
-): string {
-  const direction = correlation > 0 ? 'positive' : 'negative'
-  const strength = Math.abs(correlation) > 0.7 ? 'strong'
-    : Math.abs(correlation) > 0.3 ? 'moderate' : 'weak'
-  const unusual = Math.abs(zScore) > 1.5
+const trendIcons = {
+  strengthening: TrendUp,
+  weakening: TrendDown,
+  stable: Minus,
+  unknown: Minus,
+} as const
 
-  if (beginnerMode) {
-    let text = `${assetA} and ${assetB} have a ${strength} ${direction} relationship right now. `
-    if (correlation > 0.5) {
-      text += 'They tend to move in the same direction. When one goes up, the other usually follows. '
-    } else if (correlation < -0.5) {
-      text += 'They tend to move in opposite directions. When one goes up, the other usually goes down. '
-    } else {
-      text += 'Their movements are mostly independent of each other right now. '
-    }
-    if (unusual) {
-      text += `This is unusual compared to historical norms (${zScore > 0 ? 'stronger' : 'weaker'} than normal by ${Math.abs(zScore).toFixed(1)} standard deviations). Worth monitoring.`
-    } else {
-      text += 'This is within the normal historical range.'
-    }
-    return text
-  }
-
-  let text = `${strength.charAt(0).toUpperCase() + strength.slice(1)} ${direction} correlation at ${correlation.toFixed(3)}. `
-  text += `Historical mean: ${mean > 0 ? '+' : ''}${mean.toFixed(3)}. `
-  if (unusual) {
-    text += `Currently ${Math.abs(zScore).toFixed(1)}σ ${zScore > 0 ? 'above' : 'below'} the mean — ${regime} regime. `
-    if (regime === 'inversion') {
-      text += 'The historical relationship has flipped sign. This typically signals a regime change.'
-    } else if (regime === 'breakdown') {
-      text += 'Significant deviation from normal behavior. Monitor for potential mean reversion or structural shift.'
-    }
-  } else {
-    text += 'Within normal range. No actionable signal.'
-  }
-  return text
+const trendColors: Record<string, string> = {
+  strengthening: 'var(--data-positive)',
+  weakening: 'var(--data-negative)',
+  stable: 'var(--text-muted)',
+  unknown: 'var(--text-muted)',
 }
 
 export function PairDetailPanel({
@@ -74,16 +44,29 @@ export function PairDetailPanel({
 }: PairDetailPanelProps) {
   const [activePeriod, setActivePeriod] = useState<'30d' | '90d' | '1y'>('30d')
   const { openWithPrompt } = usePelicanPanelContext()
+  const { openTrades } = useTrades({ status: 'open' })
 
   const { data: pairData, isLoading } = useCorrelationPair(assetA, assetB)
   const correlations = pairData?.pair ?? []
 
   const currentData = correlations.find(c => c.period === activePeriod)
+  const data30d = correlations.find(c => c.period === '30d')
+  const data90d = correlations.find(c => c.period === '90d')
+  const data1y = correlations.find(c => c.period === '1y')
   const found = findSignalForPair(assetA, assetB)
   const signal = found?.signal ?? null
 
-  const nameA = assets.find(a => a.ticker === assetA)?.display_name || assetA
-  const nameB = assets.find(a => a.ticker === assetB)?.display_name || assetB
+  const assetInfoA = assets.find(a => a.ticker === assetA)
+  const assetInfoB = assets.find(a => a.ticker === assetB)
+  const nameA = assetInfoA?.display_name || assetA
+  const nameB = assetInfoB?.display_name || assetB
+
+  const trend = getCorrelationTrend(data30d?.correlation, data90d?.correlation, data1y?.correlation)
+  const TrendIcon = trendIcons[trend]
+
+  const userHoldsAsset = openTrades.some(t =>
+    t.ticker === assetA || t.ticker === assetB
+  )
 
   if (isLoading) {
     return (
@@ -97,6 +80,19 @@ export function PairDetailPanel({
 
   if (!currentData) return null
 
+  const interpretation = assetInfoA && assetInfoB ? interpretCorrelation({
+    assetA: assetInfoA,
+    assetB: assetInfoB,
+    current: currentData.correlation,
+    mean: currentData.historical_mean,
+    std: currentData.historical_std,
+    zScore: currentData.z_score,
+    regime: currentData.regime,
+    corr30d: data30d?.correlation,
+    corr90d: data90d?.correlation,
+    corr1y: data1y?.correlation,
+  }, beginnerMode) : ''
+
   const handleAskPelican = () => {
     const visibleMessage = `Analyze the ${nameA} / ${nameB} correlation`
     const fullPrompt = [
@@ -106,7 +102,7 @@ export function PairDetailPanel({
       `Historical mean: ${currentData.historical_mean.toFixed(3)}.`,
       `Z-Score: ${currentData.z_score.toFixed(1)}σ.`,
       `Regime: ${currentData.regime}.`,
-      signal ? `Known signal: "${signal.name}" — ${signal.description}` : null,
+      signal ? `Known signal: "${signal.name}" \u2014 ${signal.description}` : null,
       signal ? `Bullish when: ${signal.bullish_when}. Bearish when: ${signal.bearish_when}.` : null,
       `What does this tell us about current market conditions? Is this a normal relationship or an anomaly worth monitoring? Any actionable implications for traders?`,
     ].filter(Boolean).join(' ')
@@ -129,6 +125,12 @@ export function PairDetailPanel({
           <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
             {nameA} / {nameB}
           </h3>
+          {trend !== 'unknown' && (
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ background: 'var(--bg-base)', color: trendColors[trend] }}>
+              <TrendIcon weight="bold" className="w-3 h-3" />
+              {trend === 'strengthening' ? 'Strengthening' : trend === 'weakening' ? 'Weakening' : 'Stable'}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-1 p-0.5 rounded-lg" style={{ background: 'var(--bg-base)' }}>
@@ -148,44 +150,88 @@ export function PairDetailPanel({
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
-        <div>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Current</p>
-          <p
-            className="text-lg font-mono font-bold tabular-nums"
-            style={{ color: currentData.correlation > 0 ? 'var(--data-positive)' : 'var(--data-negative)' }}
-          >
-            {currentData.correlation > 0 ? '+' : ''}{currentData.correlation.toFixed(3)}
-          </p>
+      {/* Stats row + period comparison */}
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-4">
+        <div className="sm:col-span-3 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Current</p>
+            <p
+              className="text-lg font-mono font-bold tabular-nums"
+              style={{ color: currentData.correlation > 0 ? 'var(--data-positive)' : 'var(--data-negative)' }}
+            >
+              {currentData.correlation > 0 ? '+' : ''}{currentData.correlation.toFixed(3)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Historical Mean</p>
+            <p className="text-lg font-mono tabular-nums" style={{ color: 'var(--text-primary)' }}>
+              {currentData.historical_mean > 0 ? '+' : ''}{currentData.historical_mean.toFixed(3)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Z-Score</p>
+            <p
+              className="text-lg font-mono font-bold tabular-nums"
+              style={{ color: Math.abs(currentData.z_score) > 1.5 ? 'var(--data-negative)' : 'var(--text-primary)' }}
+            >
+              {currentData.z_score > 0 ? '+' : ''}{currentData.z_score.toFixed(1)}{beginnerMode ? ' SD' : 'σ'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Regime</p>
+            <p
+              className="text-sm font-semibold capitalize"
+              style={{ color: regimeColors[currentData.regime] }}
+            >
+              {currentData.regime}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Historical Mean</p>
-          <p className="text-lg font-mono tabular-nums" style={{ color: 'var(--text-primary)' }}>
-            {currentData.historical_mean > 0 ? '+' : ''}{currentData.historical_mean.toFixed(3)}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Z-Score</p>
-          <p
-            className="text-lg font-mono font-bold tabular-nums"
-            style={{ color: Math.abs(currentData.z_score) > 1.5 ? 'var(--data-negative)' : 'var(--text-primary)' }}
-          >
-            {currentData.z_score > 0 ? '+' : ''}{currentData.z_score.toFixed(1)}σ
-          </p>
-        </div>
-        <div>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Regime</p>
-          <p
-            className="text-sm font-semibold capitalize"
-            style={{ color: regimeColors[currentData.regime] }}
-          >
-            {currentData.regime}
-          </p>
+
+        {/* Period Comparison Mini-Bars */}
+        <div className="sm:col-span-2">
+          <h4 className="text-xs font-semibold mb-2" style={{ color: 'var(--text-muted)' }}>
+            Period Comparison
+          </h4>
+          <div className="space-y-1.5">
+            {[
+              { label: '30d', data: data30d },
+              { label: '90d', data: data90d },
+              { label: '1y', data: data1y },
+            ].map(({ label, data: d }) => d && (
+              <div key={label} className="flex items-center gap-2">
+                <span
+                  className="text-[10px] font-mono w-6 shrink-0"
+                  style={{ color: activePeriod === d.period ? 'var(--accent-indigo)' : 'var(--text-muted)' }}
+                >
+                  {label}
+                </span>
+                <div className="flex-1 h-3 rounded-sm overflow-hidden relative" style={{ background: 'var(--bg-base)' }}>
+                  <div
+                    className="h-full rounded-sm transition-all duration-300 absolute top-0"
+                    style={{
+                      width: `${Math.abs(d.correlation) * 50}%`,
+                      left: d.correlation >= 0 ? '50%' : `${50 - Math.abs(d.correlation) * 50}%`,
+                      background: d.correlation >= 0 ? 'var(--data-positive)' : 'var(--data-negative)',
+                      opacity: activePeriod === d.period ? 1 : 0.5,
+                    }}
+                  />
+                  {/* Center line */}
+                  <div className="absolute top-0 left-1/2 w-px h-full" style={{ background: 'var(--border-default)' }} />
+                </div>
+                <span
+                  className="text-[10px] font-mono tabular-nums w-10 text-right"
+                  style={{ color: activePeriod === d.period ? 'var(--text-primary)' : 'var(--text-muted)' }}
+                >
+                  {d.correlation > 0 ? '+' : ''}{d.correlation.toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Chart + interpretation */}
+      {/* Chart + interpretation + actions */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <div className="lg:col-span-3">
           <RollingChart
@@ -262,31 +308,40 @@ export function PairDetailPanel({
                 Correlation Summary
               </h4>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                {generateInterpretation(
-                  assetA, assetB,
-                  currentData.correlation,
-                  currentData.z_score,
-                  currentData.historical_mean,
-                  currentData.regime,
-                  beginnerMode,
-                )}
+                {interpretation}
               </p>
             </div>
           )}
 
-          {/* Ask Pelican button */}
-          <button
-            onClick={handleAskPelican}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors w-full"
-            style={{
-              background: 'var(--bg-elevated)',
-              border: '1px solid var(--border-subtle)',
-              color: 'var(--text-secondary)',
-            }}
-          >
-            <ChatCircleDots weight="bold" className="w-3.5 h-3.5" style={{ color: 'var(--accent-indigo)' }} />
-            Ask Pelican About This
-          </button>
+          {/* Action buttons */}
+          <div className="space-y-2">
+            <button
+              onClick={handleAskPelican}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors w-full"
+              style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <ChatCircleDots weight="bold" className="w-3.5 h-3.5" style={{ color: 'var(--accent-indigo)' }} />
+              Ask Pelican About This
+            </button>
+            {userHoldsAsset && (
+              <a
+                href="/positions"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors w-full"
+                style={{
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                <Briefcase weight="bold" className="w-3.5 h-3.5" style={{ color: 'var(--data-positive)' }} />
+                View on Positions
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>

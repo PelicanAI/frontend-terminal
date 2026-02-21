@@ -1,13 +1,19 @@
 "use client"
 
-import { useState, useRef, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowsClockwise, Warning, TrendUp, TrendDown, Minus, Shuffle } from '@phosphor-icons/react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowsClockwise, Warning, TrendUp, TrendDown, Minus, Shuffle, ChartLineUp, Briefcase } from '@phosphor-icons/react'
 import { useCorrelationMatrix } from '@/hooks/use-correlations'
 import { CorrelationMatrix } from '@/components/correlations/correlation-matrix'
 import { SignalCards } from '@/components/correlations/signal-cards'
+import { RegimeBanner } from '@/components/correlations/regime-banner'
 import { PairDetailPanel } from '@/components/correlations/pair-detail-panel'
+import { PortfolioCorrelations } from '@/components/correlations/portfolio-correlations'
+import { CorrelationListView } from '@/components/correlations/correlation-list-view'
+import { DataFreshness } from '@/components/correlations/data-freshness'
 import { BeginnerToggle, useBeginnerMode } from '@/components/correlations/beginner-toggle'
+
+type ViewTab = 'market' | 'portfolio'
 
 const NEUTRAL_REGIME = { color: 'var(--text-muted)', Icon: Minus, label: 'Neutral' } as const
 
@@ -20,6 +26,7 @@ const regimeConfig: Record<string, { color: string; Icon: typeof TrendUp; label:
 }
 
 export default function CorrelationsPageClient() {
+  const [activeTab, setActiveTab] = useState<ViewTab>('market')
   const [period, setPeriod] = useState<'30d' | '90d' | '1y'>('30d')
   const [selectedPair, setSelectedPair] = useState<{ assetA: string; assetB: string } | null>(null)
   const [beginnerMode, setBeginnerMode] = useBeginnerMode()
@@ -28,6 +35,8 @@ export default function CorrelationsPageClient() {
   const detailPanelRef = useRef<HTMLDivElement>(null)
 
   const { data, isLoading, error, refetch } = useCorrelationMatrix(period)
+  // Fetch 90d data for cross-period signal detection when viewing 30d
+  const { data: data90d } = useCorrelationMatrix('90d')
 
   useEffect(() => {
     if (selectedPair && detailPanelRef.current) {
@@ -36,6 +45,23 @@ export default function CorrelationsPageClient() {
       }, 100)
     }
   }, [selectedPair])
+
+  // Keyboard shortcut: 1/2/3 for period switching
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (e.key === '1') setPeriod('30d')
+      else if (e.key === '2') setPeriod('90d')
+      else if (e.key === '3') setPeriod('1y')
+      else if (e.key === 'Escape') setSelectedPair(null)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
+  const handleSelectPair = useCallback((a: string, b: string) => {
+    setSelectedPair({ assetA: a, assetB: b })
+  }, [])
 
   const handleCalculate = async () => {
     setCalculating(true)
@@ -87,15 +113,19 @@ export default function CorrelationsPageClient() {
         transition={{ duration: 0.3 }}
       >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-              Market Correlations
+              Correlations
             </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              {data?.assets.length || 0} assets
-              {regime && ` \u00B7 Updated ${new Date(regime.calculated_at).toLocaleString()}`}
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <DataFreshness calculatedAt={regime?.calculated_at ?? null} />
+              {data && (
+                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  · {data.assets.length} assets
+                </span>
+              )}
+            </div>
           </div>
 
           {regime && (
@@ -118,37 +148,76 @@ export default function CorrelationsPageClient() {
           )}
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center justify-between mb-4">
+        {/* View tabs: Market Matrix | My Portfolio */}
+        <div className="flex items-center gap-4 mb-4">
           <div className="flex gap-1 p-0.5 rounded-lg" style={{ background: 'var(--bg-base)' }}>
-            {(['30d', '90d', '1y'] as const).map(p => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
-                style={{
-                  background: period === p ? 'var(--accent-indigo)' : 'transparent',
-                  color: period === p ? 'white' : 'var(--text-secondary)',
-                }}
-              >
-                {p === '1y' ? '1 Year' : p === '90d' ? '90 Day' : '30 Day'}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <BeginnerToggle value={beginnerMode} onChange={setBeginnerMode} />
             <button
-              onClick={handleCalculate}
-              disabled={calculating}
-              className="p-1.5 rounded-lg transition-colors"
-              style={{ color: 'var(--text-muted)', background: 'var(--bg-base)' }}
-              title="Recalculate correlations (admin)"
+              onClick={() => { setActiveTab('market'); setSelectedPair(null) }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+              style={{
+                background: activeTab === 'market' ? 'var(--accent-indigo)' : 'transparent',
+                color: activeTab === 'market' ? 'white' : 'var(--text-secondary)',
+              }}
             >
-              <ArrowsClockwise weight="bold" className={`w-4 h-4 ${calculating ? 'animate-spin' : ''}`} />
+              <ChartLineUp weight={activeTab === 'market' ? 'fill' : 'regular'} className="w-3.5 h-3.5" />
+              Market Matrix
+            </button>
+            <button
+              onClick={() => { setActiveTab('portfolio'); setSelectedPair(null) }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+              style={{
+                background: activeTab === 'portfolio' ? 'var(--accent-indigo)' : 'transparent',
+                color: activeTab === 'portfolio' ? 'white' : 'var(--text-secondary)',
+              }}
+            >
+              <Briefcase weight={activeTab === 'portfolio' ? 'fill' : 'regular'} className="w-3.5 h-3.5" />
+              My Portfolio
             </button>
           </div>
         </div>
+
+        {/* Controls — only for Market Matrix tab */}
+        {activeTab === 'market' && (
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex gap-1 p-0.5 rounded-lg" style={{ background: 'var(--bg-base)' }}>
+              {(['30d', '90d', '1y'] as const).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPeriod(p)}
+                  className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+                  style={{
+                    background: period === p ? 'var(--accent-indigo)' : 'transparent',
+                    color: period === p ? 'white' : 'var(--text-secondary)',
+                  }}
+                >
+                  {p === '1y' ? '1 Year' : p === '90d' ? '90 Day' : '30 Day'}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <BeginnerToggle value={beginnerMode} onChange={setBeginnerMode} />
+              <button
+                onClick={handleCalculate}
+                disabled={calculating}
+                className="p-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--text-muted)', background: 'var(--bg-base)' }}
+                title="Recalculate correlations (admin)"
+              >
+                <ArrowsClockwise weight="bold" className={`w-4 h-4 ${calculating ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Regime Banner */}
+        {activeTab === 'market' && data && regime && (
+          <RegimeBanner
+            regime={regime}
+            correlations={data.correlations}
+            beginnerMode={beginnerMode}
+          />
+        )}
 
         {/* Loading */}
         {isLoading && (
@@ -171,43 +240,93 @@ export default function CorrelationsPageClient() {
 
         {/* Main content */}
         {data && data.correlations.length > 0 && (
-          <>
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
-              <div className="xl:col-span-3">
-                <div className="pelican-card overflow-auto">
-                  <CorrelationMatrix
-                    assets={data.assets}
-                    correlations={data.correlations}
-                    period={period}
-                    selectedPair={selectedPair}
-                    onSelectPair={(a, b) => setSelectedPair({ assetA: a, assetB: b })}
-                    beginnerMode={beginnerMode}
-                  />
-                </div>
-              </div>
+          <AnimatePresence mode="wait">
+            {activeTab === 'market' ? (
+              <motion.div
+                key="market"
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 12 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
+                  <div className="xl:col-span-3">
+                    {/* Desktop: full matrix */}
+                    <div className="pelican-card overflow-auto hidden md:block">
+                      <CorrelationMatrix
+                        assets={data.assets}
+                        correlations={data.correlations}
+                        period={period}
+                        selectedPair={selectedPair}
+                        onSelectPair={handleSelectPair}
+                        beginnerMode={beginnerMode}
+                      />
+                    </div>
+                    {/* Mobile: list view */}
+                    <div className="md:hidden">
+                      <CorrelationListView
+                        correlations={data.correlations}
+                        assets={data.assets}
+                        period={period}
+                        beginnerMode={beginnerMode}
+                        onSelectPair={handleSelectPair}
+                      />
+                    </div>
+                  </div>
 
-              <div className="xl:col-span-1">
-                <SignalCards
+                  <div className="xl:col-span-1">
+                    <SignalCards
+                      correlations={data.correlations}
+                      correlations90d={period === '30d' ? data90d?.correlations : undefined}
+                      assets={data.assets}
+                      beginnerMode={beginnerMode}
+                      onSelectPair={handleSelectPair}
+                    />
+                  </div>
+                </div>
+
+                {selectedPair && (
+                  <div ref={detailPanelRef}>
+                    <PairDetailPanel
+                      assetA={selectedPair.assetA}
+                      assetB={selectedPair.assetB}
+                      assets={data.assets}
+                      beginnerMode={beginnerMode}
+                      onClose={() => setSelectedPair(null)}
+                    />
+                  </div>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="portfolio"
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.2 }}
+              >
+                <PortfolioCorrelations
                   correlations={data.correlations}
                   assets={data.assets}
+                  period={period}
                   beginnerMode={beginnerMode}
-                  onSelectPair={(a, b) => setSelectedPair({ assetA: a, assetB: b })}
+                  onSelectPair={handleSelectPair}
                 />
-              </div>
-            </div>
 
-            {selectedPair && (
-              <div ref={detailPanelRef}>
-                <PairDetailPanel
-                  assetA={selectedPair.assetA}
-                  assetB={selectedPair.assetB}
-                  assets={data.assets}
-                  beginnerMode={beginnerMode}
-                  onClose={() => setSelectedPair(null)}
-                />
-              </div>
+                {selectedPair && (
+                  <div ref={detailPanelRef}>
+                    <PairDetailPanel
+                      assetA={selectedPair.assetA}
+                      assetB={selectedPair.assetB}
+                      assets={data.assets}
+                      beginnerMode={beginnerMode}
+                      onClose={() => setSelectedPair(null)}
+                    />
+                  </div>
+                )}
+              </motion.div>
             )}
-          </>
+          </AnimatePresence>
         )}
       </motion.div>
     </div>
