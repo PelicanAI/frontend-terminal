@@ -20,7 +20,7 @@
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import dynamicImport from 'next/dynamic'
 import { TopNav } from '@/components/navigation/top-nav'
@@ -32,6 +32,9 @@ import { PelicanContainer } from '@/components/ui/pelican-container'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { ChatCircle } from '@phosphor-icons/react'
+import { TrialExhaustedModal } from '@/components/trial-exhausted-modal'
+import { InsufficientCreditsModal } from '@/components/insufficient-credits-modal'
+import { toast } from '@/hooks/use-toast'
 
 const PelicanChatPanel = dynamicImport(
   () => import('@/components/pelican-panel/pelican-chat-panel').then((m) => ({ default: m.PelicanChatPanel })),
@@ -139,18 +142,32 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
 // =============================================================================
 
 export default function FeaturesLayout({ children }: { children: React.ReactNode }) {
-  const handleTrialExhausted = (_info: unknown) => {
-    // TODO: Show trial exhausted modal
-  }
+  const [trialModal, setTrialModal] = useState<{ open: boolean; message?: string }>({ open: false })
+  const [creditsModal, setCreditsModal] = useState<{ open: boolean; required?: number; balance?: number; message?: string }>({ open: false })
 
-  const handleInsufficientCredits = (_info: unknown) => {
-    // TODO: Show insufficient credits modal
-  }
+  const handleTrialExhausted = useCallback((info: unknown) => {
+    const data = info as { message?: string } | undefined
+    setTrialModal({ open: true, message: data?.message ?? undefined })
+  }, [])
 
-  const handleError = (error: Error) => {
+  const handleInsufficientCredits = useCallback((info: unknown) => {
+    const data = info as { required?: number; balance?: number; message?: string } | undefined
+    setCreditsModal({
+      open: true,
+      required: data?.required ?? undefined,
+      balance: data?.balance ?? undefined,
+      message: data?.message ?? undefined,
+    })
+  }, [])
+
+  const handleError = useCallback((error: Error) => {
     console.error('[FEATURES-LAYOUT] Panel error', error)
-    // TODO: Show error toast
-  }
+    toast({
+      title: 'Something went wrong',
+      description: 'Could not check your credits. Please try again.',
+      variant: 'destructive',
+    })
+  }, [])
 
   return (
     <PelicanPanelProvider
@@ -159,6 +176,18 @@ export default function FeaturesLayout({ children }: { children: React.ReactNode
       onError={handleError}
     >
       <FeaturesLayoutInner>{children}</FeaturesLayoutInner>
+      <TrialExhaustedModal
+        isOpen={trialModal.open}
+        onClose={() => setTrialModal({ open: false })}
+        message={trialModal.message}
+      />
+      <InsufficientCreditsModal
+        isOpen={creditsModal.open}
+        onClose={() => setCreditsModal({ open: false })}
+        required={creditsModal.required}
+        balance={creditsModal.balance}
+        message={creditsModal.message}
+      />
     </PelicanPanelProvider>
   )
 }
