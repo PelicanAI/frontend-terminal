@@ -141,11 +141,7 @@ export function formatPrice(price: number | null): string {
   return price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-export function formatPercent(percent: number | null): string {
-  if (percent === null) return "---%"
-  const sign = percent >= 0 ? "+" : ""
-  return `${sign}${percent.toFixed(2)}%`
-}
+export { formatPercent } from '@/lib/formatters'
 
 export function getMarketStatus(): "pre-market" | "open" | "after-hours" | "closed" {
   const now = new Date()

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@supabase/supabase-js'
+import { getServiceClient } from '@/lib/admin'
 
 const PLAN_CREDITS: Record<string, number> = {
   base: 1000,
@@ -14,15 +14,6 @@ const getStripeClient = () => {
     throw new Error('Missing STRIPE_SECRET_KEY')
   }
   return new Stripe(secretKey, { apiVersion: '2025-12-15.clover' })
-}
-
-const getSupabaseAdmin = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error('Missing Supabase admin credentials')
-  }
-  return createClient(supabaseUrl, serviceRoleKey)
 }
 
 export async function POST(request: NextRequest) {
@@ -69,7 +60,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const supabaseAdmin = getSupabaseAdmin()
+    const supabaseAdmin = getServiceClient()
 
     switch (event.type) {
       case 'checkout.session.completed': {

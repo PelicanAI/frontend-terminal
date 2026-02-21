@@ -13,6 +13,7 @@ import { EducationChat } from "./EducationChat"
 import { useWatchlist } from "@/hooks/use-watchlist"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
 import { useTrades } from "@/hooks/use-trades"
+import { formatPercent } from "@/lib/formatters"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import {
   DropdownMenu,
@@ -169,11 +170,6 @@ export function TradingContextPanel({
     return price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
-  const formatPercent = (percent: number | null) => {
-    if (percent === null) return "---%"
-    const sign = percent >= 0 ? "+" : ""
-    return `${sign}${percent.toFixed(2)}%`
-  }
 
   const getChangeColor = (value: number | null) => {
     if (value === null) return "text-[var(--text-muted)]"

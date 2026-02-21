@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Lightning, Notebook, CalendarCheck } from '@phosphor-icons/react'
 import { Trade } from '@/hooks/use-trades'
+import { formatPnl } from '@/lib/formatters'
 import { TradeStats, EquityCurvePoint } from '@/hooks/use-trade-stats'
 import { Quote } from '@/hooks/use-live-quotes'
 import { PositionsDashboardTab } from '@/components/positions/positions-dashboard-tab'
@@ -69,9 +70,6 @@ function getWeekRange(weeksAgo: number) {
   return { start, end }
 }
 
-function formatPnl(n: number): string {
-  return `${n >= 0 ? '+' : ''}$${Math.abs(n).toFixed(2)}`
-}
 
 // ============================================================================
 // Period Comparison Banner

@@ -5,6 +5,7 @@ import { Shield, Check, X, Equals, Sparkle } from '@phosphor-icons/react'
 import { PelicanCard } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 import type { RuleComplianceStat } from '@/types/trading'
+import { formatPnl as _formatPnl } from '@/lib/formatters'
 
 // Human-readable labels for rule keys
 const RULE_LABELS: Record<string, string> = {
@@ -62,10 +63,7 @@ function categorizeRules(stats: RuleComplianceStat[]): CategorizedRules {
   return { moneyMakers, dontMatter, keepBreaking }
 }
 
-function formatPnl(amount: number): string {
-  const prefix = amount >= 0 ? '+' : ''
-  return `${prefix}$${amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
-}
+const formatPnl = (amount: number) => _formatPnl(amount, 0)
 
 function RuleRow({ stat, variant }: { stat: RuleComplianceStat; variant: 'money' | 'breaking' | 'neutral' }) {
   const label = getRuleLabel(stat.rule_key)

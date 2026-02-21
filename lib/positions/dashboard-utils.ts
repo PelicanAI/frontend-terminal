@@ -423,9 +423,10 @@ export function formatDollarSigned(value: number, precise = false): string {
   return value >= 0 ? `+${formatted}` : `-${formatted}`
 }
 
-export function formatPercent(value: number): string {
-  return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
-}
+import { formatPercent as _formatPercent } from '@/lib/formatters'
+
+/** Positions use 1 decimal for percent display */
+export const formatPercent = (value: number) => _formatPercent(value, 1)
 
 export function formatCompactDollar(value: number): string {
   const abs = Math.abs(value)
