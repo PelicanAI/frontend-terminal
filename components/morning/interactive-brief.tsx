@@ -4,7 +4,8 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import {
   CaretDown, CaretUp, Export, Copy, FileText, XLogo,
   Moon, Target, Briefcase, Eye, Globe, Factory,
-  TrendUp, Lightbulb, Warning, GameController, Article
+  TrendUp, Lightbulb, Warning, GameController, Article,
+  BookOpenText,
 } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -33,6 +34,7 @@ const BRIEF_SECTIONS = [
   { pattern: /trade ideas/i, id: 'ideas', label: 'Ideas' },
   { pattern: /risk warning/i, id: 'risk', label: 'Risk' },
   { pattern: /game plan/i, id: 'plan', label: 'Game Plan' },
+  { pattern: /setup|playbook/i, id: 'setups', label: 'Setups' },
 ]
 
 const SECTION_ICONS: Record<string, React.ElementType> = {
@@ -46,6 +48,7 @@ const SECTION_ICONS: Record<string, React.ElementType> = {
   ideas: Lightbulb,
   risk: Warning,
   plan: GameController,
+  setups: BookOpenText,
 }
 
 interface InteractiveBriefProps {
@@ -314,7 +317,10 @@ export function InteractiveBrief({ content, isStreaming, onTickerClick, onShare 
                     <div
                       key={section.id}
                       id={`brief-${section.id}`}
-                      className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden"
+                      className={cn(
+                        "rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden",
+                        section.id === 'setups' && "border-l-2 border-l-[var(--accent-primary)]"
+                      )}
                     >
                       {/* Section header (clickable to collapse) */}
                       <button

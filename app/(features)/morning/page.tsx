@@ -6,6 +6,7 @@ import { useMemo, useState, useEffect, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { useTrades } from "@/hooks/use-trades"
+import { usePlaybooks } from "@/hooks/use-playbooks"
 import { useMorningBrief } from "@/hooks/use-morning-brief"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
@@ -260,6 +261,7 @@ export default function MorningPage() {
   const { movers, isLoading: moversLoading, refetch: refetchMovers } = useMorningBrief()
   const { openWithPrompt } = usePelicanPanelContext()
   const { items: watchlistItems } = useWatchlist()
+  const { activePlaybooks } = usePlaybooks()
   const { toast } = useToast()
 
   // Onboarding milestone
@@ -540,8 +542,25 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
       prompt += `\nPlease acknowledge these warnings in my brief and factor them into your risk assessment and game plan sections.`
     }
 
+    // Setups for You — only if user has active playbooks
+    if (activePlaybooks.length > 0) {
+      const playbookSummaries = activePlaybooks
+        .slice(0, 5)
+        .map(p => `- "${p.name}" (${p.timeframe || 'any timeframe'}): ${p.entry_rules || 'no entry rules defined'}`)
+        .join('\n')
+
+      const watchlistTickers = watchlistItems.slice(0, 20).map(w => w.ticker).join(', ')
+
+      prompt += `\n\n**11. SETUPS FOR YOU**\n`
+      prompt += `I have these active playbook setups:\n${playbookSummaries}\n\n`
+      prompt += `My watchlist: ${watchlistTickers || 'No watchlist tickers'}\n\n`
+      prompt += `Based on current market conditions, are any of my watchlist tickers showing patterns `
+      prompt += `that match my playbook setups? Be specific — name the ticker, the playbook it matches, `
+      prompt += `and why. Only mention genuine matches, not stretches. If nothing matches today, say so.`
+    }
+
     return prompt
-  }, [openTrades, watchlistItems, movers.gainers, movers.losers, todaysWarnings, marketType, briefConfig])
+  }, [openTrades, watchlistItems, movers.gainers, movers.losers, todaysWarnings, marketType, briefConfig, activePlaybooks])
 
   const supabase = useMemo(() => createClient(), [])
   const briefAbortRef = useRef<AbortController | null>(null)
