@@ -57,7 +57,7 @@ export function FAQSection() {
       <ScrollReveal>
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
-            Questions?
+            Frequently Asked Questions
           </h2>
         </div>
       </ScrollReveal>

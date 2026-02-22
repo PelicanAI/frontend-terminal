@@ -8,10 +8,10 @@ import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 const plans = [
   {
-    name: 'Base',
+    name: 'Starter',
     price: 29,
     credits: '1,000',
-    planId: 'base',
+    planId: 'starter',
     description: 'For traders getting started with AI-assisted trading',
     features: [
       'AI chat with live market data',
@@ -21,7 +21,7 @@ const plans = [
       'Correlations dashboard',
       'Learning mode',
     ],
-    cta: 'Start with Base',
+    cta: 'Start with Starter',
     highlighted: false,
   },
   {
@@ -31,7 +31,7 @@ const plans = [
     planId: 'pro',
     description: 'For active traders who want the full edge',
     features: [
-      'Everything in Base',
+      'Everything in Starter',
       '3.5x more monthly credits',
       'Playbook Lab with AI grading',
       'Advanced trade analytics',

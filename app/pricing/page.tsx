@@ -21,7 +21,7 @@ const pricingJsonLd = {
   offers: [
     {
       '@type': 'Offer',
-      name: 'Base',
+      name: 'Starter',
       price: '29',
       priceCurrency: 'USD',
       priceSpecification: {

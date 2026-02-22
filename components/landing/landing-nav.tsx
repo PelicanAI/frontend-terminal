@@ -1,15 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { List, X } from '@phosphor-icons/react'
 
 export function LandingNav() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+    <nav className={`fixed top-0 left-0 right-0 z-50 h-16 border-b transition-all duration-300 ${
+      scrolled
+        ? 'bg-white/95 backdrop-blur-xl shadow-sm border-slate-200/80'
+        : 'bg-white/80 backdrop-blur-xl border-transparent'
+    }`}>
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center gap-2.5">

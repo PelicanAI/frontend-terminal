@@ -16,7 +16,6 @@ const legalLinks = [
 ]
 
 const connectLinks = [
-  { label: 'Discord', href: '#' },
   { label: 'Support', href: 'mailto:support@pelicantrading.ai' },
 ]
 

@@ -3,7 +3,7 @@
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 const stats = [
-  { value: '99%', label: 'Cheaper Than Bloomberg' },
+  { value: '1/60th', label: 'The Cost of Institutional Tools' },
   { value: '10K+', label: 'Tickers Covered' },
   { value: '30+', label: 'Languages' },
   { value: '4', label: 'Asset Classes' },

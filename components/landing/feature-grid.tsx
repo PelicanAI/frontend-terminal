@@ -73,18 +73,21 @@ export function FeatureGrid() {
     <Section id="features">
       <ScrollReveal>
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
-            And everything else
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+            The Full Platform
           </h2>
+          <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+            Everything you need, nothing you don&apos;t. All included in every plan.
+          </p>
         </div>
       </ScrollReveal>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {features.map((feature, i) => {
           const Icon = feature.icon
           return (
             <ScrollReveal key={i} delay={i * 0.05}>
-              <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <Icon
                   className="h-5 w-5 text-blue-600 mb-3"
                   weight="duotone"
@@ -92,7 +95,7 @@ export function FeatureGrid() {
                 <h3 className="text-sm font-semibold text-slate-900 mb-1">
                   {feature.title}
                 </h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-sm text-slate-500 leading-relaxed">
                   {feature.description}
                 </p>
               </div>

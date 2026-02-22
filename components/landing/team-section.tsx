@@ -17,7 +17,7 @@ function TeamAvatar({
   const [imgError, setImgError] = useState(false)
 
   return (
-    <div className="h-24 w-24 rounded-full overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
+    <div className="h-24 w-24 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 ring-2 ring-slate-200">
       {!imgError ? (
         <Image
           src={src}
@@ -28,7 +28,7 @@ function TeamAvatar({
           onError={() => setImgError(true)}
         />
       ) : (
-        <span className="text-2xl font-bold text-slate-400">{initials}</span>
+        <span className="text-2xl font-bold text-white">{initials}</span>
       )}
     </div>
   )

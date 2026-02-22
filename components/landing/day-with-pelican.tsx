@@ -11,7 +11,7 @@ const timelineItems = [
     title: 'Your brief is waiting',
     description:
       'Market overnight moves, positions analyzed, events flagged.',
-    color: 'amber' as DotColor,
+    color: 'blue' as DotColor,
     icon: Sun,
   },
   {
@@ -27,7 +27,7 @@ const timelineItems = [
     title: 'You take a trade',
     description:
       'Run through pre-trade checklist, log entry/stop/target. Risk sizing confirmed. 15 seconds.',
-    color: 'emerald' as DotColor,
+    color: 'blue' as DotColor,
     icon: Lightning,
   },
   {
@@ -35,7 +35,7 @@ const timelineItems = [
     title: 'Positions monitored',
     description:
       'Position hits 1R profit. Pelican notes tendency to close early. "Your average winner when you hold: 2.1R."',
-    color: 'cyan' as DotColor,
+    color: 'blue' as DotColor,
     icon: Eye,
   },
   {
@@ -47,22 +47,21 @@ const timelineItems = [
     icon: Notebook,
   },
   {
-    time: 'Over time',
+    time: 'Ongoing',
     title: 'Pelican gets smarter',
     description:
       'After 100 trades, knows you win 72% on London session iFVGs but only 38% during NY news. Best days: 1-2 trades max.',
-    color: 'blue' as DotColor,
+    color: 'slate' as DotColor,
     icon: Brain,
+    isOngoing: true,
   },
 ]
 
-type DotColor = 'amber' | 'blue' | 'emerald' | 'cyan'
+type DotColor = 'blue' | 'slate'
 
 const dotColors: Record<DotColor, { border: string; bg: string }> = {
-  amber: { border: 'border-amber-400', bg: 'bg-amber-400/20' },
   blue: { border: 'border-blue-500', bg: 'bg-blue-500/20' },
-  emerald: { border: 'border-emerald-400', bg: 'bg-emerald-400/20' },
-  cyan: { border: 'border-cyan-400', bg: 'bg-cyan-400/20' },
+  slate: { border: 'border-slate-400', bg: 'bg-slate-400/20' },
 }
 
 export function DayWithPelican() {
@@ -106,9 +105,15 @@ export function DayWithPelican() {
                         className="h-5 w-5 text-slate-400"
                         weight="duotone"
                       />
-                      <span className="text-xs font-mono text-slate-400 tabular-nums">
-                        {item.time}
-                      </span>
+                      {'isOngoing' in item && item.isOngoing ? (
+                        <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                          {item.time}
+                        </span>
+                      ) : (
+                        <span className="text-xs font-mono text-slate-400 tabular-nums">
+                          {item.time}
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-base font-semibold text-slate-900">
                       {item.title}
