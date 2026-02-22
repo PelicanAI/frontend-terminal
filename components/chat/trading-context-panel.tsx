@@ -15,6 +15,7 @@ import { useLiveQuotes } from "@/hooks/use-live-quotes"
 import { useTrades } from "@/hooks/use-trades"
 import { formatPercent } from "@/lib/formatters"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
+import { useTraderProfile } from "@/hooks/use-trader-profile"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +51,131 @@ interface WatchlistTicker {
   symbol: string
   price: number | null
   changePercent: number | null
+}
+
+// --- Market-adaptive panel configuration ---
+interface MarketPanelConfig {
+  indices: MarketIndex[]
+  categories: SectorData[]
+  categoryLabel: string
+  /** Map sidebar category names → heatmap filter names (stocks only) */
+  categoryHeatmapMap: Record<string, string>
+  showVix: boolean
+  volatilityLabel: string
+  volatilitySubLabel: string
+}
+
+const MARKET_PANEL_CONFIGS: Record<string, MarketPanelConfig> = {
+  stocks: {
+    indices: [
+      { symbol: "SPX", name: "S&P 500", price: null, change: null, changePercent: null },
+      { symbol: "IXIC", name: "Nasdaq", price: null, change: null, changePercent: null },
+      { symbol: "DJI", name: "Dow Jones", price: null, change: null, changePercent: null },
+    ],
+    categories: [
+      { name: "Technology", changePercent: null },
+      { name: "Financials", changePercent: null },
+      { name: "Healthcare", changePercent: null },
+      { name: "Energy", changePercent: null },
+    ],
+    categoryLabel: "Sector Performance",
+    categoryHeatmapMap: {
+      Technology: "Information Technology",
+      Financials: "Financials",
+      Healthcare: "Health Care",
+      Energy: "Energy",
+    },
+    showVix: true,
+    volatilityLabel: "VIX",
+    volatilitySubLabel: "Fear Index",
+  },
+  forex: {
+    indices: [
+      { symbol: "C:EURUSD", name: "EUR/USD", price: null, change: null, changePercent: null },
+      { symbol: "C:GBPUSD", name: "GBP/USD", price: null, change: null, changePercent: null },
+      { symbol: "C:USDJPY", name: "USD/JPY", price: null, change: null, changePercent: null },
+      { symbol: "C:AUDUSD", name: "AUD/USD", price: null, change: null, changePercent: null },
+    ],
+    categories: [
+      { name: "EUR/CHF", changePercent: null },
+      { name: "GBP/JPY", changePercent: null },
+      { name: "NZD/USD", changePercent: null },
+      { name: "USD/CAD", changePercent: null },
+    ],
+    categoryLabel: "Minor Pairs",
+    categoryHeatmapMap: {},
+    showVix: false,
+    volatilityLabel: "",
+    volatilitySubLabel: "",
+  },
+  crypto: {
+    indices: [
+      { symbol: "X:BTCUSD", name: "Bitcoin", price: null, change: null, changePercent: null },
+      { symbol: "X:ETHUSD", name: "Ethereum", price: null, change: null, changePercent: null },
+      { symbol: "X:SOLUSD", name: "Solana", price: null, change: null, changePercent: null },
+    ],
+    categories: [
+      { name: "Layer 1", changePercent: null },
+      { name: "DeFi", changePercent: null },
+      { name: "Meme", changePercent: null },
+    ],
+    categoryLabel: "Categories",
+    categoryHeatmapMap: {},
+    showVix: false,
+    volatilityLabel: "",
+    volatilitySubLabel: "",
+  },
+  // futures and options share stock indices + VIX since they reference equity markets
+  futures: {
+    indices: [
+      { symbol: "SPX", name: "S&P 500", price: null, change: null, changePercent: null },
+      { symbol: "IXIC", name: "Nasdaq", price: null, change: null, changePercent: null },
+      { symbol: "DJI", name: "Dow Jones", price: null, change: null, changePercent: null },
+    ],
+    categories: [
+      { name: "Technology", changePercent: null },
+      { name: "Financials", changePercent: null },
+      { name: "Healthcare", changePercent: null },
+      { name: "Energy", changePercent: null },
+    ],
+    categoryLabel: "Sector Performance",
+    categoryHeatmapMap: {
+      Technology: "Information Technology",
+      Financials: "Financials",
+      Healthcare: "Health Care",
+      Energy: "Energy",
+    },
+    showVix: true,
+    volatilityLabel: "VIX",
+    volatilitySubLabel: "Fear Index",
+  },
+  options: {
+    indices: [
+      { symbol: "SPX", name: "S&P 500", price: null, change: null, changePercent: null },
+      { symbol: "IXIC", name: "Nasdaq", price: null, change: null, changePercent: null },
+      { symbol: "DJI", name: "Dow Jones", price: null, change: null, changePercent: null },
+    ],
+    categories: [
+      { name: "Technology", changePercent: null },
+      { name: "Financials", changePercent: null },
+      { name: "Healthcare", changePercent: null },
+      { name: "Energy", changePercent: null },
+    ],
+    categoryLabel: "Sector Performance",
+    categoryHeatmapMap: {
+      Technology: "Information Technology",
+      Financials: "Financials",
+      Healthcare: "Health Care",
+      Energy: "Energy",
+    },
+    showVix: true,
+    volatilityLabel: "VIX",
+    volatilitySubLabel: "Fear Index",
+  },
+}
+
+function getMarketConfig(primaryMarket: string): MarketPanelConfig {
+  return (MARKET_PANEL_CONFIGS[primaryMarket] ?? MARKET_PANEL_CONFIGS.stocks) as MarketPanelConfig
 }
 
 interface TradingContextPanelProps {
@@ -109,30 +235,18 @@ export function TradingContextPanel({
   // Open trades
   const { openTrades } = useTrades()
   const { completeMilestone } = useOnboardingProgress()
+  const { primaryMarket } = useTraderProfile()
 
-  const defaultIndices: MarketIndex[] = indices || [
-    { symbol: "SPX", name: "S&P 500", price: null, change: null, changePercent: null },
-    { symbol: "IXIC", name: "Nasdaq", price: null, change: null, changePercent: null },
-    { symbol: "DJI", name: "Dow Jones", price: null, change: null, changePercent: null },
-  ]
+  // Market-adaptive config driven by trader profile
+  const marketConfig = getMarketConfig(primaryMarket)
 
+  const defaultIndices: MarketIndex[] = indices || marketConfig.indices
   const defaultVix = vix ?? null
   const defaultVixChange = vixChange ?? null
+  const defaultSectors: SectorData[] = sectors || marketConfig.categories
 
-  const defaultSectors: SectorData[] = sectors || [
-    { name: "Technology", changePercent: null },
-    { name: "Financials", changePercent: null },
-    { name: "Healthcare", changePercent: null },
-    { name: "Energy", changePercent: null },
-  ]
-
-  // Map sidebar short names → SP500 sector names for heatmap filtering
-  const sectorToSP500: Record<string, string> = {
-    "Technology": "Information Technology",
-    "Financials": "Financials",
-    "Healthcare": "Health Care",
-    "Energy": "Energy",
-  }
+  // Map sidebar category names → heatmap filter names (empty for non-stock markets)
+  const sectorToSP500 = marketConfig.categoryHeatmapMap
 
   // Rich prompt builder for active position clicks
   const buildPositionReviewPrompt = (trade: Trade) => {
@@ -517,18 +631,23 @@ export function TradingContextPanel({
                 </div>
               )}
 
-              {/* Sector Performance */}
+              {/* Category / Sector Performance */}
               <div className="space-y-2">
                 <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
-                  Sector Performance
+                  {marketConfig.categoryLabel}
                 </h4>
                 <div className="space-y-1.5">
                   {defaultSectors.map((sector) => (
                     <button
                       key={sector.name}
                       onClick={() => {
-                        const sp500Name = sectorToSP500[sector.name] || sector.name
-                        router.push(`/heatmap?sector=${encodeURIComponent(sp500Name)}`)
+                        const heatmapName = sectorToSP500[sector.name]
+                        if (heatmapName) {
+                          router.push(`/heatmap?sector=${encodeURIComponent(heatmapName)}`)
+                        } else {
+                          // Non-stock categories: ask Pelican about the category
+                          onPrefillChat?.(`What's happening in ${sector.name} today?`)
+                        }
                       }}
                       className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors duration-150 cursor-pointer group"
                     >
@@ -558,15 +677,16 @@ export function TradingContextPanel({
                 </div>
               </div>
 
-              {/* Volatility */}
+              {/* Volatility — only shown for markets that reference VIX */}
+              {marketConfig.showVix && (
               <div className="space-y-2">
                 <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Volatility</h4>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                   <div className="flex items-center gap-2">
                     <Pulse size={16} weight="regular" className="text-[var(--data-warning)]" />
                     <div className="flex flex-col">
-                      <span className="text-xs font-medium text-[var(--text-primary)]">VIX</span>
-                      <span className="text-[10px] text-[var(--text-muted)]">Fear Index</span>
+                      <span className="text-xs font-medium text-[var(--text-primary)]">{marketConfig.volatilityLabel}</span>
+                      <span className="text-[10px] text-[var(--text-muted)]">{marketConfig.volatilitySubLabel}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
@@ -577,6 +697,7 @@ export function TradingContextPanel({
                   </div>
                 </div>
               </div>
+              )}
 
               {/* Indices */}
               <div className="space-y-2">
