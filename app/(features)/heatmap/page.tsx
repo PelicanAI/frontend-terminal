@@ -3,16 +3,19 @@
 import { useState, useRef, useEffect, useMemo, useCallback, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { useHeatmap, type HeatmapTimeframe } from "@/hooks/use-heatmap"
+import { useHeatmap, type HeatmapTimeframe, type HeatmapMarket } from "@/hooks/use-heatmap"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useTrades } from "@/hooks/use-trades"
 import { useWatchlist } from "@/hooks/use-watchlist"
 import { useMarketPulse } from "@/hooks/use-market-pulse"
 import { useBehavioralInsights } from "@/hooks/use-behavioral-insights"
+import { useTraderProfile } from "@/hooks/use-trader-profile"
 import { Treemap } from "@/components/heatmap/treemap"
 import { HeatmapGrid } from "@/components/heatmap/heatmap-grid"
 import { SectorLegend } from "@/components/heatmap/sector-legend"
 import { getSectors, type SP500Sector } from "@/lib/data/sp500-constituents"
+import { getForexCategories } from "@/lib/data/forex-pairs"
+import { getCryptoCategories } from "@/lib/data/crypto-tokens"
 import { ArrowsClockwise, GridFour, SquaresFour, Lightning, Crosshair } from "@phosphor-icons/react"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { getMarketStatus } from "@/hooks/use-market-data"
@@ -33,6 +36,40 @@ const TIMEFRAMES: { value: HeatmapTimeframe; label: string }[] = [
   { value: '1Y', label: '1Y' },
 ]
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function getSectorsForMarket(market: HeatmapMarket): string[] {
+  switch (market) {
+    case 'forex': return getForexCategories()
+    case 'crypto': return getCryptoCategories()
+    default: return getSectors()
+  }
+}
+
+function getPageTitle(market: HeatmapMarket): string {
+  switch (market) {
+    case 'forex': return 'Forex Heatmap'
+    case 'crypto': return 'Crypto Heatmap'
+    default: return 'S&P 500 Heatmap'
+  }
+}
+
+function getItemLabel(market: HeatmapMarket): string {
+  switch (market) {
+    case 'forex': return 'pairs'
+    case 'crypto': return 'tokens'
+    default: return 'stocks'
+  }
+}
+
+function getSectorLabel(market: HeatmapMarket): string {
+  switch (market) {
+    case 'forex': return 'Categories'
+    case 'crypto': return 'Categories'
+    default: return 'Sectors'
+  }
+}
+
 // ── Context-rich prompt builder ──────────────────────────────────────────────
 
 interface HeatmapContext {
@@ -43,14 +80,64 @@ interface HeatmapContext {
   watchlistTickers: string[]
 }
 
-function buildAnalysisPrompt(stock: HeatmapStock, ctx: HeatmapContext): string {
+function buildAnalysisPrompt(stock: HeatmapStock, ctx: HeatmapContext, market: HeatmapMarket): string {
   const change = stock.changePercent ?? 0
+
+  if (market === 'forex') {
+    const parts = [
+      `Analyze ${stock.ticker}.`,
+      `It's ${change >= 0 ? 'up' : 'down'} ${Math.abs(change).toFixed(2)}% today${stock.price != null ? ` at ${stock.price.toFixed(5)}` : ''}.`,
+    ]
+    const pos = ctx.openTrades.find(t => t.ticker === stock.ticker)
+    if (pos) {
+      parts.push(`I have a ${pos.direction.toUpperCase()} position from ${pos.entry_price}.`)
+      if (pos.pnl_percent != null) {
+        parts.push(`Current P&L: ${pos.pnl_percent >= 0 ? '+' : ''}${pos.pnl_percent.toFixed(1)}%.`)
+      }
+      parts.push('Should I hold, add, or exit?')
+    } else {
+      parts.push('I have no position. Is this move tradeable?')
+    }
+    parts.push('Give me key levels, session context, and a trade plan with invalidation.')
+    return parts.join(' ')
+  }
+
+  if (market === 'crypto') {
+    const parts = [
+      `Analyze ${stock.ticker} (${stock.name}, ${stock.sector}).`,
+      `It's ${change >= 0 ? 'up' : 'down'} ${Math.abs(change).toFixed(2)}% today${stock.price != null ? ` at $${stock.price.toFixed(2)}` : ''}.`,
+    ]
+    const categoryChange = ctx.sectorPerformance[stock.sector]
+    if (categoryChange != null) {
+      const rel = change - categoryChange
+      if (Math.abs(rel) > 0.5) {
+        parts.push(
+          `Its category (${stock.sector}) is ${categoryChange >= 0 ? 'up' : 'down'} ${Math.abs(categoryChange).toFixed(2)}%, so ${stock.ticker} is ${rel > 0 ? 'outperforming' : 'underperforming'} by ${Math.abs(rel).toFixed(2)}%.`
+        )
+      }
+    }
+    const pos = ctx.openTrades.find(t => t.ticker === stock.ticker)
+    if (pos) {
+      parts.push(`I have a ${pos.direction.toUpperCase()} position from $${pos.entry_price}.`)
+      if (pos.pnl_percent != null) {
+        parts.push(`Current P&L: ${pos.pnl_percent >= 0 ? '+' : ''}${pos.pnl_percent.toFixed(1)}%.`)
+      }
+      parts.push('Should I hold, add, or exit?')
+    } else if (ctx.watchlistTickers.includes(stock.ticker)) {
+      parts.push('This is on my watchlist. Is now a good entry?')
+    } else {
+      parts.push('I have no position. Is this relative strength/weakness worth a trade?')
+    }
+    parts.push('Give me key levels, the catalyst, and a trade plan with invalidation.')
+    return parts.join(' ')
+  }
+
+  // Stocks (default)
   const parts = [
     `Analyze ${stock.ticker} (${stock.name}, ${stock.sector}).`,
     `It's ${change >= 0 ? 'up' : 'down'} ${Math.abs(change).toFixed(2)}% today${stock.price != null ? ` at $${stock.price.toFixed(2)}` : ''}.`,
   ]
 
-  // Sector relative strength
   const sectorChange = ctx.sectorPerformance[stock.sector]
   if (sectorChange != null) {
     const rel = change - sectorChange
@@ -61,7 +148,6 @@ function buildAnalysisPrompt(stock: HeatmapStock, ctx: HeatmapContext): string {
     }
   }
 
-  // Broad market context
   if (ctx.spxChange != null) {
     parts.push(`S&P 500 is ${ctx.spxChange >= 0 ? 'up' : 'down'} ${Math.abs(ctx.spxChange).toFixed(2)}% today.`)
   }
@@ -69,7 +155,6 @@ function buildAnalysisPrompt(stock: HeatmapStock, ctx: HeatmapContext): string {
     parts.push(`VIX is at ${ctx.vixLevel.toFixed(1)}.`)
   }
 
-  // User position context
   const pos = ctx.openTrades.find(t => t.ticker === stock.ticker)
   if (pos) {
     parts.push(`I have a ${pos.direction.toUpperCase()} position from $${pos.entry_price}.`)
@@ -89,7 +174,7 @@ function buildAnalysisPrompt(stock: HeatmapStock, ctx: HeatmapContext): string {
 
 // ── Market Breadth Strip ─────────────────────────────────────────────────────
 
-function MarketBreadthStrip({ stocks }: { stocks: HeatmapStock[] }) {
+function MarketBreadthStrip({ stocks, market }: { stocks: HeatmapStock[]; market: HeatmapMarket }) {
   if (stocks.length === 0) return null
 
   const advancing = stocks.filter(s => (s.changePercent ?? 0) > 0.05).length
@@ -132,8 +217,25 @@ export default function HeatmapPage() {
 
 function HeatmapPageInner() {
   const searchParams = useSearchParams()
+
+  // Determine which markets the user trades
+  const { survey } = useTraderProfile()
+  const marketsTraded = survey?.markets_traded || ['stocks']
+
+  const marketTabs = useMemo(() => {
+    const tabs: { id: HeatmapMarket; label: string }[] = []
+    if (marketsTraded.includes('stocks')) tabs.push({ id: 'stocks', label: 'Stocks' })
+    if (marketsTraded.includes('forex')) tabs.push({ id: 'forex', label: 'Forex' })
+    if (marketsTraded.includes('crypto')) tabs.push({ id: 'crypto', label: 'Crypto' })
+    if (tabs.length === 0) tabs.push({ id: 'stocks', label: 'Stocks' })
+    return tabs
+  }, [marketsTraded])
+
+  const defaultMarket: HeatmapMarket = (marketsTraded[0] as HeatmapMarket) || 'stocks'
+
   const [viewMode, setViewMode] = useState<ViewMode>("treemap")
-  const [selectedSectors, setSelectedSectors] = useState<SP500Sector[]>(getSectors())
+  const [activeMarket, setActiveMarket] = useState<HeatmapMarket>(defaultMarket)
+  const [selectedSectors, setSelectedSectors] = useState<string[]>(getSectorsForMarket(defaultMarket))
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [timeframe, setTimeframe] = useState<HeatmapTimeframe>('1D')
   const [showMyStocks, setShowMyStocks] = useState(false)
@@ -141,25 +243,37 @@ function HeatmapPageInner() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 })
 
+  // Reset sectors when switching markets
+  const handleMarketChange = useCallback((market: HeatmapMarket) => {
+    setActiveMarket(market)
+    setSelectedSectors(getSectorsForMarket(market))
+    setHighlightedSector(null)
+    // Reset timeframe for forex/crypto (only 1D supported initially)
+    if (market !== 'stocks') {
+      setTimeframe('1D')
+    }
+  }, [])
+
   // Onboarding milestone
   const { completeMilestone } = useOnboardingProgress()
   useEffect(() => { completeMilestone("visited_heatmap") }, [completeMilestone])
 
-  // Filter to a single sector if passed via query param
+  // Filter to a single sector if passed via query param (stocks only)
   useEffect(() => {
     const sectorParam = searchParams.get('sector')
-    if (sectorParam) {
+    if (sectorParam && activeMarket === 'stocks') {
       const allSectors = getSectors()
       const match = allSectors.find(s => s === sectorParam)
       if (match) setSelectedSectors([match])
     }
-  }, [searchParams])
+  }, [searchParams, activeMarket])
 
   // Data hooks
   const { stocks, isLoading, error, lastUpdated, refetch } = useHeatmap({
     autoRefresh,
     refreshInterval: 60000,
     timeframe,
+    market: activeMarket,
   })
   const { openWithPrompt } = usePelicanPanelContext()
   const { openTrades } = useTrades({ status: 'open' })
@@ -190,10 +304,10 @@ function HeatmapPageInner() {
     return map
   }, [behavioralInsights])
 
-  // Sector performance for context prompts
+  // Sector/category performance for context prompts
   const sectorPerformance = useMemo(() => {
     const perf: Record<string, number> = {}
-    const sectors = getSectors()
+    const sectors = getSectorsForMarket(activeMarket)
     for (const sector of sectors) {
       const sectorStocks = stocks.filter(s => s.sector === sector)
       if (sectorStocks.length > 0) {
@@ -201,7 +315,7 @@ function HeatmapPageInner() {
       }
     }
     return perf
-  }, [stocks])
+  }, [stocks, activeMarket])
 
   // Market context for prompts
   const heatmapContext: HeatmapContext = useMemo(() => {
@@ -240,13 +354,13 @@ function HeatmapPageInner() {
   const handleStockClick = useCallback((ticker: string, name: string) => {
     const stock = stocks.find(s => s.ticker === ticker)
     if (stock) {
-      openWithPrompt(ticker, buildAnalysisPrompt(stock, heatmapContext), 'heatmap', 'heatmap_click')
+      openWithPrompt(ticker, buildAnalysisPrompt(stock, heatmapContext, activeMarket), 'heatmap', 'heatmap_click')
     } else {
       openWithPrompt(ticker, `Analyze ${ticker} (${name}). Provide momentum drivers, key levels, setup quality, and a tactical trade plan with invalidation.`, 'heatmap', 'heatmap_click')
     }
-  }, [stocks, heatmapContext, openWithPrompt])
+  }, [stocks, heatmapContext, activeMarket, openWithPrompt])
 
-  const handleToggleSector = useCallback((sector: SP500Sector) => {
+  const handleToggleSector = useCallback((sector: string) => {
     setSelectedSectors((prev) => {
       if (prev.includes(sector)) {
         if (prev.length === 1) return prev
@@ -256,24 +370,26 @@ function HeatmapPageInner() {
     })
   }, [])
 
-  const handleSectorHighlight = useCallback((sector: SP500Sector) => {
+  const handleSectorHighlight = useCallback((sector: string) => {
     setHighlightedSector(prev => prev === sector ? null : sector)
   }, [])
 
   // Filter stocks by selected sectors
   const filteredStocks = useMemo(
-    () => stocks.filter((stock) => selectedSectors.includes(stock.sector as SP500Sector)),
+    () => stocks.filter((stock) => selectedSectors.includes(stock.sector)),
     [stocks, selectedSectors]
   )
 
+  const currentSectors = useMemo(() => getSectorsForMarket(activeMarket), [activeMarket])
   const marketStatus = getMarketStatus()
   const isMarketOpen = marketStatus === 'open'
+  const itemLabel = getItemLabel(activeMarket)
 
   const subtitleParts = [
-    `${filteredStocks.length} stocks`,
-    `${selectedSectors.length} sectors`,
+    `${filteredStocks.length} ${itemLabel}`,
+    `${selectedSectors.length} ${activeMarket === 'stocks' ? 'sectors' : 'categories'}`,
   ]
-  if (timeframe !== '1D') {
+  if (activeMarket === 'stocks' && timeframe !== '1D') {
     subtitleParts.push(`${timeframe} performance`)
   } else if (lastUpdated) {
     subtitleParts.push(`Updated ${new Date(lastUpdated).toLocaleTimeString()}`)
@@ -288,29 +404,51 @@ function HeatmapPageInner() {
     >
       {/* Header */}
       <div className="flex-shrink-0 px-6 py-4 bg-gradient-to-b from-white/[0.03] to-transparent border-b border-[var(--border-subtle)]">
+        {/* Market tabs */}
+        {marketTabs.length > 1 && (
+          <div className="flex items-center gap-1 mb-3 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg p-0.5 w-fit">
+            {marketTabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => handleMarketChange(tab.id)}
+                className={cn(
+                  "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+                  activeMarket === tab.id
+                    ? "bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <PageHeader
-          title="S&P 500 Heatmap"
+          title={getPageTitle(activeMarket)}
           subtitle={subtitleParts.join(' · ')}
           className="mb-3"
           actions={
             <div className="flex items-center gap-2 flex-wrap">
-              {/* Timeframe selector */}
-              <div className="flex items-center gap-0.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg p-0.5">
-                {TIMEFRAMES.map(tf => (
-                  <button
-                    key={tf.value}
-                    onClick={() => setTimeframe(tf.value)}
-                    className={cn(
-                      "px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
-                      timeframe === tf.value
-                        ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    )}
-                  >
-                    {tf.label}
-                  </button>
-                ))}
-              </div>
+              {/* Timeframe selector — stocks only */}
+              {activeMarket === 'stocks' && (
+                <div className="flex items-center gap-0.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg p-0.5">
+                  {TIMEFRAMES.map(tf => (
+                    <button
+                      key={tf.value}
+                      onClick={() => setTimeframe(tf.value)}
+                      className={cn(
+                        "px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
+                        timeframe === tf.value
+                          ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm'
+                          : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                      )}
+                    >
+                      {tf.label}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* My Stocks toggle */}
               <button
@@ -323,7 +461,7 @@ function HeatmapPageInner() {
                 )}
               >
                 <Crosshair className="w-3.5 h-3.5" weight={showMyStocks ? "fill" : "regular"} />
-                My Stocks
+                My {activeMarket === 'forex' ? 'Pairs' : activeMarket === 'crypto' ? 'Tokens' : 'Stocks'}
               </button>
 
               {/* Auto-refresh toggle */}
@@ -380,13 +518,27 @@ function HeatmapPageInner() {
 
         {/* Market status + Breadth strip */}
         <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2">
-            <div className={cn("w-2 h-2 rounded-full", isMarketOpen ? 'bg-[var(--data-positive)]' : 'bg-[var(--data-warning)]')} />
-            <span className="text-xs text-[var(--text-muted)]">
-              Market {isMarketOpen ? 'Open' : marketStatus.replace('-', ' ')}
-            </span>
-          </div>
-          <MarketBreadthStrip stocks={filteredStocks} />
+          {activeMarket === 'stocks' && (
+            <div className="flex items-center gap-2">
+              <div className={cn("w-2 h-2 rounded-full", isMarketOpen ? 'bg-[var(--data-positive)]' : 'bg-[var(--data-warning)]')} />
+              <span className="text-xs text-[var(--text-muted)]">
+                Market {isMarketOpen ? 'Open' : marketStatus.replace('-', ' ')}
+              </span>
+            </div>
+          )}
+          {activeMarket === 'crypto' && (
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[var(--data-positive)]" />
+              <span className="text-xs text-[var(--text-muted)]">24/7 Market</span>
+            </div>
+          )}
+          {activeMarket === 'forex' && (
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[var(--data-positive)]" />
+              <span className="text-xs text-[var(--text-muted)]">Forex Market</span>
+            </div>
+          )}
+          <MarketBreadthStrip stocks={filteredStocks} market={activeMarket} />
         </div>
       </div>
 
@@ -396,7 +548,7 @@ function HeatmapPageInner() {
         <div className="flex-shrink-0 sm:w-64 border-b sm:border-b-0 sm:border-r border-[var(--border-subtle)] overflow-y-auto">
           {/* Mobile: horizontal scrolling pills */}
           <div className="sm:hidden flex gap-2 overflow-x-auto scrollbar-hide p-3 pb-2">
-            {getSectors().map((sector) => {
+            {currentSectors.map((sector) => {
               const sectorStocks = stocks.filter(s => s.sector === sector)
               const avgChange = sectorStocks.length > 0
                 ? sectorStocks.reduce((sum, s) => sum + (s.changePercent ?? 0), 0) / sectorStocks.length
@@ -434,10 +586,12 @@ function HeatmapPageInner() {
           <div className="hidden sm:block p-4">
             <SectorLegend
               stocks={stocks}
-              selectedSectors={selectedSectors}
-              onToggleSector={handleToggleSector}
-              onHighlightSector={handleSectorHighlight}
+              selectedSectors={selectedSectors as SP500Sector[]}
+              onToggleSector={handleToggleSector as (sector: SP500Sector) => void}
+              onHighlightSector={handleSectorHighlight as (sector: SP500Sector) => void}
               highlightedSector={highlightedSector}
+              sectorLabel={getSectorLabel(activeMarket)}
+              customSectors={activeMarket !== 'stocks' ? currentSectors : undefined}
             />
           </div>
         </div>
@@ -466,7 +620,7 @@ function HeatmapPageInner() {
 
           {!error && !isLoading && filteredStocks.length === 0 && (
             <div className="flex items-center justify-center h-full">
-              <p className="text-[var(--text-muted)] text-sm">No stocks to display</p>
+              <p className="text-[var(--text-muted)] text-sm">No {itemLabel} to display</p>
             </div>
           )}
 
@@ -501,10 +655,10 @@ function HeatmapPageInner() {
               <div className="sm:hidden space-y-1 p-3">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">
-                    {selectedSectors.length === getSectors().length ? 'All Stocks' : `${selectedSectors.join(', ')}`} — Sorted by Change
+                    {selectedSectors.length === currentSectors.length ? `All ${itemLabel}` : `${selectedSectors.join(', ')}`} — Sorted by Change
                   </h3>
                   <span className="text-[10px] font-mono tabular-nums text-[var(--text-muted)]">
-                    {filteredStocks.length} stocks
+                    {filteredStocks.length} {itemLabel}
                   </span>
                 </div>
 
@@ -526,7 +680,9 @@ function HeatmapPageInner() {
                       </div>
                       <div className="flex items-center gap-3 flex-shrink-0">
                         <span className="text-[10px] font-mono tabular-nums text-[var(--text-secondary)]">
-                          ${stock.price?.toFixed(2) ?? '—'}
+                          {activeMarket === 'forex'
+                            ? stock.price?.toFixed(5) ?? '\u2014'
+                            : `$${stock.price?.toFixed(2) ?? '\u2014'}`}
                         </span>
                         <DataCell
                           value={stock.changePercent?.toFixed(2) ?? '0.00'}

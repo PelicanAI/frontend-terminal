@@ -5,6 +5,8 @@ import type { HeatmapStock, HeatmapResponse, HeatmapTimeframe } from "@/app/api/
 
 export type { HeatmapStock, HeatmapResponse, HeatmapTimeframe }
 
+export type HeatmapMarket = 'stocks' | 'forex' | 'crypto'
+
 export interface UseHeatmapReturn {
   stocks: HeatmapStock[]
   isLoading: boolean
@@ -17,16 +19,28 @@ export function useHeatmap({
   autoRefresh = false,
   refreshInterval = 60000,
   timeframe = '1D' as HeatmapTimeframe,
+  market = 'stocks' as HeatmapMarket,
 }: {
   autoRefresh?: boolean
   refreshInterval?: number
   timeframe?: HeatmapTimeframe
+  market?: HeatmapMarket
 } = {}): UseHeatmapReturn {
-  // Only auto-refresh for 1D (real-time), others are stale-friendly
-  const effectiveInterval = autoRefresh && timeframe === '1D' ? refreshInterval : 0
+  // Build API URL based on market
+  const apiUrl = market === 'stocks'
+    ? `/api/heatmap?timeframe=${timeframe}`
+    : `/api/heatmap/${market}`
+
+  // Auto-refresh: stocks only for 1D, crypto always (24/7), forex conditionally
+  const shouldAutoRefresh = autoRefresh && (
+    (market === 'stocks' && timeframe === '1D') ||
+    market === 'crypto' ||
+    market === 'forex'
+  )
+  const effectiveInterval = shouldAutoRefresh ? refreshInterval : 0
 
   const { data, error, isLoading, mutate } = useSWR<HeatmapResponse>(
-    `/api/heatmap?timeframe=${timeframe}`,
+    apiUrl,
     async (url) => {
       const response = await fetch(url)
       if (!response.ok) throw new Error('Failed to fetch heatmap data')
@@ -35,7 +49,7 @@ export function useHeatmap({
     {
       refreshInterval: effectiveInterval,
       revalidateOnFocus: false,
-      dedupingInterval: timeframe === '1D' ? 30000 : 120000,
+      dedupingInterval: market === 'stocks' && timeframe !== '1D' ? 120000 : 30000,
     }
   )
 
@@ -52,7 +66,7 @@ export function useHeatmap({
  * Format change percent with sign
  */
 export function formatChangePercent(changePercent: number | null): string {
-  if (changePercent === null) return "—"
+  if (changePercent === null) return "\u2014"
   const sign = changePercent >= 0 ? "+" : ""
   return `${sign}${changePercent.toFixed(2)}%`
 }

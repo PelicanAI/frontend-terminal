@@ -11,10 +11,12 @@ interface SectorLegendProps {
   onToggleSector: (sector: SP500Sector) => void
   onHighlightSector?: (sector: SP500Sector) => void
   highlightedSector?: string | null
+  sectorLabel?: string
+  customSectors?: string[]
 }
 
-export function SectorLegend({ stocks, selectedSectors, onToggleSector, onHighlightSector, highlightedSector }: SectorLegendProps) {
-  const sectors = getSectors()
+export function SectorLegend({ stocks, selectedSectors, onToggleSector, onHighlightSector, highlightedSector, sectorLabel = 'Sectors', customSectors }: SectorLegendProps) {
+  const sectors = customSectors ?? getSectors()
 
   // Calculate sector performance
   const sectorStats = sectors.map((sector) => {
@@ -37,17 +39,20 @@ export function SectorLegend({ stocks, selectedSectors, onToggleSector, onHighli
   // Calculate max absolute change for bar scaling
   const maxAbsChange = Math.max(...sortedSectors.map(s => Math.abs(s.avgChange)), 1)
 
+  // Item count label
+  const countLabel = customSectors ? 'items' : 'stocks'
+
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-[var(--text-primary)]">Sectors</h3>
+        <h3 className="text-sm font-medium text-[var(--text-primary)]">{sectorLabel}</h3>
         {selectedSectors.length < sectors.length && (
           <button
             onClick={() => {
               // Select all
               sectors.forEach((s) => {
-                if (!selectedSectors.includes(s)) {
-                  onToggleSector(s)
+                if (!selectedSectors.includes(s as SP500Sector)) {
+                  onToggleSector(s as SP500Sector)
                 }
               })
             }}
@@ -66,7 +71,7 @@ export function SectorLegend({ stocks, selectedSectors, onToggleSector, onHighli
         className="space-y-0.5"
       >
         {sortedSectors.map(({ sector, avgChange, count }) => {
-          const isSelected = selectedSectors.includes(sector)
+          const isSelected = selectedSectors.includes(sector as SP500Sector)
           const isPositive = avgChange >= 0
           const absChange = Math.abs(avgChange)
           const barWidth = (absChange / maxAbsChange) * 100
@@ -75,10 +80,10 @@ export function SectorLegend({ stocks, selectedSectors, onToggleSector, onHighli
             <motion.button
               key={sector}
               variants={staggerItem}
-              onClick={() => onToggleSector(sector)}
+              onClick={() => onToggleSector(sector as SP500Sector)}
               onDoubleClick={(e) => {
                 e.preventDefault()
-                onHighlightSector?.(sector)
+                onHighlightSector?.(sector as SP500Sector)
               }}
               className={`
                 w-full group relative overflow-hidden rounded-md
@@ -102,11 +107,11 @@ export function SectorLegend({ stocks, selectedSectors, onToggleSector, onHighli
               {/* Content */}
               <div className="relative flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <span className="text-sm font-medium text-[var(--text-primary)] truncate block">
+                  <span className="text-sm font-medium text-[var(--text-primary)] truncate block capitalize">
                     {sector}
                   </span>
                   <span className="text-xs text-[var(--text-muted)]">
-                    {count} stocks
+                    {count} {countLabel}
                   </span>
                 </div>
 
