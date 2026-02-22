@@ -189,7 +189,7 @@ export function PlaybookStatsTab({ stats, isLoading }: PlaybookStatsTabProps) {
               <BarChart data={stats.rDistribution}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis
-                  dataKey="bucket"
+                  dataKey="range"
                   tick={{ fill: "var(--text-muted)", fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
@@ -212,7 +212,14 @@ export function PlaybookStatsTab({ stats, isLoading }: PlaybookStatsTabProps) {
                 />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                   {stats.rDistribution.map((entry, i) => (
-                    <Cell key={i} fill={entry.color} />
+                    <Cell
+                      key={i}
+                      fill={
+                        entry.range.startsWith("-")
+                          ? "var(--data-negative)"
+                          : "var(--accent-primary)"
+                      }
+                    />
                   ))}
                 </Bar>
               </BarChart>
@@ -222,7 +229,7 @@ export function PlaybookStatsTab({ stats, isLoading }: PlaybookStatsTabProps) {
       )}
 
       {/* Recent results strip */}
-      {stats.recentResults.length > 0 && (
+      {stats.recentTrades.length > 0 && (
         <div
           className={cn(
             "bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-4",
@@ -233,19 +240,23 @@ export function PlaybookStatsTab({ stats, isLoading }: PlaybookStatsTabProps) {
             Recent Results
           </h3>
           <div className="flex flex-wrap gap-1.5">
-            {stats.recentResults.map((r) => (
-              <div
-                key={r.id}
-                className={cn(
-                  "w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold font-mono",
-                  r.result === "W"
-                    ? "bg-[var(--data-positive)]/15 text-[var(--data-positive)]"
-                    : "bg-[var(--data-negative)]/15 text-[var(--data-negative)]"
-                )}
-              >
-                {r.result}
-              </div>
-            ))}
+            {stats.recentTrades.map((r) => {
+              const isWin = (r.pnl_amount ?? 0) > 0
+              return (
+                <div
+                  key={r.id}
+                  title={`${r.ticker}: ${isWin ? '+' : ''}${(r.pnl_amount ?? 0).toFixed(0)}`}
+                  className={cn(
+                    "w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold font-mono",
+                    isWin
+                      ? "bg-[var(--data-positive)]/15 text-[var(--data-positive)]"
+                      : "bg-[var(--data-negative)]/15 text-[var(--data-negative)]"
+                  )}
+                >
+                  {isWin ? "W" : "L"}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

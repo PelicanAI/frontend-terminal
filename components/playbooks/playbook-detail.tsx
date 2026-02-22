@@ -35,7 +35,7 @@ const tabs: { key: TabKey; label: string; icon: typeof Eye }[] = [
 
 export function PlaybookDetail({ playbook, onBack }: PlaybookDetailProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("overview")
-  const { stats, isLoading: statsLoading } = usePlaybookStats(playbook)
+  const { stats, isLoading: statsLoading } = usePlaybookStats(playbook.id)
   const { openWithPrompt } = usePelicanPanelContext()
 
   const handleGrade = () => {
@@ -140,7 +140,7 @@ Average R: ${stats.avgR?.toFixed(2) ?? "N/A"}
 Profit Factor: ${stats.profitFactor?.toFixed(2) ?? "N/A"}
 Expectancy: ${stats.expectancy != null ? `$${stats.expectancy.toFixed(2)}` : "N/A"}
 Total P&L: $${stats.totalPnl.toFixed(2)}
-Recent Results: ${stats.recentResults.map((r) => r.result).join(" ")}`
+Recent Results: ${stats.recentTrades.map((t) => (t.pnl_amount ?? 0) > 0 ? "W" : "L").join(" ")}`
     : "No trade data available yet."
 
   const fullPrompt = `I want you to grade my trading playbook called "${playbook.name}" (setup type: ${playbook.setup_type}).

@@ -16,7 +16,7 @@ import { PlaybookCard } from "@/components/playbooks/playbook-card"
 import { PlaybookDetail } from "@/components/playbooks/playbook-detail"
 import { PlaybookEmptyState } from "@/components/playbooks/playbook-empty-state"
 import { CreatePlaybookModal } from "@/components/playbooks/create-playbook-modal"
-import type { PlaybookFormData } from "@/components/playbooks/create-playbook-modal"
+import type { PlaybookFormData } from "@/hooks/use-playbooks"
 import type { Playbook } from "@/types/trading"
 
 export default function PlaybooksPage() {

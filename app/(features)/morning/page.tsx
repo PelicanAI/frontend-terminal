@@ -261,7 +261,7 @@ export default function MorningPage() {
   const { movers, isLoading: moversLoading, refetch: refetchMovers } = useMorningBrief()
   const { openWithPrompt } = usePelicanPanelContext()
   const { items: watchlistItems } = useWatchlist()
-  const { activePlaybooks } = usePlaybooks()
+  const { playbooks: activePlaybooks } = usePlaybooks()
   const { toast } = useToast()
 
   // Onboarding milestone
