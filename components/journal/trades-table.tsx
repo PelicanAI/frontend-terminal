@@ -1,7 +1,7 @@
 "use client"
 
 import { Trade } from "@/hooks/use-trades"
-import { CaretUp, CaretDown, CaretUpDown } from "@phosphor-icons/react"
+import { CaretUp, CaretDown, CaretUpDown, PlayCircle } from "@phosphor-icons/react"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { useLiveQuotes, type Quote } from "@/hooks/use-live-quotes"
@@ -15,6 +15,7 @@ interface TradesTableProps {
   selectedTradeId?: string | null
   onScanTrade?: (trade: Trade) => void
   onAskPelican?: (prompt: string) => void
+  onReplayTrade?: (trade: Trade) => void
 }
 
 function getUnrealizedPnL(trade: Trade, quotes: Record<string, Quote>) {
@@ -43,7 +44,7 @@ type SortField = 'entry_date' | 'exit_date' | 'ticker' | 'pnl_amount' | 'pnl_per
 type SortDirection = 'asc' | 'desc'
 type StatusFilter = 'all' | 'open' | 'closed' | 'cancelled'
 
-export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrade, onAskPelican }: TradesTableProps) {
+export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrade, onAskPelican, onReplayTrade }: TradesTableProps) {
   const [sortField, setSortField] = useState<SortField>('entry_date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
@@ -424,19 +425,35 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                     >
                       Monitor &rarr;
                     </a>
-                  ) : onScanTrade ? (
-                    <PelicanButton
-                      variant="secondary"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onScanTrade(trade)
-                      }}
-                      className="text-[10px] font-bold"
-                    >
-                      SCAN
-                    </PelicanButton>
-                  ) : null}
+                  ) : (
+                    <div className="flex items-center justify-end gap-1.5">
+                      {onReplayTrade && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onReplayTrade(trade)
+                          }}
+                          className="p-1.5 rounded-lg text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors active:scale-95"
+                          title="Replay trade"
+                        >
+                          <PlayCircle size={16} weight="fill" />
+                        </button>
+                      )}
+                      {onScanTrade && (
+                        <PelicanButton
+                          variant="secondary"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onScanTrade(trade)
+                          }}
+                          className="text-[10px] font-bold"
+                        >
+                          SCAN
+                        </PelicanButton>
+                      )}
+                    </div>
+                  )}
                 </td>
               </tr>
             )
@@ -575,19 +592,35 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                       >
                         Monitor &rarr;
                       </a>
-                    ) : onScanTrade ? (
-                      <PelicanButton
-                        variant="secondary"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onScanTrade(trade)
-                        }}
-                        className="text-[10px] font-bold min-h-[44px]"
-                      >
-                        SCAN
-                      </PelicanButton>
-                    ) : null}
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        {onReplayTrade && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onReplayTrade(trade)
+                            }}
+                            className="p-1.5 rounded-lg text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                            title="Replay trade"
+                          >
+                            <PlayCircle size={16} weight="fill" />
+                          </button>
+                        )}
+                        {onScanTrade && (
+                          <PelicanButton
+                            variant="secondary"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onScanTrade(trade)
+                            }}
+                            className="text-[10px] font-bold min-h-[44px]"
+                          >
+                            SCAN
+                          </PelicanButton>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </PelicanCard>

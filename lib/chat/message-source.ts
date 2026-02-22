@@ -32,6 +32,7 @@ export type MessageSource =
   | 'journal_compliance'
   | 'journal_grade'
   | 'journal_scan'
+  | 'journal_replay'
 
   // Feature page actions
   | 'heatmap_click'
@@ -160,6 +161,7 @@ const SOURCE_LABELS: Record<MessageSource, string> = {
   journal_compliance: 'Compliance',
   journal_grade: 'Trade Grade',
   journal_scan: 'Trade Scan',
+  journal_replay: 'Trade Replay',
   heatmap_click: 'Heatmap',
   earnings_click: 'Earnings',
   economic_calendar_click: 'Economic Calendar',

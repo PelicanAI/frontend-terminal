@@ -17,8 +17,9 @@ import { CloseTradeModal } from "@/components/journal/close-trade-modal"
 import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
 import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
+import { buildReplayNarrationPrompt } from "@/lib/journal/build-replay-prompt"
 import { PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/pelican"
-import { Plus, ChartBar, Funnel, ClipboardText, Brain, UserCircle } from "@phosphor-icons/react"
+import { Plus, ChartBar, Funnel, ClipboardText, Brain, UserCircle, X as XIcon } from "@phosphor-icons/react"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 
 const PerformanceTab = dynamicImport(
@@ -41,6 +42,11 @@ const InsightsTab = dynamicImport(
   { ssr: false }
 )
 
+const TradeReplay = dynamicImport(
+  () => import("@/components/journal/trade-replay").then((m) => ({ default: m.TradeReplay })),
+  { ssr: false }
+)
+
 type TabKey = 'performance' | 'trades' | 'plan' | 'insights'
 type ActivePanel = 'detail' | 'pelican' | null
 
@@ -60,6 +66,7 @@ export default function JournalPage() {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null)
   const [tradeTypeFilter, setTradeTypeFilter] = useState<'all' | 'real' | 'paper'>('all')
   const [showProfileModal, setShowProfileModal] = useState(false)
+  const [replayTrade, setReplayTrade] = useState<Trade | null>(null)
 
   const { trades, isLoading: tradesLoading, logTrade, closeTrade, refetch, updateTrade } = useTrades()
 
@@ -242,6 +249,15 @@ export default function JournalPage() {
     await openWithPrompt(null, prompt, "journal", 'journal_review')
   }
 
+  const handleReplayTrade = (trade: Trade) => {
+    setReplayTrade(trade)
+  }
+
+  const handleNarrateTrade = async (trade: Trade) => {
+    const prompt = buildReplayNarrationPrompt(trade)
+    await openWithPrompt(trade.ticker, prompt, "journal", 'journal_replay')
+  }
+
   const showDetailPanel = activePanel === 'detail' && selectedTrade !== null
 
   const filterButtons = ['all', 'real', 'paper'] as const
@@ -387,6 +403,7 @@ export default function JournalPage() {
                   onScanTrade={handleScanTrade}
                   selectedTradeId={selectedTrade?.id}
                   onAskPelican={handleAskPelican}
+                  onReplayTrade={handleReplayTrade}
                 />
               </motion.div>
             )}
@@ -441,6 +458,7 @@ export default function JournalPage() {
               trade={selectedTrade}
               onClose={handleCloseDetailPanel}
               onCloseTrade={handleOpenCloseTrade}
+              onReplay={handleReplayTrade}
             />
           </div>
         )}
@@ -470,6 +488,55 @@ export default function JournalPage() {
           onSubmit={handleCloseTrade}
         />
       )}
+
+      {/* Trade Replay Modal */}
+      <AnimatePresence>
+        {replayTrade && (
+          <motion.div
+            variants={backdrop}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-50 bg-[var(--bg-overlay)] backdrop-blur-sm"
+            onClick={() => setReplayTrade(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[min(800px,90vw)] sm:max-h-[85vh] bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-subtle)]">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-semibold text-[var(--text-primary)]">Trade Replay</h2>
+                  <span className="font-mono tabular-nums text-sm text-[var(--accent-primary)]">{replayTrade.ticker}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium uppercase ${
+                    replayTrade.direction === 'long'
+                      ? 'bg-[var(--data-positive)]/20 text-[var(--data-positive)]'
+                      : 'bg-[var(--data-negative)]/20 text-[var(--data-negative)]'
+                  }`}>
+                    {replayTrade.direction}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setReplayTrade(null)}
+                  className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                >
+                  <XIcon size={16} weight="bold" />
+                </button>
+              </div>
+              <div className="p-4">
+                <TradeReplay
+                  trade={replayTrade}
+                  onNarrate={handleNarrateTrade}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Profile Modal */}
       <AnimatePresence>

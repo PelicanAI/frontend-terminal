@@ -1,7 +1,7 @@
 "use client"
 
 import { Trade } from "@/hooks/use-trades"
-import { X } from "@phosphor-icons/react"
+import { X, PlayCircle } from "@phosphor-icons/react"
 import { PelicanCard, PelicanButton, DataCell } from "@/components/ui/pelican"
 import { TradeGradeCard } from "@/components/grading/trade-grade-card"
 import type { TradeGrade } from "@/lib/grading/trade-grader"
@@ -11,9 +11,10 @@ interface TradeDetailPanelProps {
   onClose: () => void
   onEdit?: (trade: Trade) => void
   onCloseTrade?: (trade: Trade) => void
+  onReplay?: (trade: Trade) => void
 }
 
-export function TradeDetailPanel({ trade, onClose, onCloseTrade }: TradeDetailPanelProps) {
+export function TradeDetailPanel({ trade, onClose, onCloseTrade, onReplay }: TradeDetailPanelProps) {
   const isWinner = trade.pnl_amount !== null && trade.pnl_amount > 0
   const isLoser = trade.pnl_amount !== null && trade.pnl_amount < 0
 
@@ -243,9 +244,21 @@ export function TradeDetailPanel({ trade, onClose, onCloseTrade }: TradeDetailPa
         )}
       </div>
 
-      {/* Actions (if open trade) */}
-      {trade.status === 'open' && onCloseTrade && (
-        <div className="flex-shrink-0 p-4 border-t border-[var(--border-subtle)]">
+      {/* Actions */}
+      <div className="flex-shrink-0 p-4 border-t border-[var(--border-subtle)] space-y-2">
+        {/* Replay button for closed trades */}
+        {trade.status === 'closed' && onReplay && (
+          <button
+            onClick={() => onReplay(trade)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[var(--accent-muted)] text-[var(--accent-primary)] text-sm font-medium hover:bg-[var(--accent-primary)]/20 transition-colors active:scale-[0.98]"
+          >
+            <PlayCircle size={16} weight="fill" />
+            Replay Trade
+          </button>
+        )}
+
+        {/* Close trade button for open trades */}
+        {trade.status === 'open' && onCloseTrade && (
           <PelicanButton
             variant="danger"
             size="lg"
@@ -254,8 +267,8 @@ export function TradeDetailPanel({ trade, onClose, onCloseTrade }: TradeDetailPa
           >
             Close Trade
           </PelicanButton>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
