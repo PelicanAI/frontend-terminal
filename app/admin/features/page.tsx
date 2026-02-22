@@ -172,7 +172,7 @@ export default function AdminFeaturesPage() {
   const maxFunnel = Math.max(...funnelSteps.map((s) => s.value), 1)
 
   // Sort plans for matrix: trial, starter/base, pro, power, none
-  const planOrder = ['trial', 'starter', 'base', 'pro', 'power', 'none', 'founder']
+  const planOrder = ['starter', 'pro', 'power', 'founder', 'none']
   const sortedFeatureByPlan = [...featureByPlan].sort(
     (a, b) => (planOrder.indexOf(a.plan) === -1 ? 99 : planOrder.indexOf(a.plan)) -
               (planOrder.indexOf(b.plan) === -1 ? 99 : planOrder.indexOf(b.plan))

@@ -40,8 +40,8 @@ function CostBreakdownTable() {
 
 const PLANS = [
   {
-    id: 'base',
-    name: 'Base',
+    id: 'starter',
+    name: 'Starter',
     price: 29,
     credits: 1000,
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || 'price_starter',

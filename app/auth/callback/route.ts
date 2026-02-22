@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(new URL('/accept-terms', request.url))
       }
 
-      const validPlans = ['base', 'pro', 'power', 'founder', 'starter', 'trial']
+      const validPlans = ['starter', 'pro', 'power', 'founder']
       const hasSubscription = userCredits.plan_type && validPlans.includes(userCredits.plan_type)
       const hasFreeQuestions = (userCredits.free_questions_remaining ?? 0) > 0
       const hasAccess = hasSubscription || hasFreeQuestions

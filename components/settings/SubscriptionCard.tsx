@@ -40,7 +40,7 @@ export function SubscriptionCard() {
               <Zap className="w-5 h-5 text-blue-500 flex-shrink-0" />
               <div className="flex-1">
                 <p className="font-semibold text-blue-600 capitalize">
-                  {credits.plan === 'base' ? 'Base Plan' : `${credits.plan.charAt(0).toUpperCase() + credits.plan.slice(1)} Plan`}
+                  {`${credits.plan.charAt(0).toUpperCase() + credits.plan.slice(1)} Plan`}
                 </p>
                 <p className="text-sm text-blue-700/80">
                   {credits.monthlyAllocation.toLocaleString()} credits per month

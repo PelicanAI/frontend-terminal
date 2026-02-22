@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServiceClient } from '@/lib/admin'
-
-const PLAN_CREDITS: Record<string, number> = {
-  base: 1000,
-  pro: 3500,
-  power: 10000
-}
+import { getPlanByPriceId, getPlanCredits, PLAN_CREDITS } from '@/lib/plans'
 
 const getStripeClient = () => {
   const secretKey = process.env.STRIPE_SECRET_KEY
@@ -65,16 +60,21 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        
+
         if (session.mode === 'subscription' && session.subscription) {
           const userId = session.client_reference_id || session.metadata?.user_id
           const planName = session.metadata?.plan
-          const credits = session.metadata?.credits 
-            ? parseInt(session.metadata.credits) 
-            : PLAN_CREDITS[planName || 'base']
+          const credits = session.metadata?.credits
+            ? parseInt(session.metadata.credits)
+            : getPlanCredits(planName || 'starter')
 
           if (!userId) {
             console.error('No user_id in checkout session')
+            break
+          }
+
+          if (!planName) {
+            console.error('No plan name in checkout session metadata')
             break
           }
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
           const { error } = await supabaseAdmin.rpc('setup_subscriber', {
             p_user_id: userId,
-            p_plan_type: planName || 'base',
+            p_plan_type: planName,
             p_credits: credits,
             p_stripe_customer_id: session.customer as string,
             p_stripe_subscription_id: subscription.id
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
           const planAmount = planName === 'power' ? 249 : planName === 'pro' ? 99 : 29;
           const { error: referralError } = await supabaseAdmin.rpc('activate_referral_bonus', {
             p_user_id: userId,
-            p_plan_type: planName || 'base',
+            p_plan_type: planName,
             p_plan_amount: planAmount,
           });
           if (referralError) {
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
           const planName = subscription.metadata?.plan
           const credits = subscription.metadata?.credits
             ? parseInt(subscription.metadata.credits)
-            : PLAN_CREDITS[planName || 'base']
+            : getPlanCredits(planName || 'starter')
 
           if (userId && planName) {
             await supabaseAdmin

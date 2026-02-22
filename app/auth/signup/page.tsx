@@ -25,9 +25,7 @@ export default function SignUpPage() {
   // Store the plan parameter in sessionStorage for use after signup
   useEffect(() => {
     if (planParam) {
-      // Map 'starter' from marketing site to 'base' used by pricing page
-      const mappedPlan = planParam === 'starter' ? 'base' : planParam
-      sessionStorage.setItem('intended_plan', mappedPlan)
+      sessionStorage.setItem('intended_plan', planParam)
     }
   }, [planParam])
 

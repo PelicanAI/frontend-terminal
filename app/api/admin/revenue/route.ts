@@ -1,21 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
-
-const PLAN_PRICES: Record<string, number> = {
-  starter: 29,
-  base: 29,
-  pro: 99,
-  power: 249,
-  founder: 0,
-}
-
-const PLAN_CREDITS: Record<string, number> = {
-  starter: 1000,
-  base: 1000,
-  pro: 5000,
-  power: 20000,
-  founder: 5000,
-}
+import { PLAN_PRICES, PLAN_CREDITS } from '@/lib/plans'
 
 export async function GET() {
   try {

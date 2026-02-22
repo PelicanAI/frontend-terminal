@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
+import { PLAN_PRICES } from '@/lib/plans'
 
 function getLast30Days() {
   const days: string[] = []
@@ -199,13 +200,10 @@ export async function GET() {
   const conversion_funnel = { total_signups, active_trial, converted_paid, churned }
 
   // --- MRR ---
-  const planPrices: Record<string, number> = {
-    base: 29, starter: 29, pro: 99, power: 249, founder: 0,
-  }
   let mrr = 0
   for (const row of creditsData) {
     const plan = (row.plan_type as string) ?? 'none'
-    if (plan in planPrices) mrr += planPrices[plan]!
+    if (plan in PLAN_PRICES) mrr += PLAN_PRICES[plan]!
   }
 
   // --- Active Users (7d and 30d) ---

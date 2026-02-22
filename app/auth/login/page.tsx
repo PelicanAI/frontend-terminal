@@ -35,7 +35,7 @@ export default function LoginPage() {
           .eq('user_id', data.user.id)
           .single()
 
-        const validPlans = ['base', 'pro', 'power', 'founder', 'starter']
+        const validPlans = ['starter', 'pro', 'power', 'founder']
         const hasSubscription = userCredits?.plan_type && validPlans.includes(userCredits.plan_type)
 
         if (hasSubscription) {

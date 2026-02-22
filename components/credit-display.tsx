@@ -20,7 +20,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
     )
   }
 
-  const validPlans = ['base', 'pro', 'power', 'founder', 'starter']
+  const validPlans = ['starter', 'pro', 'power', 'founder']
   const isSubscribed = credits && validPlans.includes(credits.plan)
   const isTrial = credits && !isSubscribed && credits.freeQuestionsRemaining > 0
 
