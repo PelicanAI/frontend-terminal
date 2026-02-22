@@ -114,26 +114,43 @@ export async function GET(request: NextRequest) {
       rawEvents = data.result
     }
 
+    const RELEVANT_COUNTRIES = ['US', 'UNITED STATES', 'EU', 'GB', 'UNITED KINGDOM', 'JP', 'JAPAN', 'AU', 'AUSTRALIA', 'CA', 'CANADA', 'NZ', 'NEW ZEALAND', 'CH', 'SWITZERLAND', 'DE', 'GERMANY', 'FR', 'FRANCE']
+    const COUNTRY_NORMALIZE: Record<string, string> = {
+      'UNITED STATES': 'US', 'UNITED KINGDOM': 'GB', 'JAPAN': 'JP',
+      'AUSTRALIA': 'AU', 'CANADA': 'CA', 'NEW ZEALAND': 'NZ',
+      'SWITZERLAND': 'CH', 'GERMANY': 'DE', 'FRANCE': 'FR',
+    }
+
     const mappedEvents = rawEvents
       .filter((e) => {
         const country = (e.country || '').toUpperCase()
-        return country === 'US' || country === 'UNITED STATES'
-      })
-      .map((e) => ({
-        event: e.event || e.indicator || '',
-        country: 'US' as const,
-        date: e.date || from || new Date().toISOString().split('T')[0],
-        time: e.time || '',
-        impact: (typeof e.impact === 'number'
+        if (!RELEVANT_COUNTRIES.includes(country)) return false
+        // Filter out low impact events to reduce noise
+        const impact = typeof e.impact === 'number'
           ? (e.impact === 3 ? 'high' : e.impact === 2 ? 'medium' : 'low')
-          : ((e.impact || 'low').toLowerCase())) as 'low' | 'medium' | 'high',
-        actual: e.actual ?? null,
-        estimate: e.estimate ?? null,
-        prior: e.prior ?? e.prev ?? null,
-        unit: e.unit || '',
-      }))
+          : ((e.impact || 'low').toLowerCase())
+        return impact !== 'low'
+      })
+      .map((e) => {
+        const rawCountry = (e.country || '').toUpperCase()
+        const country = COUNTRY_NORMALIZE[rawCountry] || rawCountry
 
-    const events: EconomicEvent[] = (mappedEvents as EconomicEvent[]).slice(0, 20)
+        return {
+          event: e.event || e.indicator || '',
+          country,
+          date: e.date || from || new Date().toISOString().split('T')[0],
+          time: e.time || '',
+          impact: (typeof e.impact === 'number'
+            ? (e.impact === 3 ? 'high' : e.impact === 2 ? 'medium' : 'low')
+            : ((e.impact || 'low').toLowerCase())) as 'low' | 'medium' | 'high',
+          actual: e.actual ?? null,
+          estimate: e.estimate ?? null,
+          prior: e.prior ?? e.prev ?? null,
+          unit: e.unit || '',
+        }
+      })
+
+    const events: EconomicEvent[] = mappedEvents as EconomicEvent[]
 
     const responseData: EconomicCalendarResponse = {
       events,

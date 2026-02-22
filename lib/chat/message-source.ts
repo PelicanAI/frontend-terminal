@@ -36,6 +36,7 @@ export type MessageSource =
   // Feature page actions
   | 'heatmap_click'
   | 'earnings_click'
+  | 'economic_calendar_click'
   | 'brief_action'
   | 'correlation_ask'
 
@@ -77,6 +78,7 @@ export function contextToSource(context: PelicanPanelContext): MessageSource {
   switch (context) {
     case 'heatmap': return 'heatmap_click'
     case 'earnings': return 'earnings_click'
+    case 'calendar': return 'economic_calendar_click'
     case 'journal': return 'journal_scan'
     case 'morning': return 'brief_action'
     case 'brief': return 'brief_action'
@@ -160,6 +162,7 @@ const SOURCE_LABELS: Record<MessageSource, string> = {
   journal_scan: 'Trade Scan',
   heatmap_click: 'Heatmap',
   earnings_click: 'Earnings',
+  economic_calendar_click: 'Economic Calendar',
   brief_action: 'Morning Brief',
   correlation_ask: 'Correlation',
   welcome_chip: 'Quick Start',

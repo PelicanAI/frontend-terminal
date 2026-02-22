@@ -7,6 +7,8 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { CaretLeft, CaretRight, ArrowsClockwise } from "@phosphor-icons/react"
 import { useEnrichedEarnings, applyEarningsFilters } from "@/hooks/use-enriched-earnings"
+import { useEconomicCalendar } from "@/hooks/use-economic-calendar"
+import { useTraderProfile } from "@/hooks/use-trader-profile"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { cn } from "@/lib/utils"
 import { PageHeader, PelicanButton, staggerContainer, staggerItem } from "@/components/ui/pelican"
@@ -15,6 +17,7 @@ import { EarningsFilters } from "@/components/earnings/earnings-filters"
 import { EarningsSection } from "@/components/earnings/earnings-section"
 import { EarningsGridSkeleton } from "@/components/earnings/earnings-grid-skeleton"
 import { EarningsEmptyState } from "@/components/earnings/earnings-empty-state"
+import { EconomicCalendar } from "@/components/calendar/economic-calendar"
 import type { EnrichedEarningsEvent, EarningsFilters as EarningsFiltersType } from "@/types/earnings"
 
 const DEFAULT_FILTERS: EarningsFiltersType = {
@@ -42,6 +45,19 @@ export default function EarningsPage() {
   const [weekOffset, setWeekOffset] = useState(0)
   const [filters, setFilters] = useState<EarningsFiltersType>(DEFAULT_FILTERS)
 
+  // Trader profile for market preferences
+  const { survey } = useTraderProfile()
+  const marketsTraded = survey?.markets_traded || ['stocks']
+  const primaryMarket = marketsTraded[0] || 'stocks'
+  const tradesForex = marketsTraded.includes('forex')
+  const tradesFutures = marketsTraded.includes('futures')
+  const showEconomicTab = tradesForex || tradesFutures
+
+  // Default tab based on primary market
+  const [calendarView, setCalendarView] = useState<'earnings' | 'economic'>(
+    primaryMarket === 'forex' || primaryMarket === 'futures' ? 'economic' : 'earnings'
+  )
+
   // Calculate the week's date range (Monday-Friday)
   const weekDays = useMemo(() => {
     const today = new Date()
@@ -65,6 +81,7 @@ export default function EarningsPage() {
   const todayStr = new Date().toISOString().split('T')[0] ?? ''
 
   const { events, stats, isLoading, refetch } = useEnrichedEarnings({ from: weekStart, to: weekEnd })
+  const { events: economicEvents, isLoading: economicLoading } = useEconomicCalendar({ from: weekStart, to: weekEnd })
   const { openWithPrompt } = usePelicanPanelContext()
 
   // Apply filters + search
@@ -222,8 +239,11 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
     <div className="h-full overflow-y-auto p-4 sm:p-6">
       {/* Header */}
       <PageHeader
-        title="Earnings Calendar"
-        subtitle={subtitle}
+        title={showEconomicTab ? "Calendar" : "Earnings Calendar"}
+        subtitle={calendarView === 'economic'
+          ? `${economicEvents.length} events \u00b7 ${economicEvents.filter(e => e.impact === 'high').length} high impact`
+          : subtitle
+        }
         actions={
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {/* Week navigator */}
@@ -272,82 +292,120 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
         }
       />
 
-      {/* Spotlight section — top 8 by impact score */}
-      {!isLoading && events.length > 0 && (
-        <EarningsSpotlight events={events} onClick={handleClick} />
-      )}
-
-      {/* Filters */}
-      {!isLoading && events.length > 0 && (
-        <EarningsFilters
-          filters={filters}
-          onToggle={handleToggleFilter}
-          portfolioCount={stats.portfolioOverlap}
-          search={search}
-          onSearchChange={setSearch}
-        />
-      )}
-
-      {isLoading ? (
-        <EarningsGridSkeleton />
-      ) : events.length === 0 ? (
-        <EarningsEmptyState variant="no-data" />
-      ) : filteredEvents.length === 0 && hasActiveFilters ? (
-        <EarningsEmptyState variant="filtered" onClearFilters={clearFilters} />
-      ) : (
-        <motion.div
-          className="relative"
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-        >
-          {/* Desktop: 5-column grid */}
-          <motion.div
-            className="hidden md:grid grid-cols-5 gap-px bg-[var(--border-subtle)] rounded-xl overflow-hidden border border-[var(--border-subtle)]"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
+      {/* Tab switcher (only shown for forex/futures traders) */}
+      {showEconomicTab && (
+        <div className="flex items-center gap-1 mb-4 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg p-0.5 w-fit">
+          <button
+            onClick={() => setCalendarView('earnings')}
+            className={cn(
+              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+              calendarView === 'earnings'
+                ? "bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm"
+                : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+            )}
           >
-            {weekDays.map((day, i) => renderDayColumn(day, i))}
-          </motion.div>
+            Earnings
+          </button>
+          <button
+            onClick={() => setCalendarView('economic')}
+            className={cn(
+              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors",
+              calendarView === 'economic'
+                ? "bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm"
+                : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+            )}
+          >
+            Economic Events
+          </button>
+        </div>
+      )}
 
-          {/* Mobile: horizontal scroll */}
-          <div className="md:hidden overflow-x-auto scrollbar-hide">
+      {calendarView === 'earnings' ? (
+        <>
+          {/* Spotlight section — top 8 by impact score */}
+          {!isLoading && events.length > 0 && (
+            <EarningsSpotlight events={events} onClick={handleClick} />
+          )}
+
+          {/* Filters */}
+          {!isLoading && events.length > 0 && (
+            <EarningsFilters
+              filters={filters}
+              onToggle={handleToggleFilter}
+              portfolioCount={stats.portfolioOverlap}
+              search={search}
+              onSearchChange={setSearch}
+            />
+          )}
+
+          {isLoading ? (
+            <EarningsGridSkeleton />
+          ) : events.length === 0 ? (
+            <EarningsEmptyState variant="no-data" />
+          ) : filteredEvents.length === 0 && hasActiveFilters ? (
+            <EarningsEmptyState variant="filtered" onClearFilters={clearFilters} />
+          ) : (
             <motion.div
-              className="flex gap-px min-w-[1000px] bg-[var(--border-subtle)] rounded-xl overflow-hidden border border-[var(--border-subtle)]"
-              variants={staggerContainer}
+              className="relative"
               initial="hidden"
               animate="visible"
+              variants={staggerContainer}
             >
-              {weekDays.map((day, i) => renderDayColumn(day, i))}
+              {/* Desktop: 5-column grid */}
+              <motion.div
+                className="hidden md:grid grid-cols-5 gap-px bg-[var(--border-subtle)] rounded-xl overflow-hidden border border-[var(--border-subtle)]"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                {weekDays.map((day, i) => renderDayColumn(day, i))}
+              </motion.div>
+
+              {/* Mobile: horizontal scroll */}
+              <div className="md:hidden overflow-x-auto scrollbar-hide">
+                <motion.div
+                  className="flex gap-px min-w-[1000px] bg-[var(--border-subtle)] rounded-xl overflow-hidden border border-[var(--border-subtle)]"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {weekDays.map((day, i) => renderDayColumn(day, i))}
+                </motion.div>
+              </div>
+
+              {/* Watermark */}
+              <Image
+                src="/pelican-logo-transparent.webp"
+                alt=""
+                width={500}
+                height={500}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] object-contain opacity-[0.03] select-none pointer-events-none"
+                style={{ filter: 'brightness(0) invert(1)' }}
+                draggable={false}
+                aria-hidden={true}
+              />
             </motion.div>
+          )}
+
+          {/* Attribution for Parqet logos */}
+          <div className="text-center py-3 mt-2">
+            <a
+              href="https://elbstream.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-[var(--text-disabled)] hover:text-[var(--text-muted)] transition-colors duration-150"
+            >
+              Logos provided by Elbstream
+            </a>
           </div>
-
-          {/* Watermark */}
-          <Image
-            src="/pelican-logo-transparent.webp"
-            alt=""
-            width={500}
-            height={500}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] object-contain opacity-[0.03] select-none pointer-events-none"
-            style={{ filter: 'brightness(0) invert(1)' }}
-            draggable={false}
-            aria-hidden={true}
-          />
-        </motion.div>
+        </>
+      ) : (
+        economicLoading ? (
+          <EarningsGridSkeleton />
+        ) : (
+          <EconomicCalendar events={economicEvents} primaryMarket={primaryMarket} />
+        )
       )}
-
-      {/* Attribution for Parqet logos */}
-      <div className="text-center py-3 mt-2">
-        <a
-          href="https://elbstream.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[10px] text-[var(--text-disabled)] hover:text-[var(--text-muted)] transition-colors duration-150"
-        >
-          Logos provided by Elbstream
-        </a>
-      </div>
     </div>
   )
 }
