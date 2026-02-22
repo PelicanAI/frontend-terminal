@@ -267,6 +267,23 @@
   --fade-color: 46, 46, 46;
 }
 
+/* ======================================================================
+   Landing / Marketing Pages — Light theme with blue accents
+   ====================================================================== */
+.landing-theme {
+  --landing-bg: #ffffff;
+  --landing-bg-alt: #f8fafc;
+  --landing-bg-elevated: #f1f5f9;
+  --landing-text: #0f172a;
+  --landing-text-secondary: #475569;
+  --landing-text-muted: #94a3b8;
+  --landing-border: #e2e8f0;
+  --landing-accent: #2563eb;
+  --landing-accent-hover: #1d4ed8;
+  --landing-accent-light: #dbeafe;
+  --landing-accent-text: #1e40af;
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;

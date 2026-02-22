@@ -117,10 +117,10 @@ export function PlatformShowcase() {
       {/* Header */}
       <ScrollReveal>
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white/90 mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 mb-4">
             One platform. Every tool you need.
           </h2>
-          <p className="text-base md:text-lg text-white/50 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-slate-500 max-w-2xl mx-auto">
             AI chat, morning briefs, heatmaps, journaling, playbooks, and position tracking
             &mdash; all connected, all learning from you.
           </p>
@@ -140,8 +140,8 @@ export function PlatformShowcase() {
                 className={cn(
                   'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0',
                   isActive
-                    ? 'bg-purple-500/20 text-purple-400 shadow-[0_0_20px_rgba(139,92,246,0.15)]'
-                    : 'text-white/40 hover:text-white/60 hover:bg-white/[0.04]'
+                    ? 'bg-blue-500/15 text-blue-600'
+                    : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                 )}
               >
                 <Icon
@@ -168,10 +168,10 @@ export function PlatformShowcase() {
             {/* Left: text content */}
             <div className="space-y-6">
               <div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white/90 mb-3">
+                <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-sm md:text-base text-white/50 leading-relaxed">
+                <p className="text-sm md:text-base text-slate-500 leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -179,8 +179,8 @@ export function PlatformShowcase() {
               <ul className="space-y-3">
                 {feature.highlights.map((highlight, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0" />
-                    <span className="text-sm text-white/70 leading-relaxed">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
+                    <span className="text-sm text-slate-600 leading-relaxed">
                       {highlight}
                     </span>
                   </li>
@@ -189,7 +189,7 @@ export function PlatformShowcase() {
             </div>
 
             {/* Right: mock component */}
-            <div className="w-full rounded-xl border border-white/[0.08] bg-[#0a0a0f] shadow-[0_4px_24px_rgba(0,0,0,0.4),0_0_48px_rgba(139,92,246,0.04)] overflow-hidden">
+            <div className="w-full rounded-xl border border-slate-200 bg-[#0a0a0f] shadow-lg overflow-hidden">
               <MockComponent />
             </div>
           </div>

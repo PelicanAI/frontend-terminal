@@ -1,6 +1,5 @@
 'use client'
 
-import { LandingNav } from './landing-nav'
 import { HeroSection } from './hero-section'
 import { SocialProofBar } from './social-proof-bar'
 import { ProblemSection } from './problem-section'
@@ -9,15 +8,15 @@ import { DayWithPelican } from './day-with-pelican'
 import { FlywheelSection } from './flywheel-section'
 import { MultiAssetSection } from './multi-asset-section'
 import { FeatureGrid } from './feature-grid'
+import { CreditTiersSection } from './credit-tiers-section'
 import { PricingSection } from './pricing-section'
+import { TeamSection } from './team-section'
 import { FAQSection } from './faq-section'
 import { FinalCTA } from './final-cta'
-import { LandingFooter } from './landing-footer'
 
 export default function LandingPageClient() {
   return (
-    <main className="bg-[#0a0a0f] text-white overflow-x-hidden">
-      <LandingNav />
+    <main className="overflow-x-hidden">
       <HeroSection />
       <SocialProofBar />
       <ProblemSection />
@@ -26,10 +25,11 @@ export default function LandingPageClient() {
       <FlywheelSection />
       <MultiAssetSection />
       <FeatureGrid />
+      <CreditTiersSection />
       <PricingSection />
+      <TeamSection />
       <FAQSection />
       <FinalCTA />
-      <LandingFooter />
     </main>
   )
 }

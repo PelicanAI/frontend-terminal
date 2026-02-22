@@ -19,7 +19,7 @@ const timelineItems = [
     title: 'Setups surfaced for you',
     description:
       'EUR/USD at daily FVG with liquidity swept. Matches your iFVG playbook. Win rate: 67%.',
-    color: 'purple' as DotColor,
+    color: 'blue' as DotColor,
     icon: Target,
   },
   {
@@ -43,7 +43,7 @@ const timelineItems = [
     title: 'Review and learn',
     description:
       'Journal the day. Pelican grades execution: "A- today. Clean entry, followed rules, but added size without checklist."',
-    color: 'purple' as DotColor,
+    color: 'blue' as DotColor,
     icon: Notebook,
   },
   {
@@ -51,16 +51,16 @@ const timelineItems = [
     title: 'Pelican gets smarter',
     description:
       'After 100 trades, knows you win 72% on London session iFVGs but only 38% during NY news. Best days: 1-2 trades max.',
-    color: 'purple' as DotColor,
+    color: 'blue' as DotColor,
     icon: Brain,
   },
 ]
 
-type DotColor = 'amber' | 'purple' | 'emerald' | 'cyan'
+type DotColor = 'amber' | 'blue' | 'emerald' | 'cyan'
 
 const dotColors: Record<DotColor, { border: string; bg: string }> = {
   amber: { border: 'border-amber-400', bg: 'bg-amber-400/20' },
-  purple: { border: 'border-purple-400', bg: 'bg-purple-400/20' },
+  blue: { border: 'border-blue-500', bg: 'bg-blue-500/20' },
   emerald: { border: 'border-emerald-400', bg: 'bg-emerald-400/20' },
   cyan: { border: 'border-cyan-400', bg: 'bg-cyan-400/20' },
 }
@@ -70,10 +70,10 @@ export function DayWithPelican() {
     <Section>
       <ScrollReveal>
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             A day with Pelican
           </h2>
-          <p className="text-white/50 text-lg max-w-xl mx-auto">
+          <p className="text-slate-500 text-lg max-w-xl mx-auto">
             From pre-market to review, every step is connected.
           </p>
         </div>
@@ -81,7 +81,7 @@ export function DayWithPelican() {
 
       <div className="relative max-w-2xl mx-auto">
         {/* Vertical line */}
-        <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-purple-500/50 via-purple-500/20 to-transparent" />
+        <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500/50 via-blue-500/20 to-transparent" />
 
         <div className="space-y-10">
           {timelineItems.map((item, i) => {
@@ -103,17 +103,17 @@ export function DayWithPelican() {
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-3">
                       <Icon
-                        className="h-5 w-5 text-white/40"
+                        className="h-5 w-5 text-slate-400"
                         weight="duotone"
                       />
-                      <span className="text-xs font-mono text-white/30 tabular-nums">
+                      <span className="text-xs font-mono text-slate-400 tabular-nums">
                         {item.time}
                       </span>
                     </div>
-                    <h3 className="text-base font-semibold text-white">
+                    <h3 className="text-base font-semibold text-slate-900">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-white/40 leading-relaxed">
+                    <p className="text-sm text-slate-400 leading-relaxed">
                       {item.description}
                     </p>
                   </div>

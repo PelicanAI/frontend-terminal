@@ -180,7 +180,7 @@ export function HeroSection() {
     <section className="relative overflow-hidden px-6 pb-20 pt-32 md:pt-40">
       {/* Background glow */}
       <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2">
-        <div className="h-[600px] w-[800px] rounded-full bg-purple-600/[0.08] blur-[120px]" />
+        <div className="h-[600px] w-[800px] rounded-full bg-blue-600/[0.06] blur-[120px]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl">
@@ -191,12 +191,12 @@ export function HeroSection() {
           transition={{ duration: 0.5, ease }}
           className="mb-8 flex justify-center"
         >
-          <div className="flex items-center gap-2.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5">
+          <div className="flex items-center gap-2.5 rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22c55e] opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#22c55e]" />
             </span>
-            <span className="text-xs text-white/50">
+            <span className="text-xs text-slate-500">
               Now with Forex, Crypto & Futures support
             </span>
           </div>
@@ -209,9 +209,9 @@ export function HeroSection() {
           transition={{ duration: 0.5, delay: 0.1, ease }}
           className="mx-auto max-w-4xl text-center text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
         >
-          <span className="text-white">The AI that learns</span>
+          <span className="text-slate-900">The AI that learns</span>
           <br />
-          <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
             how you trade
           </span>
         </motion.h1>
@@ -221,7 +221,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease }}
-          className="mx-auto mt-6 max-w-2xl text-center text-base leading-relaxed text-white/50 md:text-lg"
+          className="mx-auto mt-6 max-w-2xl text-center text-base leading-relaxed text-slate-500 md:text-lg"
         >
           Pelican analyzes markets, grades your trades, learns your setups, and
           coaches you to trade better. The more you use it, the smarter it gets.
@@ -236,7 +236,7 @@ export function HeroSection() {
         >
           <Link
             href="/auth/signup"
-            className="group flex items-center gap-2 rounded-xl bg-[#8b5cf6] px-6 py-3 text-sm font-medium text-white shadow-lg shadow-purple-600/20 transition-all duration-150 hover:bg-[#9d74f7] hover:shadow-purple-600/30 active:scale-[0.98]"
+            className="group flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition-all duration-150 hover:bg-blue-700 hover:shadow-blue-600/30 active:scale-[0.98]"
           >
             Start Trading Smarter — It&apos;s Free
             <ArrowRight
@@ -246,7 +246,7 @@ export function HeroSection() {
           </Link>
           <a
             href="#platform"
-            className="rounded-xl border border-white/10 px-6 py-3 text-sm font-medium text-white/70 transition-all duration-150 hover:border-white/20 hover:text-white active:scale-[0.98]"
+            className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-medium text-slate-600 transition-all duration-150 hover:border-slate-400 hover:text-slate-900 active:scale-[0.98]"
           >
             See How It Works
           </a>
@@ -257,7 +257,7 @@ export function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4, ease }}
-          className="mt-4 text-center text-xs text-white/30"
+          className="mt-4 text-center text-xs text-slate-400"
         >
           10 free questions, no credit card required
         </motion.p>

@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { XLogo } from '@phosphor-icons/react'
 
 const productLinks = [
   { label: 'Features', href: '#platform' },
@@ -15,14 +16,13 @@ const legalLinks = [
 ]
 
 const connectLinks = [
-  { label: 'Twitter', href: 'https://x.com/PelicanAI_' },
   { label: 'Discord', href: '#' },
   { label: 'Support', href: 'mailto:support@pelicantrading.ai' },
 ]
 
 export function LandingFooter() {
   return (
-    <footer className="border-t border-white/[0.06] py-12 px-6">
+    <footer className="bg-slate-50 border-t border-slate-200 py-12 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
@@ -34,11 +34,11 @@ export function LandingFooter() {
                 width={24}
                 height={24}
               />
-              <span className="text-sm font-semibold text-white">
+              <span className="text-sm font-semibold text-slate-900">
                 Pelican AI
               </span>
             </div>
-            <p className="text-xs text-white/30 leading-relaxed">
+            <p className="text-xs text-slate-400 leading-relaxed">
               AI-powered trading analysis with live market data, trade
               journaling, and personalized coaching.
             </p>
@@ -46,7 +46,7 @@ export function LandingFooter() {
 
           {/* Product */}
           <div>
-            <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">
+            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
               Product
             </h4>
             <ul className="space-y-2">
@@ -54,7 +54,7 @@ export function LandingFooter() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/40 hover:text-white/70 transition-colors"
+                    className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -65,7 +65,7 @@ export function LandingFooter() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">
+            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
               Legal
             </h4>
             <ul className="space-y-2">
@@ -73,7 +73,7 @@ export function LandingFooter() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/40 hover:text-white/70 transition-colors"
+                    className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -84,10 +84,21 @@ export function LandingFooter() {
 
           {/* Connect */}
           <div>
-            <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">
+            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
               Connect
             </h4>
             <ul className="space-y-2">
+              <li>
+                <a
+                  href="https://x.com/PelicanAI_"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <XLogo weight="bold" className="h-3.5 w-3.5" />
+                  Twitter / X
+                </a>
+              </li>
               {connectLinks.map((link) => (
                 <li key={link.label}>
                   <a
@@ -98,7 +109,7 @@ export function LandingFooter() {
                         ? 'noopener noreferrer'
                         : undefined
                     }
-                    className="text-sm text-white/40 hover:text-white/70 transition-colors"
+                    className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     {link.label}
                   </a>
@@ -109,12 +120,12 @@ export function LandingFooter() {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/30">
+        <div className="pt-8 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-slate-400">
             &copy; {new Date().getFullYear()} Pelican AI. All rights reserved.
           </p>
-          <p className="text-xs text-white/20">
-            Not financial advice. Trading involves risk.
+          <p className="text-xs text-slate-300">
+            Not financial advice. Trading involves risk. Pelican is an AI model — it can make mistakes. Please double-check responses.
           </p>
         </div>
       </div>

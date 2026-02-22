@@ -1,4 +1,11 @@
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
+import { LandingNav } from '@/components/landing/landing-nav';
+import { LandingFooter } from '@/components/landing/landing-footer';
+
+const HelpChat = dynamic(() => import('@/components/marketing/HelpChat'), {
+  ssr: false,
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://pelicantrading.ai'),
@@ -37,8 +44,11 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="dark bg-[#0a0a0f] text-white min-h-screen antialiased scroll-smooth">
+    <div className="landing-theme bg-white text-slate-900 min-h-screen antialiased scroll-smooth">
+      <LandingNav />
       {children}
+      <LandingFooter />
+      <HelpChat />
     </div>
   );
 }
