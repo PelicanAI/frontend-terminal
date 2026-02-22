@@ -42,6 +42,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { useMarketData } from "@/hooks/use-market-data"
 import { useSparklineData } from "@/hooks/use-sparkline-data"
+import { useTraderProfile } from "@/hooks/use-trader-profile"
 import type { Mover } from "@/hooks/use-morning-brief"
 import {
   MAG7,
@@ -82,6 +83,152 @@ const ASSET_FILTER_OPTIONS: Record<Exclude<AssetClass, 'stocks'>, string[]> = {
   forex: ['All', 'Majors', 'Crosses', 'Exotic'],
 }
 
+// Market-adaptive morning brief prompt configurations
+type MarketType = 'stocks' | 'forex' | 'crypto' | 'futures' | 'options'
+
+interface BriefConfig {
+  overnightRecap: string
+  keyLevels: string
+  sectorRotation: string
+  gamePlan: string
+}
+
+const BRIEF_CONFIGS: Record<MarketType, BriefConfig> = {
+  stocks: {
+    overnightRecap: `**1. MARKET OVERNIGHT RECAP**
+- How did futures trade overnight? Where are S&P, Nasdaq, Dow futures right now?
+- What happened in Asia and Europe sessions?
+- Any overnight gaps or significant moves?`,
+    keyLevels: `**2. KEY LEVELS TODAY**
+- S&P 500: support, resistance, and pivot levels
+- Nasdaq: support, resistance, and pivot levels
+- VIX: current level and what it signals
+- DXY (dollar index): direction and impact`,
+    sectorRotation: `**6. SECTOR ROTATION**
+- Which sectors are showing relative strength/weakness?
+- Any notable sector divergences from the broad market?
+- Money flow signals`,
+    gamePlan: `**10. GAME PLAN**
+- Summarize: what am I doing today?
+- Key price alerts to set
+- Times to pay attention to (data releases, market open, power hour)`,
+  },
+  forex: {
+    overnightRecap: `**1. SESSION RECAP**
+- How did the Asian session trade? Any significant moves in JPY, AUD, NZD crosses?
+- European session open outlook — what's the tone?
+- Any overnight gaps or central bank interventions?`,
+    keyLevels: `**2. KEY LEVELS TODAY**
+- EUR/USD: support, resistance, and pivot levels
+- GBP/USD: support, resistance, and pivot levels
+- USD/JPY: support, resistance, and pivot levels
+- DXY (dollar index): current direction and momentum`,
+    sectorRotation: `**6. CURRENCY STRENGTH**
+- Which currencies are showing relative strength/weakness today?
+- Any notable divergences between correlated pairs?
+- Central bank policy outlook and rate differential shifts`,
+    gamePlan: `**10. GAME PLAN**
+- Summarize: what am I doing today?
+- Key price alerts to set on major pairs
+- Times to pay attention to (London open, NY overlap, key economic releases)`,
+  },
+  crypto: {
+    overnightRecap: `**1. MARKET RECAP (24H)**
+- How did BTC and ETH trade over the last 24 hours? Any significant moves?
+- What happened during the Asia and US sessions?
+- Any notable liquidation events or large whale movements?`,
+    keyLevels: `**2. KEY LEVELS TODAY**
+- BTC: support, resistance, and pivot levels
+- ETH: support, resistance, and pivot levels
+- BTC dominance (BTC.D): current level and trend
+- Total crypto market cap direction`,
+    sectorRotation: `**6. CATEGORY ROTATION**
+- Which categories are leading? (Layer 1, DeFi, Meme, AI, Gaming)
+- Any notable rotation between categories?
+- Funding rates and sentiment across major exchanges`,
+    gamePlan: `**10. GAME PLAN**
+- Summarize: what am I doing today?
+- Key price alerts to set
+- Volume pattern analysis (when are the highest-volume windows?)
+- On-chain metrics to watch (exchange flows, stablecoin mints)`,
+  },
+  futures: {
+    overnightRecap: `**1. OVERNIGHT SESSION RECAP**
+- How did ES, NQ, and YM trade overnight? Key levels hit?
+- Globex session volume and range — was it trending or range-bound?
+- Any overnight gaps or significant moves? Gap fill probability?`,
+    keyLevels: `**2. KEY LEVELS TODAY**
+- ES (S&P 500 futures): support, resistance, VPOC, and value area
+- NQ (Nasdaq futures): support, resistance, and pivot levels
+- VIX: current level and term structure
+- Any rollover/expiration considerations?`,
+    sectorRotation: `**6. SECTOR ROTATION**
+- Which sectors are showing relative strength/weakness?
+- COT (Commitment of Traders) positioning — any notable shifts?
+- Institutional vs retail positioning signals`,
+    gamePlan: `**10. GAME PLAN**
+- Summarize: what am I doing today?
+- Key price alerts to set on ES, NQ, CL, GC
+- Times to pay attention to (data releases, RTH open, power hour, settlement)
+- Overnight session levels to reference for RTH trading`,
+  },
+  options: {
+    overnightRecap: `**1. MARKET OVERNIGHT RECAP**
+- How did futures trade overnight? Where are S&P, Nasdaq, Dow futures right now?
+- What happened in Asia and Europe sessions?
+- Any overnight gaps or significant moves affecting implied volatility?`,
+    keyLevels: `**2. KEY LEVELS TODAY**
+- S&P 500: support, resistance, and gamma exposure flip levels
+- VIX: current level, term structure (contango/backwardation)
+- Put/Call ratio: current reading and 5-day trend
+- Max pain levels for major indices and my positions`,
+    sectorRotation: `**6. VOLATILITY & FLOW ANALYSIS**
+- Implied volatility regime — are we in high or low IV?
+- Notable unusual options activity across sectors
+- Gamma exposure levels — where are dealer hedging flows concentrated?
+- Skew analysis — is put skew elevated?`,
+    gamePlan: `**10. GAME PLAN**
+- Summarize: what am I doing today?
+- Key volatility alerts to set
+- Times to pay attention to (data releases, market open, OPEX dates)
+- Position Greeks summary — any adjustments needed?`,
+  },
+}
+
+// Market-adaptive prompts for MarketPulseStrip clicks
+const PULSE_STRIP_PROMPTS: Record<MarketType, Record<string, string>> = {
+  stocks: {
+    SPX: `What's driving the S&P 500 today? Key levels, sentiment, and what to watch.`,
+    COMP: `What's moving the Nasdaq today? Tech sector analysis, key levels, and outlook.`,
+    DJI: `Analyze the Dow Jones today. What sectors are leading/lagging and why?`,
+    VIX: `VIX analysis: what is volatility signaling right now? Should I be hedging?`,
+  },
+  forex: {
+    SPX: `How is equity market performance affecting currency pairs today? Risk-on or risk-off?`,
+    COMP: `How is tech sector performance influencing USD and risk currencies today?`,
+    DJI: `How is the Dow's performance reflecting on USD strength and safe-haven flows?`,
+    VIX: `VIX analysis: what is volatility signaling for FX carry trades and risk currencies?`,
+  },
+  crypto: {
+    SPX: `How is S&P 500 performance correlating with crypto today? Risk-on or risk-off impact on BTC?`,
+    COMP: `How is Nasdaq performance affecting crypto sentiment today? Tech-crypto correlation analysis.`,
+    DJI: `How are traditional markets influencing crypto flows today?`,
+    VIX: `VIX analysis: what does equity volatility signal for crypto? Historical correlation check.`,
+  },
+  futures: {
+    SPX: `ES futures analysis: key levels, value area, VPOC, and overnight session recap.`,
+    COMP: `NQ futures analysis: key levels, relative strength vs ES, and tech sector leadership.`,
+    DJI: `YM futures analysis: Dow futures levels and sector rotation signals.`,
+    VIX: `VIX futures analysis: term structure, contango/backwardation, and hedging signals.`,
+  },
+  options: {
+    SPX: `SPX options analysis: implied volatility, gamma exposure, max pain, and notable flow.`,
+    COMP: `Nasdaq options analysis: IV rank, put/call skew, and unusual activity.`,
+    DJI: `Dow options analysis: current implied move, notable institutional positioning.`,
+    VIX: `VIX term structure deep dive: front-month vs back-month, VIX options flow, and what it signals for hedging.`,
+  },
+}
+
 interface EconomicEvent {
   event: string
   country: string
@@ -120,6 +267,9 @@ export default function MorningPage() {
   useEffect(() => { completeMilestone("visited_brief") }, [completeMilestone])
   const { warnings: todaysWarnings, warningCount } = useTodaysWarnings()
   const { data: behavioralInsights } = useBehavioralInsights()
+  const { primaryMarket } = useTraderProfile()
+  const marketType = (primaryMarket as MarketType) || 'stocks'
+  const briefConfig = BRIEF_CONFIGS[marketType] ?? BRIEF_CONFIGS.stocks
 
   // Get live quotes for open positions to calculate unrealized P&L
   const openTickersWithTypes = openTrades
@@ -319,7 +469,15 @@ export default function MorningPage() {
       `${m.ticker}: ${m.changePercent >= 0 ? '+' : ''}${m.changePercent.toFixed(1)}%`
     ).join(', ')
 
-    let prompt = `You are Pelican, an institutional-grade AI trading assistant delivering a comprehensive daily briefing.
+    const marketLabel: Record<MarketType, string> = {
+      stocks: 'equities/stock',
+      forex: 'forex/currency',
+      crypto: 'cryptocurrency',
+      futures: 'futures',
+      options: 'options',
+    }
+
+    let prompt = `You are Pelican, an institutional-grade AI trading assistant delivering a comprehensive daily briefing. My primary market is ${marketLabel[marketType] ?? 'equities/stock'}.
 
 Date: ${dateStr}
 Time: ${timeStr}
@@ -333,18 +491,11 @@ ${watchlistSummary}
 TODAY'S TOP MOVERS:
 ${moversSummary || 'Loading...'}
 
-Generate my personalized daily brief covering ALL of the following sections. Be specific with numbers, levels, and tickers. No fluff \u2014 write like a Goldman Sachs morning note meets a trading desk briefing.
+Generate my personalized daily brief covering ALL of the following sections. Be specific with numbers, levels, and tickers. No fluff — write like a Goldman Sachs morning note meets a trading desk briefing.
 
-**1. MARKET OVERNIGHT RECAP**
-- How did futures trade overnight? Where are S&P, Nasdaq, Dow futures right now?
-- What happened in Asia and Europe sessions?
-- Any overnight gaps or significant moves?
+${briefConfig.overnightRecap}
 
-**2. KEY LEVELS TODAY**
-- S&P 500: support, resistance, and pivot levels
-- Nasdaq: support, resistance, and pivot levels
-- VIX: current level and what it signals
-- DXY (dollar index): direction and impact
+${briefConfig.keyLevels}
 
 **3. MY POSITIONS UPDATE**
 - For each of my open positions: current price vs my entry, how far from stop/target, any overnight news affecting them
@@ -361,10 +512,7 @@ Generate my personalized daily brief covering ALL of the following sections. Be 
 - Earnings reports today (pre-market and after-hours)
 - Any geopolitical developments affecting markets
 
-**6. SECTOR ROTATION**
-- Which sectors are showing relative strength/weakness?
-- Any notable sector divergences from the broad market?
-- Money flow signals
+${briefConfig.sectorRotation}
 
 **7. TOP MOVERS ANALYSIS**
 - Why are today's biggest movers moving? (earnings, news, technical breakouts)
@@ -380,10 +528,7 @@ Generate my personalized daily brief covering ALL of the following sections. Be 
 - Unusual options activity or volatility signals
 - Any signs of market stress?
 
-**10. GAME PLAN**
-- Summarize: what am I doing today?
-- Key price alerts to set
-- Times to pay attention to (data releases, market open, power hour)
+${briefConfig.gamePlan}
 
 Keep it dense, actionable, and personalized to MY positions and watchlist. Use markdown headers for each section.`
 
@@ -396,7 +541,7 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
     }
 
     return prompt
-  }, [openTrades, watchlistItems, movers.gainers, movers.losers, todaysWarnings])
+  }, [openTrades, watchlistItems, movers.gainers, movers.losers, todaysWarnings, marketType, briefConfig])
 
   const supabase = useMemo(() => createClient(), [])
   const briefAbortRef = useRef<AbortController | null>(null)
@@ -554,12 +699,7 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
       <div className="mt-6">
         <MarketPulseStrip
           onIndexClick={(symbol, label) => {
-            const prompts: Record<string, string> = {
-              SPX: `What's driving the S&P 500 today? Key levels, sentiment, and what to watch.`,
-              COMP: `What's moving the Nasdaq today? Tech sector analysis, key levels, and outlook.`,
-              DJI: `Analyze the Dow Jones today. What sectors are leading/lagging and why?`,
-              VIX: `VIX analysis: what is volatility signaling right now? Should I be hedging?`,
-            }
+            const prompts = PULSE_STRIP_PROMPTS[marketType] ?? PULSE_STRIP_PROMPTS.stocks
             openWithPrompt(null, prompts[symbol] || `Analyze ${label} today. What's driving the move?`, 'morning', 'brief_action')
           }}
         />
