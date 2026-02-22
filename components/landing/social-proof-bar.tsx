@@ -1,0 +1,29 @@
+'use client'
+
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
+
+const stats = [
+  { value: '50+', label: 'Markets analyzed daily' },
+  { value: '<2s', label: 'Average response time' },
+  { value: '4', label: 'Asset classes supported' },
+  { value: '24/7', label: 'AI availability' },
+]
+
+export function SocialProofBar() {
+  return (
+    <section className="border-y border-white/[0.06] bg-white/[0.01] px-6 py-12 md:py-16">
+      <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 md:grid-cols-4 md:gap-12">
+        {stats.map((stat, i) => (
+          <ScrollReveal key={stat.label} delay={i * 0.1}>
+            <div className="text-center">
+              <div className="font-mono text-2xl font-bold text-white">
+                {stat.value}
+              </div>
+              <div className="mt-1 text-xs text-white/40">{stat.label}</div>
+            </div>
+          </ScrollReveal>
+        ))}
+      </div>
+    </section>
+  )
+}
