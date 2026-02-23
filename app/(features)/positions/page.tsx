@@ -24,6 +24,7 @@ import { CloseTradeModal } from "@/components/journal/close-trade-modal"
 import { LogTradeModal } from "@/components/journal/log-trade-modal"
 import { SessionIndicator } from "@/components/positions/session-indicator"
 import { MarketSessionsStrip } from "@/components/positions/market-sessions-strip"
+import Link from "next/link"
 import { PelicanButton, pageEnter } from "@/components/ui/pelican"
 import { computePortfolioGrade } from "@/lib/portfolio-grade"
 import type { PortfolioPosition } from "@/types/portfolio"
@@ -282,6 +283,15 @@ export default function PositionsPage() {
       />
 
       {/* Position cards */}
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-[var(--text-muted)]">Open positions</span>
+        <Link
+          href="/journal?tab=trades"
+          className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors"
+        >
+          Review closed trades in Journal &rarr;
+        </Link>
+      </div>
       <PositionList
         positions={portfolio.positions}
         portfolioStats={portfolio.portfolio}

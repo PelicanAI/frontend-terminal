@@ -381,7 +381,7 @@ export function PositionCard({
                   onClick={(e) => { e.stopPropagation(); onScanWithPelican(position) }}
                 >
                   <Lightning size={14} weight="bold" />
-                  Scan with Pelican
+                  Monitor
                 </PelicanButton>
                 <PelicanButton
                   variant="secondary"

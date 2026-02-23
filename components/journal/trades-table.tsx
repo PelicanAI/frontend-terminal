@@ -1,8 +1,9 @@
 "use client"
 
 import { Trade } from "@/hooks/use-trades"
-import { CaretUp, CaretDown, CaretUpDown, PlayCircle } from "@phosphor-icons/react"
+import { CaretUp, CaretDown, CaretUpDown, PlayCircle, ArrowRight, X as XIcon } from "@phosphor-icons/react"
 import { useState } from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { useLiveQuotes, type Quote } from "@/hooks/use-live-quotes"
 import { LogoImg } from "@/components/ui/logo-img"
@@ -46,9 +47,13 @@ type SortDirection = 'asc' | 'desc'
 type StatusFilter = 'all' | 'open' | 'closed' | 'cancelled'
 
 export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrade, onAskPelican, onReplayTrade }: TradesTableProps) {
-  const [sortField, setSortField] = useState<SortField>('entry_date')
+  const [sortField, setSortField] = useState<SortField>('exit_date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('closed')
+  const [dismissedPositionsBanner, setDismissedPositionsBanner] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('pelican_dismiss_positions_banner') === '1'
+  })
 
   // Get live quotes for open positions
   const openTickersWithTypes = trades
@@ -190,6 +195,28 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
           </button>
         ))}
       </div>
+
+      {/* Cross-link banner: Open filter → Positions */}
+      {statusFilter === 'open' && !dismissedPositionsBanner && (
+        <div className="flex items-center justify-between gap-3 mb-4 px-3 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+          <p className="text-xs text-[var(--text-secondary)]">
+            Managing live positions? Positions dashboard has real-time health scores and alerts{' '}
+            <Link href="/positions" className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors font-medium inline-flex items-center gap-0.5">
+              Go to Positions <ArrowRight size={12} weight="bold" />
+            </Link>
+          </p>
+          <button
+            onClick={() => {
+              setDismissedPositionsBanner(true)
+              localStorage.setItem('pelican_dismiss_positions_banner', '1')
+            }}
+            className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors shrink-0"
+            aria-label="Dismiss"
+          >
+            <XIcon size={14} weight="bold" />
+          </button>
+        </div>
+      )}
 
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
