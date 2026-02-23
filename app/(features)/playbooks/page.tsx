@@ -3,8 +3,9 @@
 export const dynamic = "force-dynamic"
 
 import { useState, useCallback } from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
-import { Plus } from "@phosphor-icons/react"
+import { Plus, Compass } from "@phosphor-icons/react"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { usePlaybooks } from "@/hooks/use-playbooks"
 import {
@@ -66,14 +67,22 @@ export default function PlaybooksPage() {
         }
         actions={
           playbooks.length > 0 ? (
-            <PelicanButton
-              variant="primary"
-              size="md"
-              onClick={() => setShowCreateModal(true)}
-            >
-              <Plus size={16} weight="bold" />
-              New Playbook
-            </PelicanButton>
+            <div className="flex items-center gap-2">
+              <Link href="/strategies">
+                <PelicanButton variant="secondary" size="md">
+                  <Compass size={16} weight="regular" />
+                  Browse Templates
+                </PelicanButton>
+              </Link>
+              <PelicanButton
+                variant="primary"
+                size="md"
+                onClick={() => setShowCreateModal(true)}
+              >
+                <Plus size={16} weight="bold" />
+                New Playbook
+              </PelicanButton>
+            </div>
           ) : undefined
         }
       />

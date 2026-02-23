@@ -213,6 +213,73 @@ export interface Playbook {
   expectancy: number | null
   best_trade_pnl: number | null
   worst_trade_pnl: number | null
+  // Strategy template fields
+  is_curated: boolean
+  is_published: boolean
+  published_at: string | null
+  slug: string | null
+  forked_from: string | null
+  fork_depth: number
+  category: string | null
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | null
+  recommended_assets: string[] | null
+  best_when: string | null
+  avoid_when: string | null
+  author_display_name: string | null
+  adoption_count: number
+  community_rating: number | null
+  rating_count: number
+  stats_verified: boolean
+  stats_verified_at: string | null
+  stats_trade_count: number
+  has_backtest: boolean
   created_at: string
   updated_at: string
+}
+
+export type StrategyCategory = 'momentum' | 'mean_reversion' | 'event_driven' | 'options'
+export type StrategyDifficulty = 'beginner' | 'intermediate' | 'advanced'
+export type StrategySource = 'all' | 'curated' | 'community'
+
+export interface StrategyFilter {
+  source: StrategySource
+  category: StrategyCategory | 'all'
+  difficulty: StrategyDifficulty | 'all'
+  search: string
+  sortBy: 'popular' | 'rating' | 'newest'
+}
+
+export interface StrategyRating {
+  id: string
+  user_id: string
+  playbook_id: string
+  rating: number
+  review: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface TemplateAdoption {
+  id: string
+  user_id: string
+  source_playbook_id: string
+  adopted_playbook_id: string
+  created_at: string
+}
+
+export interface StrategyBacktestResult {
+  id: string
+  playbook_id: string
+  universe: string
+  lookback_period: string
+  total_trades: number
+  win_rate: number | null
+  profit_factor: number | null
+  max_drawdown_pct: number | null
+  sharpe_ratio: number | null
+  avg_r_multiple: number | null
+  equity_curve: Array<{ date: string; value: number }> | null
+  notes: string | null
+  calculated_at: string
+  created_at: string
 }

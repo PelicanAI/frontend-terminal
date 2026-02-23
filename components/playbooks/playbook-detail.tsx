@@ -8,11 +8,13 @@ import {
   ChartBar,
   List,
   Sparkle,
+  Globe,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { PelicanButton, pageEnter, tabContent } from "@/components/ui/pelican"
 import { usePlaybookStats } from "@/hooks/use-playbooks"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
+import { PublishModal } from "@/components/strategies/publish-modal"
 import type { Playbook } from "@/types/trading"
 import { PlaybookOverviewTab } from "./detail-tabs/overview-tab"
 import { PlaybookStatsTab } from "./detail-tabs/stats-tab"
@@ -35,8 +37,11 @@ const tabs: { key: TabKey; label: string; icon: typeof Eye }[] = [
 
 export function PlaybookDetail({ playbook, onBack }: PlaybookDetailProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("overview")
+  const [showPublishModal, setShowPublishModal] = useState(false)
   const { stats, isLoading: statsLoading } = usePlaybookStats(playbook.id)
   const { openWithPrompt } = usePelicanPanelContext()
+
+  const canPublish = !playbook.is_published && !playbook.is_curated && playbook.entry_rules && playbook.exit_rules && playbook.risk_rules
 
   const handleGrade = () => {
     const { visibleMessage, fullPrompt } = buildGradePrompt(playbook, stats)
@@ -52,16 +57,35 @@ export function PlaybookDetail({ playbook, onBack }: PlaybookDetailProps) {
           Back
         </PelicanButton>
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl font-semibold text-[var(--text-primary)] truncate">
-            {playbook.name}
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] truncate">
+              {playbook.name}
+            </h2>
+            {playbook.forked_from && (
+              <span className="text-[10px] font-medium text-[var(--accent-primary)] bg-[var(--accent-muted)] px-2 py-0.5 rounded-md whitespace-nowrap">
+                Forked
+              </span>
+            )}
+          </div>
           {playbook.description && (
             <p className="text-sm text-[var(--text-secondary)] truncate mt-0.5">
               {playbook.description}
             </p>
           )}
         </div>
+        {canPublish && (
+          <PelicanButton variant="secondary" size="sm" onClick={() => setShowPublishModal(true)}>
+            <Globe size={14} weight="regular" />
+            Publish
+          </PelicanButton>
+        )}
       </div>
+
+      <PublishModal
+        playbook={playbook}
+        open={showPublishModal}
+        onOpenChange={setShowPublishModal}
+      />
 
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-6 overflow-x-auto scrollbar-hide">

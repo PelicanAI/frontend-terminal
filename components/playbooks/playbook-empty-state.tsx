@@ -1,7 +1,8 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
-import { BookOpenText, Plus } from "@phosphor-icons/react"
+import { BookOpenText, Plus, ArrowSquareOut } from "@phosphor-icons/react"
 import { PelicanButton, pageEnter } from "@/components/ui/pelican"
 
 interface PlaybookEmptyStateProps {
@@ -29,10 +30,18 @@ export function PlaybookEmptyState({ onCreatePlaybook }: PlaybookEmptyStateProps
         Tag trades with your playbooks to measure which setups actually make money.
       </p>
 
-      <PelicanButton variant="primary" size="lg" onClick={onCreatePlaybook}>
-        <Plus size={16} weight="bold" />
-        Create your first playbook
-      </PelicanButton>
+      <div className="flex flex-col sm:flex-row items-center gap-3">
+        <PelicanButton variant="primary" size="lg" onClick={onCreatePlaybook}>
+          <Plus size={16} weight="bold" />
+          Create your first playbook
+        </PelicanButton>
+        <Link href="/strategies">
+          <PelicanButton variant="secondary" size="lg">
+            <ArrowSquareOut size={16} weight="regular" />
+            Browse Strategy Templates
+          </PelicanButton>
+        </Link>
+      </div>
     </motion.div>
   )
 }
