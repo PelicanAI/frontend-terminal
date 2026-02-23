@@ -67,11 +67,35 @@ export function useStrategies(initialFilters?: Partial<StrategyFilter>) {
     {
       revalidateOnFocus: false,
       dedupingInterval: 30000,
+      shouldRetryOnError: false,
     }
   )
 
+  // Fetch user's adopted strategy IDs
+  const { data: adoptedRaw } = useSWR<string[]>(
+    'user-adopted-ids',
+    async () => {
+      const { data, error } = await supabase
+        .from('playbooks')
+        .select('forked_from')
+        .eq('is_curated', false)
+        .not('forked_from', 'is', null)
+
+      if (error) throw error
+      return (data || []).map(d => d.forked_from).filter(Boolean) as string[]
+    },
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 30000,
+      shouldRetryOnError: false,
+    }
+  )
+
+  const adoptedIds = useMemo(() => new Set(adoptedRaw || []), [adoptedRaw])
+
   return {
     strategies: data || [],
+    adoptedIds,
     isLoading,
     error: error ?? null,
     filters,
@@ -96,7 +120,7 @@ export function useStrategyDetail(slug: string | null) {
       if (error) throw error
       return data as Playbook
     },
-    { revalidateOnFocus: false, dedupingInterval: 30000 }
+    { revalidateOnFocus: false, dedupingInterval: 30000, shouldRetryOnError: false }
   )
 
   // Fetch backtests
@@ -112,7 +136,7 @@ export function useStrategyDetail(slug: string | null) {
       if (error) throw error
       return data as StrategyBacktestResult[]
     },
-    { revalidateOnFocus: false }
+    { revalidateOnFocus: false, dedupingInterval: 30000, shouldRetryOnError: false }
   )
 
   // Fetch ratings
@@ -128,7 +152,7 @@ export function useStrategyDetail(slug: string | null) {
       if (error) throw error
       return data as StrategyRating[]
     },
-    { revalidateOnFocus: false }
+    { revalidateOnFocus: false, dedupingInterval: 30000, shouldRetryOnError: false }
   )
 
   // Check if current user adopted this strategy
@@ -148,7 +172,25 @@ export function useStrategyDetail(slug: string | null) {
       if (error) throw error
       return data as TemplateAdoption | null
     },
-    { revalidateOnFocus: false }
+    { revalidateOnFocus: false, dedupingInterval: 30000, shouldRetryOnError: false }
+  )
+
+  // Fetch similar strategies
+  const { data: similar } = useSWR<Playbook[]>(
+    strategy?.id ? ['strategy-similar', strategy.id] : null,
+    async () => {
+      const { data, error } = await supabase
+        .from('playbooks')
+        .select('*')
+        .eq('category', strategy!.category)
+        .neq('id', strategy!.id)
+        .or('is_curated.eq.true,is_published.eq.true')
+        .limit(3)
+
+      if (error) throw error
+      return data as Playbook[]
+    },
+    { revalidateOnFocus: false, dedupingInterval: 30000, shouldRetryOnError: false }
   )
 
   return {
@@ -156,6 +198,7 @@ export function useStrategyDetail(slug: string | null) {
     backtests: backtests || [],
     ratings: ratings || [],
     adoption: adoption ?? null,
+    similar: similar || [],
     isLoading,
     error: error ?? null,
   }

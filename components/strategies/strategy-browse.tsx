@@ -12,7 +12,7 @@ import { StrategyFilters } from "./strategy-filters"
 import { StrategySort } from "./strategy-sort"
 
 export function StrategyBrowse() {
-  const { strategies, isLoading, filters, setFilters } = useStrategies()
+  const { strategies, adoptedIds, isLoading, filters, setFilters } = useStrategies()
 
   const curated = useMemo(() => strategies.filter(s => s.is_curated), [strategies])
   const community = useMemo(() => strategies.filter(s => !s.is_curated && s.is_published), [strategies])
@@ -72,7 +72,7 @@ export function StrategyBrowse() {
             </div>
             <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {curated.map((strategy) => (
-                <StrategyCard key={strategy.id} strategy={strategy} />
+                <StrategyCard key={strategy.id} strategy={strategy} isAdopted={adoptedIds.has(strategy.id)} />
               ))}
             </motion.div>
           </section>
@@ -89,7 +89,7 @@ export function StrategyBrowse() {
             </div>
             <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {community.map((strategy) => (
-                <StrategyCard key={strategy.id} strategy={strategy} />
+                <StrategyCard key={strategy.id} strategy={strategy} isAdopted={adoptedIds.has(strategy.id)} />
               ))}
             </motion.div>
           </section>

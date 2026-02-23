@@ -2,8 +2,8 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { BookOpenText, Plus, ArrowSquareOut } from "@phosphor-icons/react"
-import { PelicanButton, pageEnter } from "@/components/ui/pelican"
+import { BookOpenText, Plus, Compass } from "@phosphor-icons/react"
+import { pageEnter } from "@/components/ui/pelican"
 
 interface PlaybookEmptyStateProps {
   onCreatePlaybook: () => void
@@ -22,7 +22,7 @@ export function PlaybookEmptyState({ onCreatePlaybook }: PlaybookEmptyStateProps
       </div>
 
       <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
-        Define your edge
+        Build your trading edge
       </h2>
 
       <p className="text-sm text-[var(--text-secondary)] max-w-md mb-8 leading-relaxed">
@@ -30,17 +30,23 @@ export function PlaybookEmptyState({ onCreatePlaybook }: PlaybookEmptyStateProps
         Tag trades with your playbooks to measure which setups actually make money.
       </p>
 
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        <PelicanButton variant="primary" size="lg" onClick={onCreatePlaybook}>
-          <Plus size={16} weight="bold" />
-          Create your first playbook
-        </PelicanButton>
-        <Link href="/strategies">
-          <PelicanButton variant="secondary" size="lg">
-            <ArrowSquareOut size={16} weight="regular" />
-            Browse Strategy Templates
-          </PelicanButton>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
+        <Link
+          href="/strategies"
+          className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-5 hover:border-[var(--border-hover)] transition-all group"
+        >
+          <Compass size={24} weight="regular" className="text-[var(--accent-primary)] mb-3" />
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Start from a template</h3>
+          <p className="text-xs text-[var(--text-muted)] leading-relaxed">Browse proven strategies from the Pelican team and community.</p>
         </Link>
+        <button
+          onClick={onCreatePlaybook}
+          className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-5 hover:border-[var(--border-hover)] transition-all text-left group"
+        >
+          <Plus size={24} weight="regular" className="text-[var(--accent-primary)] mb-3" />
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Create from scratch</h3>
+          <p className="text-xs text-[var(--text-muted)] leading-relaxed">Define your own setup with custom entry, exit, and risk rules.</p>
+        </button>
       </div>
     </motion.div>
   )

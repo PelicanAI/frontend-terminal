@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils"
 import { pageEnter, tabContent } from "@/components/ui/pelican"
 import { useStrategyDetail } from "@/hooks/use-strategies"
+import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { AdoptButton } from "./adopt-button"
 import { StrategyStats } from "./strategy-stats"
 import { BacktestChart } from "./backtest-chart"
@@ -31,6 +32,13 @@ interface StrategyDetailProps {
   slug: string
 }
 
+const CATEGORY_COLORS: Record<string, string> = {
+  momentum: "bg-blue-500/15 text-blue-400",
+  mean_reversion: "bg-emerald-500/15 text-emerald-400",
+  event_driven: "bg-amber-500/15 text-amber-400",
+  options: "bg-rose-500/15 text-rose-400",
+}
+
 const CATEGORY_LABELS: Record<string, string> = {
   momentum: "Momentum",
   mean_reversion: "Mean Reversion",
@@ -39,7 +47,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export function StrategyDetail({ slug }: StrategyDetailProps) {
-  const { strategy, backtests, ratings, adoption, isLoading } = useStrategyDetail(slug)
+  const { strategy, backtests, ratings, adoption, similar, isLoading } = useStrategyDetail(slug)
   const [activeTab, setActiveTab] = useState<TabKey>("overview")
 
   if (isLoading) {
@@ -135,7 +143,12 @@ export function StrategyDetail({ slug }: StrategyDetailProps) {
               )}
             </div>
           </div>
-          <AdoptButton strategy={strategy} adoption={adoption} />
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-2">
+              <AskPelicanButton strategy={strategy} />
+              <AdoptButton strategy={strategy} adoption={adoption} />
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -167,7 +180,7 @@ export function StrategyDetail({ slug }: StrategyDetailProps) {
         <AnimatePresence mode="wait">
           {activeTab === "overview" && (
             <motion.div key="overview" variants={tabContent} initial="hidden" animate="visible" exit="exit">
-              <OverviewTab strategy={strategy} />
+              <OverviewTab strategy={strategy} similar={similar} />
             </motion.div>
           )}
           {activeTab === "stats" && (
@@ -187,7 +200,27 @@ export function StrategyDetail({ slug }: StrategyDetailProps) {
   )
 }
 
-function OverviewTab({ strategy }: { strategy: Playbook }) {
+function AskPelicanButton({ strategy }: { strategy: Playbook }) {
+  const { openWithPrompt } = usePelicanPanelContext()
+
+  const handleAsk = () => {
+    const visibleMessage = `Tell me about the "${strategy.name}" strategy`
+    const fullPrompt = `Tell me everything about the ${strategy.name} strategy. When does it work best? What are the common failure modes and how do I avoid them? How should I size positions and manage risk with this setup? What market conditions make it most reliable? Give me real examples.`
+    openWithPrompt(null, { visibleMessage, fullPrompt }, 'playbooks', 'strategy_ask')
+  }
+
+  return (
+    <button
+      onClick={handleAsk}
+      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] transition-all active:scale-[0.98]"
+    >
+      <ChatCircle size={16} weight="regular" />
+      Ask Pelican
+    </button>
+  )
+}
+
+function OverviewTab({ strategy, similar }: { strategy: Playbook; similar: Playbook[] }) {
   const ruleCards = [
     { label: "Entry Rules", content: strategy.entry_rules, icon: SignIn },
     { label: "Exit Rules", content: strategy.exit_rules, icon: SignOutIcon },
@@ -266,6 +299,34 @@ function OverviewTab({ strategy }: { strategy: Playbook }) {
               {asset}
             </span>
           ))}
+        </div>
+      )}
+
+      {/* Similar Strategies */}
+      {similar && similar.length > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-3">Similar Strategies</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {similar.map(s => (
+              <Link key={s.id} href={`/strategies/${s.slug}`}>
+                <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-4 hover:border-[var(--border-hover)] transition-all">
+                  <div className="flex items-center gap-2 mb-2">
+                    {s.category && (
+                      <span className={cn("text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md", CATEGORY_COLORS[s.category] || "bg-[var(--accent-muted)] text-[var(--accent-primary)]")}>
+                        {CATEGORY_LABELS[s.category] || s.category}
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="text-sm font-medium text-[var(--text-primary)] line-clamp-1">{s.name}</h4>
+                  <div className="flex items-center gap-1 mt-2 text-xs text-[var(--text-muted)]">
+                    <Users size={12} />
+                    <span className="font-mono tabular-nums">{s.adoption_count}</span>
+                    <span>users</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

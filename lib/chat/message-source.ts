@@ -47,6 +47,10 @@ export type MessageSource =
   | 'learn_mode'
   | 'search_ticker'
 
+  // Playbook/Strategy actions
+  | 'playbook_scan'
+  | 'strategy_ask'
+
   // Future
   | 'whisper'
   | 'deja_vu'
@@ -171,6 +175,8 @@ const SOURCE_LABELS: Record<MessageSource, string> = {
   action_bar: 'Action Bar',
   learn_mode: 'Learn Mode',
   search_ticker: 'Ticker Search',
+  playbook_scan: 'Playbook Scan',
+  strategy_ask: 'Strategy Ask',
   whisper: 'Whisper',
   deja_vu: 'Deja Vu',
   journal_save: 'Journal Save',

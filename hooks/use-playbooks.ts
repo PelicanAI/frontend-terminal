@@ -49,18 +49,44 @@ export interface PlaybookStats {
 
 // ── usePlaybooks ──
 
-export function usePlaybooks() {
+export function usePlaybooks(
+  tab: 'all' | 'active' | 'archived' = 'active',
+  sortBy: 'recent' | 'win_rate' | 'most_trades' | 'newest' = 'recent'
+) {
   const supabase = useMemo(() => createClient(), [])
 
   const { data, error, isLoading, mutate } = useSWR<Playbook[]>(
-    'playbooks',
+    ['playbooks', tab, sortBy],
     async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('playbooks')
         .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true })
+        .eq('is_curated', false)
 
+      // Tab filter
+      if (tab === 'active') {
+        query = query.eq('is_active', true)
+      } else if (tab === 'archived') {
+        query = query.eq('is_active', false)
+      }
+
+      // Sort
+      switch (sortBy) {
+        case 'recent':
+          query = query.order('updated_at', { ascending: false })
+          break
+        case 'win_rate':
+          query = query.order('win_rate', { ascending: false, nullsFirst: false })
+          break
+        case 'most_trades':
+          query = query.order('total_trades', { ascending: false })
+          break
+        case 'newest':
+          query = query.order('created_at', { ascending: false })
+          break
+      }
+
+      const { data, error } = await query
       if (error) throw error
       return data as Playbook[]
     },
@@ -293,8 +319,60 @@ export function usePlaybookStats(playbookId: string | null) {
     {
       revalidateOnFocus: false,
       dedupingInterval: 30000,
+      shouldRetryOnError: false,
     }
   )
 
   return { stats: stats ?? null, isLoading }
+}
+
+// ── useSuggestedStrategies ──
+
+export function useSuggestedStrategies() {
+  const supabase = useMemo(() => createClient(), [])
+
+  const { data: adoptedData } = useSWR<string[]>(
+    'suggested-adopted-ids',
+    async () => {
+      const { data, error } = await supabase
+        .from('playbooks')
+        .select('forked_from')
+        .eq('is_curated', false)
+        .not('forked_from', 'is', null)
+
+      if (error) throw error
+      return (data || []).map(d => d.forked_from).filter(Boolean) as string[]
+    },
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000,
+      shouldRetryOnError: false,
+    }
+  )
+
+  const { data: curatedData, isLoading } = useSWR<Playbook[]>(
+    'suggested-curated',
+    async () => {
+      const { data, error } = await supabase
+        .from('playbooks')
+        .select('*')
+        .eq('is_curated', true)
+
+      if (error) throw error
+      return data as Playbook[]
+    },
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000,
+      shouldRetryOnError: false,
+    }
+  )
+
+  const suggestions = useMemo(() => {
+    const adoptedSet = new Set(adoptedData || [])
+    const curated = curatedData || []
+    return curated.filter(s => !adoptedSet.has(s.id)).slice(0, 3)
+  }, [adoptedData, curatedData])
+
+  return { suggestions, isLoading }
 }

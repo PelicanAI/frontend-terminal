@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Star, Users, ShieldCheck, Lightning } from "@phosphor-icons/react"
+import { Star, Users, ShieldCheck, Lightning, CheckCircle } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { staggerItem } from "@/components/ui/pelican"
 import type { Playbook } from "@/types/trading"
@@ -29,9 +29,10 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 
 interface StrategyCardProps {
   strategy: Playbook
+  isAdopted?: boolean
 }
 
-export function StrategyCard({ strategy }: StrategyCardProps) {
+export function StrategyCard({ strategy, isAdopted }: StrategyCardProps) {
   const categoryColor = CATEGORY_COLORS[strategy.category || ''] || "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
   const categoryLabel = CATEGORY_LABELS[strategy.category || ''] || strategy.setup_type
 
@@ -103,6 +104,12 @@ export function StrategyCard({ strategy }: StrategyCardProps) {
             <div className="flex items-center gap-1 text-xs text-[var(--data-positive)]">
               <ShieldCheck size={13} weight="fill" />
               <span>Verified</span>
+            </div>
+          )}
+          {isAdopted && (
+            <div className="flex items-center gap-1 text-xs text-emerald-400">
+              <CheckCircle size={12} weight="fill" />
+              <span>In playbooks</span>
             </div>
           )}
           {strategy.win_rate != null && strategy.stats_trade_count >= 10 && (
