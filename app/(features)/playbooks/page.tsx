@@ -2,10 +2,10 @@
 
 export const dynamic = "force-dynamic"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo, useEffect } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Plus, SortAscending } from "@phosphor-icons/react"
+import { Plus, SortAscending, Info, X, Compass } from "@phosphor-icons/react"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { usePlaybooks, useSuggestedStrategies } from "@/hooks/use-playbooks"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
@@ -14,10 +14,10 @@ import {
   PelicanButton,
   pageEnter,
   staggerContainer,
+  staggerItem,
 } from "@/components/ui/pelican"
 import { PlaybookCard } from "@/components/playbooks/playbook-card"
 import { PlaybookDetail } from "@/components/playbooks/playbook-detail"
-import { PlaybookEmptyState } from "@/components/playbooks/playbook-empty-state"
 import { CreatePlaybookModal } from "@/components/playbooks/create-playbook-modal"
 import type { PlaybookFormData } from "@/hooks/use-playbooks"
 import type { Playbook } from "@/types/trading"
@@ -38,6 +38,8 @@ const sortOptions = [
 type TabKey = typeof tabs[number]['key']
 type SortKey = typeof sortOptions[number]['key']
 
+const TAGGING_HINT_KEY = 'pelican_playbook_tagging_hint_dismissed'
+
 export default function PlaybooksPage() {
   const [tab, setTab] = useState<TabKey>('active')
   const [sortBy, setSortBy] = useState<SortKey>('recent')
@@ -46,6 +48,38 @@ export default function PlaybooksPage() {
   const { openWithPrompt } = usePelicanPanelContext()
   const [selectedPlaybook, setSelectedPlaybook] = useState<Playbook | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [hintDismissed, setHintDismissed] = useState(true)
+
+  // Check localStorage for tagging hint dismissal
+  useEffect(() => {
+    setHintDismissed(localStorage.getItem(TAGGING_HINT_KEY) === 'true')
+  }, [])
+
+  // Split playbooks into sections
+  const { myPlaybooks, adoptedPlaybooks } = useMemo(() => {
+    const my: Playbook[] = []
+    const adopted: Playbook[] = []
+    for (const p of playbooks) {
+      if (p.forked_from) {
+        adopted.push(p)
+      } else {
+        my.push(p)
+      }
+    }
+    return { myPlaybooks: my, adoptedPlaybooks: adopted }
+  }, [playbooks])
+
+  // Total count for subtitle (My + Adopted, excluding suggested)
+  const totalCount = myPlaybooks.length + adoptedPlaybooks.length
+
+  // Check if ALL playbook cards show "No trades tagged yet"
+  const allUntagged = playbooks.length > 0 && playbooks.every(p => p.total_trades === 0)
+  const showTaggingHint = allUntagged && !hintDismissed
+
+  const handleDismissHint = useCallback(() => {
+    localStorage.setItem(TAGGING_HINT_KEY, 'true')
+    setHintDismissed(true)
+  }, [])
 
   const handleSelectPlaybook = useCallback((playbook: Playbook) => {
     setSelectedPlaybook(playbook)
@@ -86,6 +120,8 @@ export default function PlaybooksPage() {
     )
   }
 
+  const hasAnyPlaybooks = playbooks.length > 0 || tab !== 'active'
+
   return (
     <motion.div
       variants={pageEnter}
@@ -97,12 +133,12 @@ export default function PlaybooksPage() {
       <PageHeader
         title="Playbook Lab"
         subtitle={
-          playbooks.length > 0
-            ? `${playbooks.length} playbook${playbooks.length !== 1 ? "s" : ""}`
+          totalCount > 0
+            ? `${totalCount} playbook${totalCount !== 1 ? "s" : ""}`
             : undefined
         }
         actions={
-          playbooks.length > 0 ? (
+          totalCount > 0 ? (
             <PelicanButton
               variant="primary"
               size="md"
@@ -116,7 +152,7 @@ export default function PlaybooksPage() {
       />
 
       {/* Filter tabs + sort */}
-      {playbooks.length > 0 || tab !== 'active' ? (
+      {hasAnyPlaybooks ? (
         <div className="flex items-center justify-between mb-5">
           {/* Tabs */}
           <div className="flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-surface)]">
@@ -158,6 +194,27 @@ export default function PlaybooksPage() {
         </div>
       ) : null}
 
+      {/* Tagging hint banner */}
+      {showTaggingHint && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          className="flex items-start gap-3 mb-5 p-4 rounded-xl bg-[var(--accent-muted)] border border-[var(--accent-primary)]/20"
+        >
+          <Info size={18} weight="regular" className="text-[var(--accent-primary)] mt-0.5 shrink-0" />
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed flex-1">
+            Tag trades to your playbooks to track performance per strategy. When logging or editing a trade, select a playbook to link it.
+          </p>
+          <button
+            onClick={handleDismissHint}
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors shrink-0"
+          >
+            <X size={16} weight="regular" />
+          </button>
+        </motion.div>
+      )}
+
       {/* Loading */}
       {isLoading && playbooks.length === 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -170,12 +227,12 @@ export default function PlaybooksPage() {
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Global empty state — no playbooks at all on active tab */}
       {!isLoading && playbooks.length === 0 && tab === 'active' && (
-        <PlaybookEmptyState onCreatePlaybook={() => setShowCreateModal(true)} />
+        <GlobalEmptyState onCreatePlaybook={() => setShowCreateModal(true)} />
       )}
 
-      {/* Empty filtered state */}
+      {/* Empty filtered state for non-active tabs */}
       {!isLoading && playbooks.length === 0 && tab !== 'active' && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <p className="text-sm text-[var(--text-muted)]">
@@ -184,63 +241,109 @@ export default function PlaybooksPage() {
         </div>
       )}
 
-      {/* Grid */}
+      {/* === SECTIONED LAYOUT === */}
       {playbooks.length > 0 && (
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
-          {playbooks.map((playbook) => (
-            <PlaybookCard
-              key={playbook.id}
-              playbook={playbook}
-              onClick={handleSelectPlaybook}
-              onScan={handleScan}
-              onEdit={handleEdit}
-            />
-          ))}
-        </motion.div>
-      )}
+        <div className="space-y-8">
+          {/* MY PLAYBOOKS */}
+          <PlaybookSection
+            title="MY PLAYBOOKS"
+            count={myPlaybooks.length}
+            playbooks={myPlaybooks}
+            onSelect={handleSelectPlaybook}
+            onScan={handleScan}
+            onEdit={handleEdit}
+            emptyState={
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <p className="text-sm text-[var(--text-muted)] mb-4">
+                  You haven&apos;t created any custom playbooks yet.
+                </p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="px-4 py-2 text-sm font-medium rounded-lg bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] transition-colors active:scale-[0.98]"
+                  >
+                    Start from Scratch
+                  </button>
+                  <Link
+                    href="/strategies"
+                    className="px-4 py-2 text-sm font-medium rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] transition-colors active:scale-[0.98]"
+                  >
+                    Browse Templates &amp; Customize
+                  </Link>
+                </div>
+              </div>
+            }
+            showNewCard
+            onNewPlaybook={() => setShowCreateModal(true)}
+          />
 
-      {/* Suggested For You */}
-      {playbooks.length > 0 && suggestedStrategies.length > 0 && (
-        <section className="mt-8">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-              Suggested For You
-            </span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {suggestedStrategies.map((s) => (
+          {/* FROM STRATEGY LIBRARY */}
+          <PlaybookSection
+            title="FROM STRATEGY LIBRARY"
+            count={adoptedPlaybooks.length}
+            playbooks={adoptedPlaybooks}
+            onSelect={handleSelectPlaybook}
+            onScan={handleScan}
+            onEdit={handleEdit}
+            trailingAction={
               <Link
-                key={s.id}
-                href={`/strategies/${s.slug}`}
-                className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-4 hover:border-[var(--border-hover)] transition-all group"
+                href="/strategies"
+                className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors line-clamp-1">
-                    {s.name}
-                  </h4>
-                  <span className="text-xs text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] transition-colors shrink-0 ml-2">
-                    View &rarr;
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {s.category && (
-                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[var(--accent-muted)] text-[var(--accent-primary)]">
-                      {s.category.replace('_', ' ')}
-                    </span>
-                  )}
-                  <span className="text-[10px] font-mono tabular-nums text-[var(--text-muted)]">
-                    {s.adoption_count} adopted
-                  </span>
-                </div>
+                Browse more &rarr;
               </Link>
-            ))}
-          </div>
-        </section>
+            }
+            emptyState={
+              <div className="py-6 text-center">
+                <Link
+                  href="/strategies"
+                  className="text-sm text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors"
+                >
+                  Browse the Strategy Library to find setups that match your style &rarr;
+                </Link>
+              </div>
+            }
+          />
+
+          {/* SUGGESTED FOR YOU */}
+          {suggestedStrategies.length > 0 && (
+            <section>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+                  Suggested For You
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {suggestedStrategies.map((s) => (
+                  <Link
+                    key={s.id}
+                    href={`/strategies/${s.slug}`}
+                    className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-4 hover:border-[var(--border-hover)] transition-all group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors line-clamp-1">
+                        {s.name}
+                      </h4>
+                      <span className="text-xs text-[var(--text-muted)] group-hover:text-[var(--accent-primary)] transition-colors shrink-0 ml-2">
+                        View &rarr;
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {s.category && (
+                        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[var(--accent-muted)] text-[var(--accent-primary)]">
+                          {s.category.replace('_', ' ')}
+                        </span>
+                      )}
+                      <span className="text-[10px] font-mono tabular-nums text-[var(--text-muted)]">
+                        {s.adoption_count} adopted
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
       )}
 
       {/* Create modal */}
@@ -251,7 +354,7 @@ export default function PlaybooksPage() {
       />
 
       {/* Mobile FAB */}
-      {playbooks.length > 0 && (
+      {totalCount > 0 && (
         <IconTooltip label="New Playbook" side="left">
           <button
             onClick={() => setShowCreateModal(true)}
@@ -262,6 +365,130 @@ export default function PlaybooksPage() {
           </button>
         </IconTooltip>
       )}
+    </motion.div>
+  )
+}
+
+// ─── Section Component ───────────────────────────────────────────────────────
+
+interface PlaybookSectionProps {
+  title: string
+  count: number
+  playbooks: Playbook[]
+  onSelect: (playbook: Playbook) => void
+  onScan: (playbook: Playbook) => void
+  onEdit: (playbook: Playbook) => void
+  emptyState: React.ReactNode
+  trailingAction?: React.ReactNode
+  showNewCard?: boolean
+  onNewPlaybook?: () => void
+}
+
+function PlaybookSection({
+  title,
+  count,
+  playbooks,
+  onSelect,
+  onScan,
+  onEdit,
+  emptyState,
+  trailingAction,
+  showNewCard,
+  onNewPlaybook,
+}: PlaybookSectionProps) {
+  return (
+    <section>
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+            {title}
+          </span>
+          <span className="text-xs font-mono tabular-nums text-[var(--text-muted)]">
+            {count}
+          </span>
+        </div>
+        {trailingAction}
+      </div>
+
+      {/* Content */}
+      {playbooks.length === 0 ? (
+        emptyState
+      ) : (
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {playbooks.map((playbook) => (
+            <PlaybookCard
+              key={playbook.id}
+              playbook={playbook}
+              onClick={onSelect}
+              onScan={onScan}
+              onEdit={onEdit}
+            />
+          ))}
+
+          {/* "+ New Playbook" ghost card */}
+          {showNewCard && onNewPlaybook && (
+            <motion.button
+              variants={staggerItem}
+              onClick={onNewPlaybook}
+              className="flex flex-col items-center justify-center gap-2 min-h-[12rem] rounded-xl border-2 border-dashed border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-secondary)] transition-all cursor-pointer"
+            >
+              <Plus size={24} weight="regular" />
+              <span className="text-sm font-medium">New Playbook</span>
+            </motion.button>
+          )}
+        </motion.div>
+      )}
+    </section>
+  )
+}
+
+// ─── Global Empty State ──────────────────────────────────────────────────────
+
+function GlobalEmptyState({ onCreatePlaybook }: { onCreatePlaybook: () => void }) {
+  return (
+    <motion.div
+      variants={pageEnter}
+      initial="hidden"
+      animate="visible"
+      className="flex flex-col items-center justify-center py-24 px-6 text-center"
+    >
+      <div className="w-16 h-16 rounded-2xl bg-[var(--accent-muted)] flex items-center justify-center mb-6">
+        <Plus size={32} weight="thin" className="text-[var(--accent-primary)]" />
+      </div>
+
+      <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
+        Build your trading edge
+      </h2>
+
+      <p className="text-sm text-[var(--text-secondary)] max-w-md mb-8 leading-relaxed">
+        A playbook captures your trading strategy with specific rules for entry, exit, and risk.
+        Tag trades with your playbooks to measure which setups actually make money.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
+        <button
+          onClick={onCreatePlaybook}
+          className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-5 hover:border-[var(--border-hover)] transition-all text-left group"
+        >
+          <Plus size={24} weight="regular" className="text-[var(--accent-primary)] mb-3" />
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Start from Scratch</h3>
+          <p className="text-xs text-[var(--text-muted)] leading-relaxed">Define your own setup with custom entry, exit, and risk rules.</p>
+        </button>
+        <Link
+          href="/strategies"
+          className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-5 hover:border-[var(--border-hover)] transition-all group"
+        >
+          <Compass size={24} weight="regular" className="text-[var(--accent-primary)] mb-3" />
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Browse Templates &amp; Customize</h3>
+          <p className="text-xs text-[var(--text-muted)] leading-relaxed">Browse proven strategies from the Pelican team and community.</p>
+        </Link>
+      </div>
     </motion.div>
   )
 }
