@@ -404,13 +404,35 @@ export default function ChatPage() {
     fileUpload.handleMultipleFileUploadWithCapture(files)
   }, [fileUpload])
 
+  // Detect "log a trade" intent and open modal instead of sending to AI
+  const LOG_TRADE_PATTERNS = [
+    /^log\s*(a\s*)?trade/i,
+    /^add\s*(a\s*)?trade/i,
+    /^record\s*(a\s*)?trade/i,
+    /^new\s*trade/i,
+    /^enter\s*(a\s*)?trade/i,
+  ]
+
+  const NOT_TICKERS = new Set(['A', 'I', 'AM', 'AN', 'AS', 'AT', 'BE', 'BY', 'DO', 'GO', 'IF', 'IN', 'IS', 'IT', 'ME', 'MY', 'NO', 'OF', 'ON', 'OR', 'SO', 'TO', 'UP', 'US', 'WE', 'LOG', 'ADD', 'NEW', 'FOR', 'THE'])
+
   const handleSendMessageWithFiles = useCallback(async (message: string) => {
+    const trimmed = message.trim()
+    const isLogTradeIntent = LOG_TRADE_PATTERNS.some(pattern => pattern.test(trimmed))
+
+    if (isLogTradeIntent) {
+      // Try to extract a ticker from the message (e.g., "log a trade on AAPL")
+      const words = trimmed.split(/\s+/)
+      const ticker = words.find(w => /^[A-Z]{1,5}$/.test(w) && !NOT_TICKERS.has(w))
+      handleOpenLogTrade(ticker || "")
+      return
+    }
+
     const uploadPayload = await fileUpload.prepareMessageFiles(user?.id)
     await messageHandler.handleSendMessage(message, uploadPayload)
 
     // Clear uploaded files after sending
     clearUploadedFiles()
-  }, [fileUpload, messageHandler, user?.id, clearUploadedFiles])
+  }, [fileUpload, messageHandler, user?.id, clearUploadedFiles, handleOpenLogTrade])
 
   const handleConversationSelect = (id: string) => {
     conversationRouter.handleConversationSelect(id)
