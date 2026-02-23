@@ -34,9 +34,9 @@ export function buildScanPrompt(ctx: ScanContext): ScanPromptResult {
   }
 
   // Build structured context block (sent to backend)
-  let prompt = `[PELICAN TRADE SCAN — ${isOpen ? 'OPEN POSITION' : 'CLOSED TRADE'} REVIEW]
+  let prompt = `[PELICAN SCAN — ${trade.ticker} — ${isOpen ? 'OPEN POSITION' : 'CLOSED POSITION'} REVIEW]
 
-POSITION:
+${trade.ticker} POSITION DETAILS:
 • Ticker: ${trade.ticker}
 • Direction: ${trade.direction.toUpperCase()}
 • Entry: $${trade.entry_price} on ${new Date(trade.entry_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
