@@ -1,12 +1,21 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { Check, ArrowRight } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 interface ProgressWidgetProps {
   className?: string
+}
+
+const MILESTONE_ROUTES: Record<string, string> = {
+  first_trade: "/journal",
+  first_watchlist: "/chat",
+  visited_heatmap: "/heatmap",
+  visited_brief: "/morning",
+  five_trades: "/journal",
 }
 
 function ProgressRing({ progress }: { progress: number }) {
@@ -56,8 +65,16 @@ function ProgressRing({ progress }: { progress: number }) {
 export function ProgressWidget({ className }: ProgressWidgetProps) {
   const { milestones, completed, progress, nextMilestone, dismiss, dismissed, isLoading } =
     useOnboardingProgress()
+  const router = useRouter()
 
   if (isLoading || dismissed || progress >= 100) return null
+
+  const handleMilestoneClick = (key: string) => {
+    const route = MILESTONE_ROUTES[key]
+    if (route) {
+      router.push(route)
+    }
+  }
 
   return (
     <motion.div
@@ -86,16 +103,21 @@ export function ProgressWidget({ className }: ProgressWidgetProps) {
         {milestones.slice(0, 5).map((m) => {
           const done = completed.includes(m.key)
           const isNext = nextMilestone?.key === m.key
+          const hasRoute = m.key in MILESTONE_ROUTES
           return (
-            <div
+            <button
               key={m.key}
+              onClick={() => !done && hasRoute && handleMilestoneClick(m.key)}
+              disabled={done || !hasRoute}
               className={cn(
-                "flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors",
+                "flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs transition-colors w-full text-left",
                 done
-                  ? "text-[var(--text-muted)]"
+                  ? "text-[var(--text-muted)] cursor-default"
                   : isNext
-                    ? "text-[var(--text-primary)] bg-[var(--accent-muted)]"
-                    : "text-[var(--text-secondary)]",
+                    ? "text-[var(--text-primary)] bg-[var(--accent-muted)] hover:bg-[var(--accent-muted)]/80 cursor-pointer"
+                    : hasRoute
+                      ? "text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] cursor-pointer"
+                      : "text-[var(--text-secondary)] cursor-default",
               )}
             >
               {done ? (
@@ -106,7 +128,7 @@ export function ProgressWidget({ className }: ProgressWidgetProps) {
                 <div className="w-3.5 h-3.5 rounded-full border border-[var(--border-default)] shrink-0" />
               )}
               <span className={cn(done && "line-through")}>{m.label}</span>
-            </div>
+            </button>
           )
         })}
       </div>

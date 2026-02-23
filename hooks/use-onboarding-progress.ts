@@ -1,10 +1,12 @@
 "use client"
 
 import useSWR from "swr"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { MILESTONES, TOTAL_MILESTONES } from "@/lib/onboarding-milestones"
+
+const DISMISS_KEY = "pelican-onboarding-dismissed"
 
 interface OnboardingRow {
   user_id: string
@@ -17,6 +19,7 @@ interface OnboardingRow {
 export function useOnboardingProgress() {
   const { user } = useAuth()
   const supabase = useMemo(() => createClient(), [])
+  const retroCheckDone = useRef(false)
 
   const { data, error, isLoading, mutate } = useSWR<OnboardingRow | null>(
     user ? ["onboarding_progress", user.id] : null,
@@ -33,8 +36,93 @@ export function useOnboardingProgress() {
     { revalidateOnFocus: false, dedupingInterval: 60000 },
   )
 
+  // Retroactive milestone detection for veteran users
+  // Only runs once per session when the hook loads with no completed milestones
+  useEffect(() => {
+    if (!user || isLoading || retroCheckDone.current) return
+    const completed = data?.completed_milestones ?? []
+    if (completed.length > 0) {
+      retroCheckDone.current = true
+      return
+    }
+
+    retroCheckDone.current = true
+
+    // Check what milestones the user has already achieved
+    const checkRetroactive = async () => {
+      const detected: string[] = []
+
+      try {
+        // Check first_message: has any conversations
+        const { count: convCount } = await supabase
+          .from("conversations")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .limit(1)
+        if (convCount && convCount > 0) detected.push("first_message")
+
+        // Check first_trade & five_trades: has trades
+        const { count: tradeCount } = await supabase
+          .from("trades")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+        if (tradeCount && tradeCount > 0) detected.push("first_trade")
+        if (tradeCount && tradeCount >= 5) detected.push("five_trades")
+
+        // Check first_watchlist: has watchlist items
+        const { count: watchCount } = await supabase
+          .from("watchlist")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id)
+          .limit(1)
+        if (watchCount && watchCount > 0) detected.push("first_watchlist")
+      } catch {
+        // Silently fail — don't block UI for retroactive checks
+        return
+      }
+
+      if (detected.length === 0) return
+
+      // If veteran user has done most things, auto-dismiss
+      const shouldAutoDismiss = detected.length >= 4
+
+      // Optimistic update
+      mutate(
+        (prev) =>
+          prev
+            ? { ...prev, completed_milestones: detected, dismissed: prev.dismissed || shouldAutoDismiss }
+            : {
+                user_id: user.id,
+                completed_milestones: detected,
+                dismissed: shouldAutoDismiss,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              },
+        false,
+      )
+
+      // Persist to DB
+      await supabase.from("onboarding_progress").upsert(
+        {
+          user_id: user.id,
+          completed_milestones: detected,
+          dismissed: shouldAutoDismiss,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" },
+      )
+    }
+
+    checkRetroactive()
+  }, [user, isLoading, data, supabase, mutate])
+
   const completed = data?.completed_milestones ?? []
-  const dismissed = data?.dismissed ?? false
+
+  // localStorage fallback for dismiss — covers cases where DB write fails
+  const localDismissed = typeof window !== "undefined"
+    ? localStorage.getItem(DISMISS_KEY) === "true"
+    : false
+  const dismissed = data?.dismissed ?? localDismissed
   const progress = TOTAL_MILESTONES > 0 ? Math.round((completed.length / TOTAL_MILESTONES) * 100) : 0
 
   const nextMilestone = useMemo(
@@ -82,6 +170,11 @@ export function useOnboardingProgress() {
 
   const dismiss = useCallback(async () => {
     if (!user) return
+
+    // localStorage fallback
+    if (typeof window !== "undefined") {
+      localStorage.setItem(DISMISS_KEY, "true")
+    }
 
     mutate(
       (prev) =>
