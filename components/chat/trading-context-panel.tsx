@@ -307,7 +307,7 @@ export function TradingContextPanel({
   // Chart, calendar, and learn modes get a full-height card
   if (activeMode === "chart" || activeMode === "calendar" || activeMode === "learn") {
     return (
-      <Card className="border-l-0 rounded-l-none bg-[var(--bg-surface)]/60 backdrop-blur-xl border-l border-[var(--border-subtle)] rounded-none border-y-0 border-r-0 overflow-hidden h-full flex flex-col">
+      <Card className="border-l-0 rounded-l-none bg-[var(--bg-surface)]/60 backdrop-blur-xl border-l border-[var(--border-subtle)] rounded-none border-y-0 border-r-0 overflow-hidden h-full flex flex-col max-h-full">
         {activeMode === "learn" && (
           <div className="flex items-center border-b border-border/20 shrink-0">
             <div className="flex flex-1">

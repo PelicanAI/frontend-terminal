@@ -70,13 +70,13 @@ function EconomicCalendarInner({ onClose }: EconomicCalendarProps) {
         <span className="text-lg font-bold text-foreground">Economic Calendar</span>
       </div>
 
-      <div className="flex-1 relative min-h-0">
+      <div className="flex-1 relative min-h-0 overflow-hidden">
         {isLoading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80">
             <div className="h-48 w-full mx-4 rounded-lg bg-muted/30 animate-pulse" />
           </div>
         )}
-        <div ref={containerRef} className="h-full w-full bg-card" />
+        <div ref={containerRef} className="absolute inset-0 w-full h-full bg-card overflow-hidden" />
       </div>
 
       {/* TradingView Attribution */}
