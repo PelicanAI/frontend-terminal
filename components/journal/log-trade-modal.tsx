@@ -12,6 +12,7 @@ import { usePlaybooks } from "@/hooks/use-playbooks"
 import { useRiskBudget } from "@/hooks/use-risk-budget"
 import { useAntiTradeCheck } from "@/hooks/use-anti-trade-check"
 import { cn } from "@/lib/utils"
+import { toast } from "@/hooks/use-toast"
 import { BudgetWarningBanner } from "@/components/risk-budget/budget-warning-banner"
 
 interface LogTradeModalProps {
@@ -298,8 +299,9 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
 
       onOpenChange(false)
     } catch (err) {
-      console.error('Error logging trade:', err)
-      setError(err instanceof Error ? err.message : 'Failed to log trade. Please try again.')
+      const errorMessage = err instanceof Error ? err.message : 'Failed to log trade. Please try again.'
+      setError(errorMessage)
+      toast({ title: isEditMode ? "Failed to update trade" : "Failed to log trade", description: errorMessage, variant: "destructive" })
     } finally {
       setIsSubmitting(false)
     }

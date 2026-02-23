@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
+import { toast } from "@/hooks/use-toast"
 import { LogOut } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
@@ -24,16 +24,16 @@ export function PrivacySection({ user }: PrivacySectionProps) {
 
       if (error) {
         logger.error("Failed to log out", error)
-        toast.error("Failed to log out. Please try again.")
+        toast({ title: "Failed to log out", description: "Please try again.", variant: "destructive" })
         return
       }
 
-      toast.success("Logged out successfully")
+      toast({ title: "Logged out successfully" })
       logger.info("User logged out", { userId: user?.id })
       router.push('/auth/login')
     } catch (error) {
       logger.error("Logout error", error instanceof Error ? error : new Error(String(error)))
-      toast.error("An error occurred during logout")
+      toast({ title: "An error occurred during logout", variant: "destructive" })
     }
   }
 

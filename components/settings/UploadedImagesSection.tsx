@@ -18,7 +18,7 @@ import {
 import { Trash2, ImageIcon } from "lucide-react"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { createClient } from "@/lib/supabase/client"
-import { toast } from "sonner"
+import { toast } from "@/hooks/use-toast"
 import { logger } from "@/lib/logger"
 
 interface FileRecord {
@@ -133,15 +133,15 @@ export function UploadedImagesSection({ userId }: UploadedImagesSectionProps) {
         logger.error("Failed to delete file record", dbError)
         // Revert optimistic update
         await fetchImages()
-        toast.error("Failed to delete image")
+        toast({ title: "Failed to delete image", variant: "destructive" })
         return
       }
 
-      toast.success("Image deleted")
+      toast({ title: "Image deleted" })
     } catch (err) {
       logger.error("Delete error", err instanceof Error ? err : new Error(String(err)))
       await fetchImages()
-      toast.error("Failed to delete image")
+      toast({ title: "Failed to delete image", variant: "destructive" })
     } finally {
       setDeleting(false)
     }

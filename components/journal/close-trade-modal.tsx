@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Trade, CloseTradeData } from "@/hooks/use-trades"
 import { PelicanButton } from "@/components/ui/pelican"
+import { toast } from "@/hooks/use-toast"
 
 interface CloseTradeModalProps {
   open: boolean
@@ -69,7 +70,7 @@ export function CloseTradeModal({ open, onOpenChange, trade, onSubmit }: CloseTr
 
       onOpenChange(false)
     } catch (error) {
-      console.error('Error closing trade:', error)
+      toast({ title: "Failed to close trade", description: error instanceof Error ? error.message : "Please try again.", variant: "destructive" })
     } finally {
       setIsSubmitting(false)
     }

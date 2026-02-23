@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
+import { toast } from "@/hooks/use-toast"
 import { Trash2 } from "lucide-react"
 import { logger } from "@/lib/logger"
 import {
@@ -42,22 +42,22 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
 
   const handlePasswordChange = async () => {
     if (!currentPassword) {
-      toast.error("Enter your current password")
+      toast({ title: "Enter your current password", variant: "destructive" })
       return
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match")
+      toast({ title: "Passwords do not match", variant: "destructive" })
       return
     }
 
     if (newPassword.length < 8) {
-      toast.error("Password must be at least 8 characters")
+      toast({ title: "Password must be at least 8 characters", variant: "destructive" })
       return
     }
 
     if (!user.email) {
-      toast.error("Missing account email. Please sign in again.")
+      toast({ title: "Missing account email", description: "Please sign in again.", variant: "destructive" })
       return
     }
 
@@ -77,14 +77,14 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
 
       if (error) throw error
 
-      toast.success("Password updated successfully")
+      toast({ title: "Password updated successfully" })
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
       logger.info("Password changed", { userId: user.id })
     } catch (error) {
       logger.error("Failed to change password", error instanceof Error ? error : new Error(String(error)))
-      toast.error("Failed to change password. Please try again.")
+      toast({ title: "Failed to change password", description: "Please try again.", variant: "destructive" })
     }
   }
 
@@ -93,7 +93,7 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
 
     if (!isValidUUID(user.id)) {
       logger.error("Invalid user ID format")
-      toast.error("Invalid user session. Please sign in again.")
+      toast({ title: "Invalid user session", description: "Please sign in again.", variant: "destructive" })
       return
     }
 
@@ -121,19 +121,19 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
         logger.error("Failed to sign out after account deletion", signOutError)
       }
 
-      toast.success("Account data deleted successfully")
+      toast({ title: "Account data deleted successfully" })
       router.push("/")
       logger.info("Account deleted", { userId: user.id })
     } catch (error) {
       logger.error("Failed to delete account", error instanceof Error ? error : new Error(String(error)))
-      toast.error("Failed to delete account. Please contact support.")
+      toast({ title: "Failed to delete account", description: "Please contact support.", variant: "destructive" })
     }
   }
 
   const handleClearHistory = async () => {
     if (!isValidUUID(user.id)) {
       logger.error("Invalid user ID format")
-      toast.error("Invalid user session. Please sign in again.")
+      toast({ title: "Invalid user session", description: "Please sign in again.", variant: "destructive" })
       return
     }
 
@@ -153,16 +153,16 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
       })
 
       if (!allSuccess) {
-        toast.error("Failed to clear some history. Please try again.")
+        toast({ title: "Failed to clear some history", description: "Please try again.", variant: "destructive" })
         return
       }
 
-      toast.success("Conversation history cleared")
+      toast({ title: "Conversation history cleared" })
       setShowClearHistoryDialog(false)
       logger.info("Conversation history cleared", { userId: user.id })
     } catch (error) {
       logger.error("Failed to clear history", error instanceof Error ? error : new Error(String(error)))
-      toast.error("Failed to clear history. Please try again.")
+      toast({ title: "Failed to clear history", description: "Please try again.", variant: "destructive" })
     }
   }
 

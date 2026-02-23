@@ -22,6 +22,7 @@ import { PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/
 import { Plus, ChartBar, Funnel, ClipboardText, Brain, UserCircle, X as XIcon } from "@phosphor-icons/react"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { trackEvent } from "@/lib/tracking"
+import { toast } from "@/hooks/use-toast"
 
 const PerformanceTab = dynamicImport(
   () => import("@/components/journal/performance-tab").then((m) => ({ default: m.PerformanceTab })),
@@ -233,6 +234,8 @@ export default function JournalPage() {
     await logTrade(data)
     refetch()
 
+    toast({ title: "Trade logged", description: `${data.ticker} ${data.direction} position recorded.` })
+
     // Onboarding milestones
     completeMilestone("first_trade")
     const totalTrades = trades.length + 1
@@ -244,6 +247,17 @@ export default function JournalPage() {
     // Let errors propagate to the modal's error handler
     await closeTrade(selectedTrade.id, data)
     refetch()
+
+    // Calculate P&L for toast message
+    const exitPrice = data.exit_price
+    const direction = selectedTrade.direction === 'long' ? 1 : -1
+    const pnlAmount = (exitPrice - selectedTrade.entry_price) * selectedTrade.quantity * direction
+    const pnlSign = pnlAmount >= 0 ? '+' : ''
+    toast({
+      title: "Trade closed",
+      description: `${selectedTrade.ticker} ${pnlSign}$${pnlAmount.toFixed(2)}`,
+    })
+
     setShowCloseTradeModal(false)
     handleCloseDetailPanel()
   }
@@ -259,6 +273,7 @@ export default function JournalPage() {
   }
 
   const handleEditComplete = () => {
+    toast({ title: "Trade updated", description: editTrade ? `${editTrade.ticker} position updated.` : undefined })
     setEditTrade(null)
     setShowLogTradeModal(false)
     refetch()

@@ -5,6 +5,17 @@ import { useCallback, useEffect, useMemo, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { MILESTONES, TOTAL_MILESTONES } from "@/lib/onboarding-milestones"
+import { toast } from "@/hooks/use-toast"
+
+const MILESTONE_CELEBRATIONS: Record<string, { title: string; description: string }> = {
+  first_message: { title: "First chat with Pelican!", description: "Ask anything about trading" },
+  first_trade: { title: "First trade logged!", description: "Positions dashboard is now tracking it" },
+  first_watchlist: { title: "Watchlist started!", description: "Track prices in your morning brief" },
+  visited_heatmap: { title: "Heatmap explored!", description: "Click any stock for Pelican analysis" },
+  visited_brief: { title: "Morning Brief read!", description: "Check it every morning for daily insights" },
+  five_trades: { title: "5 trades logged!", description: "Pattern detection is now active" },
+  first_insight: { title: "First insight discovered!", description: "Pelican is learning your trading style" },
+}
 
 const DISMISS_KEY = "pelican-onboarding-dismissed"
 
@@ -135,6 +146,12 @@ export function useOnboardingProgress() {
       if (!user || completed.includes(key)) return
 
       const updated = [...completed, key]
+
+      // Fire celebration toast
+      const celebration = MILESTONE_CELEBRATIONS[key]
+      if (celebration) {
+        toast({ title: celebration.title, description: celebration.description })
+      }
 
       // Optimistic update
       mutate(

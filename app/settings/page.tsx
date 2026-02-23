@@ -15,7 +15,7 @@ import { Loader2 } from "lucide-react"
 import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
 import { logger } from "@/lib/logger"
-import { toast } from "sonner"
+import { toast } from "@/hooks/use-toast"
 import {
   upsertUserSettings,
   isValidUUID,
@@ -91,7 +91,7 @@ export default function SettingsPage() {
 
     if (!isValidUUID(user.id)) {
       logger.error("Invalid user ID format")
-      toast.error("Invalid user session. Please sign in again.")
+      toast({ title: "Invalid user session", description: "Please sign in again.", variant: "destructive" })
       return
     }
 
@@ -106,11 +106,11 @@ export default function SettingsPage() {
 
       await mutate()
       setHasUnsavedChanges(false)
-      toast.success("Settings saved successfully")
+      toast({ title: "Settings saved" })
       logger.info("Settings saved", { userId: user.id })
     } catch (error) {
       logger.error("Failed to save settings", error instanceof Error ? error : new Error(String(error)))
-      toast.error("Failed to save settings. Please try again.")
+      toast({ title: "Failed to save settings", description: "Please try again.", variant: "destructive" })
     } finally {
       setIsSaving(false)
     }

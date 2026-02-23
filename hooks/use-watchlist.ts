@@ -4,6 +4,7 @@ import useSWR from "swr"
 import { useMemo, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeTicker } from "@/lib/utils"
+import { toast } from "@/hooks/use-toast"
 import type { ActionWatchlistItem } from "@/types/action-buttons"
 
 interface WatchlistItem {
@@ -105,10 +106,12 @@ export function useWatchlist() {
 
       // Revalidate to get real data
       mutate()
+      toast({ title: "Added to watchlist", description: ticker })
       return true
     } catch {
       // Rollback
       mutate(items, false)
+      toast({ title: "Failed to add to watchlist", variant: "destructive" })
       return false
     } finally {
       pendingOps.current.delete(`add-${ticker}`)
@@ -142,10 +145,12 @@ export function useWatchlist() {
       if (error) throw error
 
       mutate()
+      toast({ title: "Removed from watchlist", description: ticker })
       return true
     } catch {
       // Rollback
       mutate(items, false)
+      toast({ title: "Failed to remove from watchlist", variant: "destructive" })
       return false
     } finally {
       pendingOps.current.delete(`remove-${ticker}`)

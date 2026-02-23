@@ -14,7 +14,7 @@ import {
   CaretRight,
   Sparkle,
 } from '@phosphor-icons/react'
-import { toast } from 'sonner'
+import { toast } from '@/hooks/use-toast'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import type { Trade } from '@/hooks/use-trades'
 import { useTradingPlan, type CreatePlanData } from '@/hooks/use-trading-plan'
@@ -234,21 +234,21 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      toast.error('Plan name is required')
+      toast({ title: 'Plan name is required', variant: 'destructive' })
       return
     }
     setSaving(true)
     try {
       if (mode === 'create') {
         await createPlan(form)
-        toast.success('Trading plan created')
+        toast({ title: 'Trading plan created', description: `"${form.name}" is now active.` })
       } else if (mode === 'edit' && plan) {
         await updatePlan(plan.id, form as Partial<TradingPlan>)
-        toast.success('Trading plan updated')
+        toast({ title: 'Trading plan updated' })
       }
       setMode('view')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to save plan')
+      toast({ title: 'Failed to save plan', description: err instanceof Error ? err.message : 'Please try again.', variant: 'destructive' })
     } finally {
       setSaving(false)
     }
@@ -258,10 +258,10 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
     if (!plan) return
     try {
       await deletePlan(plan.id)
-      toast.success('Trading plan deleted')
+      toast({ title: 'Trading plan deleted' })
       setMode('view')
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to delete plan')
+      toast({ title: 'Failed to delete plan', description: err instanceof Error ? err.message : 'Please try again.', variant: 'destructive' })
     }
   }
 

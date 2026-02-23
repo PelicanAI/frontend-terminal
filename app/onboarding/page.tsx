@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, SpinnerGap } from '@phosphor-icons/react'
-import { toast } from 'sonner'
+import { toast } from '@/hooks/use-toast'
 
 import { useAuth } from '@/lib/providers/auth-provider'
 import { createClient } from '@/lib/supabase/client'
@@ -197,7 +197,7 @@ async function completeSurvey(data: SurveyData, userId: string) {
     }
   } catch {
     // Survey was written but secondary writes failed
-    toast.info('Profile saved! Some settings couldn\'t be updated.')
+    toast({ title: 'Profile saved', description: 'Some settings couldn\'t be updated.' })
   }
 
   // 8. Redirect to morning brief
@@ -307,7 +307,7 @@ export default function OnboardingPage() {
       })
       router.push('/chat')
     } catch {
-      toast.error('Something went wrong. Please try again.')
+      toast({ title: 'Something went wrong', description: 'Please try again.', variant: 'destructive' })
       setIsSubmitting(false)
     }
   }
@@ -318,7 +318,7 @@ export default function OnboardingPage() {
     try {
       await completeSurvey(surveyData, user.id)
     } catch {
-      toast.error('Something went wrong saving your profile.')
+      toast({ title: 'Something went wrong', description: 'Failed to save your profile.', variant: 'destructive' })
       setIsSubmitting(false)
     }
   }
