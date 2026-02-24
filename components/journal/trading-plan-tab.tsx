@@ -482,7 +482,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
 
   // ── View Mode ──
   return (
-    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4">
+    <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-4">
       {/* Plan Header */}
       <motion.div variants={staggerItem}>
         <PelicanCard>
