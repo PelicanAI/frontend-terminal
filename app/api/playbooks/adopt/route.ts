@@ -10,6 +10,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'sourcePlaybookId is required' }, { status: 400 })
     }
 
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(sourcePlaybookId)) {
+      return NextResponse.json({ error: 'Invalid playbook ID format' }, { status: 400 })
+    }
+
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
