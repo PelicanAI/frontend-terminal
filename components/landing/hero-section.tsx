@@ -244,12 +244,12 @@ export function HeroSection() {
               className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5"
             />
           </Link>
-          <a
-            href="#platform"
+          <Link
+            href="/how-to-use"
             className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-medium text-slate-600 transition-all duration-150 hover:border-slate-400 hover:text-slate-900 active:scale-[0.98]"
           >
             See How It Works
-          </a>
+          </Link>
         </motion.div>
 
         {/* Fine print */}

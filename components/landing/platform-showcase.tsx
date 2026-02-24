@@ -12,6 +12,7 @@ import {
   Notebook,
   Strategy,
   Crosshair,
+  Brain,
 } from '@phosphor-icons/react'
 import { ChatMock } from '@/components/landing/mocks/chat-mock'
 import { BriefMock } from '@/components/landing/mocks/brief-mock'
@@ -19,6 +20,7 @@ import { HeatmapMock } from '@/components/landing/mocks/heatmap-mock'
 import { JournalMock } from '@/components/landing/mocks/journal-mock'
 import { PlaybookMock } from '@/components/landing/mocks/playbook-mock'
 import { PositionsMock } from '@/components/landing/mocks/positions-mock'
+import { CoachingMock } from '@/components/landing/mocks/coaching-mock'
 
 const features = [
   {
@@ -104,6 +106,20 @@ const features = [
       'Portfolio-level risk and exposure overview',
     ],
     mock: PositionsMock,
+  },
+  {
+    id: 'coaching',
+    label: 'Coaching',
+    icon: Brain,
+    title: 'Your AI trading coach',
+    description:
+      'Pelican doesn\'t just answer questions — it pushes back when the data says you\'re making a mistake. It knows your win rates, your weak spots, and your patterns.',
+    highlights: [
+      'Warns you before you repeat costly patterns',
+      'Enforces your own trading plan rules',
+      'Detects tilt, revenge trading, and setup drift',
+    ],
+    mock: CoachingMock,
   },
 ] as const
 

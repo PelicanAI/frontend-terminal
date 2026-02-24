@@ -42,6 +42,12 @@ export function LandingNav() {
           >
             Platform
           </a>
+          <Link
+            href="/how-to-use"
+            className="text-sm text-slate-500 transition-colors duration-150 hover:text-slate-900"
+          >
+            How It Works
+          </Link>
           <a
             href="#pricing"
             className="text-sm text-slate-500 transition-colors duration-150 hover:text-slate-900"
@@ -96,6 +102,13 @@ export function LandingNav() {
             >
               Platform
             </a>
+            <Link
+              href="/how-to-use"
+              onClick={() => setMobileOpen(false)}
+              className="text-sm text-slate-600 transition-colors hover:text-slate-900"
+            >
+              How It Works
+            </Link>
             <a
               href="#pricing"
               onClick={() => setMobileOpen(false)}

@@ -12,9 +12,9 @@ export function FinalCTA() {
           <div className="relative text-center max-w-2xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
               <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                Stop Searching.
+                Stop Trading Alone.
                 <br />
-                Start Asking.
+                Start Trading Smarter.
               </span>
             </h2>
 
