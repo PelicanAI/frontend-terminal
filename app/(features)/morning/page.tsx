@@ -755,7 +755,7 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
         <MarketPulseStrip
           onIndexClick={(symbol, label) => {
             const prompts = PULSE_STRIP_PROMPTS[marketType] ?? PULSE_STRIP_PROMPTS.stocks
-            openWithPrompt(null, prompts[symbol] || `Analyze ${label} today. What's driving the move?`, 'morning', 'brief_action')
+            openWithPrompt(null, prompts[symbol] || `Analyze ${label} today. What's driving the move and does it affect any of my positions or watchlist?`, 'morning', 'brief_action')
           }}
         />
       </div>
@@ -794,7 +794,7 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
                   size="sm"
                   onClick={() => {
                     trackEvent({ eventType: 'brief_section_engaged', feature: 'morning_brief', data: { action: 'discuss' } })
-                    openWithPrompt(null, `Let's discuss today's morning brief. Based on my current positions and the market conditions outlined in the brief, what are the most important things I should focus on today? What actionable steps should I take?`, 'morning', 'brief_action')
+                    openWithPrompt(null, `Give me your honest assessment of my portfolio risk today. What's the biggest threat to my open positions and what should I be watching for?`, 'morning', 'brief_action')
                   }}
                 >
                   <ChatCircleDots className="h-3 w-3" weight="regular" />

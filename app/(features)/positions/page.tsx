@@ -158,7 +158,7 @@ export default function PositionsPage() {
       <>
         <PositionsEmptyState
           onLogTrade={() => setShowLogTradeModal(true)}
-          onAskPelican={() => handleSendMessage('Suggest a trade idea for me. Give me: ticker, direction, entry, stop, target, R:R, thesis.')}
+          onAskPelican={() => handleSendMessage('Based on my current portfolio exposure and open positions, suggest what I should be looking at next. Consider my sector concentration, directional bias, and which setups have been working for me.')}
         />
         <LogTradeModal
           open={showLogTradeModal}

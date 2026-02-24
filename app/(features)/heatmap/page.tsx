@@ -372,7 +372,7 @@ function HeatmapPageInner() {
     if (stock) {
       openWithPrompt(ticker, buildAnalysisPrompt(stock, heatmapContext, activeMarket), 'heatmap', 'heatmap_click')
     } else {
-      openWithPrompt(ticker, `Analyze ${ticker} (${name}). Provide momentum drivers, key levels, setup quality, and a tactical trade plan with invalidation.`, 'heatmap', 'heatmap_click')
+      openWithPrompt(ticker, `Analyze ${ticker} (${name}) — is there a trade here for me? Consider my current portfolio exposure, my best-performing setups, and my risk rules.`, 'heatmap', 'heatmap_click')
     }
   }, [stocks, heatmapContext, activeMarket, openWithPrompt])
 

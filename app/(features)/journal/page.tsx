@@ -449,7 +449,7 @@ export default function JournalPage() {
                 {!tradesLoading && trades.length === 0 ? (
                   <JournalEmptyState
                     onLogTrade={() => setShowLogTradeModal(true)}
-                    onAskPelican={() => openWithPrompt(null, 'Suggest a trade idea for me. Give me: ticker, direction, entry, stop, target, R:R, thesis.', 'journal', 'journal_review')}
+                    onAskPelican={() => openWithPrompt(null, 'Suggest a trade idea that fits my edge. Look at my best-performing setups, strongest tickers, and current portfolio exposure. Give me: ticker, direction, entry, stop loss, take profit, R:R, thesis, and which of my playbooks it matches. Avoid tickers I historically lose on.', 'journal', 'journal_review')}
                   />
                 ) : (
                   <TradesTable
