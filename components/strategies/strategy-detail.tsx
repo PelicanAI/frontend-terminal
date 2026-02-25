@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Eye, ChartBar, ChatCircle, Star,
@@ -12,7 +13,6 @@ import {
 import { cn } from "@/lib/utils"
 import { pageEnter, tabContent } from "@/components/ui/pelican"
 import { useStrategyDetail } from "@/hooks/use-strategies"
-import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { AdoptButton } from "./adopt-button"
 import { StrategyStats } from "./strategy-stats"
 import { BacktestChart } from "./backtest-chart"
@@ -201,12 +201,11 @@ export function StrategyDetail({ slug }: StrategyDetailProps) {
 }
 
 function AskPelicanButton({ strategy }: { strategy: Playbook }) {
-  const { openWithPrompt } = usePelicanPanelContext()
+  const router = useRouter()
 
   const handleAsk = () => {
-    const visibleMessage = `Tell me about the "${strategy.name}" strategy`
-    const fullPrompt = `Tell me everything about the ${strategy.name} strategy. When does it work best? What are the common failure modes and how do I avoid them? How should I size positions and manage risk with this setup? What market conditions make it most reliable? Give me real examples.`
-    openWithPrompt(null, { visibleMessage, fullPrompt }, 'playbooks', 'strategy_ask')
+    const prompt = `Tell me everything about the ${strategy.name} strategy. When does it work best? What are the common failure modes and how do I avoid them? How should I size positions and manage risk with this setup? What market conditions make it most reliable? Give me real examples.`
+    router.push(`/chat?prefill=${encodeURIComponent(prompt)}`)
   }
 
   return (

@@ -250,6 +250,18 @@ export default function ChatPage() {
 
   // Get conversation ID from URL
   const conversationIdFromUrl = searchParams.get("conversation")
+  const prefillFromUrl = searchParams.get("prefill")
+
+  // Prefill chat input from URL param (e.g. from strategy "Ask Pelican" button)
+  useEffect(() => {
+    if (prefillFromUrl && chatInputRef.current) {
+      chatInputRef.current.setMessage(prefillFromUrl)
+      // Clean up URL to avoid re-prefilling on re-render
+      const url = new URL(window.location.href)
+      url.searchParams.delete("prefill")
+      window.history.replaceState({}, "", url.toString())
+    }
+  }, [prefillFromUrl])
 
   const handleSaveInsight = useCallback(async (content: string, tickers: string[]) => {
     return saveInsight(content, {
