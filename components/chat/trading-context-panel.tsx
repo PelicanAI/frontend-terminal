@@ -1,7 +1,7 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, CaretRight, GraduationCap, X, Plus, ChartLineUp, ChatCircle, Briefcase, Trash, MagnifyingGlass, Bell, BellRinging } from "@phosphor-icons/react"
+import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, CaretRight, GraduationCap, X, Plus, ChartLineUp, ChatCircle, Briefcase, Trash, MagnifyingGlass, Bell, BellRinging, BellSimple } from "@phosphor-icons/react"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { cn, normalizeTicker } from "@/lib/utils"
 import { useState, useRef } from "react"
@@ -18,6 +18,7 @@ import { useTrades } from "@/hooks/use-trades"
 import { formatPercent } from "@/lib/formatters"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { useTraderProfile } from "@/hooks/use-trader-profile"
+import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,10 +51,14 @@ interface SectorData {
 }
 
 interface WatchlistTicker {
+  id: string
   symbol: string
   price: number | null
   changePercent: number | null
   customPrompt: string | null
+  notes: string | null
+  alertPriceAbove: number | null
+  alertPriceBelow: number | null
 }
 
 // --- Market-adaptive panel configuration ---
@@ -222,10 +227,14 @@ export function TradingContextPanel({
   const addInputRef = useRef<HTMLInputElement>(null)
 
   // Real watchlist from Supabase
-  const { items: watchlistItems, addToWatchlist, removeFromWatchlist, updateCustomPrompt, loading: watchlistLoading } = useWatchlist()
+  const { items: watchlistItems, addToWatchlist, removeFromWatchlist, updateCustomPrompt, updateWatchlistItem, loading: watchlistLoading } = useWatchlist()
+  const { openWithPrompt } = usePelicanPanelContext()
   const [alertEditTicker, setAlertEditTicker] = useState<string | null>(null)
   const [alertInput, setAlertInput] = useState("")
   const alertInputRef = useRef<HTMLInputElement>(null)
+  const [priceAlertEditId, setPriceAlertEditId] = useState<string | null>(null)
+  const [priceAboveInput, setPriceAboveInput] = useState("")
+  const [priceBelowInput, setPriceBelowInput] = useState("")
 
   // Live quotes for watchlist tickers
   const watchlistSymbols = watchlistItems.map(item => item.ticker)
@@ -233,10 +242,14 @@ export function TradingContextPanel({
 
   // Merge watchlist items with live prices
   const watchlistTickers: WatchlistTicker[] = watchlistItems.map(item => ({
+    id: item.id,
     symbol: item.ticker,
     price: watchlistQuotes[item.ticker]?.price ?? null,
     changePercent: watchlistQuotes[item.ticker]?.changePercent ?? null,
     customPrompt: item.custom_prompt ?? null,
+    notes: item.notes ?? null,
+    alertPriceAbove: item.alert_price_above ?? null,
+    alertPriceBelow: item.alert_price_below ?? null,
   }))
 
   // Open trades
@@ -280,7 +293,7 @@ export function TradingContextPanel({
       setAddTickerInput("")
       return
     }
-    await addToWatchlist(ticker)
+    await addToWatchlist(ticker, { added_from: 'manual' })
     completeMilestone("first_watchlist")
     setAddTickerInput("")
     addInputRef.current?.focus()
@@ -536,61 +549,167 @@ export function TradingContextPanel({
                         </>
                       ) : (
                         <div className="w-full">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button className="w-full flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150 text-left">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
-                                  {ticker.customPrompt && (
-                                    <BellRinging size={10} weight="fill" className="text-[var(--accent-primary)]" />
+                          <div className="flex items-center gap-1">
+                            {/* Clickable ticker row — opens chat */}
+                            <button
+                              className="flex-1 flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-white/5 cursor-pointer transition-all duration-150 text-left"
+                              onClick={() => {
+                                const prompt = `Analyze ${ticker.symbol} — it's on my watchlist. ${ticker.notes ? `Notes: ${ticker.notes}` : ''} ${ticker.customPrompt || 'Give me a technical and fundamental update.'}`
+                                openWithPrompt(
+                                  ticker.symbol,
+                                  prompt,
+                                  null
+                                )
+                              }}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
+                                {ticker.customPrompt && (
+                                  <BellRinging size={10} weight="fill" className="text-[var(--accent-primary)]" />
+                                )}
+                                {(ticker.alertPriceAbove != null || ticker.alertPriceBelow != null) && (
+                                  <BellSimple size={10} weight="fill" className="text-[var(--data-warning)]" />
+                                )}
+                              </div>
+                              <div className="flex flex-col items-end">
+                                <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price, ticker.symbol)}</span>
+                                <div
+                                  className={cn(
+                                    "text-[10px] font-medium font-mono tabular-nums px-1.5 py-0.5 rounded",
+                                    getChangeBg(ticker.changePercent),
+                                    getChangeColor(ticker.changePercent),
                                   )}
+                                >
+                                  {formatPercent(ticker.changePercent)}
                                 </div>
-                                <div className="flex flex-col items-end">
-                                  <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price, ticker.symbol)}</span>
-                                  <div
-                                    className={cn(
-                                      "text-[10px] font-medium font-mono tabular-nums px-1.5 py-0.5 rounded",
-                                      getChangeBg(ticker.changePercent),
-                                      getChangeColor(ticker.changePercent),
-                                    )}
+                              </div>
+                            </button>
+                            {/* Action menu button — stops propagation */}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button
+                                  className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors duration-150"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <CaretDown size={12} weight="regular" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-48">
+                                <DropdownMenuItem onClick={() => showChart(ticker.symbol)}>
+                                  <ChartLineUp size={14} weight="regular" className="mr-2" />
+                                  Open Chart
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onPrefillChat?.(`Analyze ${ticker.symbol}`)}>
+                                  <ChatCircle size={14} weight="regular" className="mr-2" />
+                                  Ask Pelican
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => onPrefillChat?.(`Deep dive on ${ticker.symbol} — technicals, fundamentals, and sentiment`)}>
+                                  <MagnifyingGlass size={14} weight="regular" className="mr-2" />
+                                  Deep Dive
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setPriceAlertEditId(ticker.id)
+                                    setPriceAboveInput(ticker.alertPriceAbove != null ? String(ticker.alertPriceAbove) : "")
+                                    setPriceBelowInput(ticker.alertPriceBelow != null ? String(ticker.alertPriceBelow) : "")
+                                  }}
+                                >
+                                  <BellSimple size={14} weight="regular" className="mr-2" />
+                                  {(ticker.alertPriceAbove != null || ticker.alertPriceBelow != null) ? 'Edit Price Alerts...' : 'Set Price Alerts...'}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setAlertEditTicker(ticker.symbol)
+                                    setAlertInput(ticker.customPrompt || "")
+                                    setTimeout(() => alertInputRef.current?.focus(), 50)
+                                  }}
+                                >
+                                  <Bell size={14} weight="regular" className="mr-2" />
+                                  {ticker.customPrompt ? 'Edit Custom Alert...' : 'Set Custom Alert...'}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => removeFromWatchlist(ticker.symbol)}
+                                  className="text-[var(--data-negative)] focus:text-[var(--data-negative)]"
+                                >
+                                  <Trash size={14} weight="regular" className="mr-2" />
+                                  Remove
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+
+                          {/* Price Alerts Inline Editor */}
+                          {priceAlertEditId === ticker.id && (
+                            <div className="mt-1.5 p-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--accent-primary)]/30">
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <BellSimple size={12} weight="bold" className="text-[var(--accent-primary)]" />
+                                <span className="text-[10px] font-medium text-[var(--accent-primary)]">Price Alerts</span>
+                              </div>
+                              <div className="space-y-1.5">
+                                <div className="flex items-center gap-2">
+                                  <label className="text-[10px] text-[var(--text-muted)] w-14 shrink-0">Above</label>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={priceAboveInput}
+                                    onChange={(e) => setPriceAboveInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Escape") setPriceAlertEditId(null)
+                                    }}
+                                    placeholder="Price..."
+                                    className="flex-1 bg-[var(--bg-surface)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] px-2 py-1.5 rounded border border-[var(--border-subtle)] outline-none focus:border-[var(--accent-primary)] transition-colors font-mono tabular-nums"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <label className="text-[10px] text-[var(--text-muted)] w-14 shrink-0">Below</label>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={priceBelowInput}
+                                    onChange={(e) => setPriceBelowInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Escape") setPriceAlertEditId(null)
+                                    }}
+                                    placeholder="Price..."
+                                    className="flex-1 bg-[var(--bg-surface)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] px-2 py-1.5 rounded border border-[var(--border-subtle)] outline-none focus:border-[var(--accent-primary)] transition-colors font-mono tabular-nums"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1.5 mt-1.5">
+                                <button
+                                  onClick={() => {
+                                    const above = priceAboveInput.trim() ? parseFloat(priceAboveInput) : null
+                                    const below = priceBelowInput.trim() ? parseFloat(priceBelowInput) : null
+                                    updateWatchlistItem(ticker.id, {
+                                      alert_price_above: above != null && !isNaN(above) ? above : null,
+                                      alert_price_below: below != null && !isNaN(below) ? below : null,
+                                    })
+                                    setPriceAlertEditId(null)
+                                  }}
+                                  className="px-2 py-1 rounded text-[10px] font-medium bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] transition-colors"
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  onClick={() => setPriceAlertEditId(null)}
+                                  className="px-2 py-1 rounded text-[10px] font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                {(ticker.alertPriceAbove != null || ticker.alertPriceBelow != null) && (
+                                  <button
+                                    onClick={() => {
+                                      updateWatchlistItem(ticker.id, { alert_price_above: null, alert_price_below: null })
+                                      setPriceAlertEditId(null)
+                                    }}
+                                    className="px-2 py-1 rounded text-[10px] font-medium text-[var(--data-negative)] hover:bg-[var(--data-negative)]/10 transition-colors ml-auto"
                                   >
-                                    {formatPercent(ticker.changePercent)}
-                                  </div>
-                                </div>
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48">
-                              <DropdownMenuItem onClick={() => showChart(ticker.symbol)}>
-                                <ChartLineUp size={14} weight="regular" className="mr-2" />
-                                Open Chart
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => onPrefillChat?.(`Analyze ${ticker.symbol}`)}>
-                                <ChatCircle size={14} weight="regular" className="mr-2" />
-                                Ask Pelican
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => onPrefillChat?.(`Deep dive on ${ticker.symbol} — technicals, fundamentals, and sentiment`)}>
-                                <MagnifyingGlass size={14} weight="regular" className="mr-2" />
-                                Deep Dive
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setAlertEditTicker(ticker.symbol)
-                                  setAlertInput(ticker.customPrompt || "")
-                                  setTimeout(() => alertInputRef.current?.focus(), 50)
-                                }}
-                              >
-                                <Bell size={14} weight="regular" className="mr-2" />
-                                {ticker.customPrompt ? 'Edit Custom Alert...' : 'Set Custom Alert...'}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => removeFromWatchlist(ticker.symbol)}
-                                className="text-[var(--data-negative)] focus:text-[var(--data-negative)]"
-                              >
-                                <Trash size={14} weight="regular" className="mr-2" />
-                                Remove
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                                    Clear
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          )}
 
                           {/* Custom Alert Inline Editor */}
                           {alertEditTicker === ticker.symbol && (

@@ -14,7 +14,6 @@ import { NotEnoughData } from "@/components/insights/not-enough-data"
 import { TimeOfDayChart } from "@/components/journal/insights/time-of-day-chart"
 import { HoldingPeriodChart } from "@/components/journal/insights/holding-period-chart"
 import { TickerScorecard } from "@/components/journal/insights/ticker-scorecard"
-import { StreaksCard } from "@/components/journal/insights/streaks-card"
 import { CalendarCard } from "@/components/journal/insights/calendar-card"
 import { PlanComplianceCard } from "@/components/journal/insights/plan-compliance-card"
 import { usePlanCompliance } from "@/hooks/use-plan-compliance"
@@ -353,9 +352,8 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
         <TickerScorecard data={insights.ticker_performance} onAskPelican={onAskPelican} />
       </motion.div>
 
-      {/* Row 4: Streaks + Calendar Patterns */}
-      <motion.div variants={staggerItem} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <StreaksCard data={insights.streaks} onAskPelican={onAskPelican} />
+      {/* Row 4: Calendar Patterns */}
+      <motion.div variants={staggerItem}>
         <CalendarCard data={insights.calendar_patterns} onAskPelican={onAskPelican} />
       </motion.div>
     </motion.div>

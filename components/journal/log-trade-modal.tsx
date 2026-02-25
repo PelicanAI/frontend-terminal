@@ -13,6 +13,7 @@ import { useRiskBudget } from "@/hooks/use-risk-budget"
 import { useAntiTradeCheck } from "@/hooks/use-anti-trade-check"
 import { cn } from "@/lib/utils"
 import { toast } from "@/hooks/use-toast"
+import { trackEvent } from "@/lib/tracking"
 import { BudgetWarningBanner } from "@/components/risk-budget/budget-warning-banner"
 
 interface LogTradeModalProps {
@@ -53,7 +54,17 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
   }, [playbookId])
 
   const togglePlaybookChecklistItem = (index: number) => {
-    setPlaybookChecklistState(prev => ({ ...prev, [index]: !prev[index] }))
+    setPlaybookChecklistState(prev => {
+      const next = { ...prev, [index]: !prev[index] }
+      // Fire checklist_completed when ALL items are now checked
+      if (
+        selectedPlaybook?.checklist?.length &&
+        selectedPlaybook.checklist.every((_, i) => next[i])
+      ) {
+        trackEvent({ eventType: 'checklist_completed', feature: 'trade_logging' })
+      }
+      return next
+    })
   }
 
   const allPlaybookChecked = selectedPlaybook?.checklist?.length

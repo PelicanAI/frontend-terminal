@@ -14,7 +14,7 @@ import {
 } from "recharts"
 import { cn } from "@/lib/utils"
 import type { PlaybookStats } from "@/hooks/use-playbooks"
-import { ChartBar } from "@phosphor-icons/react"
+import { ChartBar, Flask } from "@phosphor-icons/react"
 
 interface PlaybookStatsTabProps {
   stats: PlaybookStats | null
@@ -260,6 +260,25 @@ export function PlaybookStatsTab({ stats, isLoading }: PlaybookStatsTabProps) {
           </div>
         </div>
       )}
+
+      {/* Pelican Backtest Placeholder */}
+      <div className="mt-8 border border-[var(--border-subtle)] rounded-xl p-6 text-center">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <Flask size={20} weight="regular" className="text-[var(--accent-primary)]" />
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Pelican Backtest</h3>
+        </div>
+        <p className="text-sm text-[var(--text-secondary)] mb-4">
+          Test this strategy against historical data. Pelican will scan for setups matching your rules
+          and simulate trades.
+        </p>
+        <button
+          disabled
+          className="px-4 py-2 bg-[var(--accent-primary)]/30 text-[var(--text-disabled)] rounded-lg cursor-not-allowed text-sm"
+        >
+          Coming Soon — Backtest with Pelican
+        </button>
+        <p className="text-xs text-[var(--text-muted)] mt-2 font-mono tabular-nums">Uses 1 credit - Results saved permanently</p>
+      </div>
     </div>
   )
 }

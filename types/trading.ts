@@ -128,8 +128,6 @@ export interface RuleComplianceStat {
 // ── Behavioral Insights ──
 
 export type InsightCategory =
-  | 'win_streak'
-  | 'loss_streak'
   | 'overtrading'
   | 'revenge_trading'
   | 'best_setup'
@@ -159,7 +157,7 @@ export interface MilestoneDefinition {
   name: string
   description: string
   icon: string
-  category: 'trades' | 'profit' | 'discipline' | 'learning' | 'streak'
+  category: 'trades' | 'profit' | 'discipline' | 'learning'
   threshold: number
   unit: string
 }

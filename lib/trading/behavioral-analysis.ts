@@ -16,33 +16,6 @@ export function analyzeBehavior(trades: Trade[]): BehavioralInsight[] {
     new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime()
   )
 
-  // ── Streaks ──
-  const streaks = detectStreaks(sorted)
-  if (streaks.winStreak >= 3) {
-    insights.push({
-      id: 'win_streak',
-      category: 'win_streak',
-      title: `${streaks.winStreak}-trade winning streak`,
-      description: `You've won ${streaks.winStreak} trades in a row. Stay disciplined — don't increase size out of overconfidence.`,
-      severity: 'positive',
-      data: { streak: streaks.winStreak },
-      actionable: 'Stick to your plan. Winning streaks end when discipline slips.',
-      created_at: new Date().toISOString(),
-    })
-  }
-  if (streaks.lossStreak >= 3) {
-    insights.push({
-      id: 'loss_streak',
-      category: 'loss_streak',
-      title: `${streaks.lossStreak}-trade losing streak`,
-      description: `You've lost ${streaks.lossStreak} trades in a row. Consider stepping back to reassess.`,
-      severity: streaks.lossStreak >= 5 ? 'critical' : 'warning',
-      data: { streak: streaks.lossStreak },
-      actionable: 'Take a break. Review your last entries for pattern deviations.',
-      created_at: new Date().toISOString(),
-    })
-  }
-
   // ── Overtrading detection ──
   const overtradingInsight = detectOvertrading(sorted)
   if (overtradingInsight) insights.push(overtradingInsight)
@@ -72,45 +45,6 @@ export function analyzeBehavior(trades: Trade[]): BehavioralInsight[] {
   if (concentrationInsight) insights.push(concentrationInsight)
 
   return insights
-}
-
-function detectStreaks(sorted: Trade[]) {
-  let winStreak = 0
-  let lossStreak = 0
-  let currentWin = 0
-  let currentLoss = 0
-
-  for (const trade of sorted) {
-    if ((trade.pnl_amount ?? 0) > 0) {
-      currentWin++
-      currentLoss = 0
-    } else {
-      currentLoss++
-      currentWin = 0
-    }
-    winStreak = Math.max(winStreak, currentWin)
-    lossStreak = Math.max(lossStreak, currentLoss)
-  }
-
-  // Current streak (from most recent)
-  const recent = [...sorted].reverse()
-  let recentWin = 0
-  let recentLoss = 0
-  for (const trade of recent) {
-    if ((trade.pnl_amount ?? 0) > 0) {
-      recentWin++
-    } else break
-  }
-  for (const trade of recent) {
-    if ((trade.pnl_amount ?? 0) <= 0) {
-      recentLoss++
-    } else break
-  }
-
-  return {
-    winStreak: Math.max(winStreak, recentWin),
-    lossStreak: Math.max(lossStreak, recentLoss),
-  }
 }
 
 function detectOvertrading(sorted: Trade[]): BehavioralInsight | null {

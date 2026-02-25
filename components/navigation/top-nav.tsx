@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import { useStreaks } from '@/hooks/use-streaks'
 import { useCreditsContext } from '@/providers/credits-provider'
 import { useTraderProfile } from '@/hooks/use-trader-profile'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
@@ -50,7 +49,6 @@ const NAV_TABS: NavTab[] = [
 
 export function TopNav({ className }: TopNavProps) {
   const pathname = usePathname()
-  const { journalStreak } = useStreaks()
   const { credits } = useCreditsContext()
   const { survey } = useTraderProfile()
 
@@ -156,17 +154,8 @@ export function TopNav({ className }: TopNavProps) {
           </div>
         </div>
 
-        {/* Right: Streak + Credits */}
+        {/* Right: Credits */}
         <div className="flex items-center gap-2 sm:gap-3 ml-auto flex-shrink-0">
-          {/* Streak */}
-          <IconTooltip label={`${journalStreak}-day journal streak`} side="bottom">
-            <div className="flex items-center gap-1 sm:gap-1.5 text-sm text-[var(--text-secondary)]">
-              <span className={`${journalStreak > 0 ? 'text-base sm:text-lg filter drop-shadow-[0_0_6px_rgba(251,146,60,0.4)]' : ''}`}>🔥</span>
-              <span className="font-mono font-medium text-[var(--text-primary)] tabular-nums text-sm sm:text-base">{journalStreak}</span>
-              <span className="text-xs hidden sm:inline">days</span>
-            </div>
-          </IconTooltip>
-
           {/* Credits */}
           <IconTooltip label="Credit balance" side="bottom">
             <Link

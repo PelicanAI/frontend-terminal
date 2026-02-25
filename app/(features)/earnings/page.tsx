@@ -10,6 +10,7 @@ import { useEnrichedEarnings, applyEarningsFilters } from "@/hooks/use-enriched-
 import { useEconomicCalendar } from "@/hooks/use-economic-calendar"
 import { useTraderProfile } from "@/hooks/use-trader-profile"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
+import { useWatchlist } from "@/hooks/use-watchlist"
 import { cn } from "@/lib/utils"
 import { PageHeader, PelicanButton, staggerContainer, staggerItem } from "@/components/ui/pelican"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
@@ -85,6 +86,20 @@ export default function EarningsPage() {
   const { events, stats, isLoading, refetch } = useEnrichedEarnings({ from: weekStart, to: weekEnd })
   const { events: economicEvents, isLoading: economicLoading } = useEconomicCalendar({ from: weekStart, to: weekEnd })
   const { openWithPrompt } = usePelicanPanelContext()
+  const { items: watchlistItems, addToWatchlist, removeFromWatchlist } = useWatchlist()
+
+  const watchlistTickers = useMemo(
+    () => new Set((watchlistItems ?? []).map((w: { ticker: string }) => w.ticker.toUpperCase())),
+    [watchlistItems]
+  )
+
+  const handleToggleWatchlist = useCallback((ticker: string, isWatched: boolean) => {
+    if (isWatched) {
+      removeFromWatchlist(ticker)
+    } else {
+      addToWatchlist(ticker, { added_from: 'manual' })
+    }
+  }, [addToWatchlist, removeFromWatchlist])
 
   // Apply filters + search
   const filteredEvents = useMemo(
@@ -209,6 +224,8 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
             onClick={handleClick}
             searchTerm={search}
             autoExpand={!!search}
+            watchlistTickers={watchlistTickers}
+            onToggleWatchlist={handleToggleWatchlist}
           />
         )}
 
@@ -225,6 +242,8 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
             onClick={handleClick}
             searchTerm={search}
             autoExpand={!!search}
+            watchlistTickers={watchlistTickers}
+            onToggleWatchlist={handleToggleWatchlist}
           />
         )}
 

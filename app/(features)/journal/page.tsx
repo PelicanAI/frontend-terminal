@@ -258,18 +258,21 @@ export default function JournalPage() {
 
   const handleCloseTrade = async (data: Parameters<typeof closeTrade>[1]) => {
     if (!selectedTrade) return
-    // Let errors propagate to the modal's error handler
-    await closeTrade(selectedTrade.id, data)
+    const result = await closeTrade(selectedTrade.id, data)
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to close trade')
+    }
+
     refetch()
 
-    // Calculate P&L for toast message
-    const exitPrice = data.exit_price
-    const direction = selectedTrade.direction === 'long' ? 1 : -1
-    const pnlAmount = (exitPrice - selectedTrade.entry_price) * selectedTrade.quantity * direction
-    const pnlSign = pnlAmount >= 0 ? '+' : ''
+    // Use server-returned P&L values instead of client-side calculation
+    const pnlDisplay = result.pnl_amount != null
+      ? `${result.pnl_amount >= 0 ? '+' : ''}$${result.pnl_amount.toFixed(2)} (${result.pnl_percent?.toFixed(1)}%)`
+      : 'Success'
     toast({
       title: "Trade closed",
-      description: `${selectedTrade.ticker} ${pnlSign}$${pnlAmount.toFixed(2)}`,
+      description: `${selectedTrade.ticker} ${pnlDisplay}`,
     })
 
     setShowCloseTradeModal(false)

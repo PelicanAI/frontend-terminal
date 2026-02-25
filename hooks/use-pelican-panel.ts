@@ -20,6 +20,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { useStreamingChat, type TrialExhaustedInfo, type InsufficientCreditsInfo } from './use-streaming-chat'
 import { logger, type LogContext } from '@/lib/logger'
 import { createClient } from '@/lib/supabase/client'
+import { trackEvent } from '@/lib/tracking'
 import type { Message } from '@/lib/chat-utils'
 import {
   type MessageSource,
@@ -247,6 +248,12 @@ export function usePelicanPanel(options: UsePelicanPanelOptions = {}): UsePelica
     const fullPrompt = typeof prompt === 'string' ? prompt : prompt.fullPrompt
 
     logger.info('[PELICAN-PANEL] Opening with prompt', { ticker, context, promptLength: fullPrompt.length })
+
+    trackEvent({
+      eventType: 'chat_prefill_used',
+      ticker: ticker || undefined,
+      feature: context || 'unknown',
+    })
 
     // If panel is already open for same context, append to existing conversation
     const shouldAppend = stateRef.current.isOpen && stateRef.current.context === context && conversationIdRef.current

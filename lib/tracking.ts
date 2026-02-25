@@ -36,3 +36,7 @@ export function trackEvent({ eventType, ticker, feature, data }: TrackEventParam
     }
   })()
 }
+
+// TODO: Fire 'daily_journal_written' when daily journal feature is built
+// TODO: Fire 'earnings_alert_set' when earnings alert UI is built
+// TODO: Fire 'health_score_viewed' when a dedicated health score detail view is added

@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic"
 
 import { useState, useCallback, useMemo, useRef } from "react"
+import { useWatchlist } from "@/hooks/use-watchlist"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { ArrowsClockwise, Brain } from "@phosphor-icons/react"
@@ -55,6 +56,11 @@ export default function PositionsPage() {
   const { openWithPrompt } = usePelicanPanelContext()
   const { closeTrade, refetch: refetchTrades, logTrade } = useTrades()
   const { survey } = useTraderProfile()
+  const { items: watchlistItems } = useWatchlist()
+  const watchlistTickers = useMemo(
+    () => new Set(watchlistItems.map(w => w.ticker.toUpperCase())),
+    [watchlistItems]
+  )
   const marketsTraded = survey?.markets_traded || ['stocks']
   const primaryMarket = marketsTraded[0] || 'stocks'
 
@@ -124,9 +130,14 @@ export default function PositionsPage() {
     setClosingTrade(position)
   }, [])
 
-  const handleCloseTradeSubmit = useCallback(async (data: { exit_price: number; exit_date: string; notes?: string | null }) => {
+  const handleCloseTradeSubmit = useCallback(async (data: { exit_price: number; exit_date: string; notes?: string | null; mistakes?: string | null }) => {
     if (!closingTrade) return
-    await closeTrade(closingTrade.id, data)
+    const result = await closeTrade(closingTrade.id, data)
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to close trade')
+    }
+
     refetchTrades()
     refreshPortfolio()
     // Show post-close review prompt
@@ -305,6 +316,7 @@ export default function PositionsPage() {
         portfolioStats={portfolio.portfolio}
         insights={insights}
         tickerHistory={tickerHistory}
+        watchlistTickers={watchlistTickers}
         activeFilter={activeFilter}
         sortBy={sortBy}
         searchQuery={searchQuery}

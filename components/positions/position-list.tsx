@@ -14,6 +14,7 @@ interface PositionListProps {
   portfolioStats: PortfolioStats
   insights: BehavioralInsights | null
   tickerHistory: Record<string, TickerHistory>
+  watchlistTickers?: Set<string>
   activeFilter: string
   sortBy: string
   searchQuery: string
@@ -34,6 +35,7 @@ export function PositionList({
   portfolioStats,
   insights,
   tickerHistory,
+  watchlistTickers,
   activeFilter,
   sortBy,
   searchQuery,
@@ -143,6 +145,7 @@ export function PositionList({
           healthScore={data.health}
           smartAlerts={data.alerts}
           tickerHistory={tickerHistory[data.position.ticker] ?? null}
+          isWatching={watchlistTickers?.has(data.position.ticker.toUpperCase()) ?? false}
           isExpanded={expandedId === data.position.id}
           onToggleExpand={() => handleToggle(data.position.id)}
           onScanWithPelican={() => onScanWithPelican(data.position)}

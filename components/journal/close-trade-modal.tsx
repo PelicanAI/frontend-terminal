@@ -18,6 +18,7 @@ export function CloseTradeModal({ open, onOpenChange, trade, onSubmit }: CloseTr
   const [exitPrice, setExitPrice] = useState("")
   const [exitDate, setExitDate] = useState(new Date().toISOString().split('T')[0])
   const [notes, setNotes] = useState("")
+  const [mistakes, setMistakes] = useState("")
 
   if (!trade) return null
 
@@ -61,12 +62,14 @@ export function CloseTradeModal({ open, onOpenChange, trade, onSubmit }: CloseTr
         exit_price: parseFloat(exitPrice),
         exit_date: exitDate,
         notes: notes || null,
+        mistakes: mistakes || null,
       })
 
       // Reset form
       setExitPrice("")
       setExitDate(new Date().toISOString().split('T')[0])
       setNotes("")
+      setMistakes("")
 
       onOpenChange(false)
     } catch (error) {
@@ -189,6 +192,20 @@ export function CloseTradeModal({ open, onOpenChange, trade, onSubmit }: CloseTr
               rows={3}
               className="w-full px-4 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/40 focus:border-[var(--accent-primary)] transition-colors resize-none"
               placeholder="Why did you exit? What did you learn?"
+            />
+          </div>
+
+          {/* Mistakes / Lessons */}
+          <div>
+            <label className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)] mb-1.5 block">
+              Mistakes / Lessons
+            </label>
+            <textarea
+              value={mistakes}
+              onChange={(e) => setMistakes(e.target.value)}
+              rows={2}
+              className="w-full px-4 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/40 focus:border-[var(--accent-primary)] transition-colors resize-none"
+              placeholder="What would you do differently?"
             />
           </div>
 

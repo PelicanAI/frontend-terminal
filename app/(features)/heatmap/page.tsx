@@ -16,7 +16,7 @@ import { SectorLegend } from "@/components/heatmap/sector-legend"
 import { getSectors, type SP500Sector } from "@/lib/data/sp500-constituents"
 import { getForexCategories } from "@/lib/data/forex-pairs"
 import { getCryptoCategories } from "@/lib/data/crypto-tokens"
-import { ArrowsClockwise, GridFour, SquaresFour, Lightning, Crosshair } from "@phosphor-icons/react"
+import { ArrowsClockwise, GridFour, SquaresFour, Lightning, Crosshair, BookmarkSimple } from "@phosphor-icons/react"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { getMarketStatus } from "@/hooks/use-market-data"
@@ -70,6 +70,27 @@ function getSectorLabel(market: HeatmapMarket): string {
     case 'crypto': return 'Categories'
     default: return 'Sectors'
   }
+}
+
+// ── Market-hours-aware refresh interval ──────────────────────────────────────
+
+function getRefreshInterval(): number {
+  const now = new Date()
+  const et = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }))
+  const hour = et.getHours()
+  const minute = et.getMinutes()
+  const day = et.getDay()
+
+  // Weekend
+  if (day === 0 || day === 6) return 5 * 60 * 1000
+  // Pre-market (4am-9:30am ET)
+  if (hour >= 4 && (hour < 9 || (hour === 9 && minute < 30))) return 2 * 60 * 1000
+  // Market hours (9:30am-4pm ET)
+  if ((hour === 9 && minute >= 30) || (hour >= 10 && hour < 16)) return 30 * 1000
+  // After hours (4pm-8pm ET)
+  if (hour >= 16 && hour < 20) return 2 * 60 * 1000
+  // Overnight
+  return 5 * 60 * 1000
 }
 
 // ── Context-rich prompt builder ──────────────────────────────────────────────
@@ -286,13 +307,13 @@ function HeatmapPageInner() {
   // Data hooks
   const { stocks, isLoading, error, lastUpdated, refetch } = useHeatmap({
     autoRefresh,
-    refreshInterval: 60000,
+    refreshInterval: getRefreshInterval(),
     timeframe,
     market: activeMarket,
   })
   const { openWithPrompt } = usePelicanPanelContext()
   const { openTrades } = useTrades({ status: 'open' })
-  const { items: watchlistItems } = useWatchlist()
+  const { items: watchlistItems, addToWatchlist, removeFromWatchlist } = useWatchlist()
   const { data: marketPulse } = useMarketPulse()
   const { data: behavioralInsights } = useBehavioralInsights()
 
@@ -365,6 +386,22 @@ function HeatmapPageInner() {
     window.addEventListener('resize', updateDimensions)
     return () => window.removeEventListener('resize', updateDimensions)
   }, [viewMode])
+
+  // Dynamic auto-refresh with market-hours-aware intervals
+  useEffect(() => {
+    if (!autoRefresh) return
+    let timeoutId: NodeJS.Timeout
+
+    const scheduleNext = () => {
+      timeoutId = setTimeout(() => {
+        refetch()
+        scheduleNext()
+      }, getRefreshInterval())
+    }
+
+    scheduleNext()
+    return () => clearTimeout(timeoutId)
+  }, [autoRefresh, refetch])
 
   const handleStockClick = useCallback((ticker: string, name: string) => {
     const stock = stocks.find(s => s.ticker === ticker)
@@ -669,7 +706,14 @@ function HeatmapPageInner() {
 
               {viewMode === 'grid' && (
                 <div className="hidden sm:block">
-                  <HeatmapGrid stocks={filteredStocks} onStockClick={handleStockClick} market={activeMarket} />
+                  <HeatmapGrid
+                    stocks={filteredStocks}
+                    onStockClick={handleStockClick}
+                    market={activeMarket}
+                    watchlistTickers={watchlistTickers}
+                    addToWatchlist={addToWatchlist}
+                    removeFromWatchlist={removeFromWatchlist}
+                  />
                 </div>
               )}
 
@@ -714,6 +758,27 @@ function HeatmapPageInner() {
                           size="sm"
                           className="w-16 text-right font-semibold"
                         />
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const isWatched = watchlistTickers.has(stock.ticker.toUpperCase())
+                            if (isWatched) {
+                              removeFromWatchlist(stock.ticker)
+                            } else {
+                              addToWatchlist(stock.ticker, { added_from: 'manual' })
+                            }
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          className="p-1 rounded hover:bg-white/10 transition-colors"
+                          title={watchlistTickers.has(stock.ticker.toUpperCase()) ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                        >
+                          <BookmarkSimple
+                            size={14}
+                            weight={watchlistTickers.has(stock.ticker.toUpperCase()) ? 'fill' : 'regular'}
+                            className={watchlistTickers.has(stock.ticker.toUpperCase()) ? 'text-[var(--accent-primary)]' : 'text-white/40 hover:text-white/60'}
+                          />
+                        </div>
                       </div>
                     </button>
                   ))

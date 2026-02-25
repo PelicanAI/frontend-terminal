@@ -16,6 +16,8 @@ interface EarningsSectionProps {
   onClick: (e: EnrichedEarningsEvent) => void
   searchTerm?: string
   autoExpand?: boolean
+  watchlistTickers?: Set<string>
+  onToggleWatchlist?: (ticker: string, isWatched: boolean) => void
 }
 
 export function EarningsSection({
@@ -24,6 +26,8 @@ export function EarningsSection({
   onClick,
   searchTerm,
   autoExpand,
+  watchlistTickers,
+  onToggleWatchlist,
 }: EarningsSectionProps) {
   const [expanded, setExpanded] = useState(false)
   const shouldExpand = autoExpand || expanded
@@ -64,6 +68,8 @@ export function EarningsSection({
             event={event}
             onClick={onClick}
             highlighted={searchMatch(event)}
+            isWatched={watchlistTickers?.has(event.symbol.toUpperCase())}
+            onToggleWatchlist={onToggleWatchlist}
           />
         ))}
       </motion.div>

@@ -40,7 +40,7 @@ interface ChatContainerProps {
   conversationId?: string
   allTrades?: ActionTrade[]
   watchlistItems?: ActionWatchlistItem[]
-  onAddToWatchlist?: (ticker: string, conversationId?: string) => Promise<boolean>
+  onAddToWatchlist?: (ticker: string, options?: { added_from?: 'manual' | 'chat' | 'trade' | 'onboarding'; conversationId?: string }) => Promise<boolean>
   onRemoveFromWatchlist?: (ticker: string) => Promise<boolean>
   onOpenLogTrade?: (ticker: string) => void
   onOpenCloseTrade?: (tradeId: string) => void

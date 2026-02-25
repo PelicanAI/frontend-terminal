@@ -13,12 +13,15 @@ import {
   Archive,
   Trash,
   X as XIcon,
+  PencilSimple,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { PelicanButton, pageEnter, tabContent } from "@/components/ui/pelican"
-import { usePlaybookStats } from "@/hooks/use-playbooks"
+import { usePlaybooks, usePlaybookStats } from "@/hooks/use-playbooks"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { PublishModal } from "@/components/strategies/publish-modal"
+import { CreatePlaybookModal } from "@/components/playbooks/create-playbook-modal"
+import type { PlaybookFormData } from "@/components/playbooks/create-playbook-modal"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -52,10 +55,13 @@ const tabs: { key: TabKey; label: string; icon: typeof Eye }[] = [
 export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadopt }: PlaybookDetailProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("overview")
   const [showPublishModal, setShowPublishModal] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
   const { stats, isLoading: statsLoading } = usePlaybookStats(playbook.id)
+  const { updatePlaybook } = usePlaybooks()
   const { openWithPrompt } = usePelicanPanelContext()
 
   const canPublish = !playbook.is_published && !playbook.is_curated && playbook.entry_rules && playbook.exit_rules && playbook.risk_rules
+  const canEdit = !playbook.is_curated
   const isAdopted = !!playbook.forked_from
   const hasMenu = onArchive || onDelete || onUnadopt
 
@@ -90,6 +96,15 @@ export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadop
           )}
         </div>
         <div className="flex items-center gap-2">
+          {canEdit && (
+            <button
+              onClick={() => setIsEditOpen(true)}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              title="Edit playbook"
+            >
+              <PencilSimple size={18} weight="regular" className="text-[var(--text-secondary)]" />
+            </button>
+          )}
           {canPublish && (
             <PelicanButton variant="secondary" size="sm" onClick={() => setShowPublishModal(true)}>
               <Globe size={14} weight="regular" />
@@ -144,6 +159,15 @@ export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadop
         playbook={playbook}
         open={showPublishModal}
         onOpenChange={setShowPublishModal}
+      />
+
+      <CreatePlaybookModal
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        onSubmit={async (data: PlaybookFormData) => {
+          await updatePlaybook(playbook.id, data as Partial<Playbook>)
+        }}
+        editPlaybook={playbook}
       />
 
       {/* Tabs */}

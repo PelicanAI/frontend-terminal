@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { TickerSearch } from '@/components/command-k/ticker-search'
 import { useCommandK } from '@/hooks/use-command-k'
 import { PelicanContainer } from '@/components/ui/pelican-container'
+import { usePageTracking } from '@/hooks/use-page-tracking'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { ChatCircle } from '@phosphor-icons/react'
@@ -50,6 +51,7 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
   const panel = usePelicanPanelContext()
   const commandK = useCommandK()
   const isMobile = useIsMobile()
+  usePageTracking()
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false)
 
   // Clear panel messages when navigating between pages

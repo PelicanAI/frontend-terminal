@@ -1,6 +1,6 @@
 "use client"
 
-import useSWR from "swr"
+import useSWR, { mutate as globalMutate } from "swr"
 import { createClient } from "@/lib/supabase/client"
 import { useMemo } from "react"
 
@@ -59,6 +59,15 @@ export interface CloseTradeData {
   exit_price: number
   exit_date: string
   notes?: string | null
+  mistakes?: string | null
+}
+
+export interface CloseTradeResult {
+  success: boolean
+  pnl_amount?: number
+  pnl_percent?: number
+  r_multiple?: number
+  error?: string
 }
 
 export interface UseTradesReturn {
@@ -69,7 +78,7 @@ export interface UseTradesReturn {
   error: Error | null
   refetch: () => void
   logTrade: (data: TradeFormData) => Promise<Trade>
-  closeTrade: (tradeId: string, data: CloseTradeData) => Promise<void>
+  closeTrade: (tradeId: string, data: CloseTradeData) => Promise<CloseTradeResult>
   updateTrade: (tradeId: string, updates: Partial<Trade>) => Promise<void>
   deleteTrade: (tradeId: string) => Promise<void>
 }
@@ -163,21 +172,39 @@ export function useTrades({
     return data as Trade
   }
 
-  const closeTrade = async (tradeId: string, closeData: CloseTradeData): Promise<void> => {
+  const closeTrade = async (tradeId: string, closeData: CloseTradeData): Promise<CloseTradeResult> => {
     // Call the close_trade RPC function
-    const { error } = await supabase.rpc('close_trade', {
+    const { data, error } = await supabase.rpc('close_trade', {
       p_trade_id: tradeId,
       p_exit_price: closeData.exit_price,
       p_exit_date: closeData.exit_date,
       p_notes: closeData.notes || null,
+      p_mistakes: closeData.mistakes || null,
     })
 
     if (error) {
-      throw new Error(error.message || 'Failed to close trade')
+      return { success: false, error: error.message || 'Failed to close trade' }
     }
 
     // Revalidate trades
     mutate()
+
+    // Revalidate all stats-related SWR keys (trade stats, equity curve, P&L by day, etc.)
+    globalMutate(
+      (key: unknown) => {
+        if (typeof key === 'string') {
+          return key.includes('stats') || key.includes('equity') || key.includes('pnl')
+        }
+        if (Array.isArray(key)) {
+          return key.some(
+            (k) => typeof k === 'string' && (k.includes('stats') || k.includes('equity') || k.includes('pnl'))
+          )
+        }
+        return false
+      },
+      undefined,
+      { revalidate: true }
+    )
 
     // Fire and forget — auto-grade the closed trade
     fetch('/api/grade-trade', {
@@ -192,12 +219,23 @@ export function useTrades({
       .catch(() => {
         // Grading is non-blocking
       })
+
+    return {
+      success: true,
+      pnl_amount: data?.pnl_amount,
+      pnl_percent: data?.pnl_percent,
+      r_multiple: data?.r_multiple,
+    }
   }
 
   const updateTrade = async (tradeId: string, updates: Partial<Trade>): Promise<void> => {
+    // Strip protected fields that should never be client-updated
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { user_id, status, pnl_amount, pnl_percent, r_multiple, created_at, id, ...safeUpdates } = updates
+
     const { error } = await supabase
       .from('trades')
-      .update(updates)
+      .update(safeUpdates)
       .eq('id', tradeId)
 
     if (error) {

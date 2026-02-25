@@ -3,11 +3,15 @@
 import { HeatmapStock } from "@/app/api/heatmap/route"
 import { getStockColor, formatChangePercent } from "@/hooks/use-heatmap"
 import { ArrowUp, ArrowDown, Minus } from "lucide-react"
+import { BookmarkSimple } from "@phosphor-icons/react"
 
 interface HeatmapGridProps {
   stocks: HeatmapStock[]
   onStockClick?: (ticker: string, name: string) => void
   market?: string
+  watchlistTickers?: Set<string>
+  addToWatchlist?: (ticker: string, options?: { added_from?: 'manual' | 'chat' | 'trade' | 'onboarding'; conversationId?: string }) => Promise<boolean>
+  removeFromWatchlist?: (ticker: string) => void
 }
 
 function formatGridPrice(price: number, market?: string): string {
@@ -15,7 +19,7 @@ function formatGridPrice(price: number, market?: string): string {
   return `$${price.toFixed(2)}`
 }
 
-export function HeatmapGrid({ stocks, onStockClick, market }: HeatmapGridProps) {
+export function HeatmapGrid({ stocks, onStockClick, market, watchlistTickers, addToWatchlist, removeFromWatchlist }: HeatmapGridProps) {
   if (stocks.length === 0) {
     return (
       <div className="flex items-center justify-center border border-[var(--border-subtle)] rounded-lg bg-surface-1 p-12">
@@ -37,6 +41,7 @@ export function HeatmapGrid({ stocks, onStockClick, market }: HeatmapGridProps) 
         const colors = getStockColor(stock.changePercent)
         const isPositive = (stock.changePercent ?? 0) > 0
         const isNegative = (stock.changePercent ?? 0) < 0
+        const isWatched = watchlistTickers?.has(stock.ticker.toUpperCase()) ?? false
 
         return (
           <button
@@ -71,10 +76,38 @@ export function HeatmapGrid({ stocks, onStockClick, market }: HeatmapGridProps) 
               </div>
             )}
 
-            {/* Sector indicator (subtle) */}
-            <div className="absolute top-1 right-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-            </div>
+            {/* Watchlist bookmark */}
+            {addToWatchlist && removeFromWatchlist && (
+              <div
+                className="absolute top-1 right-1"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (isWatched) {
+                    removeFromWatchlist(stock.ticker)
+                  } else {
+                    addToWatchlist(stock.ticker, { added_from: 'manual' })
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                title={isWatched ? 'Remove from Watchlist' : 'Add to Watchlist'}
+              >
+                <div className="p-1 rounded hover:bg-white/10 transition-colors">
+                  <BookmarkSimple
+                    size={14}
+                    weight={isWatched ? 'fill' : 'regular'}
+                    className={isWatched ? 'text-[var(--accent-primary)]' : 'text-white/40 hover:text-white/60'}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Sector indicator (subtle) — only show when no watchlist buttons */}
+            {(!addToWatchlist || !removeFromWatchlist) && (
+              <div className="absolute top-1 right-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+              </div>
+            )}
           </button>
         )
       })}

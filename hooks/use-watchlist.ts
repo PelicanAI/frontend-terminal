@@ -1,7 +1,7 @@
 "use client"
 
 import useSWR from "swr"
-import { useMemo, useCallback, useRef } from "react"
+import { useMemo, useCallback, useRef, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeTicker } from "@/lib/utils"
 import { toast } from "@/hooks/use-toast"
@@ -30,24 +30,7 @@ export function useWatchlist() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      const rows = data as WatchlistItem[]
-
-      // One-time dedup: remove rows that are duplicates after normalization
-      const seen = new Set<string>()
-      const dupeIds: string[] = []
-      for (const row of rows) {
-        const norm = normalizeTicker(row.ticker)
-        if (seen.has(norm)) {
-          dupeIds.push(row.id)
-        }
-        seen.add(norm)
-      }
-      if (dupeIds.length > 0) {
-        await supabase.from('watchlist').delete().in('id', dupeIds)
-        return rows.filter(r => !dupeIds.includes(r.id))
-      }
-
-      return rows
+      return data as WatchlistItem[]
     },
     {
       revalidateOnFocus: true,
@@ -57,9 +40,32 @@ export function useWatchlist() {
 
   const items = data || []
 
+  // One-time dedup: clean up duplicate rows after first data load
+  const hasDeduped = useRef(false)
+
+  useEffect(() => {
+    if (hasDeduped.current || !data || data.length === 0) return
+    hasDeduped.current = true
+
+    const seen = new Set<string>()
+    const dupeIds: string[] = []
+    for (const row of data) {
+      const norm = normalizeTicker(row.ticker)
+      if (seen.has(norm)) dupeIds.push(row.id)
+      seen.add(norm)
+    }
+
+    if (dupeIds.length > 0) {
+      supabase.from('watchlist').delete().in('id', dupeIds).then(() => mutate())
+    }
+  }, [data, supabase, mutate])
+
   const addToWatchlist = useCallback(async (
     rawTicker: string,
-    conversationId?: string
+    options?: {
+      added_from?: 'manual' | 'chat' | 'trade' | 'onboarding'
+      conversationId?: string
+    }
   ): Promise<boolean> => {
     const ticker = normalizeTicker(rawTicker)
 
@@ -93,9 +99,10 @@ export function useWatchlist() {
       const insertData: Record<string, string | null> = {
         ticker,
         user_id: user.id,
+        added_from: options?.added_from || 'manual',
       }
-      if (conversationId) {
-        insertData.conversation_id = conversationId
+      if (options?.conversationId) {
+        insertData.conversation_id = options.conversationId
       }
 
       const { error } = await supabase
@@ -188,6 +195,37 @@ export function useWatchlist() {
     }
   }, [items, mutate, supabase])
 
+  const updateWatchlistItem = useCallback(async (
+    id: string,
+    updates: {
+      alert_price_above?: number | null
+      alert_price_below?: number | null
+      notes?: string | null
+      custom_prompt?: string | null
+    }
+  ): Promise<boolean> => {
+    // Optimistic update
+    const updatedItems = items.map(item =>
+      item.id === id ? { ...item, ...updates } : item
+    )
+    mutate(updatedItems, false)
+
+    try {
+      const { error } = await supabase
+        .from('watchlist')
+        .update(updates)
+        .eq('id', id)
+
+      if (error) throw error
+      mutate()
+      return true
+    } catch {
+      mutate(items, false)
+      toast({ title: "Failed to update watchlist item", variant: "destructive" })
+      return false
+    }
+  }, [items, mutate, supabase])
+
   const isOnWatchlist = useCallback((rawTicker: string): boolean => {
     const ticker = normalizeTicker(rawTicker)
     return items.some(i => normalizeTicker(i.ticker) === ticker)
@@ -206,6 +244,7 @@ export function useWatchlist() {
     addToWatchlist,
     removeFromWatchlist,
     updateCustomPrompt,
+    updateWatchlistItem,
     isOnWatchlist,
     refetch: mutate,
   }

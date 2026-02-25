@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Briefcase } from "@phosphor-icons/react"
+import { Briefcase, BookmarkSimple } from "@phosphor-icons/react"
 import { LogoImg } from "@/components/ui/logo-img"
 import { staggerItem } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
@@ -21,9 +21,11 @@ interface EarningsCardProps {
   event: EnrichedEarningsEvent
   onClick: (e: EnrichedEarningsEvent) => void
   highlighted?: boolean
+  isWatched?: boolean
+  onToggleWatchlist?: (ticker: string, isWatched: boolean) => void
 }
 
-export function EarningsCard({ event, onClick, highlighted }: EarningsCardProps) {
+export function EarningsCard({ event, onClick, highlighted, isWatched, onToggleWatchlist }: EarningsCardProps) {
   const epsBeat =
     event.epsActual !== null && event.epsEstimate !== null
       ? event.epsActual > event.epsEstimate
@@ -127,6 +129,26 @@ export function EarningsCard({ event, onClick, highlighted }: EarningsCardProps)
                     : ""}
               </span>
             )}
+          </div>
+        )}
+
+        {/* Watchlist bookmark */}
+        {onToggleWatchlist && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleWatchlist(event.symbol, !!isWatched)
+            }}
+            role="button"
+            tabIndex={0}
+            className="p-1 rounded hover:bg-white/5 transition-colors flex-shrink-0"
+            title={isWatched ? 'Remove from Watchlist' : 'Add to Watchlist'}
+          >
+            <BookmarkSimple
+              size={16}
+              weight={isWatched ? 'fill' : 'regular'}
+              className={isWatched ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}
+            />
           </div>
         )}
       </div>

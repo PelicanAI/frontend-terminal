@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { useAdoptTemplate } from "@/hooks/use-strategies"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "@/hooks/use-toast"
+import { trackEvent } from "@/lib/tracking"
 import type { Playbook, TemplateAdoption } from "@/types/trading"
 
 interface AdoptButtonProps {
@@ -33,6 +34,7 @@ export function AdoptButton({ strategy, adoption }: AdoptButtonProps) {
     setResult(res)
 
     if (res.success) {
+      trackEvent({ eventType: 'playbook_adopted', feature: 'strategies' })
       toast({ title: "Strategy adopted", description: `"${strategy.name}" added to your playbooks.` })
     } else {
       toast({ title: "Failed to adopt strategy", description: res.error || "Please try again.", variant: "destructive" })

@@ -19,7 +19,7 @@ interface MessageActionBarProps {
   watchlistItems: ActionWatchlistItem[]
 
   // Mutation callbacks from parent
-  onAddToWatchlist: (ticker: string, conversationId?: string) => Promise<boolean>
+  onAddToWatchlist: (ticker: string, options?: { added_from?: 'manual' | 'chat' | 'trade' | 'onboarding'; conversationId?: string }) => Promise<boolean>
   onRemoveFromWatchlist: (ticker: string) => Promise<boolean>
 
   // Modal openers
@@ -117,7 +117,7 @@ export function MessageActionBar({
 
         case 'add_watchlist': {
           if (action.ticker) {
-            const success = await onAddToWatchlist(action.ticker, conversationId)
+            const success = await onAddToWatchlist(action.ticker, { added_from: 'chat', conversationId })
             toast({
               title: success ? `${action.ticker} added to watchlist` : `Failed to add ${action.ticker}`,
               duration: 2000,

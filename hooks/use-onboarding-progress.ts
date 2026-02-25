@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { MILESTONES, TOTAL_MILESTONES } from "@/lib/onboarding-milestones"
 import { toast } from "@/hooks/use-toast"
+import { trackEvent } from "@/lib/tracking"
 
 const MILESTONE_CELEBRATIONS: Record<string, { title: string; description: string }> = {
   first_message: { title: "First chat with Pelican!", description: "Ask anything about trading" },
@@ -152,6 +153,8 @@ export function useOnboardingProgress() {
       if (celebration) {
         toast({ title: celebration.title, description: celebration.description })
       }
+
+      trackEvent({ eventType: 'feature_first_use', feature: key })
 
       // Optimistic update
       mutate(

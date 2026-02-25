@@ -20,12 +20,6 @@ const MILESTONES: MilestoneDefinition[] = [
   { id: 'plan_followed_10', name: 'Plan Follower', description: 'Follow your trading plan 10 times', icon: 'ClipboardText', category: 'discipline', threshold: 10, unit: 'trades' },
   { id: 'thesis_logged_10', name: 'Thoughtful Trader', description: 'Log thesis on 10 trades', icon: 'Notebook', category: 'discipline', threshold: 10, unit: 'trades with thesis' },
 
-  // Streak milestones
-  { id: 'win_streak_3', name: 'Hot Streak', description: '3 consecutive winning trades', icon: 'Fire', category: 'streak', threshold: 3, unit: 'consecutive wins' },
-  { id: 'win_streak_5', name: 'On Fire', description: '5 consecutive winning trades', icon: 'Fire', category: 'streak', threshold: 5, unit: 'consecutive wins' },
-  { id: 'journal_streak_7', name: 'Consistent', description: 'Trade for 7 consecutive days', icon: 'CalendarCheck', category: 'streak', threshold: 7, unit: 'days' },
-  { id: 'journal_streak_30', name: 'Dedicated', description: 'Trade for 30 consecutive days', icon: 'CalendarCheck', category: 'streak', threshold: 30, unit: 'days' },
-
   // Learning milestones
   { id: 'scans_5', name: 'AI Student', description: 'Run 5 Pelican scans', icon: 'MagnifyingGlass', category: 'learning', threshold: 5, unit: 'scans' },
   { id: 'scans_25', name: 'AI Analyst', description: 'Run 25 Pelican scans', icon: 'Brain', category: 'learning', threshold: 25, unit: 'scans' },
@@ -52,16 +46,6 @@ export function calculateMilestones(
     else break
   }
 
-  // Count consecutive wins from most recent
-  let winStreak = 0
-  const closedSorted = [...closed].sort((a, b) =>
-    new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime()
-  )
-  for (const trade of closedSorted) {
-    if ((trade.pnl_amount ?? 0) > 0) winStreak++
-    else break
-  }
-
   // Count trades with thesis
   const tradesWithThesis = trades.filter(t => t.thesis && t.thesis.trim().length > 0).length
 
@@ -70,10 +54,6 @@ export function calculateMilestones(
     const grade = t.ai_grade as { pelican_scan_count?: number } | null
     return sum + (grade?.pelican_scan_count ?? 0)
   }, 0)
-
-  // Count consecutive trading days
-  const tradeDays = new Set(trades.map(t => t.entry_date.split('T')[0] as string))
-  const journalStreak = calculateJournalStreak(tradeDays)
 
   return MILESTONES.map(milestone => {
     let current = 0
@@ -103,14 +83,6 @@ export function calculateMilestones(
       case 'thesis_logged_10':
         current = tradesWithThesis
         break
-      case 'win_streak_3':
-      case 'win_streak_5':
-        current = winStreak
-        break
-      case 'journal_streak_7':
-      case 'journal_streak_30':
-        current = journalStreak
-        break
       case 'scans_5':
       case 'scans_25':
         current = scanCount
@@ -127,38 +99,6 @@ export function calculateMilestones(
       progress_percent: Math.min(100, (current / milestone.threshold) * 100),
     }
   })
-}
-
-function calculateJournalStreak(tradeDays: Set<string>): number {
-  if (tradeDays.size === 0) return 0
-
-  const sorted = [...tradeDays].sort().reverse()
-  let streak = 1
-  const today = new Date().toISOString().split('T')[0]
-
-  // Start from most recent trade day
-  if (sorted[0] !== today) {
-    // Check if yesterday
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
-    if (sorted[0] !== yesterday.toISOString().split('T')[0]) {
-      return 0 // Streak broken
-    }
-  }
-
-  for (let i = 1; i < sorted.length; i++) {
-    const prev = new Date(sorted[i - 1]!)
-    const curr = new Date(sorted[i]!)
-    const diffDays = (prev.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24)
-
-    if (diffDays <= 1.5) {
-      streak++
-    } else {
-      break
-    }
-  }
-
-  return streak
 }
 
 export { MILESTONES }

@@ -29,6 +29,7 @@ interface PositionCardProps {
   healthScore: PositionHealth
   smartAlerts: PositionAlert[]
   tickerHistory: TickerHistory | null
+  isWatching?: boolean
   onScanWithPelican: (position: PortfolioPosition) => void
   onEdit: (position: PortfolioPosition) => void
   onClose: (position: PortfolioPosition) => void
@@ -133,6 +134,7 @@ export function PositionCard({
   healthScore,
   smartAlerts,
   tickerHistory,
+  isWatching,
   onScanWithPelican,
   onEdit,
   onClose,
@@ -161,6 +163,11 @@ export function PositionCard({
       >
         <div className={`w-2 h-2 rounded-full shrink-0 ${healthDotColor[healthScore.color]}`} title={healthScore.tooltip} />
         <span className="text-base font-semibold text-[var(--text-primary)]">{position.ticker}</span>
+        {isWatching && (
+          <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-[var(--accent-muted)] text-[var(--accent-primary)] rounded-full">
+            Watching
+          </span>
+        )}
         <span className={`text-[10px] font-medium uppercase px-1.5 py-0.5 rounded-full ${
           position.direction === 'long'
             ? 'bg-emerald-500/15 text-emerald-400'

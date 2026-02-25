@@ -4,6 +4,7 @@ import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
 import { useMemo, useCallback } from "react"
 import type { Playbook } from "@/types/trading"
+import { trackEvent } from "@/lib/tracking"
 
 // ── Types ──
 
@@ -20,6 +21,8 @@ export interface PlaybookFormData {
   market_type?: string
   instruments?: string[] | null
   notes?: string | null
+  category?: string | null
+  difficulty?: string | null
 }
 
 export interface PlaybookStats {
@@ -132,6 +135,8 @@ export function usePlaybooks(
         market_type: formData.market_type || 'all',
         instruments: formData.instruments || null,
         notes: formData.notes || null,
+        category: formData.category || null,
+        difficulty: formData.difficulty || null,
         display_order: maxOrder + 1,
         is_active: true,
       })
@@ -140,6 +145,7 @@ export function usePlaybooks(
 
     if (error) throw new Error(error.message || 'Failed to create playbook')
     mutate()
+    trackEvent({ eventType: 'playbook_created', feature: 'playbooks' })
     return data as Playbook
   }, [supabase, mutate, playbooks])
 
