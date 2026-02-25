@@ -253,14 +253,28 @@ export default function ChatPage() {
   const prefillFromUrl = searchParams.get("prefill")
 
   // Prefill chat input from URL param (e.g. from strategy "Ask Pelican" button)
+  // ChatInput mounts later in the tree, so retry until the ref is available
   useEffect(() => {
-    if (prefillFromUrl && chatInputRef.current) {
-      chatInputRef.current.setMessage(prefillFromUrl)
-      // Clean up URL to avoid re-prefilling on re-render
-      const url = new URL(window.location.href)
-      url.searchParams.delete("prefill")
-      window.history.replaceState({}, "", url.toString())
+    if (!prefillFromUrl) return
+
+    const applyPrefill = () => {
+      if (chatInputRef.current) {
+        chatInputRef.current.setMessage(prefillFromUrl)
+        const url = new URL(window.location.href)
+        url.searchParams.delete("prefill")
+        window.history.replaceState({}, "", url.toString())
+        return true
+      }
+      return false
     }
+
+    if (applyPrefill()) return
+
+    // Retry — ref may not be assigned yet on first render
+    const timer = setInterval(() => {
+      if (applyPrefill()) clearInterval(timer)
+    }, 100)
+    return () => clearInterval(timer)
   }, [prefillFromUrl])
 
   const handleSaveInsight = useCallback(async (content: string, tickers: string[]) => {
