@@ -23,7 +23,9 @@ export function PlaybookTradesTab({ stats, isLoading }: PlaybookTradesTabProps) 
     )
   }
 
-  if (!stats || stats.recentTrades.length === 0) {
+  const trades = stats?.allTrades ?? stats?.recentTrades ?? []
+
+  if (!stats || trades.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <List
@@ -59,7 +61,7 @@ export function PlaybookTradesTab({ stats, isLoading }: PlaybookTradesTabProps) 
 
       {/* Rows */}
       <div className="divide-y divide-[var(--border-subtle)]">
-        {stats.recentTrades.map((trade) => {
+        {trades.map((trade) => {
           const pnl = trade.pnl_amount ?? 0
           const isPositive = pnl >= 0
           const dateStr = trade.exit_date

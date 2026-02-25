@@ -43,6 +43,16 @@ export interface PlaybookStats {
     entry_date: string
     exit_date: string | null
   }>
+  allTrades: Array<{
+    id: string
+    ticker: string
+    direction: string
+    pnl_amount: number | null
+    pnl_percent: number | null
+    r_multiple: number | null
+    entry_date: string
+    exit_date: string | null
+  }>
   equityCurve: Array<{ date: string; cumPnl: number }>
   rDistribution: Array<{ range: string; count: number }>
 }
@@ -286,6 +296,7 @@ export function usePlaybookStats(playbookId: string | null) {
           bestTrade: null,
           worstTrade: null,
           recentTrades: [],
+          allTrades: [],
           equityCurve: [],
           rDistribution: [],
         }
@@ -325,10 +336,9 @@ export function usePlaybookStats(playbookId: string | null) {
         ? { id: best.id, ticker: best.ticker, pnl: best.pnl_amount ?? 0 }
         : null
 
-      // Recent trades (last 10)
-      const recentTrades = [...closedTrades]
+      // All trades sorted by exit date descending
+      const allTradesSorted = [...closedTrades]
         .sort((a, b) => new Date(b.exit_date || b.entry_date).getTime() - new Date(a.exit_date || a.entry_date).getTime())
-        .slice(0, 10)
         .map(t => ({
           id: t.id,
           ticker: t.ticker,
@@ -339,6 +349,9 @@ export function usePlaybookStats(playbookId: string | null) {
           entry_date: t.entry_date,
           exit_date: t.exit_date,
         }))
+
+      // Recent trades (last 10) for stats summary strip
+      const recentTrades = allTradesSorted.slice(0, 10)
 
       // Equity curve
       let cumPnl = 0
@@ -377,6 +390,7 @@ export function usePlaybookStats(playbookId: string | null) {
         bestTrade,
         worstTrade,
         recentTrades,
+        allTrades: allTradesSorted,
         equityCurve,
         rDistribution,
       }
