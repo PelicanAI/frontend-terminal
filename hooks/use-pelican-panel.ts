@@ -276,10 +276,17 @@ export function usePelicanPanel(options: UsePelicanPanelOptions = {}): UsePelica
     const assistantMessage = createAssistantMessage('')
     const assistantMessageId = assistantMessage.id
 
+    // Capture history BEFORE updating state, then include the new user message.
+    // updateMessagesWithSync is batched by React, so messagesRef may not update
+    // before captureConversationHistory reads it — causing empty history warnings.
+    const existingHistory = captureConversationHistory()
+    const conversationHistory = [
+      ...existingHistory,
+      { role: 'user' as const, content: fullPrompt },
+    ]
+
     updateMessagesWithSync(prev => [...prev, userMessage, assistantMessage])
     lastUserMessageRef.current = fullPrompt
-
-    const conversationHistory = captureConversationHistory()
 
     try {
       await sendStreamingMessage(
@@ -361,10 +368,15 @@ export function usePelicanPanel(options: UsePelicanPanelOptions = {}): UsePelica
     const assistantMessage = createAssistantMessage('')
     const assistantMessageId = assistantMessage.id
 
+    // Capture history before state update to avoid batching race condition
+    const existingHistory = captureConversationHistory()
+    const conversationHistory = [
+      ...existingHistory,
+      { role: 'user' as const, content },
+    ]
+
     updateMessagesWithSync(prev => [...prev, userMessage, assistantMessage])
     lastUserMessageRef.current = content
-
-    const conversationHistory = captureConversationHistory()
 
     try {
       await sendStreamingMessage(
