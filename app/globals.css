@@ -532,11 +532,22 @@
 
   /* Text overflow and word-breaking utilities */
   .message-content {
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    hyphens: auto;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
+    -webkit-hyphens: none;
     max-width: 100%;
     overflow-x: hidden;
+  }
+
+  /* Prevent aggressive word hyphenation in AI content panels */
+  .prose,
+  .prose-sm,
+  .prose-invert,
+  .message-content *,
+  [class*="hyphens-auto"] {
+    hyphens: none !important;
+    -webkit-hyphens: none !important;
   }
 
   .code-block {
