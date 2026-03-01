@@ -126,7 +126,7 @@ export function formatLine(line: string): string {
     const tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
     const sizeClass = level <= 2 ? 'text-lg font-semibold' : level === 3 ? 'text-base font-semibold' : 'text-sm font-semibold'
     return DOMPurify.sanitize(
-      `<${tag} class="${sizeClass} mt-3 mb-1">${formatted}</${tag}>`,
+      `<${tag} class="${sizeClass} mt-2 mb-0.5">${formatted}</${tag}>`,
       {
         ALLOWED_TAGS: ["h1", "h2", "h3", "h4", "h5", "h6", "strong", "em", "span"],
         ALLOWED_ATTR: ["class"],
@@ -136,7 +136,7 @@ export function formatLine(line: string): string {
 
   // Step 2: Horizontal rules (---, ***, ___)
   if (/^(\s*[-*_]\s*){3,}$/.test(line)) {
-    return '<hr class="my-3 border-[var(--border-subtle)]" />'
+    return '<hr class="my-2 border-[var(--border-subtle)]" />'
   }
 
   // Step 3: Unordered list items (- item or * item, with optional indentation)
@@ -147,7 +147,7 @@ export function formatLine(line: string): string {
     const formatted = applyInlineFormatting(itemContent)
     const paddingClass = indent >= 4 ? 'pl-8' : indent >= 2 ? 'pl-4' : 'pl-4'
     return DOMPurify.sanitize(
-      `<div class="${paddingClass} relative before:content-['•'] before:absolute before:left-0 before:text-[var(--text-muted)]">${formatted}</div>`,
+      `<div class="my-0.5 ${paddingClass} relative before:content-['•'] before:absolute before:left-0 before:text-[var(--text-muted)]">${formatted}</div>`,
       LINE_SANITIZE_CONFIG,
     )
   }
@@ -161,7 +161,7 @@ export function formatLine(line: string): string {
     const formatted = applyInlineFormatting(itemContent)
     const paddingClass = indent >= 4 ? 'pl-8' : indent >= 2 ? 'pl-4' : 'pl-4'
     return DOMPurify.sanitize(
-      `<div class="${paddingClass} relative"><span class="absolute left-0 text-[var(--text-muted)] font-mono text-sm">${num}.</span>${formatted}</div>`,
+      `<div class="my-0.5 ${paddingClass} relative"><span class="absolute left-0 text-[var(--text-muted)] font-mono text-sm">${num}.</span>${formatted}</div>`,
       LINE_SANITIZE_CONFIG,
     )
   }

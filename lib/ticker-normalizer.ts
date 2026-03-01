@@ -162,6 +162,14 @@ export function extractTickers(content: string): NormalizedTicker[] {
     }
   }
 
+  // Post-processing: contextual false-positive removal
+  // Remove matches that appear adjacent to time patterns (e.g. "4:00 PM ET")
+  const timeAdjacentPattern = /\d{1,2}:\d{2}\s*(?:AM|PM)?\s*([A-Z]{2,3})\b/g
+  let timeMatch: RegExpExecArray | null
+  while ((timeMatch = timeAdjacentPattern.exec(content)) !== null) {
+    if (timeMatch[1]) seen.delete(timeMatch[1])
+  }
+
   const results = Array.from(seen.values())
   return results.slice(0, 5)
 }

@@ -42,6 +42,19 @@ export const TICKER_BLOCKLIST = new Set([
   // Crypto jargon
   'NFT', 'DAO', 'DEX', 'CEX', 'TVL',
   'DEFI', 'CEFI', 'MEV', 'GAS', 'WEI', 'GWEI',
+  // Timezone abbreviations
+  'EST', 'PST', 'CST', 'MST', 'EDT', 'PDT', 'CDT', 'MDT', 'UTC', 'GMT',
+  // Trading session terms
+  'RTH', 'ETH', 'AHT',
+  // Common trading nouns/verbs that collide with tickers
+  'MAX', 'MIN', 'AVG', 'QTY', 'VOL', 'BID', 'ASK', 'MID',
+  'HIGH', 'LOW', 'OPEN', 'LAST',
+  'STOP', 'TAKE', 'RISK', 'SIZE', 'FLAT',
+  'CALL', 'PUTS', 'LONG', 'SHORT',
+  'BULL', 'BEAR', 'HOLD', 'TRIM', 'EXIT', 'ENTRY',
+  'GAIN', 'LOSS', 'WINS', 'SELL',
+  'PLAN', 'RULE', 'NOTE', 'SAVE', 'EDIT', 'VIEW',
+  'SCAN', 'DEEP', 'DIVE',
   // Common English words that appear uppercase
   'I', 'A', 'THE', 'AND', 'OR', 'BUT', 'FOR', 'TO', 'IN', 'ON', 'AT', 'BY', 'UP',
   'IS', 'IT', 'OF', 'AS', 'BE', 'ARE', 'WAS', 'SO', 'IF', 'MY', 'ME', 'DO', 'GO',
@@ -80,4 +93,9 @@ export const AMBIGUOUS_TWO_LETTER = new Set([
   'OR', 'AM', 'PM', 'OK', 'US', 'UK', 'EU',
   'DD', 'TA', 'FA', 'PA', 'SL', 'TP', 'BE', 'RR', 'IV', 'HV',
   'OI', 'BB', 'OB', 'FD',
+  // Timezone abbreviations
+  'ET', 'PT', 'CT', 'MT',
+  // Common English/trading abbreviations
+  'RE', 'VS', 'AD', 'PS', 'TV', 'DJ', 'FX', 'EX', 'PC', 'PR',
+  'HR', 'WK', 'MO', 'YR',
 ])

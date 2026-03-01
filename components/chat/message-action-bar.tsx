@@ -228,26 +228,22 @@ export function MessageActionBar({
   // Group actions by category
   const ANALYSIS_TYPES = new Set(['deep_dive', 'compare'])
   const TRADE_TYPES = new Set(['view_position', 'pelican_scan', 'close_trade', 'review_trade', 'review_trade_vs_plan', 'log_trade', 'add_watchlist', 'remove_watchlist'])
-  const NAVIGATE_TYPES = new Set(['show_heatmap', 'show_correlations'])
   // Everything else is tools
 
   const grouped = useMemo(() => {
     const analysis: MessageAction[] = []
     const trade: MessageAction[] = []
-    const navigate: MessageAction[] = []
     const tools: MessageAction[] = []
 
     for (const action of actions) {
       if (ANALYSIS_TYPES.has(action.type)) analysis.push(action)
       else if (TRADE_TYPES.has(action.type)) trade.push(action)
-      else if (NAVIGATE_TYPES.has(action.type)) navigate.push(action)
       else tools.push(action)
     }
 
     const groups: { label: string; items: MessageAction[] }[] = []
     if (analysis.length > 0) groups.push({ label: 'Analysis', items: analysis })
     if (trade.length > 0) groups.push({ label: 'Trade Actions', items: trade })
-    if (navigate.length > 0) groups.push({ label: 'Navigate', items: navigate })
     if (tools.length > 0) groups.push({ label: 'Tools', items: tools })
 
     return groups

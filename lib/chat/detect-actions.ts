@@ -147,28 +147,6 @@ export function resolveActions(
     })
   }
 
-  // Cross-feature navigation
-  if (tickers.length > 0) {
-    actions.push({
-      id: 'show-heatmap',
-      type: 'show_heatmap',
-      label: 'Heatmap',
-      priority: 10,
-    })
-  }
-
-  if (tickers.length >= 2) {
-    const c0 = tickers[0]!
-    const c1 = tickers[1]!
-    actions.push({
-      id: `correlations-${c0}-${c1}`,
-      type: 'show_correlations',
-      label: `Correlations`,
-      compareTickers: [c0, c1],
-      priority: 10,
-    })
-  }
-
   // Plan & profile actions (always available)
   actions.push({
     id: 'analyze-behavior',

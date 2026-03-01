@@ -139,12 +139,12 @@ export const MessageContent = memo(function MessageContent({
 
   return (
     <motion.div
-      className="leading-relaxed tracking-normal font-normal break-words overflow-wrap-anywhere max-w-full text-rendering-optimizeLegibility"
+      className="leading-normal tracking-normal font-normal break-words overflow-wrap-anywhere max-w-full text-rendering-optimizeLegibility"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {segments.map((segment, index) => {
           if (segment.type === "code") {
             return (

@@ -69,7 +69,7 @@ export function TextSegment({ content, index, isStreaming, isLargeContent, ticke
     return (
       <motion.div
         key={`text-${index}`}
-        className="space-y-2 whitespace-pre-wrap"
+        className="space-y-1 whitespace-pre-wrap"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
@@ -100,7 +100,7 @@ export function TextSegment({ content, index, isStreaming, isLargeContent, ticke
     <motion.div
       ref={containerRef}
       key={`text-${index}`}
-      className="space-y-2"
+      className="space-y-1"
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3, delay: index * 0.03 }}
