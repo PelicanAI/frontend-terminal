@@ -52,7 +52,7 @@ export function EarningsSection({
         <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
           {label === "bmo" ? "Before Open" : "After Close"}
         </span>
-        <span className="text-[10px] font-mono tabular-nums text-[var(--text-disabled)]">
+        <span className="text-[10px] font-mono tabular-nums text-[var(--text-muted)]">
           ({events.length})
         </span>
       </div>

@@ -87,7 +87,7 @@ export function EarningsCard({ event, onClick, highlighted, isWatched, onToggleW
                   : epsMiss
                     ? "text-[var(--data-negative)]"
                     : "text-[var(--text-muted)]"
-                : "text-[var(--text-secondary)]"
+                : "text-[var(--text-primary)]"
             )}
           >
             <span className="text-[var(--text-muted)] mr-1">
@@ -113,7 +113,7 @@ export function EarningsCard({ event, onClick, highlighted, isWatched, onToggleW
                 ? revBeat
                   ? "text-[var(--data-positive)]/70"
                   : "text-[var(--data-negative)]/70"
-                : "text-[var(--text-secondary)]"
+                : "text-[var(--text-primary)]"
             )}
           >
             <span className="text-[var(--text-muted)] mr-1">
