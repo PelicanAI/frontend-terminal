@@ -17,9 +17,6 @@
  * @version 2.0.0 - Mobile responsive
  */
 
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
-
 import React, { useCallback, useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import dynamicImport from 'next/dynamic'
@@ -84,6 +81,7 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
 
       <div className="relative z-10 flex h-[calc(100vh-3.5rem)] overflow-hidden">
         <motion.main
+          id="main-content"
           layout
           initial={false}
           animate={{ width: panel.isOpen && !isMobile ? "70%" : "100%" }}
@@ -117,6 +115,7 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Mobile Pelican FAB */}
       {!mobilePanelOpen && (
         <button
+          aria-label="Open Pelican AI chat"
           className="lg:hidden fixed bottom-6 left-6 z-40 w-12 h-12 bg-[var(--accent-primary)] rounded-full shadow-lg shadow-[var(--accent-primary)]/25 flex items-center justify-center active:scale-95 transition-transform"
           onClick={() => setMobilePanelOpen(true)}
         >
