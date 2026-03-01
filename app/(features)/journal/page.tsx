@@ -564,7 +564,7 @@ export default function JournalPage() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-50 bg-[var(--bg-overlay)] backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-[var(--bg-overlay)] backdrop-blur-sm cursor-pointer"
             onClick={() => setReplayTrade(null)}
           >
             <motion.div
@@ -613,7 +613,7 @@ export default function JournalPage() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-50 bg-[var(--bg-overlay)]"
+            className="fixed inset-0 z-50 bg-[var(--bg-overlay)] cursor-pointer"
             onClick={() => setShowProfileModal(false)}
           >
             <motion.div
@@ -665,7 +665,7 @@ export default function JournalPage() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="md:hidden fixed inset-0 z-50 bg-[var(--bg-overlay)]"
+            className="md:hidden fixed inset-0 z-50 bg-[var(--bg-overlay)] cursor-pointer"
             onClick={handleCloseDetailPanel}
           >
             <motion.div
