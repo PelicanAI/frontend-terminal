@@ -38,8 +38,6 @@ import { useTiltDetection } from "@/hooks/use-tilt-detection"
 import { TiltAlertBanner } from "@/components/tilt/tilt-alert-banner"
 import { TiltIndicator } from "@/components/tilt/tilt-indicator"
 import type { ActionTrade } from "@/types/action-buttons"
-import { ActionBar } from "@/components/chat/action-bar"
-import { ActionExpanders, type ExpanderKey } from "@/components/chat/action-expanders"
 import { useFirstSession } from "@/hooks/use-first-session"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 
@@ -151,9 +149,6 @@ export default function ChatPage() {
 
   // Tilt detection
   const { alerts: tiltAlerts, isOnTilt } = useTiltDetection()
-
-  // Action bar expander state
-  const [activeExpander, setActiveExpander] = useState<ExpanderKey | null>(null)
 
   // Action buttons — shared state
   const { trades: allTradesRaw, closeTrade: closeTradeAction, logTrade: logTradeAction } = useTrades()
@@ -668,23 +663,6 @@ export default function ChatPage() {
                   </div>
                 </div>
               )}
-              <ActionExpanders
-                active={activeExpander}
-                onClose={() => setActiveExpander(null)}
-                onSend={(msg) => {
-                  messageHandler.handleSendMessage(msg, { source: 'action_bar' })
-                  setActiveExpander(null)
-                }}
-                openTrades={allTradesRaw.filter(t => t.status === "open")}
-              />
-              <ActionBar
-                active={activeExpander}
-                onToggle={setActiveExpander}
-                onFocusInput={() => chatInputRef.current?.focus()}
-                hasOpenTrades={allTradesRaw.some(t => t.status === "open")}
-                disabled={outOfCredits}
-                isAIResponding={chatLoading}
-              />
               <ChatInput
                 ref={chatInputRef}
                 onSendMessage={handleSendMessageWithFiles}
@@ -750,6 +728,7 @@ export default function ChatPage() {
               isLoading={isLoadingMarketData}
               onRefresh={refreshMarketData}
               onPrefillChat={messageHandler.handleSendMessage}
+              onFocusInput={() => chatInputRef.current?.focus()}
             />
           </div>
         </>

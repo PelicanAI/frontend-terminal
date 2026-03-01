@@ -1,3 +1,4 @@
+// DEPRECATED: Actions moved to sidebar actions-tab.tsx — safe to delete
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"

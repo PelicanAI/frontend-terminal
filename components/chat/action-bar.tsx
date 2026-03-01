@@ -1,3 +1,4 @@
+// DEPRECATED: Actions moved to sidebar actions-tab.tsx — safe to delete
 "use client"
 
 import { motion } from "framer-motion"
