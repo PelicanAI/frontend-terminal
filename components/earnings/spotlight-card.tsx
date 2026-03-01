@@ -91,13 +91,13 @@ export function SpotlightCard({ event, onClick }: SpotlightCardProps) {
 
       {/* Row 2: Company name */}
       {event.name && (
-        <p className="mt-1.5 text-xs text-[var(--text-muted)] truncate">
+        <p className="mt-1.5 text-xs text-[var(--text-secondary)] truncate">
           {event.name}
         </p>
       )}
 
       {/* Row 3: Date */}
-      <p className="mt-1 text-[11px] font-mono tabular-nums text-[var(--text-muted)]">
+      <p className="mt-1 text-[11px] font-mono tabular-nums text-[var(--text-secondary)]">
         {formatDate(event.date)}
       </p>
 
@@ -109,10 +109,10 @@ export function SpotlightCard({ event, onClick }: SpotlightCardProps) {
           </p>
           <p
             className={cn(
-              'font-mono tabular-nums text-sm font-medium',
+              'font-mono tabular-nums text-sm font-semibold',
               hasReported && epsBeat === true && 'text-[var(--data-positive)]',
               hasReported && epsBeat === false && 'text-[var(--data-negative)]',
-              !hasReported && 'text-[var(--text-secondary)]'
+              !hasReported && 'text-[var(--text-primary)]'
             )}
           >
             {hasReported
@@ -126,7 +126,7 @@ export function SpotlightCard({ event, onClick }: SpotlightCardProps) {
           <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-0.5">
             Revenue
           </p>
-          <p className="font-mono tabular-nums text-sm font-medium text-[var(--text-secondary)]">
+          <p className="font-mono tabular-nums text-sm font-semibold text-[var(--text-primary)]">
             {hasReported
               ? formatRevenue(event.revenueActual)
               : event.revenueEstimate !== null

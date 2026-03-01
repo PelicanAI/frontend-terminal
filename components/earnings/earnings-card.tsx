@@ -80,17 +80,17 @@ export function EarningsCard({ event, onClick, highlighted, isWatched, onToggleW
         {(event.epsActual !== null || event.epsEstimate !== null) && (
           <div
             className={cn(
-              "font-mono tabular-nums whitespace-nowrap text-xs",
+              "font-mono tabular-nums whitespace-nowrap text-xs font-semibold",
               event.epsActual !== null
                 ? epsBeat
                   ? "text-[var(--data-positive)]"
                   : epsMiss
                     ? "text-[var(--data-negative)]"
                     : "text-[var(--text-muted)]"
-                : "text-[var(--text-disabled)]"
+                : "text-[var(--text-secondary)]"
             )}
           >
-            <span className="text-[var(--text-disabled)] mr-1">
+            <span className="text-[var(--text-muted)] mr-1">
               {event.epsActual !== null ? "EPS:" : "Est. EPS:"}
             </span>
             {event.epsActual !== null
@@ -108,15 +108,15 @@ export function EarningsCard({ event, onClick, highlighted, isWatched, onToggleW
         {(event.revenueActual !== null || event.revenueEstimate !== null) && (
           <div
             className={cn(
-              "font-mono tabular-nums whitespace-nowrap text-xs",
+              "font-mono tabular-nums whitespace-nowrap text-xs font-semibold",
               event.revenueActual !== null
                 ? revBeat
                   ? "text-[var(--data-positive)]/70"
                   : "text-[var(--data-negative)]/70"
-                : "text-[var(--text-disabled)]"
+                : "text-[var(--text-secondary)]"
             )}
           >
-            <span className="text-[var(--text-disabled)] mr-1">
+            <span className="text-[var(--text-muted)] mr-1">
               {event.revenueActual !== null ? "Rev:" : "Est. Rev:"}
             </span>
             {formatRevenue(event.revenueActual ?? event.revenueEstimate)}

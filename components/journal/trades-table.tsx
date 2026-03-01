@@ -53,7 +53,7 @@ type StatusFilter = 'all' | 'open' | 'closed' | 'cancelled'
 export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrade, onAskPelican, onReplayTrade, onEditTrade }: TradesTableProps) {
   const [sortField, setSortField] = useState<SortField>('exit_date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('closed')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [dismissedPositionsBanner, setDismissedPositionsBanner] = useState(() => {
     if (typeof window === 'undefined') return false
     return localStorage.getItem('pelican_dismiss_positions_banner') === '1'

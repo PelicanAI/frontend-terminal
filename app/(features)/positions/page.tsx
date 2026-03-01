@@ -270,28 +270,6 @@ export default function PositionsPage() {
         />
       )}
 
-      {/* Today's Actions */}
-      <TodaysActions
-        positions={portfolio.positions}
-        insights={insights}
-        warnings={warnings}
-        earningsWarnings={earningsWarnings}
-        portfolioStats={portfolio.portfolio}
-        riskSummary={portfolio.risk}
-        onAction={handleSendMessage}
-        onEditPosition={handleEditPosition}
-      />
-
-      {/* Portfolio overview */}
-      <PortfolioOverview
-        portfolio={portfolio.portfolio}
-        risk={portfolio.risk}
-        planCompliance={portfolio.plan_compliance}
-        positions={portfolio.positions}
-        isLoading={portfolioLoading}
-        onSendMessage={handleSendMessage}
-      />
-
       {/* Filters + Sort */}
       <PositionFilters
         positions={portfolio.positions}
@@ -327,6 +305,56 @@ export default function PositionsPage() {
         onEdit={handleEditPosition}
         onClose={handleClosePosition}
         onLogTrade={() => setShowLogTradeModal(true)}
+      />
+
+      {/* Exposure Breakdown */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
+          <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Total Exposure</p>
+          <p className="text-lg font-mono tabular-nums font-semibold text-[var(--text-primary)]">
+            {formatNum(portfolio.portfolio.total_exposure)}
+          </p>
+        </div>
+        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
+          <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Long Exposure</p>
+          <p className="text-lg font-mono tabular-nums font-semibold text-[var(--data-positive)]">
+            {formatNum(portfolio.portfolio.long_exposure)}
+          </p>
+          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+            {portfolio.portfolio.direction_breakdown.long.count} position{portfolio.portfolio.direction_breakdown.long.count !== 1 ? 's' : ''}
+          </p>
+        </div>
+        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
+          <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Short Exposure</p>
+          <p className="text-lg font-mono tabular-nums font-semibold text-[var(--data-negative)]">
+            {formatNum(portfolio.portfolio.short_exposure)}
+          </p>
+          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+            {portfolio.portfolio.direction_breakdown.short.count} position{portfolio.portfolio.direction_breakdown.short.count !== 1 ? 's' : ''}
+          </p>
+        </div>
+      </div>
+
+      {/* Today's Actions */}
+      <TodaysActions
+        positions={portfolio.positions}
+        insights={insights}
+        warnings={warnings}
+        earningsWarnings={earningsWarnings}
+        portfolioStats={portfolio.portfolio}
+        riskSummary={portfolio.risk}
+        onAction={handleSendMessage}
+        onEditPosition={handleEditPosition}
+      />
+
+      {/* Portfolio overview */}
+      <PortfolioOverview
+        portfolio={portfolio.portfolio}
+        risk={portfolio.risk}
+        planCompliance={portfolio.plan_compliance}
+        positions={portfolio.positions}
+        isLoading={portfolioLoading}
+        onSendMessage={handleSendMessage}
       />
 
       {/* Portfolio intelligence */}

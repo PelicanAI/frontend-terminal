@@ -25,6 +25,7 @@ import {
   Lightning,
   Briefcase,
   ChatCircleDots,
+  Plus,
 } from "@phosphor-icons/react"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { getMarketStatus } from "@/hooks/use-market-data"
@@ -56,6 +57,10 @@ import {
   CRYPTO_TOP_20,
   CRYPTO_TOP_100,
 } from "@/lib/trading/ticker-lists"
+import Link from "next/link"
+import { LogTradeModal } from "@/components/journal/log-trade-modal"
+import { useCorrelationMatrix } from "@/hooks/use-correlations"
+import { CorrelationListView } from "@/components/correlations/correlation-list-view"
 
 type MoversTab = "gainers" | "losers"
 type AssetClass = "stocks" | "crypto" | "forex"
@@ -261,7 +266,7 @@ export default function MorningPage() {
   const [assetLoading, setAssetLoading] = useState(false)
 
   const router = useRouter()
-  const { openTrades, closedTrades, isLoading: tradesLoading } = useTrades()
+  const { openTrades, closedTrades, isLoading: tradesLoading, logTrade, refetch: refetchTrades } = useTrades()
   const { movers, isLoading: moversLoading, refetch: refetchMovers } = useMorningBrief()
   const { openWithPrompt } = usePelicanPanelContext()
   const { items: watchlistItems } = useWatchlist()
@@ -279,6 +284,8 @@ export default function MorningPage() {
   const { warnings: todaysWarnings, warningCount } = useTodaysWarnings()
   const { data: behavioralInsights } = useBehavioralInsights()
   const { patterns: activePatterns } = useTradePatterns()
+  const [showLogTradeModal, setShowLogTradeModal] = useState(false)
+  const { data: correlationData } = useCorrelationMatrix('30d')
   const { primaryMarket } = useTraderProfile()
   const marketType = (primaryMarket as MarketType) || 'stocks'
   const briefConfig = BRIEF_CONFIGS[marketType] ?? BRIEF_CONFIGS.stocks
@@ -459,6 +466,11 @@ export default function MorningPage() {
       toast({ description: 'Failed to copy', variant: 'destructive' })
     })
   }, [briefContent, toast])
+
+  const handleLogTrade = useCallback(async (data: Parameters<typeof logTrade>[0]) => {
+    await logTrade(data)
+    refetchTrades()
+  }, [logTrade, refetchTrades])
 
   const buildMorningBriefPrompt = useCallback(() => {
     const now = new Date()
@@ -830,6 +842,116 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
         </div>
       )}
 
+      {/* Active Exposure — headline section */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+        className="mt-6"
+      >
+        <PelicanCard accentGlow className="p-5">
+              {/* Enhanced header with total P&L */}
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div>
+                    <h2 className="text-sm font-semibold text-[var(--text-primary)]">Active Exposure</h2>
+                    <p className="text-xs text-[var(--text-muted)]">{openTrades.length} open position{openTrades.length !== 1 ? 's' : ''}</p>
+                  </div>
+                  <IconTooltip label="Log a new trade" side="right">
+                    <button
+                      onClick={() => setShowLogTradeModal(true)}
+                      className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors"
+                      aria-label="Log trade"
+                    >
+                      <Plus className="h-4 w-4" weight="bold" />
+                    </button>
+                  </IconTooltip>
+                </div>
+                {totalPnl != null && (
+                  <div className="text-right">
+                    <p className={`text-lg font-mono tabular-nums font-semibold ${
+                      totalPnl >= 0 ? 'text-[var(--data-positive)]' : 'text-[var(--data-negative)]'
+                    }`}>
+                      {totalPnl >= 0 ? '+' : ''}{totalPnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)]">Total P&L</p>
+                  </div>
+                )}
+              </div>
+              {tradesLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent-muted)] border-t-[var(--accent-primary)]" />
+                </div>
+              ) : openTrades.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Briefcase className="h-8 w-8 text-[var(--text-muted)] mb-2" weight="light" />
+                  <p className="text-sm text-[var(--text-muted)]">No open positions</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-1">Log trades in the Journal to see them here</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {openTrades.slice(0, 8).map((trade) => {
+                    // Calculate unrealized P&L from live prices
+                    const quote = quotes[trade.ticker]
+                    const currentPrice = quote?.price
+                    const direction = trade.direction === 'long' ? 1 : -1
+
+                    let unrealizedPnL: number | null = null
+                    if (currentPrice) {
+                      unrealizedPnL = (currentPrice - trade.entry_price) * trade.quantity * direction
+                    }
+
+                    const pnl = unrealizedPnL ?? trade.pnl_amount ?? null
+
+                    return (
+                      <button
+                        key={trade.id}
+                        onClick={() => handleAnalyzePosition(trade)}
+                        className={`w-full rounded-xl border bg-[var(--bg-surface)] p-3 text-left transition-all duration-150 hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)] active:scale-[0.98] min-h-[44px] border-l-2 ${
+                          pnl != null && pnl >= 0
+                            ? 'border-[var(--border-subtle)] border-l-[var(--data-positive)]'
+                            : pnl != null && pnl < 0
+                              ? 'border-[var(--border-subtle)] border-l-[var(--data-negative)]'
+                              : 'border-[var(--border-subtle)]'
+                        }`}
+                      >
+                        <div className="mb-1 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <LogoImg symbol={trade.ticker} size={20} />
+                            <span className="font-mono text-sm font-semibold text-[var(--text-primary)]">{trade.ticker}</span>
+                          </div>
+                          <span className={`text-xs font-medium uppercase ${trade.direction === "long" ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"}`}>
+                            {trade.direction}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-[var(--text-muted)]">
+                            Entry <span className="font-mono tabular-nums">${trade.entry_price.toFixed(2)}</span> · Qty <span className="font-mono tabular-nums">{trade.quantity}</span>
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Sparkline
+                              data={sparklines[trade.ticker] || []}
+                              positive={(pnl ?? 0) >= 0}
+                            />
+                            {pnl === null ? (
+                              <span className="font-mono tabular-nums text-[var(--text-disabled)]">&mdash;</span>
+                            ) : (
+                              <DataCell
+                                value={`${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)}`}
+                                sentiment={pnl >= 0 ? 'positive' : 'negative'}
+                                size="sm"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+        </PelicanCard>
+      </motion.div>
+
       {/* Pelican Brief — full width, above the grid */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -933,100 +1055,6 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
       >
         {/* Left column */}
         <div className="space-y-6">
-          {/* Active Exposure */}
-          <motion.div variants={staggerItem}>
-            <PelicanCard accentGlow className="p-5">
-              {/* Enhanced header with total P&L */}
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-semibold text-[var(--text-primary)]">Active Exposure</h2>
-                  <p className="text-xs text-[var(--text-muted)]">{openTrades.length} open position{openTrades.length !== 1 ? 's' : ''}</p>
-                </div>
-                {totalPnl != null && (
-                  <div className="text-right">
-                    <p className={`text-lg font-mono tabular-nums font-semibold ${
-                      totalPnl >= 0 ? 'text-[var(--data-positive)]' : 'text-[var(--data-negative)]'
-                    }`}>
-                      {totalPnl >= 0 ? '+' : ''}{totalPnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
-                    <p className="text-xs text-[var(--text-muted)]">Total P&L</p>
-                  </div>
-                )}
-              </div>
-              {tradesLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent-muted)] border-t-[var(--accent-primary)]" />
-                </div>
-              ) : openTrades.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <Briefcase className="h-8 w-8 text-[var(--text-muted)] mb-2" weight="light" />
-                  <p className="text-sm text-[var(--text-muted)]">No open positions</p>
-                  <p className="text-xs text-[var(--text-muted)] mt-1">Log trades in the Journal to see them here</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {openTrades.slice(0, 8).map((trade) => {
-                    // Calculate unrealized P&L from live prices
-                    const quote = quotes[trade.ticker]
-                    const currentPrice = quote?.price
-                    const direction = trade.direction === 'long' ? 1 : -1
-
-                    let unrealizedPnL: number | null = null
-                    if (currentPrice) {
-                      unrealizedPnL = (currentPrice - trade.entry_price) * trade.quantity * direction
-                    }
-
-                    const pnl = unrealizedPnL ?? trade.pnl_amount ?? null
-
-                    return (
-                      <button
-                        key={trade.id}
-                        onClick={() => handleAnalyzePosition(trade)}
-                        className={`w-full rounded-xl border bg-[var(--bg-surface)] p-3 text-left transition-all duration-150 hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)] active:scale-[0.98] min-h-[44px] border-l-2 ${
-                          pnl != null && pnl >= 0
-                            ? 'border-[var(--border-subtle)] border-l-[var(--data-positive)]'
-                            : pnl != null && pnl < 0
-                              ? 'border-[var(--border-subtle)] border-l-[var(--data-negative)]'
-                              : 'border-[var(--border-subtle)]'
-                        }`}
-                      >
-                        <div className="mb-1 flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <LogoImg symbol={trade.ticker} size={20} />
-                            <span className="font-mono text-sm font-semibold text-[var(--text-primary)]">{trade.ticker}</span>
-                          </div>
-                          <span className={`text-xs font-medium uppercase ${trade.direction === "long" ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"}`}>
-                            {trade.direction}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-[var(--text-muted)]">
-                            Entry <span className="font-mono tabular-nums">${trade.entry_price.toFixed(2)}</span> · Qty <span className="font-mono tabular-nums">{trade.quantity}</span>
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <Sparkline
-                              data={sparklines[trade.ticker] || []}
-                              positive={(pnl ?? 0) >= 0}
-                            />
-                            {pnl === null ? (
-                              <span className="font-mono tabular-nums text-[var(--text-disabled)]">&mdash;</span>
-                            ) : (
-                              <DataCell
-                                value={`${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)}`}
-                                sentiment={pnl >= 0 ? 'positive' : 'negative'}
-                                size="sm"
-                              />
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </PelicanCard>
-          </motion.div>
-
           {/* Market Movers */}
           <motion.div variants={staggerItem}>
             <PelicanCard className="p-5">
@@ -1246,6 +1274,47 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
           }}
         />
       </motion.div>
+
+      {/* Portfolio Correlations — below heatmap */}
+      {correlationData && correlationData.correlations.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
+          className="mt-6"
+        >
+          <PelicanCard className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-sm font-semibold text-[var(--text-primary)]">Portfolio Correlations</h2>
+                <p className="text-xs text-[var(--text-muted)]">30-day cross-asset relationships</p>
+              </div>
+              <Link
+                href="/correlations"
+                className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors"
+              >
+                Full matrix &rarr;
+              </Link>
+            </div>
+            <CorrelationListView
+              correlations={correlationData.correlations.slice(0, 8)}
+              assets={correlationData.assets}
+              period="30d"
+              beginnerMode={false}
+              onSelectPair={(a, b) => {
+                router.push(`/correlations?a=${a}&b=${b}`)
+              }}
+            />
+          </PelicanCard>
+        </motion.div>
+      )}
+
+      {/* Log Trade Modal */}
+      <LogTradeModal
+        open={showLogTradeModal}
+        onOpenChange={setShowLogTradeModal}
+        onSubmit={handleLogTrade}
+      />
 
       {/* Footer disclaimer */}
       <p className="text-center text-xs text-[var(--text-disabled)] mt-8 pb-4">
