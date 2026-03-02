@@ -89,8 +89,8 @@ export function SectorLegend({ stocks, selectedSectors, onToggleSector, onHighli
                 w-full group relative overflow-hidden rounded-md
                 px-3 py-2.5 text-left transition-all duration-150
                 ${isSelected
-                  ? 'hover:bg-[var(--bg-elevated)] active:bg-[var(--bg-elevated)]'
-                  : 'opacity-40 hover:opacity-60'
+                  ? 'bg-[var(--bg-elevated)]/50 border-l-2 border-l-[var(--accent-primary)] hover:bg-[var(--bg-elevated)]'
+                  : 'opacity-30 hover:opacity-50 border-l-2 border-l-transparent'
                 }
                 ${highlightedSector === sector ? 'ring-1 ring-[var(--accent-primary)]/50 bg-[var(--accent-muted)]' : ''}
               `}
