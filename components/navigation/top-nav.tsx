@@ -124,8 +124,11 @@ export function TopNav({ className }: TopNavProps) {
               const isActive = activeTab === tab.key
 
               return (
-                <Link
-                  key={tab.key}
+                <React.Fragment key={tab.key}>
+                  {tab.key === 'heatmap' && (
+                    <div className="hidden md:block h-4 w-px bg-[var(--border-subtle)] mx-1 flex-shrink-0" />
+                  )}
+                  <Link
                   href={tab.href}
                   onMouseEnter={() => {
                     // Prefetch earnings data on hover for instant navigation
@@ -152,6 +155,7 @@ export function TopNav({ className }: TopNavProps) {
                     <span className="hidden md:block absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)] rounded-full shadow-[0_0_8px_var(--accent-muted)]" />
                   )}
                 </Link>
+                </React.Fragment>
               )
             })}
           </div>
