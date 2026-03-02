@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { X, SpinnerGap } from "@phosphor-icons/react"
 import { ShareButton } from "./share-button"
-import { createClient } from "@/lib/supabase/client"
 import type { ShareFormat, ShareCardType } from "@/types/share-cards"
 
 interface ShareCardPreviewModalProps {
@@ -15,17 +14,52 @@ interface ShareCardPreviewModalProps {
   tickers: string[]
 }
 
-type StatsPeriod = "Week" | "Month" | "All Time"
+interface ParsedStatRow {
+  label: string
+  value: string
+  color: string
+}
 
-interface StatsData {
-  total_trades: number
-  win_rate: number
-  total_pnl: number
-  profit_factor: number
-  avg_r_multiple: number
-  largest_win: number
-  largest_loss: number
-  expectancy: number
+function parseTextToStats(text: string): ParsedStatRow[] {
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+  const rows: ParsedStatRow[] = []
+
+  for (const line of lines) {
+    const cleaned = line
+      .replace(/^[•\-*]\s*/, "")
+      .replace(/\*\*/g, "")
+      .replace(/^\d+[.)]\s*/, "")
+
+    // Split on colon, em-dash, or multiple spaces
+    const match =
+      cleaned.match(/^([^:\u2014]+?)[\s]*[:\u2014\u2013]+[\s]*(.+)$/) ||
+      cleaned.match(/^(.+?)\s{2,}(.+)$/)
+
+    if (match && match[1] && match[2]) {
+      const label = match[1].trim()
+      const value = match[2].trim()
+
+      let color = "white"
+      const numVal = parseFloat(value.replace(/[^0-9.\-+]/g, ""))
+      if (value.startsWith("+") || value.startsWith("$")) {
+        color = numVal >= 0 ? "green" : "red"
+      }
+      if (value.startsWith("-")) color = "red"
+      if (value.includes("%")) {
+        color = numVal >= 50 ? "green" : numVal > 0 ? "white" : "red"
+      }
+      if (/r$/i.test(value.trim())) {
+        color = numVal >= 0 ? "cyan" : "red"
+      }
+
+      rows.push({ label, value, color })
+    }
+  }
+
+  return rows
 }
 
 export function ShareCardPreviewModal({
@@ -37,72 +71,33 @@ export function ShareCardPreviewModal({
 }: ShareCardPreviewModalProps) {
   const [format, setFormat] = useState<ShareFormat>("og")
   const [imageError, setImageError] = useState(false)
-  const [period, setPeriod] = useState<StatsPeriod>("All Time")
-  const [stats, setStats] = useState<StatsData | null>(null)
-  const [statsLoading, setStatsLoading] = useState(false)
 
-  // Fetch stats when opening stats-table card
-  useEffect(() => {
-    if (!isOpen || cardType !== "stats-table") {
-      setStats(null)
-      return
-    }
+  // Parse stats from highlighted text immediately
+  const parsedStats = useMemo(() => {
+    if (cardType !== "stats-table" || !headline) return []
+    return parseTextToStats(headline)
+  }, [cardType, headline])
 
-    let cancelled = false
-    const fetchStats = async () => {
-      setStatsLoading(true)
-      setImageError(false)
-      try {
-        const supabase = createClient()
-        const { data, error } = await supabase.rpc("get_trade_stats", {
-          p_is_paper: null,
-        })
-        if (error) {
-          console.error("Stats RPC error:", error)
-          throw error
-        }
-        console.log("Stats RPC data:", data)
-        if (!cancelled) setStats(data as StatsData)
-      } catch (err) {
-        console.error("Stats fetch failed:", err)
-        if (!cancelled) setImageError(true)
-      } finally {
-        if (!cancelled) setStatsLoading(false)
-      }
-    }
-    fetchStats()
-    return () => {
-      cancelled = true
-    }
-  }, [isOpen, cardType])
+  const noStats = cardType === "stats-table" && parsedStats.length === 0
 
-  const imageUrl = useMemo(() => {
-    if (cardType === "pelican-insight") {
-      if (!headline) return ""
-      const params = new URLSearchParams({
-        type: "pelican-insight",
-        headline,
-        format,
-      })
-      if (tickers.length > 0) params.set("tickers", tickers.join(","))
-      return `/api/share-card?${params.toString()}`
-    }
+  // Insight card uses GET URL
+  const insightImageUrl = useMemo(() => {
+    if (cardType !== "pelican-insight" || !headline) return ""
+    const params = new URLSearchParams({
+      type: "pelican-insight",
+      headline,
+      format,
+    })
+    if (tickers.length > 0) params.set("tickers", tickers.join(","))
+    return `/api/share-card?${params.toString()}`
+  }, [cardType, headline, tickers, format])
 
-    if (cardType === "stats-table") {
-      if (!stats) return ""
-      // Use POST via a blob URL for stats (data too large for query params)
-      return ""
-    }
-
-    return ""
-  }, [cardType, headline, tickers, format, stats])
-
-  // For stats-table, generate image via POST and use blob URL
+  // Stats card uses POST → blob URL
   const [statsBlobUrl, setStatsBlobUrl] = useState<string>("")
   const blobUrlRef = useRef<string>("")
 
   useEffect(() => {
-    if (cardType !== "stats-table" || !stats || !isOpen) {
+    if (cardType !== "stats-table" || parsedStats.length === 0 || !isOpen) {
       if (blobUrlRef.current) {
         URL.revokeObjectURL(blobUrlRef.current)
         blobUrlRef.current = ""
@@ -112,23 +107,23 @@ export function ShareCardPreviewModal({
     }
 
     let cancelled = false
-    const generateStatsImage = async () => {
+    const generateImage = async () => {
+      setImageError(false)
       try {
         const res = await fetch("/api/share-card", {
           method: "POST",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type: "stats-table",
-            period,
-            stats,
+            period: "Performance",
+            rows: parsedStats,
             format,
           }),
         })
         if (!res.ok) {
           const errText = await res.text()
           console.error("Stats card POST failed:", res.status, errText)
-          throw new Error(`Stats card failed: ${res.status} - ${errText}`)
+          throw new Error(errText)
         }
         const blob = await res.blob()
         if (!cancelled) {
@@ -142,14 +137,14 @@ export function ShareCardPreviewModal({
         if (!cancelled) setImageError(true)
       }
     }
-    generateStatsImage()
+    generateImage()
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardType, stats, period, format, isOpen])
+  }, [cardType, parsedStats, format, isOpen])
 
-  const effectiveImageUrl = cardType === "stats-table" ? statsBlobUrl : imageUrl
+  const effectiveImageUrl =
+    cardType === "stats-table" ? statsBlobUrl : insightImageUrl
 
   const handleClose = useCallback(() => {
     setImageError(false)
@@ -162,11 +157,9 @@ export function ShareCardPreviewModal({
   }, [onClose])
 
   const filename = useMemo(() => {
-    if (cardType === "stats-table") return `pelican-stats-${period.toLowerCase().replace(" ", "-")}.png`
+    if (cardType === "stats-table") return "pelican-stats.png"
     return `pelican-insight-${tickers[0] || "card"}.png`
-  }, [cardType, period, tickers])
-
-  const isEmpty = cardType === "stats-table" && stats && stats.total_trades === 0
+  }, [cardType, tickers])
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -187,25 +180,6 @@ export function ShareCardPreviewModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Period picker for stats-table */}
-          {cardType === "stats-table" ? (
-            <div className="flex items-center gap-2">
-              {(["Week", "Month", "All Time"] as StatsPeriod[]).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                    period === p
-                      ? "bg-[var(--accent-muted)] text-[var(--accent-primary)] font-medium"
-                      : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          ) : null}
-
           {/* Format toggle */}
           <div className="flex items-center gap-2">
             <button
@@ -232,17 +206,20 @@ export function ShareCardPreviewModal({
 
           {/* Image preview */}
           <div className="relative rounded-xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-            {statsLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <SpinnerGap size={24} weight="regular" className="animate-spin text-[var(--text-muted)]" />
-              </div>
-            ) : isEmpty ? (
-              <div className="flex items-center justify-center py-12">
-                <span className="text-sm text-[var(--text-muted)]">No trades found for this period</span>
+            {noStats ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-2">
+                <span className="text-sm text-[var(--text-muted)]">
+                  Could not parse stats from selection.
+                </span>
+                <span className="text-xs text-[var(--text-muted)]">
+                  Try highlighting text with labeled values like &quot;Win Rate: 72.4%&quot;
+                </span>
               </div>
             ) : imageError ? (
               <div className="flex items-center justify-center py-12">
-                <span className="text-sm text-[var(--data-negative)]">Failed to load card preview</span>
+                <span className="text-sm text-[var(--data-negative)]">
+                  Failed to load card preview
+                </span>
               </div>
             ) : effectiveImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -250,19 +227,25 @@ export function ShareCardPreviewModal({
                 src={effectiveImageUrl}
                 alt="Share card preview"
                 className="w-full h-auto"
-                style={{ aspectRatio: format === "square" ? "1/1" : "1200/630" }}
+                style={{
+                  aspectRatio: format === "square" ? "1/1" : "1200/630",
+                }}
                 onError={() => setImageError(true)}
                 onLoad={() => setImageError(false)}
               />
             ) : (
               <div className="flex items-center justify-center py-12">
-                <SpinnerGap size={24} weight="regular" className="animate-spin text-[var(--text-muted)]" />
+                <SpinnerGap
+                  size={24}
+                  weight="regular"
+                  className="animate-spin text-[var(--text-muted)]"
+                />
               </div>
             )}
           </div>
 
           {/* Share actions */}
-          {effectiveImageUrl && !imageError && !isEmpty ? (
+          {effectiveImageUrl && !imageError && !noStats ? (
             <div className="flex items-center justify-end">
               <ShareButton imageUrl={effectiveImageUrl} filename={filename} />
             </div>

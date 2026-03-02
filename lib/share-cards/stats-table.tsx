@@ -1,101 +1,30 @@
 import { CardLayout, CARD_COLORS, PELICAN_LOGO_B64 } from "./card-layout"
 
-interface StatsTableProps {
-  period: string
-  stats: {
-    total_trades?: number | null
-    win_rate?: number | null
-    total_pnl?: number | null
-    profit_factor?: number | null
-    avg_r_multiple?: number | null
-    largest_win?: number | null
-    largest_loss?: number | null
-    expectancy?: number | null
-  }
-}
-
-interface StatRowData {
+export interface StatsRow {
   label: string
   value: string
   color: string
 }
 
-function n(v: number | null | undefined): number {
-  return v ?? 0
+interface StatsTableProps {
+  period: string
+  rows: StatsRow[]
 }
 
-function formatCurrency(value: number): string {
-  const abs = Math.abs(value)
-  const prefix = value >= 0 ? "+$" : "-$"
-  const formatted =
-    abs >= 1000
-      ? abs.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-      : abs.toFixed(2)
-  return `${prefix}${formatted}`
+function getColor(color: string): string {
+  switch (color) {
+    case "green":
+      return CARD_COLORS.green
+    case "red":
+      return CARD_COLORS.red
+    case "cyan":
+      return CARD_COLORS.cyan
+    default:
+      return CARD_COLORS.textPrimary
+  }
 }
 
-function pnlColor(value: number): string {
-  return value >= 0 ? CARD_COLORS.green : CARD_COLORS.red
-}
-
-export function StatsTableCard({ period, stats }: StatsTableProps) {
-  const totalTrades = n(stats.total_trades)
-  const winRate = n(stats.win_rate)
-  const totalPnl = n(stats.total_pnl)
-  const profitFactor = n(stats.profit_factor)
-  const avgR = n(stats.avg_r_multiple)
-  const expectancy = n(stats.expectancy)
-  const largestWin = n(stats.largest_win)
-  const largestLoss = n(stats.largest_loss)
-
-  const rows: StatRowData[] = [
-    {
-      label: "Win Rate",
-      value: `${winRate.toFixed(1)}%`,
-      color: winRate >= 50 ? CARD_COLORS.green : CARD_COLORS.red,
-    },
-    {
-      label: "Total P&L",
-      value: formatCurrency(totalPnl),
-      color: pnlColor(totalPnl),
-    },
-    {
-      label: "Profit Factor",
-      value: profitFactor.toFixed(2),
-      color:
-        profitFactor >= 1.5
-          ? CARD_COLORS.green
-          : profitFactor >= 1
-            ? CARD_COLORS.textPrimary
-            : CARD_COLORS.red,
-    },
-    {
-      label: "Avg R-Multiple",
-      value: `${avgR >= 0 ? "+" : ""}${avgR.toFixed(2)}R`,
-      color: pnlColor(avgR),
-    },
-    {
-      label: "Expectancy",
-      value: formatCurrency(expectancy),
-      color: pnlColor(expectancy),
-    },
-    {
-      label: "Largest Win",
-      value: formatCurrency(largestWin),
-      color: CARD_COLORS.green,
-    },
-    {
-      label: "Largest Loss",
-      value: formatCurrency(largestLoss),
-      color: CARD_COLORS.red,
-    },
-  ]
-
-  const contextLine =
-    period === "All Time"
-      ? "Trading Performance"
-      : `Trading Performance - ${period}`
-
+export function StatsTableCard({ period, rows }: StatsTableProps) {
   return (
     <CardLayout hideHeader hideFooter>
       <div
@@ -107,7 +36,7 @@ export function StatsTableCard({ period, stats }: StatsTableProps) {
           alignItems: "center",
         }}
       >
-        {/* ===== Centered header: logo + brand + context ===== */}
+        {/* Centered header: logo + brand + context */}
         <div
           style={{
             display: "flex",
@@ -146,10 +75,10 @@ export function StatsTableCard({ period, stats }: StatsTableProps) {
             marginBottom: 20,
           }}
         >
-          {contextLine}
+          {period}
         </span>
 
-        {/* ===== Data table ===== */}
+        {/* Data table */}
         <div
           style={{
             display: "flex",
@@ -205,7 +134,7 @@ export function StatsTableCard({ period, stats }: StatsTableProps) {
           >
             {rows.map((row, i) => (
               <div
-                key={row.label}
+                key={i}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -233,7 +162,7 @@ export function StatsTableCard({ period, stats }: StatsTableProps) {
                     flex: 2,
                     fontSize: 17,
                     fontWeight: 700,
-                    color: row.color,
+                    color: getColor(row.color),
                     fontFamily: "Geist Mono, monospace",
                     justifyContent: "flex-end",
                   }}
@@ -245,26 +174,15 @@ export function StatsTableCard({ period, stats }: StatsTableProps) {
           </div>
         </div>
 
-        {/* Total trades count — small, bottom-left */}
+        {/* Subtle footer */}
         <div
           style={{
             display: "flex",
             width: "100%",
-            justifyContent: "space-between",
-            alignItems: "center",
+            justifyContent: "center",
             paddingTop: 12,
           }}
         >
-          <span
-            style={{
-              display: "flex",
-              fontSize: 12,
-              color: "rgba(255, 255, 255, 0.25)",
-              fontFamily: "Geist Mono, monospace",
-            }}
-          >
-            {`${totalTrades} trades`}
-          </span>
           <span
             style={{
               display: "flex",

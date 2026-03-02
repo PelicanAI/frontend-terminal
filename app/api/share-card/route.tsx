@@ -67,32 +67,6 @@ export async function GET(req: NextRequest) {
         break
       }
 
-      case "stats-table": {
-        const supabase = await createClient()
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser()
-        if (authError || !user) {
-          return new Response("Unauthorized", { status: 401 })
-        }
-
-        const period = searchParams.get("period") || "All Time"
-
-        const { data: stats, error: statsError } = await supabase.rpc("get_trade_stats", {
-          p_is_paper: null,
-        })
-
-        if (statsError || !stats) {
-          return new Response("Failed to load stats", { status: 500 })
-        }
-
-        cardContent = (
-          <StatsTableCard period={period} stats={stats} />
-        )
-        break
-      }
-
       default:
         return new Response("Invalid card type", { status: 400 })
     }
@@ -126,19 +100,13 @@ export async function POST(req: NextRequest) {
       }
 
       case "stats-table": {
-        const { period, stats } = body
-        if (!stats) return new Response("Missing stats", { status: 400 })
-        try {
-          cardContent = (
-            <StatsTableCard period={period || "All Time"} stats={stats} />
-          )
-        } catch (templateErr) {
-          console.error("Stats template error:", templateErr)
-          return new Response(
-            `Stats template error: ${templateErr instanceof Error ? templateErr.message : String(templateErr)}`,
-            { status: 500 }
-          )
+        const { period, rows } = body
+        if (!rows || !Array.isArray(rows) || rows.length === 0) {
+          return new Response("No stats rows", { status: 400 })
         }
+        cardContent = (
+          <StatsTableCard period={period || "Performance"} rows={rows} />
+        )
         break
       }
 
@@ -146,18 +114,10 @@ export async function POST(req: NextRequest) {
         return new Response("POST supports pelican-insight and stats-table", { status: 400 })
     }
 
-    try {
-      return new ImageResponse(cardContent, {
-        ...dimensions,
-        fonts: getFonts(geistSans, geistMono),
-      })
-    } catch (renderErr) {
-      console.error("Satori render error:", renderErr)
-      return new Response(
-        `Satori render error: ${renderErr instanceof Error ? renderErr.message : String(renderErr)}`,
-        { status: 500 }
-      )
-    }
+    return new ImageResponse(cardContent, {
+      ...dimensions,
+      fonts: getFonts(geistSans, geistMono),
+    })
   } catch (error) {
     console.error("Share card POST error:", error)
     return new Response(
