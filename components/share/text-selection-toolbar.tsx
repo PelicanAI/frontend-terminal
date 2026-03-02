@@ -1,10 +1,34 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { ShareNetwork, ChartBar, Lightning } from "@phosphor-icons/react"
+import { ChartBar, Lightning } from "@phosphor-icons/react"
 import { ShareCardPreviewModal } from "./share-card-preview-modal"
 import { extractTickers } from "@/lib/chat/detect-actions"
 import type { ShareCardType } from "@/types/share-cards"
+
+function getSelectionEndPosition(): { x: number; y: number } | null {
+  const selection = window.getSelection()
+  if (!selection || selection.rangeCount === 0) return null
+
+  const range = selection.getRangeAt(0)
+
+  // Collapse to the end of the selection — where the user's cursor actually is
+  const endRange = range.cloneRange()
+  endRange.collapse(false)
+  const endRect = endRange.getBoundingClientRect()
+
+  // Fallback if collapsed range has zero dimensions
+  const rect =
+    endRect.width === 0 && endRect.height === 0 ? range.getBoundingClientRect() : endRect
+
+  // Clamp to viewport so toolbar never goes off-screen
+  const toolbarWidth = 200
+  const toolbarHeight = 48
+  const x = Math.max(toolbarWidth / 2 + 8, Math.min(rect.left + rect.width / 2, window.innerWidth - toolbarWidth / 2 - 8))
+  const y = Math.max(toolbarHeight + 8, Math.min(rect.top - 8, window.innerHeight - 16))
+
+  return { x, y }
+}
 
 export function TextSelectionToolbar() {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
@@ -42,20 +66,36 @@ export function TextSelectionToolbar() {
         return
       }
 
-      const rect = range.getBoundingClientRect()
-      setPosition({ x: rect.left + rect.width / 2, y: rect.top - 8 })
-      setSelectedText(text)
+      const pos = getSelectionEndPosition()
+      if (pos) {
+        setPosition(pos)
+        setSelectedText(text)
+      }
     }
 
     document.addEventListener("selectionchange", handleSelectionChange)
     return () => document.removeEventListener("selectionchange", handleSelectionChange)
   }, [hideToolbar])
 
+  // Reposition toolbar on scroll instead of hiding it
   useEffect(() => {
+    if (!position) return
+
     const handleScroll = () => {
-      if (position) hideToolbar()
+      const selection = window.getSelection()
+      if (!selection || selection.isCollapsed) {
+        hideToolbar()
+        return
+      }
+      const pos = getSelectionEndPosition()
+      if (pos) {
+        setPosition(pos)
+      } else {
+        hideToolbar()
+      }
     }
-    window.addEventListener("scroll", handleScroll, true)
+
+    window.addEventListener("scroll", handleScroll, { capture: true, passive: true })
     return () => window.removeEventListener("scroll", handleScroll, true)
   }, [position, hideToolbar])
 
