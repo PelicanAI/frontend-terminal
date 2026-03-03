@@ -34,7 +34,7 @@ export function StatsTableCard({ period, rows }: StatsTableProps) {
           width: "100%",
           height: "100%",
           alignItems: "center",
-          padding: "0 0 16px 0",
+          padding: "0 0 40px 0",
         }}
       >
         {/* Centered header: logo + brand + context */}
@@ -144,8 +144,6 @@ export function StatsTableCard({ period, rows }: StatsTableProps) {
             style={{
               display: "flex",
               flexDirection: "column",
-              flex: 1,
-              justifyContent: "space-between",
             }}
           >
             {rows.map((row, i) => (
@@ -190,21 +188,21 @@ export function StatsTableCard({ period, rows }: StatsTableProps) {
           </div>
         </div>
 
-        {/* Footer — separate from table, flows naturally after */}
+        {/* Footer — fixed height, never overlaps table */}
         <div
           style={{
             display: "flex",
             width: "100%",
             justifyContent: "center",
-            paddingTop: 8,
             flexShrink: 0,
+            height: 30,
           }}
         >
           <span
             style={{
               display: "flex",
               fontSize: 11,
-              color: "rgba(255, 255, 255, 0.2)",
+              color: "rgba(255, 255, 255, 0.15)",
               letterSpacing: "0.08em",
             }}
           >
