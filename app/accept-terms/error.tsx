@@ -1,5 +1,6 @@
 'use client'
 
+import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 
 export default function AcceptTermsError({
@@ -10,7 +11,7 @@ export default function AcceptTermsError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('[Accept Terms Error]', error)
+    Sentry.captureException(error)
   }, [error])
 
   return (
