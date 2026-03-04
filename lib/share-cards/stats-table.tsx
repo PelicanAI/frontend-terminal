@@ -25,6 +25,10 @@ function getColor(color: string): string {
 }
 
 export function StatsTableCard({ period, rows }: StatsTableProps) {
+  // No height:100%, no flex:1 anywhere — pure top-to-bottom stacking.
+  // Satori doesn't constrain flex children in nested containers,
+  // so we rely on the row cap (7 OG / 11 square) to ensure
+  // content fits within CardLayout's padded area.
   return (
     <CardLayout hideHeader hideFooter>
       <div
@@ -32,18 +36,16 @@ export function StatsTableCard({ period, rows }: StatsTableProps) {
           display: "flex",
           flexDirection: "column",
           width: "100%",
-          height: "100%",
           alignItems: "center",
-          padding: "0 0 20px 0",
         }}
       >
-        {/* Centered header: logo + brand + context */}
+        {/* Centered header: logo + brand */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            marginBottom: 20,
+            marginBottom: 16,
           }}
         >
           <div
@@ -51,27 +53,27 @@ export function StatsTableCard({ period, rows }: StatsTableProps) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: 52,
-              height: 52,
+              width: 48,
+              height: 48,
               borderRadius: 12,
               background: "rgba(10, 10, 15, 0.9)",
               border: "1px solid rgba(139, 92, 246, 0.3)",
-              marginBottom: 10,
+              marginBottom: 8,
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={PELICAN_LOGO_B64}
               alt=""
-              width={36}
-              height={36}
-              style={{ width: 36, height: 36, borderRadius: 8 }}
+              width={32}
+              height={32}
+              style={{ width: 32, height: 32, borderRadius: 6 }}
             />
           </div>
           <span
             style={{
               display: "flex",
-              fontSize: 28,
+              fontSize: 24,
               fontWeight: 700,
               color: "#ffffff",
               letterSpacing: "0.15em",
@@ -85,116 +87,100 @@ export function StatsTableCard({ period, rows }: StatsTableProps) {
         <span
           style={{
             display: "flex",
-            fontSize: 15,
-            color: "rgba(255, 255, 255, 0.5)",
-            marginBottom: 20,
+            fontSize: 14,
+            color: "rgba(255, 255, 255, 0.45)",
+            marginBottom: 16,
           }}
         >
           {period}
         </span>
 
-        {/* Data table */}
+        {/* Column headers */}
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
             width: "100%",
-            flex: 1,
+            paddingBottom: 8,
+            borderBottom: "1px solid rgba(255, 255, 255, 0.15)",
+            marginBottom: 2,
           }}
         >
-          {/* Column headers */}
-          <div
+          <span
             style={{
               display: "flex",
-              paddingBottom: 10,
-              borderBottom: "1px solid rgba(255, 255, 255, 0.15)",
-              marginBottom: 4,
+              flex: 3,
+              fontSize: 11,
+              color: "rgba(255, 255, 255, 0.35)",
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+            }}
+          >
+            METRIC
+          </span>
+          <span
+            style={{
+              display: "flex",
+              flex: 2,
+              fontSize: 11,
+              color: "rgba(255, 255, 255, 0.35)",
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+              justifyContent: "flex-end",
+            }}
+          >
+            VALUE
+          </span>
+        </div>
+
+        {/* Data rows — direct children, no wrapper div */}
+        {rows.map((row, i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              width: "100%",
+              alignItems: "center",
+              borderBottom:
+                i < rows.length - 1
+                  ? "1px solid rgba(255, 255, 255, 0.06)"
+                  : "none",
+              paddingTop: 7,
+              paddingBottom: 7,
             }}
           >
             <span
               style={{
                 display: "flex",
                 flex: 3,
-                fontSize: 11,
-                color: "rgba(255, 255, 255, 0.35)",
-                fontWeight: 600,
-                letterSpacing: "0.12em",
+                fontSize: 14,
+                color: "rgba(255, 255, 255, 0.55)",
               }}
             >
-              METRIC
+              {row.label}
             </span>
             <span
               style={{
                 display: "flex",
                 flex: 2,
-                fontSize: 11,
-                color: "rgba(255, 255, 255, 0.35)",
-                fontWeight: 600,
-                letterSpacing: "0.12em",
+                fontSize: 15,
+                fontWeight: 700,
+                color: getColor(row.color),
+                fontFamily: "Geist Mono, monospace",
                 justifyContent: "flex-end",
               }}
             >
-              VALUE
+              {row.value}
             </span>
           </div>
+        ))}
 
-          {/* Data rows */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {rows.map((row, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  borderBottom:
-                    i < rows.length - 1
-                      ? "1px solid rgba(255, 255, 255, 0.08)"
-                      : "none",
-                  paddingTop: 8,
-                  paddingBottom: 8,
-                }}
-              >
-                <span
-                  style={{
-                    display: "flex",
-                    flex: 3,
-                    fontSize: 15,
-                    color: "rgba(255, 255, 255, 0.55)",
-                  }}
-                >
-                  {row.label}
-                </span>
-                <span
-                  style={{
-                    display: "flex",
-                    flex: 2,
-                    fontSize: 17,
-                    fontWeight: 700,
-                    color: getColor(row.color),
-                    fontFamily: "Geist Mono, monospace",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  {row.value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer — fixed height, never overlaps table */}
+        {/* Footer */}
         <div
           style={{
             display: "flex",
             width: "100%",
             justifyContent: "center",
-            flexShrink: 0,
-            height: 30,
+            marginTop: 12,
           }}
         >
           <span

@@ -53,7 +53,7 @@ const nextConfig = {
           // from marketing pages, settings, and other non-chart routes.
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://s3.tradingview.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://*.tradingview.com https://api.elbstream.com https://assets.parqet.com; connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://api.polygon.io https://s3.tradingview.com https://*.sentry.io https://*.stripe.com https://pelican-trading-api.fly.dev https://*.fly.dev; worker-src 'self' blob:; frame-src 'self' https://js.stripe.com https://*.tradingview.com https://*.tradingview-widget.com"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://s3.tradingview.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://*.tradingview.com https://api.elbstream.com https://assets.parqet.com; connect-src 'self' blob: https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://api.polygon.io https://s3.tradingview.com https://*.sentry.io https://*.stripe.com https://pelican-trading-api.fly.dev https://*.fly.dev; worker-src 'self' blob:; frame-src 'self' https://js.stripe.com https://*.tradingview.com https://*.tradingview-widget.com"
           },
         ],
       },
@@ -77,6 +77,11 @@ export default withSentryConfig(nextConfig, {
 
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: false,
+
+  // Exclude large base64 asset files from source map processing (prevents WasmHash buffer errors)
+  sourcemaps: {
+    ignore: ['lib/share-cards/*-base64*', 'lib/share-cards/font-geist-*'],
+  },
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   // This can increase your server load as well as your hosting bill.
