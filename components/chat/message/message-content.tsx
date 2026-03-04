@@ -7,7 +7,7 @@ import { detectDataTable, detectLabelValueList, type LabelValueTableResult } fro
 import { DataTable } from "@/components/chat/data-visualizations/data-table"
 import { TradeGradeCard } from "@/components/grading/trade-grade-card"
 import type { TradeGrade } from "@/lib/grading/trade-grader"
-import { parseContentSegments } from "./format-utils"
+import { parseContentSegments, formatLine } from "./format-utils"
 import { CodeBlock } from "./code-block"
 import { TextSegment } from "./text-segment"
 
@@ -231,7 +231,7 @@ export const MessageContent = memo(function MessageContent({
             ) : (
               <div
                 className="text-[15px] leading-relaxed text-foreground"
-                dangerouslySetInnerHTML={{ __html: labelValueData.postText.replace(/\n/g, '<br/>') }}
+                dangerouslySetInnerHTML={{ __html: labelValueData.postText.split('\n').map(line => formatLine(line)).join('<br/>') }}
               />
             )}
           </div>
