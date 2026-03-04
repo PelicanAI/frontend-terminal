@@ -127,19 +127,23 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
       compact ? "my-3 p-3 sm:p-4 shadow-sm" : "my-6 p-4 sm:p-8 shadow-xl"
     )}>
 
-      {/* LARGE PROMINENT WATERMARK - only in full mode */}
-      {!compact && (
-        <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none overflow-hidden">
-          <Image
-            src="/pelican-logo-transparent.webp"
-            alt=""
-            width={320}
-            height={320}
-            className="w-[min(60vw,20rem)] h-auto object-contain"
-            aria-hidden="true"
-          />
-        </div>
-      )}
+      {/* Pelican watermark — always present, subtler in compact mode */}
+      <div className={cn(
+        "absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden",
+        compact ? "opacity-[0.12]" : "opacity-30"
+      )}>
+        <Image
+          src="/pelican-logo-transparent.webp"
+          alt=""
+          width={320}
+          height={320}
+          className={cn(
+            "h-auto object-contain",
+            compact ? "w-[min(50vw,12rem)]" : "w-[min(60vw,20rem)]"
+          )}
+          aria-hidden="true"
+        />
+      </div>
 
       {/* Content layer above watermark */}
       <div className="relative z-10">
