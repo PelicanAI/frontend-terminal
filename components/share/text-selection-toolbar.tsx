@@ -6,6 +6,28 @@ import { ShareCardPreviewModal } from "./share-card-preview-modal"
 import { extractTickers } from "@/lib/chat/detect-actions"
 import type { ShareCardType } from "@/types/share-cards"
 
+/**
+ * Quick check: does this text look like a stats table?
+ * Returns true if 3+ lines match "Label: Value" or "Label  Value" patterns.
+ */
+function looksLikeStats(text: string): boolean {
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean)
+  let matches = 0
+  for (const line of lines) {
+    const cleaned = line
+      .replace(/^[•\-*]\s*/, "")
+      .replace(/\*\*/g, "")
+      .replace(/^\d+[.)]\s*/, "")
+    if (
+      cleaned.match(/^([^:\u2014]+?)[\s]*[:\u2014\u2013]+[\s]*(.+)$/) ||
+      cleaned.match(/^(.+?)\s{2,}(.+)$/)
+    ) {
+      matches++
+    }
+  }
+  return matches >= 3
+}
+
 function getSelectionEndPosition(): { x: number; y: number } | null {
   const selection = window.getSelection()
   if (!selection || selection.rangeCount === 0) return null
@@ -121,23 +143,25 @@ export function TextSelectionToolbar() {
           style={{ left: position.x, top: position.y, transform: "translate(-50%, -100%)" }}
         >
           <div className="flex items-center gap-0.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg shadow-lg p-1">
-            <button
-              onClick={() => openModal("pelican-insight")}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-all active:scale-[0.97]"
-              title="Share as Insight Card"
-            >
-              <Lightning size={14} weight="regular" />
-              Insight
-            </button>
-            <div className="w-px h-4 bg-[var(--border-subtle)]" />
-            <button
-              onClick={() => openModal("stats-table")}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-all active:scale-[0.97]"
-              title="Share Trading Stats"
-            >
-              <ChartBar size={14} weight="regular" />
-              Stats
-            </button>
+            {looksLikeStats(selectedText) ? (
+              <button
+                onClick={() => openModal("stats-table")}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-all active:scale-[0.97]"
+                title="Share Trading Stats"
+              >
+                <ChartBar size={14} weight="regular" />
+                Share Stats
+              </button>
+            ) : (
+              <button
+                onClick={() => openModal("pelican-insight")}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-all active:scale-[0.97]"
+                title="Share as Insight Card"
+              >
+                <Lightning size={14} weight="regular" />
+                Share Insight
+              </button>
+            )}
           </div>
         </div>
       ) : null}

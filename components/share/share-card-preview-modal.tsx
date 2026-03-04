@@ -91,7 +91,7 @@ export function ShareCardPreviewModal({
       format,
     })
     if (tickers.length > 0) params.set("tickers", tickers.join(","))
-    return `/api/share-card?${params.toString()}`
+    return `/api/share-card?${params.toString()}&_t=${Date.now()}`
   }, [cardType, headline, tickers, format])
 
   // Stats card uses POST → blob URL

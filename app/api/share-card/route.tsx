@@ -71,10 +71,12 @@ export async function GET(req: NextRequest) {
         return new Response("Invalid card type", { status: 400 })
     }
 
-    return new ImageResponse(cardContent, {
+    const response = new ImageResponse(cardContent, {
       ...dimensions,
       fonts: getFonts(geistSans, geistMono),
     })
+    response.headers.set("Cache-Control", "no-store, max-age=0")
+    return response
   } catch (error) {
     console.error("Share card generation error:", error)
     return new Response("Failed to generate card", { status: 500 })
@@ -114,10 +116,12 @@ export async function POST(req: NextRequest) {
         return new Response("POST supports pelican-insight and stats-table", { status: 400 })
     }
 
-    return new ImageResponse(cardContent, {
+    const response = new ImageResponse(cardContent, {
       ...dimensions,
       fonts: getFonts(geistSans, geistMono),
     })
+    response.headers.set("Cache-Control", "no-store, max-age=0")
+    return response
   } catch (error) {
     console.error("Share card POST error:", error)
     return new Response(
