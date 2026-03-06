@@ -84,21 +84,75 @@ export const MessageContent = memo(function MessageContent({
     [safeContent, isStreaming, parsedData, gradeData]
   )
 
-  // Share handler: copy table data as tab-separated text with inline feedback
+  // Share handler: generate share card image via API and copy to clipboard
   const handleShareTable = useCallback(async () => {
     if (!labelValueData) return
+
     const { table } = labelValueData
-    const header = table.columns.map(c => c.label).join('\t')
-    const rows = table.data.map((row) =>
-      table.columns.map(c => String(row[c.key] ?? '')).join('\t')
-    )
-    const text = [table.title, '', header, ...rows].join('\n')
+
+    // Build stats rows for the share card API
+    const rows = table.data.map((row) => {
+      const label = String(row[table.columns[0]?.key ?? ''] ?? '')
+      const value = String(row[table.columns[1]?.key ?? ''] ?? '')
+
+      // Detect color from value
+      let color = 'default'
+      const cleaned = value.replace(/[,$%+]/g, '').trim()
+      if (cleaned.startsWith('-') || cleaned.startsWith('(')) color = 'red'
+      else if (/^\+?\d/.test(cleaned) && parseFloat(cleaned) > 0) color = 'green'
+      else if (/\$/.test(value)) color = 'cyan'
+
+      return { label, value, color }
+    })
+
     try {
-      await navigator.clipboard.writeText(text)
-      setShareCopied(true)
-      setTimeout(() => setShareCopied(false), 2000)
-    } catch {
-      // Silent fail
+      const res = await fetch('/api/share-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'stats-table',
+          format: 'square',
+          period: table.title || 'Performance',
+          rows,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Share card generation failed')
+
+      const blob = await res.blob()
+
+      // Try to copy image to clipboard (modern browsers)
+      if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+        const item = new ClipboardItem({ 'image/png': blob })
+        await navigator.clipboard.write([item])
+        setShareCopied(true)
+        setTimeout(() => setShareCopied(false), 2000)
+      } else {
+        // Fallback: download the image
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `pelican-stats-${Date.now()}.png`
+        a.click()
+        URL.revokeObjectURL(url)
+        setShareCopied(true)
+        setTimeout(() => setShareCopied(false), 2000)
+      }
+    } catch (err) {
+      console.error('[Share Table] error:', err)
+      // Fallback: copy as text
+      const header = table.columns.map(c => c.label).join('\t')
+      const textRows = table.data.map((row) =>
+        table.columns.map(c => String(row[c.key] ?? '')).join('\t')
+      )
+      const text = [table.title, '', header, ...textRows].join('\n')
+      try {
+        await navigator.clipboard.writeText(text)
+        setShareCopied(true)
+        setTimeout(() => setShareCopied(false), 2000)
+      } catch {
+        // Silent fail
+      }
     }
   }, [labelValueData])
 

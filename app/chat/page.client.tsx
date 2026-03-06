@@ -112,7 +112,7 @@ function MobileChartSheet() {
 // ChatContainerWithChart removed — onOpenChart prop eliminated (tickers are clickable inline)
 
 function LearningAwareTradingPanel(props: React.ComponentProps<typeof TradingContextPanel>) {
-  const { enabled, selectedTerm, clearTerm, learnTabActive, setLearnTabActive } = useLearningMode()
+  const { enabled, setEnabled, selectedTerm, clearTerm, learnTabActive, setLearnTabActive } = useLearningMode()
   return (
     <TradingContextPanel
       {...props}
@@ -121,6 +121,7 @@ function LearningAwareTradingPanel(props: React.ComponentProps<typeof TradingCon
       learnTabActive={learnTabActive}
       onLearnTabClick={() => setLearnTabActive(!learnTabActive)}
       learningEnabled={enabled}
+      onToggleLearning={() => setEnabled(!enabled)}
     />
   )
 }

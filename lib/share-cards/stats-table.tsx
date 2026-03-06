@@ -35,8 +35,33 @@ export function StatsTableCard({ period, rows }: StatsTableProps) {
           height: "100%",
           alignItems: "center",
           justifyContent: "center",
+          position: "relative",
         }}
       >
+        {/* Large background watermark */}
+        <div
+          style={{
+            display: "flex",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: 0.06,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={PELICAN_LOGO_B64}
+            alt=""
+            width={400}
+            height={400}
+            style={{ width: 400, height: 400 }}
+          />
+        </div>
+
         {/* Centered header: logo + brand */}
         <div
           style={{

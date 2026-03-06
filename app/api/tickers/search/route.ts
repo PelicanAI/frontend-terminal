@@ -67,16 +67,6 @@ const COMMON_TICKERS: TickerSearchResult[] = [
   { ticker: 'EUR/GBP', name: 'Euro / British Pound', type: 'FX', market: 'fx', active: true },
   { ticker: 'EUR/JPY', name: 'Euro / Japanese Yen', type: 'FX', market: 'fx', active: true },
   { ticker: 'GBP/JPY', name: 'British Pound / Japanese Yen', type: 'FX', market: 'fx', active: true },
-  // Futures
-  { ticker: 'ES', name: 'E-mini S&P 500 Futures', type: 'FUTURE', market: 'futures', active: true },
-  { ticker: 'NQ', name: 'E-mini Nasdaq 100 Futures', type: 'FUTURE', market: 'futures', active: true },
-  { ticker: 'YM', name: 'E-mini Dow Futures', type: 'FUTURE', market: 'futures', active: true },
-  { ticker: 'RTY', name: 'E-mini Russell 2000 Futures', type: 'FUTURE', market: 'futures', active: true },
-  { ticker: 'CL', name: 'Crude Oil Futures', type: 'FUTURE', market: 'futures', active: true },
-  { ticker: 'GC', name: 'Gold Futures', type: 'FUTURE', market: 'futures', active: true },
-  { ticker: 'SI', name: 'Silver Futures', type: 'FUTURE', market: 'futures', active: true },
-  { ticker: 'ZB', name: '30-Year Treasury Bond Futures', type: 'FUTURE', market: 'futures', active: true },
-  { ticker: 'NG', name: 'Natural Gas Futures', type: 'FUTURE', market: 'futures', active: true },
 ]
 
 export interface TickerSearchResult {
@@ -119,11 +109,20 @@ export async function GET(request: NextRequest) {
       const upperQuery = query.toUpperCase()
       const filtered = COMMON_TICKERS.filter(
         t => t.ticker.includes(upperQuery) || t.name.toUpperCase().includes(upperQuery)
-      ).slice(0, limit)
+      )
+
+      // Sort: exact match first
+      filtered.sort((a, b) => {
+        const aExact = a.ticker === upperQuery ? 0 : a.ticker.startsWith(upperQuery) ? 1 : 2
+        const bExact = b.ticker === upperQuery ? 0 : b.ticker.startsWith(upperQuery) ? 1 : 2
+        return aExact - bExact
+      })
+
+      const sliced = filtered.slice(0, limit)
 
       // Allow any 1-5 character uppercase string as a valid ticker
-      if (filtered.length === 0 && /^[A-Z]{1,5}$/.test(upperQuery)) {
-        filtered.push({
+      if (sliced.length === 0 && /^[A-Z]{1,5}$/.test(upperQuery)) {
+        sliced.push({
           ticker: upperQuery,
           name: `${upperQuery} (Custom)`,
           type: 'CS',
@@ -133,8 +132,8 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.json({
-        results: filtered,
-        count: filtered.length,
+        results: sliced,
+        count: sliced.length,
       })
     }
 
@@ -149,11 +148,20 @@ export async function GET(request: NextRequest) {
       const upperQuery = query.toUpperCase()
       const filtered = COMMON_TICKERS.filter(
         t => t.ticker.includes(upperQuery) || t.name.toUpperCase().includes(upperQuery)
-      ).slice(0, limit)
+      )
+
+      // Sort: exact match first
+      filtered.sort((a, b) => {
+        const aExact = a.ticker === upperQuery ? 0 : a.ticker.startsWith(upperQuery) ? 1 : 2
+        const bExact = b.ticker === upperQuery ? 0 : b.ticker.startsWith(upperQuery) ? 1 : 2
+        return aExact - bExact
+      })
+
+      const sliced = filtered.slice(0, limit)
 
       // Allow any 1-5 character uppercase string as a valid ticker
-      if (filtered.length === 0 && /^[A-Z]{1,5}$/.test(upperQuery)) {
-        filtered.push({
+      if (sliced.length === 0 && /^[A-Z]{1,5}$/.test(upperQuery)) {
+        sliced.push({
           ticker: upperQuery,
           name: `${upperQuery} (Custom)`,
           type: 'CS',
@@ -163,8 +171,8 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.json({
-        results: filtered,
-        count: filtered.length,
+        results: sliced,
+        count: sliced.length,
       })
     }
 
@@ -192,21 +200,62 @@ export async function GET(request: NextRequest) {
       active: ticker.active,
     }))
 
-    // Merge static matches for crypto/fx/futures coverage
+    // Merge: static crypto/fx/etf come first, then sort by match quality
     const upperQuery = query.toUpperCase()
     const staticMatches = COMMON_TICKERS.filter(
       t => t.ticker.includes(upperQuery) || t.name.toUpperCase().includes(upperQuery)
     )
-    const existingTickers = new Set(results.map(r => r.ticker))
-    const merged = [
-      ...staticMatches.filter(s => !existingTickers.has(s.ticker)),
-      ...results,
-    ].slice(0, limit)
+
+    // Static crypto/forex/etf entries always take priority over Polygon stock results
+    // because Polygon doesn't serve these markets well
+    const priorityStatic = staticMatches.filter(
+      s => s.market === 'crypto' || s.market === 'fx'
+    )
+    const otherStatic = staticMatches.filter(
+      s => s.market !== 'crypto' && s.market !== 'fx'
+    )
+
+    // Dedup: static priority entries always win, then Polygon results, then other static
+    const seen = new Set<string>()
+    const merged: TickerSearchResult[] = []
+
+    // 1. Priority static (crypto, forex) — always first
+    for (const s of priorityStatic) {
+      if (!seen.has(s.ticker)) {
+        seen.add(s.ticker)
+        merged.push(s)
+      }
+    }
+
+    // 2. Polygon results — skip if already added from static priority
+    for (const r of results) {
+      if (!seen.has(r.ticker)) {
+        seen.add(r.ticker)
+        merged.push(r)
+      }
+    }
+
+    // 3. Other static matches (stock fallbacks) — fill remaining
+    for (const s of otherStatic) {
+      if (!seen.has(s.ticker)) {
+        seen.add(s.ticker)
+        merged.push(s)
+      }
+    }
+
+    // Sort: exact ticker match first, then starts-with, then contains
+    merged.sort((a, b) => {
+      const aExact = a.ticker === upperQuery ? 0 : a.ticker.startsWith(upperQuery) ? 1 : 2
+      const bExact = b.ticker === upperQuery ? 0 : b.ticker.startsWith(upperQuery) ? 1 : 2
+      return aExact - bExact
+    })
+
+    const finalResults = merged.slice(0, limit)
 
     return NextResponse.json(
       {
-        results: merged,
-        count: merged.length,
+        results: finalResults,
+        count: finalResults.length,
       },
       {
         headers: {

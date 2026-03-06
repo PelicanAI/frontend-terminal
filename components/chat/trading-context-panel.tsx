@@ -203,6 +203,7 @@ interface TradingContextPanelProps {
   learnTabActive?: boolean
   onLearnTabClick?: () => void
   learningEnabled?: boolean
+  onToggleLearning?: () => void
   onFocusInput?: () => void
 }
 
@@ -220,6 +221,7 @@ export function TradingContextPanel({
   learnTabActive = false,
   onLearnTabClick,
   learningEnabled = false,
+  onToggleLearning,
   onFocusInput,
 }: TradingContextPanelProps) {
   const { mode, selectedTicker, showChart, showCalendar, closeChart } = useChart()
@@ -399,16 +401,35 @@ export function TradingContextPanel({
               />
             ) : activeMode === "learn" ? (
               learningEnabled ? (
-                <EducationChat
-                  selectedTerm={selectedTerm ?? null}
-                  onClear={onClearTerm ?? (() => {})}
-                />
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border-subtle)]">
+                    <span className="text-xs text-[var(--text-muted)]">Learn mode active</span>
+                    <button
+                      onClick={() => onToggleLearning?.()}
+                      className="text-xs text-[var(--text-muted)] hover:text-[var(--data-negative)] transition-colors"
+                    >
+                      Disable
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <EducationChat
+                      selectedTerm={selectedTerm ?? null}
+                      onClear={onClearTerm ?? (() => {})}
+                    />
+                  </div>
+                </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full p-6 text-center">
                   <GraduationCap size={40} weight="thin" className="text-[var(--accent-primary)]/40 mb-3" />
-                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                    Toggle on Learn mode to see trading terms highlighted in Pelican&apos;s responses and get the definitions.
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
+                    Learn mode highlights trading terms in Pelican&apos;s responses. Click any term to get the definition.
                   </p>
+                  <button
+                    onClick={() => onToggleLearning?.()}
+                    className="px-4 py-2 rounded-lg text-sm font-medium bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] transition-colors duration-150"
+                  >
+                    Enable Learn Mode
+                  </button>
                 </div>
               )
             ) : activeMode === "chart" && selectedTicker ? (

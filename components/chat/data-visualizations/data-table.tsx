@@ -283,7 +283,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
                 onClick={onShare}
                 className="text-xs text-muted-foreground hover:text-foreground underline"
               >
-                {shareCopied ? "Copied!" : "Share Table"}
+                {shareCopied ? "Copied!" : "Share as Image"}
               </button>
             )}
           </div>
