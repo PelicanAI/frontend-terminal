@@ -11,7 +11,7 @@ const stats = [
 
 export function SocialProofBar() {
   return (
-    <section className="border-y border-slate-200 bg-slate-50 px-6 py-12 md:py-16">
+    <section className="border-y border-slate-200 bg-slate-50/80 px-6 py-12 md:py-16">
       <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 md:grid-cols-4 md:gap-12">
         {stats.map((stat, i) => (
           <ScrollReveal key={stat.label} delay={i * 0.1}>

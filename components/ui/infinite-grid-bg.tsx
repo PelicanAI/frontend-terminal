@@ -14,7 +14,7 @@ interface InfiniteGridBgProps {
 export function InfiniteGridBg({
   children,
   className,
-  gridColorClass = 'text-slate-300',
+  gridColorClass = 'text-slate-400',
   speed = 0.3,
   spotlightRadius = 350,
 }: InfiniteGridBgProps) {
@@ -60,7 +60,7 @@ export function InfiniteGridBg({
       className={cn('relative w-full overflow-hidden', className)}
     >
       {/* Base grid */}
-      <div className="absolute inset-0 z-0 opacity-[0.06]">
+      <div className="absolute inset-0 z-0 opacity-[0.15]">
         <GridPattern
           ref={basePatternRef}
           id={`${patternId}-base`}
@@ -71,7 +71,7 @@ export function InfiniteGridBg({
       {/* Mouse-reveal grid */}
       <div
         ref={revealRef}
-        className="absolute inset-0 z-0 opacity-25"
+        className="absolute inset-0 z-0 opacity-50"
       >
         <GridPattern
           ref={revealPatternRef}
@@ -82,9 +82,9 @@ export function InfiniteGridBg({
 
       {/* Ambient glow blobs */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute right-[-15%] top-[-15%] w-[35%] h-[35%] rounded-full bg-blue-500/[0.08] blur-[120px]" />
-        <div className="absolute right-[5%] top-[-5%] w-[20%] h-[20%] rounded-full bg-cyan-400/[0.06] blur-[100px]" />
-        <div className="absolute left-[-10%] bottom-[-15%] w-[35%] h-[35%] rounded-full bg-blue-600/[0.06] blur-[120px]" />
+        <div className="absolute right-[-15%] top-[-15%] w-[35%] h-[35%] rounded-full bg-blue-500/[0.15] blur-[120px]" />
+        <div className="absolute right-[5%] top-[-5%] w-[20%] h-[20%] rounded-full bg-cyan-400/[0.12] blur-[100px]" />
+        <div className="absolute left-[-10%] bottom-[-15%] w-[35%] h-[35%] rounded-full bg-blue-600/[0.12] blur-[120px]" />
       </div>
 
       {/* Content */}

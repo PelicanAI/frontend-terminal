@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Lightning, ArrowRight } from '@phosphor-icons/react'
-import { InfiniteGridBg } from '@/components/ui/infinite-grid-bg'
 
 const ease = [0.25, 0.1, 0.25, 1] as [number, number, number, number]
 
@@ -178,7 +177,7 @@ function MockBrowserFrame() {
 
 export function HeroSection() {
   return (
-    <InfiniteGridBg className="px-6 pb-20 pt-32 md:pt-40">
+    <section className="relative overflow-hidden px-6 pb-20 pt-32 md:pt-40">
       <div className="relative mx-auto max-w-7xl">
         {/* Eyebrow */}
         <motion.div
@@ -268,6 +267,6 @@ export function HeroSection() {
           <MockBrowserFrame />
         </motion.div>
       </div>
-    </InfiniteGridBg>
+    </section>
   )
 }
