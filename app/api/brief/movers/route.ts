@@ -75,13 +75,16 @@ export async function GET() {
     ])
 
     if (!gainersRes.ok || !losersRes.ok || !activeRes.ok) {
-      console.error("Polygon movers API error")
+      console.error("Polygon movers API error:", gainersRes.status, losersRes.status, activeRes.status)
       // Return stale cache if available
       if (cachedData?.data) {
         return NextResponse.json(cachedData.data)
       }
-      return NextResponse.json({ error: "Failed to fetch movers" }, { status: 502 })
+      // Fall through to S&P 500 cache below — don't 502 if we can build from heatmap data
     }
+
+    // If Polygon calls succeeded, parse them; otherwise use empty arrays
+    const polygonOk = gainersRes.ok && losersRes.ok && activeRes.ok
 
     interface PolygonTicker {
       ticker: string
@@ -91,11 +94,13 @@ export async function GET() {
       lastTrade?: { p?: number }
     }
 
-    const [gainersData, losersData, activeData]: Array<{ tickers?: PolygonTicker[] }> = await Promise.all([
-      gainersRes.json(),
-      losersRes.json(),
-      activeRes.json(),
-    ])
+    const [gainersData, losersData, activeData]: Array<{ tickers?: PolygonTicker[] }> = polygonOk
+      ? await Promise.all([
+          gainersRes.json(),
+          losersRes.json(),
+          activeRes.json(),
+        ])
+      : [{ tickers: [] }, { tickers: [] }, { tickers: [] }]
 
     const mapMover = (ticker: PolygonTicker): Mover => ({
       ticker: ticker.ticker,
@@ -112,7 +117,7 @@ export async function GET() {
     const { data: sp500Cache } = await supabase
       .from('cached_market_data')
       .select('data, fetched_at')
-      .eq('data_type', 'sp500_prices')
+      .eq('data_type', 'sp500_prices_1D')
       .is('user_id', null)
       .single()
 
