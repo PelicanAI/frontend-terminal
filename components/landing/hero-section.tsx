@@ -11,24 +11,6 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden px-6 pb-20 pt-32 md:pt-40">
       <div className="relative mx-auto max-w-7xl">
-        {/* Eyebrow */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease }}
-          className="mb-8 flex justify-center"
-        >
-          <div className="flex items-center gap-2.5 rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22c55e] opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#22c55e]" />
-            </span>
-            <span className="text-xs text-slate-500">
-              Now with Forex, Crypto & Futures support
-            </span>
-          </div>
-        </motion.div>
-
         {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 8 }}
