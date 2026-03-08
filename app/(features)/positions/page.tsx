@@ -15,6 +15,8 @@ import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useTrades } from "@/hooks/use-trades"
 import { useTickerHistory } from "@/hooks/use-ticker-history"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
+import { usePortfolioPnl } from "@/hooks/use-portfolio-pnl"
+import { PortfolioPnlChart } from "@/components/positions/portfolio-pnl-chart"
 import { useTraderProfile } from "@/hooks/use-trader-profile"
 import { WarningBanner } from "@/components/insights/warning-banner"
 import { TodaysActions } from "@/components/positions/todays-actions"
@@ -72,6 +74,7 @@ export default function PositionsPage() {
   )
   const { data: tickerHistory } = useTickerHistory(openTickers)
   const { quotes } = useLiveQuotes(openTickers)
+  const { data: pnlHistory, isLoading: pnlHistoryLoading } = usePortfolioPnl(portfolio?.positions ?? [])
 
   const [activeFilter, setActiveFilter] = useState('all')
   const [sortBy, setSortBy] = useState('size_desc')
@@ -307,6 +310,11 @@ export default function PositionsPage() {
         onClose={handleClosePosition}
         onLogTrade={() => setShowLogTradeModal(true)}
       />
+
+      {/* Portfolio P&L History */}
+      {portfolio.positions.length > 0 && (
+        <PortfolioPnlChart data={pnlHistory} isLoading={pnlHistoryLoading} />
+      )}
 
       {/* Exposure Breakdown */}
       <div className="grid grid-cols-3 gap-3">
