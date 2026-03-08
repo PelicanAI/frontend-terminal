@@ -321,9 +321,9 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                 data-trade-id={trade.id}
                 onClick={() => onSelectTrade(trade)}
                 className={`
-                  cursor-pointer transition-colors duration-150
-                  ${isSelected ? 'bg-[var(--accent-muted)]' : 'hover:bg-[var(--bg-elevated)]'}
-                  ${trade.is_paper ? 'border-b border-dashed border-[var(--border-subtle)]' : ''}
+                  cursor-pointer transition-colors duration-150 border-b border-[var(--border-subtle)]/40
+                  ${isSelected ? 'bg-[var(--accent-muted)]' : 'hover:bg-[var(--bg-elevated)]/30'}
+                  ${trade.is_paper ? 'border-dashed' : ''}
                 `}
               >
                 <td className="py-3 px-4">
