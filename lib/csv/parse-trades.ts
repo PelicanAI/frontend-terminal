@@ -442,8 +442,8 @@ function formatISODate(year: number, month: number, day: number): string {
 
 /* ---------------------- Direction normalization --------------------------- */
 
-const LONG_PATTERNS = /^(buy|long|b|bot|bought|cover)$/i
-const SHORT_PATTERNS = /^(sell|short|s|sold|sld)$/i
+const LONG_PATTERNS = /^(buy|long|b|bot|bought|cover|buy\s*to\s*open|buy\s*to\s*cover|buy_to_open|buy_to_cover)$/i
+const SHORT_PATTERNS = /^(sell\s*short|short\s*sell|sell|short|s|sold|sld|sell\s*to\s*open|sell_to_open|sell_short|short_sell)$/i
 
 function normalizeDirection(raw: string): 'long' | 'short' | null {
   const v = raw.trim()
