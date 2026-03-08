@@ -13,7 +13,7 @@ const positions = [
     pnlPct: '+14.0%',
     positive: true,
     session: 'NY Session',
-    sessionColor: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+    sessionColor: 'bg-violet-500/10 text-violet-600 border-violet-500/20',
   },
   {
     ticker: 'EUR/USD',
@@ -37,7 +37,7 @@ const positions = [
     pnlPct: '-1.56%',
     positive: false,
     session: '24/7',
-    sessionColor: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+    sessionColor: 'bg-violet-500/10 text-violet-600 border-violet-500/20',
   },
 ]
 

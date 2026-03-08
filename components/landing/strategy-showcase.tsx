@@ -29,7 +29,7 @@ const SHOWCASE_STRATEGIES: ShowcaseStrategy[] = [
       'Buy the first pullback after a clean breakout above resistance. Targets continuation of the new trend with a tight stop below the breakout zone.',
     category: 'momentum',
     categoryLabel: 'Momentum',
-    categoryColor: 'bg-blue-100 text-blue-700',
+    categoryColor: 'bg-violet-100 text-violet-700',
     difficulty: 'Beginner',
     difficultyColor: 'bg-emerald-100 text-emerald-700',
     entryRulesPreview:
@@ -117,7 +117,7 @@ const SHOWCASE_STRATEGIES: ShowcaseStrategy[] = [
       'Go long when price reclaims VWAP from below with confirming volume. Signals institutional buying. A high-probability intraday setup used by professional day traders.',
     category: 'momentum',
     categoryLabel: 'Momentum',
-    categoryColor: 'bg-blue-100 text-blue-700',
+    categoryColor: 'bg-violet-100 text-violet-700',
     difficulty: 'Intermediate',
     difficultyColor: 'bg-amber-100 text-amber-700',
     entryRulesPreview:
@@ -237,7 +237,7 @@ export function StrategyShowcase() {
       {/* Header */}
       <ScrollReveal>
         <div className="text-center mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-semibold tracking-wide uppercase mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-100 text-violet-600 text-xs font-semibold tracking-wide uppercase mb-6">
             <Lightning weight="fill" className="w-3.5 h-3.5" />
             Strategy Library
           </div>
@@ -295,7 +295,7 @@ export function StrategyShowcase() {
                 onClick={() => setCurrentIndex(i)}
                 className={`rounded-full transition-all duration-200 ${
                   i === currentIndex
-                    ? 'w-6 h-2 bg-blue-600'
+                    ? 'w-6 h-2 bg-violet-600'
                     : 'w-2 h-2 bg-slate-300 hover:bg-slate-400'
                 }`}
                 style={{ minWidth: i === currentIndex ? 24 : 8, minHeight: 8 }}
@@ -314,7 +314,7 @@ export function StrategyShowcase() {
           </p>
           <Link
             href="/strategies"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 transition-all duration-150 active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-violet-600/20 hover:shadow-violet-600/30 transition-all duration-150 active:scale-[0.98]"
           >
             Browse All Strategies
             <ArrowRight weight="bold" className="w-4 h-4" />

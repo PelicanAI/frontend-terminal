@@ -51,12 +51,12 @@ export function FlywheelSection() {
             <ScrollReveal key={i} delay={i * 0.15}>
               <div className="relative p-6 rounded-xl bg-white border border-slate-200 shadow-sm">
                 {/* Faded number */}
-                <span className="absolute top-4 right-4 text-4xl font-bold text-blue-500/10 select-none">
+                <span className="absolute top-4 right-4 text-4xl font-bold text-violet-500/10 select-none">
                   {step.number}
                 </span>
 
                 <Icon
-                  className="h-8 w-8 text-blue-600 mb-4"
+                  className="h-8 w-8 text-violet-600 mb-4"
                   weight="duotone"
                 />
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">

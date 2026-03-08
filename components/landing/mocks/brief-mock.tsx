@@ -24,8 +24,8 @@ export function BriefMock() {
         {/* Market Overnight */}
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
-            <TrendUp weight="bold" className="w-3.5 h-3.5 text-blue-600" />
-            <p className="text-[10px] font-medium uppercase tracking-wider text-blue-600">Market Overnight</p>
+            <TrendUp weight="bold" className="w-3.5 h-3.5 text-violet-600" />
+            <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600">Market Overnight</p>
           </div>
           <div className="bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 space-y-1">
             <div className="flex items-center justify-between">
@@ -55,8 +55,8 @@ export function BriefMock() {
         {/* Your Positions */}
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
-            <Crosshair weight="bold" className="w-3.5 h-3.5 text-blue-600" />
-            <p className="text-[10px] font-medium uppercase tracking-wider text-blue-600">Your Positions</p>
+            <Crosshair weight="bold" className="w-3.5 h-3.5 text-violet-600" />
+            <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600">Your Positions</p>
           </div>
           <div className="bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 space-y-1.5">
             <div className="flex items-center justify-between">
@@ -79,8 +79,8 @@ export function BriefMock() {
         {/* Today's Focus */}
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
-            <Sun weight="bold" className="w-3.5 h-3.5 text-blue-600" />
-            <p className="text-[10px] font-medium uppercase tracking-wider text-blue-600">Today&apos;s Focus</p>
+            <Sun weight="bold" className="w-3.5 h-3.5 text-violet-600" />
+            <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600">Today&apos;s Focus</p>
           </div>
           <div className="bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 space-y-1">
             <div className="flex items-center gap-2">
@@ -88,7 +88,7 @@ export function BriefMock() {
               <span className="text-xs text-slate-600">FOMC minutes release at 2:00 PM ET</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-1 h-1 rounded-full bg-blue-600" />
+              <div className="w-1 h-1 rounded-full bg-violet-600" />
               <span className="text-xs text-slate-600">NVDA earnings after close &mdash; position sizing</span>
             </div>
           </div>

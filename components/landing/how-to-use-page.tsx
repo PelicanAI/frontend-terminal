@@ -195,7 +195,7 @@ export function HowToUsePage() {
                     }}
                     className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
                   >
-                    <Icon weight="duotone" className="h-4 w-4 text-blue-600 shrink-0" />
+                    <Icon weight="duotone" className="h-4 w-4 text-violet-600 shrink-0" />
                     {section.title.split(' — ')[0]}
                   </a>
                 )
@@ -212,8 +212,8 @@ export function HowToUsePage() {
               <ScrollReveal key={section.id} delay={0.1}>
                 <div id={section.id} className="scroll-mt-24">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-blue-50">
-                      <Icon weight="duotone" className="h-5 w-5 text-blue-600" />
+                    <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-violet-50">
+                      <Icon weight="duotone" className="h-5 w-5 text-violet-600" />
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-slate-900">
@@ -228,7 +228,7 @@ export function HowToUsePage() {
                   <div className="space-y-3 ml-[52px]">
                     {section.content.map((item, j) => (
                       <div key={j} className="flex items-start gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-violet-600 mt-2 shrink-0" />
                         <p className="text-sm text-slate-600 leading-relaxed">
                           {item}
                         </p>
@@ -237,7 +237,7 @@ export function HowToUsePage() {
                   </div>
 
                   {section.keyPoint && (
-                    <div className="ml-[52px] mt-4 rounded-lg border border-blue-100 bg-blue-50/50 px-4 py-3">
+                    <div className="ml-[52px] mt-4 rounded-lg border border-violet-100 bg-violet-50/50 px-4 py-3">
                       <p className="text-sm text-slate-700 leading-relaxed">
                         {section.keyPoint}
                       </p>
@@ -248,7 +248,7 @@ export function HowToUsePage() {
                     <div className="ml-[52px] mt-4">
                       <Link
                         href={section.cta.href}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
                       >
                         {section.cta.label}
                       </Link>
@@ -263,8 +263,8 @@ export function HowToUsePage() {
           <ScrollReveal delay={0.1}>
             <div id="intelligence" className="scroll-mt-24">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-blue-50">
-                  <Brain weight="duotone" className="h-5 w-5 text-blue-600" />
+                <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-violet-50">
+                  <Brain weight="duotone" className="h-5 w-5 text-violet-600" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">
@@ -285,7 +285,7 @@ export function HowToUsePage() {
                   <div className="space-y-2.5">
                     {intelligenceTracks.map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-violet-600 mt-2 shrink-0" />
                         <p className="text-sm text-slate-600 leading-relaxed">
                           {item}
                         </p>
@@ -301,7 +301,7 @@ export function HowToUsePage() {
                   <div className="space-y-2.5">
                     {intelligenceActions.map((item, i) => (
                       <div key={i} className="flex items-start gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-violet-600 mt-2 shrink-0" />
                         <p className="text-sm text-slate-600 leading-relaxed">
                           {item}
                         </p>
@@ -325,7 +325,7 @@ export function HowToUsePage() {
               <div className="ml-[52px] mt-4">
                 <Link
                   href="/auth/signup"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
                 >
                   Start building your profile &rarr;
                 </Link>

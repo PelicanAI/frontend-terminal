@@ -83,7 +83,7 @@ export function FeatureGrid() {
             <ScrollReveal key={i} delay={i * 0.05}>
               <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                 <Icon
-                  className="h-5 w-5 text-blue-600 mb-3"
+                  className="h-5 w-5 text-violet-600 mb-3"
                   weight="duotone"
                 />
                 <h3 className="text-sm font-semibold text-slate-900 mb-1">

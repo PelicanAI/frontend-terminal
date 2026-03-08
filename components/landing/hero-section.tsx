@@ -20,7 +20,7 @@ export function HeroSection() {
         >
           <span className="text-slate-900">The AI that learns</span>
           <br />
-          <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-violet-600 to-purple-400 bg-clip-text text-transparent">
             how you trade
           </span>
         </motion.h1>
@@ -45,7 +45,7 @@ export function HeroSection() {
         >
           <Link
             href="/auth/signup"
-            className="group flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition-all duration-150 hover:bg-blue-700 hover:shadow-blue-600/30 active:scale-[0.98]"
+            className="group flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-violet-600/20 transition-all duration-150 hover:bg-violet-700 hover:shadow-violet-600/30 active:scale-[0.98]"
           >
             Start Trading Smarter — It&apos;s Free
             <ArrowRight

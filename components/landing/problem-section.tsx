@@ -78,7 +78,7 @@ export function ProblemSection() {
           <p className="text-lg font-medium text-slate-600 md:text-xl">
             What if everything lived in one place?
           </p>
-          <p className="mt-3 flex items-center justify-center gap-2 text-base text-blue-600">
+          <p className="mt-3 flex items-center justify-center gap-2 text-base text-violet-600">
             And an AI connected all of it — for you, automatically.
             <ArrowRight weight="bold" className="h-4 w-4" />
           </p>

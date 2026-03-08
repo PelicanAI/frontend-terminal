@@ -53,11 +53,11 @@ export function PlaybookMock() {
 
         {/* Entry Rules */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-blue-600 mb-1.5">Entry Rules</p>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600 mb-1.5">Entry Rules</p>
           <div className="bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 space-y-1.5">
             {entryRules.map((rule, i) => (
               <div key={i} className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-blue-600 mt-1.5 flex-shrink-0" />
+                <div className="w-1 h-1 rounded-full bg-violet-600 mt-1.5 flex-shrink-0" />
                 <p className="text-xs text-slate-600 leading-relaxed">{rule}</p>
               </div>
             ))}
@@ -66,7 +66,7 @@ export function PlaybookMock() {
 
         {/* Pre-Trade Checklist */}
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-blue-600 mb-1.5">Pre-Trade Checklist</p>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600 mb-1.5">Pre-Trade Checklist</p>
           <div className="bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 space-y-1.5">
             {checklist.map((item, i) => (
               <div key={i} className="flex items-center gap-2">

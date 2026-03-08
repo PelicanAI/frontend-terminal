@@ -55,9 +55,9 @@ export function MultiAssetSection() {
           const Icon = asset.icon
           return (
             <ScrollReveal key={i} delay={i * 0.1}>
-              <div className="p-5 rounded-xl bg-white border border-slate-200 hover:border-blue-500/20 transition-colors">
+              <div className="p-5 rounded-xl bg-white border border-slate-200 hover:border-violet-500/20 transition-colors">
                 <Icon
-                  className="h-7 w-7 text-blue-600 mb-3"
+                  className="h-7 w-7 text-violet-600 mb-3"
                   weight="duotone"
                 />
                 <h3 className="text-base font-semibold text-slate-900 mb-1">
@@ -70,7 +70,7 @@ export function MultiAssetSection() {
                   {asset.tickers.map((ticker) => (
                     <span
                       key={ticker}
-                      className="text-[10px] font-mono text-blue-600 bg-blue-500/10 px-1.5 py-0.5 rounded"
+                      className="text-[10px] font-mono text-violet-600 bg-violet-500/10 px-1.5 py-0.5 rounded"
                     >
                       {ticker}
                     </span>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Lightning } from '@phosphor-icons/react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 // Animation phases
@@ -83,8 +83,14 @@ export function HeroChatDemo() {
       <div className="rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50 overflow-hidden">
         {/* Header */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100">
-          <div className="w-7 h-7 rounded-full bg-blue-500/10 flex items-center justify-center">
-            <Lightning weight="fill" className="w-4 h-4 text-blue-600" />
+          <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+            <Image
+              src="/pelican-logo-transparent.webp"
+              alt="Pelican"
+              width={28}
+              height={28}
+              className="object-contain"
+            />
           </div>
           <span className="text-sm font-semibold text-slate-800">Pelican AI</span>
           <div className="ml-auto flex items-center gap-1.5">
@@ -98,7 +104,7 @@ export function HeroChatDemo() {
           {/* User message */}
           {showUser && (
             <div className="flex justify-end animate-fade-in">
-              <div className="bg-blue-600 text-white text-sm rounded-2xl rounded-br-sm px-4 py-2.5 max-w-[85%]">
+              <div className="bg-violet-600 text-white text-sm rounded-2xl rounded-br-sm px-4 py-2.5 max-w-[85%]">
                 {USER_PROMPT.substring(0, typedChars)}
                 {phase === 'user-typing' && (
                   <span className="inline-block w-0.5 h-4 bg-white/70 ml-0.5 animate-pulse align-middle" />
@@ -110,8 +116,14 @@ export function HeroChatDemo() {
           {/* Thinking indicator */}
           {showThinking && (
             <div className="flex items-center gap-2 animate-fade-in">
-              <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                <Lightning weight="fill" className="w-3 h-3 text-blue-600" />
+              <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <Image
+                  src="/pelican-logo-transparent.webp"
+                  alt="Pelican"
+                  width={28}
+                  height={28}
+                  className="object-contain"
+                />
               </div>
               <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100">
                 <div className="thinking-dot" style={{ animationDelay: '0ms' }} />
@@ -124,14 +136,20 @@ export function HeroChatDemo() {
           {/* Response blocks */}
           {(showBlock1 || showBlock2 || showBlock3) && (
             <div className="flex gap-2">
-              <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Lightning weight="fill" className="w-3 h-3 text-blue-600" />
+              <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center overflow-hidden flex-shrink-0 mt-0.5">
+                <Image
+                  src="/pelican-logo-transparent.webp"
+                  alt="Pelican"
+                  width={28}
+                  height={28}
+                  className="object-contain"
+                />
               </div>
               <div className="space-y-2.5 flex-1 min-w-0">
                 {/* Block 1: Position Context */}
                 {showBlock1 && (
                   <div className="animate-fade-slide-up rounded-xl bg-slate-50 border border-slate-200 p-3">
-                    <p className="text-[10px] uppercase tracking-wider font-medium text-blue-600 mb-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-medium text-violet-600 mb-1.5">
                       Your Position
                     </p>
                     <p className="text-xs text-slate-600 leading-relaxed">
@@ -146,7 +164,7 @@ export function HeroChatDemo() {
                 {/* Block 2: Technical Setup */}
                 {showBlock2 && (
                   <div className="animate-fade-slide-up rounded-xl bg-slate-50 border border-slate-200 p-3">
-                    <p className="text-[10px] uppercase tracking-wider font-medium text-blue-600 mb-1.5">
+                    <p className="text-[10px] uppercase tracking-wider font-medium text-violet-600 mb-1.5">
                       Technical Setup
                     </p>
                     <div className="space-y-0.5">
@@ -164,8 +182,8 @@ export function HeroChatDemo() {
 
                 {/* Block 3: Recommendation */}
                 {showBlock3 && (
-                  <div className="animate-fade-slide-up rounded-xl bg-blue-50 border border-blue-200/60 p-3">
-                    <p className="text-[10px] uppercase tracking-wider font-medium text-blue-600 mb-1.5">
+                  <div className="animate-fade-slide-up rounded-xl bg-violet-50 border border-violet-200/60 p-3">
+                    <p className="text-[10px] uppercase tracking-wider font-medium text-violet-600 mb-1.5">
                       Recommendation
                     </p>
                     <p className="text-xs text-slate-700 leading-relaxed">

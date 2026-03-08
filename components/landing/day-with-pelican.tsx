@@ -60,7 +60,7 @@ const timelineItems = [
 type DotColor = 'blue' | 'slate'
 
 const dotColors: Record<DotColor, { border: string; bg: string }> = {
-  blue: { border: 'border-blue-500', bg: 'bg-blue-500/20' },
+  blue: { border: 'border-violet-500', bg: 'bg-violet-500/20' },
   slate: { border: 'border-slate-400', bg: 'bg-slate-400/20' },
 }
 
@@ -80,7 +80,7 @@ export function DayWithPelican() {
 
       <div className="relative max-w-2xl mx-auto">
         {/* Vertical line */}
-        <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500/50 via-blue-500/20 to-transparent" />
+        <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-violet-500/50 via-violet-500/20 to-transparent" />
 
         <div className="space-y-10">
           {timelineItems.map((item, i) => {

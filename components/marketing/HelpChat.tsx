@@ -107,13 +107,13 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
           width: '60px',
           height: '60px',
           borderRadius: '50%',
-          background: 'var(--primary)',
+          background: '#7c3aed',
           border: 'none',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)',
+          boxShadow: '0 4px 20px rgba(139, 92, 246, 0.4)',
           transition: 'all 0.2s ease',
           zIndex: 1055,
           pointerEvents: 'auto',
@@ -145,7 +145,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
             height: '500px',
             maxHeight: 'calc(100vh - 140px)',
             background: 'var(--card)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
             borderRadius: '12px',
             display: 'flex',
             flexDirection: 'column',
@@ -340,7 +340,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
                   transition: 'border-color 0.2s',
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)';
+                  e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.5)';
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = 'rgba(148, 163, 184, 0.2)';
@@ -351,7 +351,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
                 disabled={isLoading || !input.trim()}
                 style={{
                   padding: '12px 16px',
-                  background: isLoading || !input.trim() ? 'var(--muted-foreground)' : 'var(--primary)',
+                  background: isLoading || !input.trim() ? 'var(--muted-foreground)' : '#7c3aed',
                   border: 'none',
                   borderRadius: '8px',
                   cursor: isLoading || !input.trim() ? 'not-allowed' : 'pointer',
@@ -375,7 +375,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
                 marginTop: '12px',
                 padding: '10px',
                 background: 'transparent',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
                 borderRadius: '6px',
                 color: 'var(--muted-foreground)',
                 fontSize: '12px',
@@ -401,10 +401,10 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
         }
         .help-chat-btn:hover {
           transform: scale(1.05);
-          box-shadow: 0 6px 30px rgba(59, 130, 246, 0.5);
+          box-shadow: 0 6px 30px rgba(139, 92, 246, 0.5);
         }
         .help-chat-support-btn:hover {
-          background: rgba(59, 130, 246, 0.1);
+          background: rgba(139, 92, 246, 0.1);
           border-color: var(--primary);
           color: var(--foreground);
         }

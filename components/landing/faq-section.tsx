@@ -104,7 +104,7 @@ export function FAQSection() {
 
       <ScrollReveal delay={0.4}>
         <div className="text-center mt-8">
-          <Link href="/faq" className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+          <Link href="/faq" className="text-sm text-violet-600 hover:text-violet-700 font-medium transition-colors">
             See all FAQs →
           </Link>
         </div>

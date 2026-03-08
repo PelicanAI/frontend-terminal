@@ -64,10 +64,10 @@ export function CreditTiersSection() {
             <ScrollReveal key={tier.label} delay={i * 0.08}>
               <div className="rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm hover:shadow-md transition-shadow">
                 <Icon
-                  className="h-7 w-7 text-blue-600 mx-auto mb-3"
+                  className="h-7 w-7 text-violet-600 mx-auto mb-3"
                   weight="duotone"
                 />
-                <div className="font-mono text-2xl font-bold text-blue-600 tabular-nums mb-1">
+                <div className="font-mono text-2xl font-bold text-violet-600 tabular-nums mb-1">
                   {tier.credits}
                 </div>
                 <div className="text-xs text-slate-400 mb-2">credits</div>

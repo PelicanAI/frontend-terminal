@@ -17,14 +17,14 @@ function TeamAvatar({
   const [imgError, setImgError] = useState(false)
 
   return (
-    <div className="h-24 w-24 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 ring-2 ring-slate-200">
+    <div className="h-24 w-24 rounded-full overflow-hidden bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center shrink-0 ring-2 ring-slate-200">
       {!imgError ? (
         <Image
           src={src}
           alt={alt}
           width={96}
           height={96}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-center scale-110"
           onError={() => setImgError(true)}
         />
       ) : (
@@ -51,7 +51,7 @@ function CollapsibleBio({ text, maxWords = 50 }: { text: string; maxWords?: numb
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="mt-1 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+        className="mt-1 text-violet-600 hover:text-violet-700 text-sm font-medium transition-colors"
       >
         {expanded ? 'Show less' : 'Read more'}
       </button>
@@ -109,7 +109,7 @@ export function TeamSection() {
                       href={member.xUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-1 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                      className="mt-1 inline-flex items-center gap-1 text-sm text-violet-600 hover:text-violet-700 transition-colors"
                     >
                       {member.xHandle}
                     </a>

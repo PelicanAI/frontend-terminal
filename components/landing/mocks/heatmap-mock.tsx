@@ -32,7 +32,7 @@ export function HeatmapMock() {
               className={cn(
                 'text-[10px] font-medium px-2.5 py-1 rounded-md transition-colors',
                 tab === 'Stocks'
-                  ? 'bg-blue-500/10 text-blue-600'
+                  ? 'bg-violet-500/10 text-violet-600'
                   : 'text-slate-400 hover:text-slate-600'
               )}
             >
