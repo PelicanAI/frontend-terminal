@@ -1,18 +1,20 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import useSWR from 'swr'
 import {
   ClipboardText,
   Plus,
   Shield,
   Warning,
   Check,
-  Pencil,
   Trash,
   CaretDown,
   CaretRight,
   Sparkle,
+  ClockCounterClockwise,
+  NotePencil,
 } from '@phosphor-icons/react'
 import { toast } from '@/hooks/use-toast'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
@@ -21,8 +23,15 @@ import type { Trade } from '@/hooks/use-trades'
 import { useTradingPlan, type CreatePlanData } from '@/hooks/use-trading-plan'
 import type { TradingPlan, RuleComplianceStat } from '@/types/trading'
 import type { TradeStats } from '@/hooks/use-trade-stats'
+import type { PlanCompliance } from '@/lib/plan-compliance'
 import { buildPlanComplianceSummary, buildPlanReviewPrompt } from '@/lib/trading/plan-check'
 import { PelicanButton, PelicanCard, staggerContainer, staggerItem, SkeletonCard } from '@/components/ui/pelican'
+import { useAutoSavePlan, type FieldSaveStatus } from '@/hooks/use-auto-save-plan'
+import { useLiveCompliance } from '@/hooks/use-live-compliance'
+import { PlanComplianceHero } from '@/components/journal/plan-compliance-hero'
+import { createClient } from '@/lib/supabase/client'
+
+// ── Constants ──
 
 interface TradingPlanTabProps {
   trades: Trade[]
@@ -32,6 +41,7 @@ interface TradingPlanTabProps {
 }
 
 const ASSET_TYPES = ['stock', 'option', 'forex', 'crypto', 'etf']
+const STORAGE_KEY = 'pelican_plan_sections'
 
 const DEFAULT_FORM: CreatePlanData = {
   name: '',
@@ -49,6 +59,30 @@ const DEFAULT_FORM: CreatePlanData = {
   allowed_asset_types: [],
   blocked_tickers: [],
 }
+
+const FIELD_LABELS: Record<string, string> = {
+  name: 'Plan Name',
+  max_risk_per_trade_pct: 'Max Risk / Trade',
+  max_daily_loss: 'Max Daily Loss',
+  max_open_positions: 'Max Open Positions',
+  max_trades_per_day: 'Max Trades / Day',
+  min_risk_reward_ratio: 'Min R:R Ratio',
+  require_stop_loss: 'Require Stop Loss',
+  require_take_profit: 'Require Take Profit',
+  require_thesis: 'Require Thesis',
+  max_consecutive_losses_before_stop: 'Max Consecutive Losses',
+  no_same_ticker_after_loss: 'No Same Ticker After Loss',
+  pre_entry_checklist: 'Pre-Entry Checklist',
+  allowed_asset_types: 'Allowed Asset Types',
+  blocked_tickers: 'Blocked Tickers',
+  plan_notes: 'Plan Notes',
+}
+
+const DEFAULT_SECTIONS: Record<string, boolean> = {
+  risk: true, requirements: true, discipline: true, checklist: true, markets: true, history: false,
+}
+
+// ── Helpers ──
 
 function planToForm(plan: TradingPlan): CreatePlanData {
   return {
@@ -69,63 +103,151 @@ function planToForm(plan: TradingPlan): CreatePlanData {
   }
 }
 
-// ── Shared sub-components ──
+function parsePlanNotes(notes: string | null): Record<string, string> {
+  if (!notes) return {}
+  try {
+    const parsed = JSON.parse(notes)
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed))
+      return parsed as Record<string, string>
+    return { general: String(parsed) }
+  } catch {
+    return notes ? { general: notes } : {}
+  }
+}
 
-function SectionHeader({ icon: Icon, title }: { icon: React.ElementType; title: string }) {
+function getSectionStatus(
+  sectionKey: string,
+  compliance: PlanCompliance | null,
+): 'green' | 'amber' | 'red' | 'gray' {
+  if (!compliance) return 'gray'
+  const { liveMetrics, ruleScores } = compliance
+  switch (sectionKey) {
+    case 'risk': {
+      const statuses = [liveMetrics.tradesToday, liveMetrics.dailyPnl, liveMetrics.openPositions]
+      if (statuses.some(m => m.status === 'critical')) return 'red'
+      if (statuses.some(m => m.status === 'warning')) return 'amber'
+      return 'green'
+    }
+    case 'requirements': {
+      const enabled = ruleScores.filter(r => r.enabled)
+      if (enabled.length === 0) return 'gray'
+      const avg = enabled.reduce((s, r) => s + r.score, 0) / enabled.length
+      if (avg < 50) return 'red'
+      if (avg < 80) return 'amber'
+      return 'green'
+    }
+    case 'discipline': {
+      if (liveMetrics.consecutiveLosses.status === 'critical') return 'red'
+      if (liveMetrics.consecutiveLosses.status === 'warning') return 'amber'
+      return 'green'
+    }
+    default:
+      return 'gray'
+  }
+}
+
+function loadSections(): Record<string, boolean> {
+  if (typeof window === 'undefined') return DEFAULT_SECTIONS
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) return { ...DEFAULT_SECTIONS, ...JSON.parse(stored) }
+  } catch { /* ignore */ }
+  return DEFAULT_SECTIONS
+}
+
+// ── Sub-components ──
+
+function SaveIndicator({ status }: { status: FieldSaveStatus }) {
+  if (status === 'idle') return null
+  if (status === 'saving')
+    return <span className="text-[10px] text-[var(--text-muted)] animate-pulse">saving...</span>
+  if (status === 'saved')
+    return <span className="text-[10px] text-[var(--data-positive)]">Saved ✓</span>
+  return <span className="text-[10px] text-[var(--data-negative)]">Error</span>
+}
+
+function GlobalSaveIndicator({ status }: { status: FieldSaveStatus }) {
+  if (status === 'idle') return null
+  if (status === 'saving')
+    return <span className="text-xs text-[var(--text-muted)] animate-pulse font-medium">Saving...</span>
+  if (status === 'saved')
+    return <span className="text-xs text-[var(--data-positive)] font-medium">All changes saved</span>
+  return <span className="text-xs text-[var(--data-negative)] font-medium">Save error</span>
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  green: 'bg-[var(--data-positive)]',
+  amber: 'bg-[var(--data-warning)]',
+  red: 'bg-[var(--data-negative)]',
+  gray: 'bg-[var(--text-muted)]',
+}
+
+function SectionHeader({
+  icon: Icon,
+  title,
+  status,
+  expanded,
+  onToggle,
+  noteExists,
+  onToggleNote,
+  unconfigured,
+}: {
+  icon: React.ElementType
+  title: string
+  status?: 'green' | 'amber' | 'red' | 'gray'
+  expanded: boolean
+  onToggle: () => void
+  noteExists?: boolean
+  onToggleNote?: () => void
+  unconfigured?: boolean
+}) {
   return (
-    <div className="flex items-center gap-2 mb-3">
-      <Icon size={18} weight="bold" className="text-[var(--accent-primary)]" />
-      <h3 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider">{title}</h3>
+    <div className="flex items-center justify-between w-full mb-1" role="button" tabIndex={0} onClick={onToggle} onKeyDown={e => e.key === 'Enter' && onToggle()}>
+      <div className="flex items-center gap-2">
+        <Icon size={18} weight="bold" className="text-[var(--accent-primary)]" />
+        <h3 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider">{title}</h3>
+        {status && <div className={`w-2 h-2 rounded-full ${STATUS_COLORS[status]}`} />}
+      </div>
+      <div className="flex items-center gap-1.5">
+        {onToggleNote && (
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={e => { e.stopPropagation(); onToggleNote() }}
+            onKeyDown={e => { if (e.key === 'Enter') { e.stopPropagation(); onToggleNote() } }}
+            className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors"
+            title={noteExists ? 'Edit note' : 'Add note'}
+          >
+            <NotePencil size={14} weight={noteExists ? 'fill' : 'regular'} />
+          </span>
+        )}
+        {!expanded && unconfigured && (
+          <span className="text-[10px] text-[var(--text-muted)] italic mr-1">Click to configure</span>
+        )}
+        {expanded
+          ? <CaretDown size={14} className="text-[var(--text-muted)]" />
+          : <CaretRight size={14} className="text-[var(--text-muted)]" />}
+      </div>
     </div>
-  )
-}
-
-function RuleValue({ label, value, status }: { label: string; value: string; status?: 'ok' | 'warn' | 'danger' }) {
-  const color = status === 'danger' ? 'text-[var(--data-negative)]'
-    : status === 'warn' ? 'text-[var(--data-warning)]'
-    : status === 'ok' ? 'text-[var(--data-positive)]'
-    : 'text-[var(--text-primary)]'
-  return (
-    <div className="flex items-center justify-between py-1.5">
-      <span className="text-sm text-[var(--text-secondary)]">{label}</span>
-      <span className={`text-sm font-mono tabular-nums ${color}`}>{value}</span>
-    </div>
-  )
-}
-
-function Toggle({ enabled }: { enabled: boolean }) {
-  return enabled
-    ? <Check size={16} weight="bold" className="text-[var(--data-positive)]" />
-    : <span className="w-4 text-center text-[var(--text-muted)]">—</span>
-}
-
-function Pill({ text, variant = 'default' }: { text: string; variant?: 'default' | 'danger' }) {
-  const base = variant === 'danger'
-    ? 'bg-[var(--data-negative)]/10 text-[var(--data-negative)] border-[var(--data-negative)]/20'
-    : 'bg-[var(--accent-muted)] text-[var(--accent-primary)] border-[var(--accent-primary)]/20'
-  return (
-    <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full border ${base}`}>
-      {text}
-    </span>
   )
 }
 
 function NumberInput({
-  label,
-  value,
-  onChange,
-  suffix,
-  placeholder,
+  label, value, onChange, suffix, placeholder, saveStatus,
 }: {
   label: string
   value: number | null | undefined
   onChange: (v: number | null) => void
   suffix?: string
   placeholder?: string
+  saveStatus?: FieldSaveStatus
 }) {
   return (
     <label className="block">
-      <span className="text-xs text-[var(--text-muted)] mb-1 block">{label}</span>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs text-[var(--text-muted)]">{label}</span>
+        {saveStatus && <SaveIndicator status={saveStatus} />}
+      </div>
       <div className="relative">
         <input
           type="number"
@@ -142,15 +264,7 @@ function NumberInput({
   )
 }
 
-function ToggleSwitch({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string
-  checked: boolean
-  onChange: (v: boolean) => void
-}) {
+function ToggleSwitch({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex items-center justify-between cursor-pointer py-1">
       <span className="text-sm text-[var(--text-secondary)]">{label}</span>
@@ -171,86 +285,111 @@ function ToggleSwitch({
   )
 }
 
+
+// ── Plan Change History ──
+
+interface PlanChange {
+  id: string
+  field_changed: string
+  old_value: string
+  new_value: string
+  created_at: string
+}
+
+function HistoryItem({ change }: { change: PlanChange }) {
+  const label = FIELD_LABELS[change.field_changed] ?? change.field_changed
+  const dateStr = new Date(change.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  return (
+    <div className="flex items-start gap-2.5 py-1.5 text-sm">
+      <span className="text-xs text-[var(--text-muted)] font-mono tabular-nums w-14 shrink-0 pt-0.5">{dateStr}</span>
+      <span className="text-[var(--text-secondary)]">
+        {label}: <span className="text-[var(--text-muted)] line-through">{change.old_value || '—'}</span>{' '}
+        → <span className="text-[var(--text-primary)] font-medium">{change.new_value || '—'}</span>
+      </span>
+    </div>
+  )
+}
+
 // ── Main Component ──
 
 export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeStats }: TradingPlanTabProps) {
-  const { plan, isLoading, createPlan, updatePlan, deletePlan } = useTradingPlan()
+  const { plan, isLoading, createPlan, deletePlan } = useTradingPlan()
   const destructive = useDestructiveAction()
-  const [mode, setMode] = useState<'view' | 'create' | 'edit'>('view')
+  const { saveField, fieldStatus, globalStatus } = useAutoSavePlan(plan?.id ?? null)
+  const { compliance: liveCompliance } = useLiveCompliance()
+  const supabase = useMemo(() => createClient(), [])
+
+  const [isCreating, setIsCreating] = useState(false)
   const [form, setForm] = useState<CreatePlanData>(DEFAULT_FORM)
   const [saving, setSaving] = useState(false)
   const [newChecklistItem, setNewChecklistItem] = useState('')
   const [newBlockedTicker, setNewBlockedTicker] = useState('')
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    risk: true, requirements: true, discipline: true, checklist: true, markets: true,
-  })
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(loadSections)
+  const [sectionNotes, setSectionNotes] = useState<Record<string, string>>({})
+  const [openNoteSection, setOpenNoteSection] = useState<string | null>(null)
+  const formRef = useRef<HTMLDivElement>(null)
 
-  const toggleSection = (key: string) =>
-    setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }))
-
-  // Compliance summary
-  const compliance = useMemo(() => {
-    if (!plan) return null
-    const todayStr = new Date().toISOString().split('T')[0] as string
-    const openCount = trades.filter(t => t.status === 'open').length
-    const todayTrades = trades.filter(t => t.entry_date.startsWith(todayStr))
-    const todaysClosed = trades.filter(t => t.status === 'closed' && t.exit_date?.startsWith(todayStr))
-    const todayPnl = todaysClosed.reduce((sum, t) => sum + (t.pnl_amount ?? 0), 0)
-
-    return {
-      openCount,
-      openMax: plan.max_open_positions,
-      openStatus: plan.max_open_positions
-        ? openCount >= plan.max_open_positions ? 'danger' as const
-          : openCount >= plan.max_open_positions * 0.8 ? 'warn' as const
-          : 'ok' as const
-        : undefined,
-      todayTradeCount: todayTrades.length,
-      todayTradeMax: plan.max_trades_per_day,
-      todayTradeStatus: plan.max_trades_per_day
-        ? todayTrades.length >= plan.max_trades_per_day ? 'danger' as const
-          : todayTrades.length >= plan.max_trades_per_day * 0.8 ? 'warn' as const
-          : 'ok' as const
-        : undefined,
-      todayPnl,
-      dailyLossMax: plan.max_daily_loss,
-      dailyLossStatus: plan.max_daily_loss
-        ? todayPnl < 0 && Math.abs(todayPnl) >= plan.max_daily_loss ? 'danger' as const
-          : todayPnl < 0 && Math.abs(todayPnl) >= plan.max_daily_loss * 0.7 ? 'warn' as const
-          : 'ok' as const
-        : undefined,
-    }
-  }, [plan, trades])
-
-  const startCreate = () => {
-    setForm(DEFAULT_FORM)
-    setMode('create')
-  }
-
-  const startEdit = () => {
-    if (plan) {
+  // Sync form from plan
+  useEffect(() => {
+    if (plan && !isCreating) {
       setForm(planToForm(plan))
-      setMode('edit')
+      setSectionNotes(parsePlanNotes(plan.plan_notes))
     }
+  }, [plan, isCreating])
+
+  // Plan changes history
+  const { data: historyData, mutate: mutateHistory } = useSWR<PlanChange[]>(
+    plan ? ['plan-changes', plan.id] : null,
+    async () => {
+      const { data } = await supabase
+        .from('plan_changes')
+        .select('*')
+        .eq('plan_id', plan!.id)
+        .order('created_at', { ascending: false })
+        .limit(10)
+      return (data as PlanChange[]) || []
+    },
+    { revalidateOnFocus: false },
+  )
+
+  // Error toast on auto-save failure
+  useEffect(() => {
+    if (globalStatus === 'error') {
+      toast({ title: 'Failed to save change', description: 'Please try again.', variant: 'destructive' })
+    }
+  }, [globalStatus])
+
+  const toggleSection = (key: string) => {
+    setExpandedSections(prev => {
+      const next = { ...prev, [key]: !prev[key] }
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch { /* ignore */ }
+      return next
+    })
   }
 
-  const handleSave = async () => {
+  const updateForm = useCallback(<K extends keyof CreatePlanData>(key: K, value: CreatePlanData[K]) => {
+    setForm(f => {
+      const oldValue = f[key]
+      if (plan && !isCreating) {
+        saveField(String(key), value, oldValue)
+        setTimeout(() => mutateHistory(), 2000)
+      }
+      return { ...f, [key]: value }
+    })
+  }, [plan, isCreating, saveField, mutateHistory])
+
+  const handleCreate = async () => {
     if (!form.name.trim()) {
       toast({ title: 'Plan name is required', variant: 'destructive' })
       return
     }
     setSaving(true)
     try {
-      if (mode === 'create') {
-        await createPlan(form)
-        toast({ title: 'Trading plan created', description: `"${form.name}" is now active.` })
-      } else if (mode === 'edit' && plan) {
-        await updatePlan(plan.id, form as Partial<TradingPlan>)
-        toast({ title: 'Trading plan updated' })
-      }
-      setMode('view')
+      await createPlan(form)
+      toast({ title: 'Trading plan created', description: `"${form.name}" is now active.` })
+      setIsCreating(false)
     } catch (err) {
-      toast({ title: 'Failed to save plan', description: err instanceof Error ? err.message : 'Please try again.', variant: 'destructive' })
+      toast({ title: 'Failed to create plan', description: err instanceof Error ? err.message : 'Please try again.', variant: 'destructive' })
     } finally {
       setSaving(false)
     }
@@ -269,7 +408,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
       onConfirm: async () => {
         await deletePlan(plan.id)
         toast({ title: 'Trading plan deleted' })
-        setMode('view')
+        setIsCreating(false)
       },
     })
   }
@@ -277,34 +416,71 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
   const addChecklistItem = () => {
     const item = newChecklistItem.trim()
     if (!item) return
-    setForm(f => ({ ...f, pre_entry_checklist: [...(f.pre_entry_checklist ?? []), item] }))
+    updateForm('pre_entry_checklist', [...(form.pre_entry_checklist ?? []), item])
     setNewChecklistItem('')
   }
 
   const removeChecklistItem = (idx: number) =>
-    setForm(f => ({ ...f, pre_entry_checklist: (f.pre_entry_checklist ?? []).filter((_, i) => i !== idx) }))
+    updateForm('pre_entry_checklist', (form.pre_entry_checklist ?? []).filter((_, i) => i !== idx))
 
-  const toggleAssetType = (type: string) =>
-    setForm(f => {
-      const current = f.allowed_asset_types ?? []
-      return {
-        ...f,
-        allowed_asset_types: current.includes(type) ? current.filter(t => t !== type) : [...current, type],
-      }
-    })
+  const toggleAssetType = (type: string) => {
+    const current = form.allowed_asset_types ?? []
+    updateForm('allowed_asset_types', current.includes(type) ? current.filter(t => t !== type) : [...current, type])
+  }
 
   const addBlockedTicker = () => {
     const ticker = newBlockedTicker.trim().toUpperCase()
     if (!ticker) return
-    setForm(f => ({ ...f, blocked_tickers: [...(f.blocked_tickers ?? []), ticker] }))
+    updateForm('blocked_tickers', [...(form.blocked_tickers ?? []), ticker])
     setNewBlockedTicker('')
   }
 
   const removeBlockedTicker = (idx: number) =>
-    setForm(f => ({ ...f, blocked_tickers: (f.blocked_tickers ?? []).filter((_, i) => i !== idx) }))
+    updateForm('blocked_tickers', (form.blocked_tickers ?? []).filter((_, i) => i !== idx))
 
-  const updateForm = <K extends keyof CreatePlanData>(key: K, value: CreatePlanData[K]) =>
-    setForm(f => ({ ...f, [key]: value }))
+  const updateSectionNote = (section: string, text: string) => {
+    setSectionNotes(prev => {
+      const next = { ...prev, [section]: text }
+      if (plan && !isCreating) {
+        saveField('plan_notes', JSON.stringify(next), JSON.stringify(prev))
+      }
+      return next
+    })
+  }
+
+  const isSectionUnconfigured = (key: string): boolean => {
+    switch (key) {
+      case 'risk':
+        return form.max_risk_per_trade_pct == null && form.max_daily_loss == null
+          && form.max_open_positions == null && form.max_trades_per_day == null
+          && form.min_risk_reward_ratio == null
+      case 'requirements':
+        return !form.require_stop_loss && !form.require_take_profit && !form.require_thesis
+      case 'discipline':
+        return form.max_consecutive_losses_before_stop == null && !form.no_same_ticker_after_loss
+      case 'checklist':
+        return (form.pre_entry_checklist ?? []).length === 0
+      case 'markets':
+        return (form.allowed_asset_types ?? []).length === 0 && (form.blocked_tickers ?? []).length === 0
+      default:
+        return false
+    }
+  }
+
+  const renderNote = (section: string) => {
+    if (openNoteSection !== section) return null
+    return (
+      <div className="mb-3">
+        <textarea
+          value={sectionNotes[section] || ''}
+          onChange={e => updateSectionNote(section, e.target.value)}
+          placeholder="Notes for this section..."
+          rows={2}
+          className="w-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors resize-none"
+        />
+      </div>
+    )
+  }
 
   // ── Loading ──
   if (isLoading) {
@@ -316,152 +492,8 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
     )
   }
 
-  // ── Create / Edit Form ──
-  if (mode === 'create' || mode === 'edit') {
-    return (
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="space-y-4">
-        {/* Plan name */}
-        <PelicanCard>
-          <label className="block">
-            <span className="text-xs text-[var(--text-muted)] mb-1 block">Plan Name</span>
-            <input
-              type="text"
-              value={form.name}
-              onChange={e => updateForm('name', e.target.value)}
-              placeholder="My Trading Plan"
-              className="w-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
-            />
-          </label>
-        </PelicanCard>
-
-        {/* Risk Management */}
-        <PelicanCard>
-          <SectionHeader icon={Shield} title="Risk Management" />
-          <div className="grid grid-cols-2 gap-3">
-            <NumberInput label="Max Risk / Trade" value={form.max_risk_per_trade_pct} onChange={v => updateForm('max_risk_per_trade_pct', v)} suffix="%" />
-            <NumberInput label="Max Daily Loss" value={form.max_daily_loss} onChange={v => updateForm('max_daily_loss', v)} suffix="$" />
-            <NumberInput label="Max Open Positions" value={form.max_open_positions} onChange={v => updateForm('max_open_positions', v)} />
-            <NumberInput label="Max Trades / Day" value={form.max_trades_per_day} onChange={v => updateForm('max_trades_per_day', v)} />
-            <NumberInput label="Min R:R Ratio" value={form.min_risk_reward_ratio} onChange={v => updateForm('min_risk_reward_ratio', v)} />
-          </div>
-        </PelicanCard>
-
-        {/* Requirements */}
-        <PelicanCard>
-          <SectionHeader icon={ClipboardText} title="Requirements" />
-          <div className="space-y-1">
-            <ToggleSwitch label="Require stop loss" checked={form.require_stop_loss ?? false} onChange={v => updateForm('require_stop_loss', v)} />
-            <ToggleSwitch label="Require take profit" checked={form.require_take_profit ?? false} onChange={v => updateForm('require_take_profit', v)} />
-            <ToggleSwitch label="Require thesis" checked={form.require_thesis ?? false} onChange={v => updateForm('require_thesis', v)} />
-          </div>
-        </PelicanCard>
-
-        {/* Discipline */}
-        <PelicanCard>
-          <SectionHeader icon={Warning} title="Discipline" />
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <NumberInput label="Max Consecutive Losses" value={form.max_consecutive_losses_before_stop} onChange={v => updateForm('max_consecutive_losses_before_stop', v)} />
-          </div>
-          <ToggleSwitch label="No same ticker after loss" checked={form.no_same_ticker_after_loss ?? false} onChange={v => updateForm('no_same_ticker_after_loss', v)} />
-        </PelicanCard>
-
-        {/* Pre-Entry Checklist */}
-        <PelicanCard>
-          <SectionHeader icon={Check} title="Pre-Entry Checklist" />
-          <div className="space-y-2">
-            {(form.pre_entry_checklist ?? []).map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-                <Check size={14} weight="bold" className="text-[var(--data-positive)] shrink-0" />
-                <span className="flex-1">{item}</span>
-                <button type="button" onClick={() => removeChecklistItem(i)} className="text-[var(--text-muted)] hover:text-[var(--data-negative)] transition-colors">
-                  <Trash size={14} />
-                </button>
-              </div>
-            ))}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newChecklistItem}
-                onChange={e => setNewChecklistItem(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
-                placeholder="Add checklist item..."
-                className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
-              />
-              <IconTooltip label="Add item" side="top">
-                <button type="button" onClick={addChecklistItem} className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors">
-                  <Plus size={18} weight="bold" />
-                </button>
-              </IconTooltip>
-            </div>
-          </div>
-        </PelicanCard>
-
-        {/* Markets & Assets */}
-        <PelicanCard>
-          <SectionHeader icon={ClipboardText} title="Markets & Assets" />
-          <span className="text-xs text-[var(--text-muted)] mb-2 block">Allowed Asset Types</span>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {ASSET_TYPES.map(type => {
-              const selected = (form.allowed_asset_types ?? []).includes(type)
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => toggleAssetType(type)}
-                  className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
-                    selected
-                      ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] border-[var(--accent-primary)]/30'
-                      : 'bg-[var(--bg-elevated)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-secondary)]'
-                  }`}
-                >
-                  {type}
-                </button>
-              )
-            })}
-          </div>
-          <span className="text-xs text-[var(--text-muted)] mb-2 block">Blocked Tickers</span>
-          <div className="flex flex-wrap gap-2 mb-2">
-            {(form.blocked_tickers ?? []).map((ticker, i) => (
-              <span key={i} className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-[var(--data-negative)]/10 text-[var(--data-negative)] border-[var(--data-negative)]/20">
-                {ticker}
-                <button type="button" onClick={() => removeBlockedTicker(i)} className="hover:text-white transition-colors">
-                  <Trash size={12} />
-                </button>
-              </span>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={newBlockedTicker}
-              onChange={e => setNewBlockedTicker(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addBlockedTicker())}
-              placeholder="e.g. MEME"
-              className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-sm font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
-            />
-            <IconTooltip label="Add ticker" side="top">
-              <button type="button" onClick={addBlockedTicker} className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors">
-                <Plus size={18} weight="bold" />
-              </button>
-            </IconTooltip>
-          </div>
-        </PelicanCard>
-
-        {/* Actions */}
-        <div className="flex items-center gap-3 pt-2">
-          <PelicanButton onClick={handleSave} disabled={saving} variant="primary">
-            {saving ? 'Saving...' : mode === 'create' ? 'Create Plan' : 'Save Changes'}
-          </PelicanButton>
-          <PelicanButton onClick={() => setMode('view')} variant="secondary">
-            Cancel
-          </PelicanButton>
-        </div>
-      </motion.div>
-    )
-  }
-
   // ── Empty State ──
-  if (!plan) {
+  if (!plan && !isCreating) {
     return (
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex flex-col items-center justify-center py-16 text-center">
         <ClipboardText size={48} weight="thin" className="text-[var(--text-muted)] mb-4" />
@@ -470,7 +502,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
           Define your risk rules, requirements, and discipline guidelines to keep yourself accountable.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-3">
-          <PelicanButton onClick={startCreate} variant="primary">
+          <PelicanButton onClick={() => { setForm(DEFAULT_FORM); setIsCreating(true) }} variant="primary">
             <Plus size={16} weight="bold" />
             Create Trading Plan
           </PelicanButton>
@@ -478,7 +510,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
             onClick={() => onAskPelican(
               'Help me build a trading plan. Ask me about my experience level, risk tolerance, account size, ' +
               'preferred asset types, and trading style. Then create a comprehensive plan with: max risk per trade, ' +
-              'daily loss limit, max positions, R:R requirements, and discipline rules. Be specific with numbers.'
+              'daily loss limit, max positions, R:R requirements, and discipline rules. Be specific with numbers.',
             )}
             variant="secondary"
           >
@@ -489,239 +521,329 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
     )
   }
 
-  // ── View Mode ──
+  // ── Plan Form (create mode OR always-editable existing plan) ──
   return (
     <>
-    <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-4">
-      {/* Plan Header */}
-      <motion.div variants={staggerItem}>
-        <PelicanCard>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h2 className="text-lg font-semibold text-[var(--text-primary)]">{plan.name}</h2>
-              {plan.is_active && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--data-positive)]/15 text-[var(--data-positive)] border border-[var(--data-positive)]/20">
-                  Active
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <IconTooltip label="Edit plan" side="top">
-                <button onClick={startEdit} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors">
-                  <Pencil size={16} />
-                </button>
-              </IconTooltip>
-              <IconTooltip label="Delete plan" side="top">
-                <button onClick={handleDelete} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--data-negative)] hover:bg-[var(--bg-elevated)] transition-colors">
-                  <Trash size={16} />
-                </button>
-              </IconTooltip>
-            </div>
-          </div>
-        </PelicanCard>
-      </motion.div>
+      <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-4">
+        {/* Compliance Hero */}
+        {plan && liveCompliance && (
+          <motion.div variants={staggerItem}>
+            <PlanComplianceHero
+              compliance={liveCompliance}
+              trades={trades}
+              plan={plan}
+              onScrollToForm={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            />
+          </motion.div>
+        )}
 
-      {/* Risk Rules */}
-      <motion.div variants={staggerItem}>
-        <PelicanCard>
-          <button onClick={() => toggleSection('risk')} className="flex items-center justify-between w-full mb-1">
-            <SectionHeader icon={Shield} title="Risk Rules" />
-            {expandedSections.risk ? <CaretDown size={14} className="text-[var(--text-muted)]" /> : <CaretRight size={14} className="text-[var(--text-muted)]" />}
-          </button>
-          <AnimatePresence>
-            {expandedSections.risk && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <div className="divide-y divide-[var(--border-subtle)]">
-                  {plan.max_risk_per_trade_pct != null && (
-                    <RuleValue label="Max Risk / Trade" value={`${plan.max_risk_per_trade_pct}%`} />
-                  )}
-                  {plan.max_daily_loss != null && (
-                    <RuleValue label="Max Daily Loss" value={`$${plan.max_daily_loss}`} status={compliance?.dailyLossStatus} />
-                  )}
-                  {plan.max_open_positions != null && (
-                    <RuleValue label="Max Open Positions" value={`${compliance?.openCount ?? 0} / ${plan.max_open_positions}`} status={compliance?.openStatus} />
-                  )}
-                  {plan.max_trades_per_day != null && (
-                    <RuleValue label="Max Trades / Day" value={`${compliance?.todayTradeCount ?? 0} / ${plan.max_trades_per_day}`} status={compliance?.todayTradeStatus} />
-                  )}
-                  {plan.min_risk_reward_ratio != null && (
-                    <RuleValue label="Min R:R Ratio" value={`${plan.min_risk_reward_ratio}:1`} />
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </PelicanCard>
-      </motion.div>
-
-      {/* Requirements */}
-      <motion.div variants={staggerItem}>
-        <PelicanCard>
-          <button onClick={() => toggleSection('requirements')} className="flex items-center justify-between w-full mb-1">
-            <SectionHeader icon={ClipboardText} title="Requirements" />
-            {expandedSections.requirements ? <CaretDown size={14} className="text-[var(--text-muted)]" /> : <CaretRight size={14} className="text-[var(--text-muted)]" />}
-          </button>
-          <AnimatePresence>
-            {expandedSections.requirements && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-sm text-[var(--text-secondary)]">Stop loss required</span>
-                    <Toggle enabled={plan.require_stop_loss} />
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-sm text-[var(--text-secondary)]">Take profit required</span>
-                    <Toggle enabled={plan.require_take_profit} />
-                  </div>
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-sm text-[var(--text-secondary)]">Thesis required</span>
-                    <Toggle enabled={plan.require_thesis} />
-                  </div>
-                  {plan.min_risk_reward_ratio != null && (
-                    <div className="flex items-center justify-between py-1">
-                      <span className="text-sm text-[var(--text-secondary)]">Min R:R ratio</span>
-                      <span className="text-sm font-mono tabular-nums text-[var(--text-primary)]">{plan.min_risk_reward_ratio}:1</span>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </PelicanCard>
-      </motion.div>
-
-      {/* Discipline */}
-      <motion.div variants={staggerItem}>
-        <PelicanCard>
-          <button onClick={() => toggleSection('discipline')} className="flex items-center justify-between w-full mb-1">
-            <SectionHeader icon={Warning} title="Discipline Rules" />
-            {expandedSections.discipline ? <CaretDown size={14} className="text-[var(--text-muted)]" /> : <CaretRight size={14} className="text-[var(--text-muted)]" />}
-          </button>
-          <AnimatePresence>
-            {expandedSections.discipline && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <div className="space-y-2">
-                  {plan.max_consecutive_losses_before_stop != null && (
-                    <RuleValue label="Stop after consecutive losses" value={`${plan.max_consecutive_losses_before_stop}`} />
-                  )}
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-sm text-[var(--text-secondary)]">No same ticker after loss</span>
-                    <Toggle enabled={plan.no_same_ticker_after_loss} />
-                  </div>
-                  {plan.cooldown_after_max_loss_hours != null && (
-                    <RuleValue label="Cooldown after max loss" value={`${plan.cooldown_after_max_loss_hours}h`} />
-                  )}
-                  {plan.min_time_between_trades_minutes != null && (
-                    <RuleValue label="Min time between trades" value={`${plan.min_time_between_trades_minutes}m`} />
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </PelicanCard>
-      </motion.div>
-
-      {/* Pre-Entry Checklist */}
-      {(plan.pre_entry_checklist?.length ?? 0) > 0 && (
+        {/* Plan Header */}
         <motion.div variants={staggerItem}>
           <PelicanCard>
-            <button onClick={() => toggleSection('checklist')} className="flex items-center justify-between w-full mb-1">
-              <SectionHeader icon={Check} title="Pre-Entry Checklist" />
-              {expandedSections.checklist ? <CaretDown size={14} className="text-[var(--text-muted)]" /> : <CaretRight size={14} className="text-[var(--text-muted)]" />}
-            </button>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {isCreating ? (
+                  <label className="block flex-1">
+                    <span className="text-xs text-[var(--text-muted)] mb-1 block">Plan Name</span>
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={e => updateForm('name', e.target.value)}
+                      placeholder="My Trading Plan"
+                      className="w-full bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
+                    />
+                  </label>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={e => updateForm('name', e.target.value)}
+                      className="text-lg font-semibold text-[var(--text-primary)] bg-transparent border-none outline-none focus:ring-0 p-0 min-w-0 flex-1"
+                    />
+                    {plan?.is_active && (
+                      <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--data-positive)]/15 text-[var(--data-positive)] border border-[var(--data-positive)]/20 shrink-0">
+                        Active
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="flex items-center gap-2 shrink-0 ml-3">
+                {!isCreating && <GlobalSaveIndicator status={globalStatus} />}
+                {plan && (
+                  <IconTooltip label="Delete plan" side="top">
+                    <button onClick={handleDelete} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--data-negative)] hover:bg-[var(--bg-elevated)] transition-colors">
+                      <Trash size={16} />
+                    </button>
+                  </IconTooltip>
+                )}
+              </div>
+            </div>
+          </PelicanCard>
+        </motion.div>
+
+        {/* Risk Management */}
+        <motion.div variants={staggerItem} ref={formRef}>
+          <PelicanCard>
+            <SectionHeader
+              icon={Shield}
+              title="Risk Management"
+              status={plan ? getSectionStatus('risk', liveCompliance) : undefined}
+              expanded={expandedSections.risk ?? true}
+              onToggle={() => toggleSection('risk')}
+              noteExists={!!sectionNotes.risk}
+              onToggleNote={() => setOpenNoteSection(p => p === 'risk' ? null : 'risk')}
+              unconfigured={isSectionUnconfigured('risk')}
+            />
             <AnimatePresence>
-              {expandedSections.checklist && (
+              {(expandedSections.risk ?? true) && (
                 <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  {renderNote('risk')}
+                  <div className="grid grid-cols-2 gap-3">
+                    <NumberInput label="Max Risk / Trade" value={form.max_risk_per_trade_pct} onChange={v => updateForm('max_risk_per_trade_pct', v)} suffix="%" saveStatus={fieldStatus.max_risk_per_trade_pct} />
+                    <NumberInput label="Max Daily Loss" value={form.max_daily_loss} onChange={v => updateForm('max_daily_loss', v)} suffix="$" saveStatus={fieldStatus.max_daily_loss} />
+                    <NumberInput label="Max Open Positions" value={form.max_open_positions} onChange={v => updateForm('max_open_positions', v)} saveStatus={fieldStatus.max_open_positions} />
+                    <NumberInput label="Max Trades / Day" value={form.max_trades_per_day} onChange={v => updateForm('max_trades_per_day', v)} saveStatus={fieldStatus.max_trades_per_day} />
+                    <NumberInput label="Min R:R Ratio" value={form.min_risk_reward_ratio} onChange={v => updateForm('min_risk_reward_ratio', v)} saveStatus={fieldStatus.min_risk_reward_ratio} />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </PelicanCard>
+        </motion.div>
+
+        {/* Requirements */}
+        <motion.div variants={staggerItem}>
+          <PelicanCard>
+            <SectionHeader
+              icon={ClipboardText}
+              title="Requirements"
+              status={plan ? getSectionStatus('requirements', liveCompliance) : undefined}
+              expanded={expandedSections.requirements ?? true}
+              onToggle={() => toggleSection('requirements')}
+              noteExists={!!sectionNotes.requirements}
+              onToggleNote={() => setOpenNoteSection(p => p === 'requirements' ? null : 'requirements')}
+              unconfigured={isSectionUnconfigured('requirements')}
+            />
+            <AnimatePresence>
+              {(expandedSections.requirements ?? true) && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  {renderNote('requirements')}
+                  <div className="space-y-1">
+                    <ToggleSwitch label="Require stop loss" checked={form.require_stop_loss ?? false} onChange={v => updateForm('require_stop_loss', v)} />
+                    <ToggleSwitch label="Require take profit" checked={form.require_take_profit ?? false} onChange={v => updateForm('require_take_profit', v)} />
+                    <ToggleSwitch label="Require thesis" checked={form.require_thesis ?? false} onChange={v => updateForm('require_thesis', v)} />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </PelicanCard>
+        </motion.div>
+
+        {/* Discipline */}
+        <motion.div variants={staggerItem}>
+          <PelicanCard>
+            <SectionHeader
+              icon={Warning}
+              title="Discipline"
+              status={plan ? getSectionStatus('discipline', liveCompliance) : undefined}
+              expanded={expandedSections.discipline ?? true}
+              onToggle={() => toggleSection('discipline')}
+              noteExists={!!sectionNotes.discipline}
+              onToggleNote={() => setOpenNoteSection(p => p === 'discipline' ? null : 'discipline')}
+              unconfigured={isSectionUnconfigured('discipline')}
+            />
+            <AnimatePresence>
+              {(expandedSections.discipline ?? true) && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  {renderNote('discipline')}
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <NumberInput label="Max Consecutive Losses" value={form.max_consecutive_losses_before_stop} onChange={v => updateForm('max_consecutive_losses_before_stop', v)} saveStatus={fieldStatus.max_consecutive_losses_before_stop} />
+                  </div>
+                  <ToggleSwitch label="No same ticker after loss" checked={form.no_same_ticker_after_loss ?? false} onChange={v => updateForm('no_same_ticker_after_loss', v)} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </PelicanCard>
+        </motion.div>
+
+        {/* Pre-Entry Checklist */}
+        <motion.div variants={staggerItem}>
+          <PelicanCard>
+            <SectionHeader
+              icon={Check}
+              title="Pre-Entry Checklist"
+              expanded={expandedSections.checklist ?? true}
+              onToggle={() => toggleSection('checklist')}
+              noteExists={!!sectionNotes.checklist}
+              onToggleNote={() => setOpenNoteSection(p => p === 'checklist' ? null : 'checklist')}
+              unconfigured={isSectionUnconfigured('checklist')}
+            />
+            <AnimatePresence>
+              {(expandedSections.checklist ?? true) && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  {renderNote('checklist')}
                   <div className="space-y-2">
-                    {plan.pre_entry_checklist!.map((item, i) => (
-                      <div key={i} className="flex items-start gap-2.5 py-0.5">
-                        <div className="w-4 h-4 rounded border border-[var(--border-subtle)] bg-[var(--bg-elevated)] shrink-0 mt-0.5 flex items-center justify-center">
-                          <Check size={10} weight="bold" className="text-[var(--text-muted)]" />
-                        </div>
-                        <span className="text-sm text-[var(--text-secondary)]">{item}</span>
+                    {(form.pre_entry_checklist ?? []).map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                        <Check size={14} weight="bold" className="text-[var(--data-positive)] shrink-0" />
+                        <span className="flex-1">{item}</span>
+                        <button type="button" onClick={() => removeChecklistItem(i)} className="text-[var(--text-muted)] hover:text-[var(--data-negative)] transition-colors">
+                          <Trash size={14} />
+                        </button>
                       </div>
                     ))}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newChecklistItem}
+                        onChange={e => setNewChecklistItem(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
+                        placeholder="Add checklist item..."
+                        className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
+                      />
+                      <IconTooltip label="Add item" side="top">
+                        <button type="button" onClick={addChecklistItem} className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors">
+                          <Plus size={18} weight="bold" />
+                        </button>
+                      </IconTooltip>
+                    </div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </PelicanCard>
         </motion.div>
-      )}
 
-      {/* Markets & Assets */}
-      {((plan.allowed_asset_types?.length ?? 0) > 0 || (plan.blocked_tickers?.length ?? 0) > 0) && (
+        {/* Markets & Assets */}
         <motion.div variants={staggerItem}>
           <PelicanCard>
-            <button onClick={() => toggleSection('markets')} className="flex items-center justify-between w-full mb-1">
-              <SectionHeader icon={ClipboardText} title="Markets & Assets" />
-              {expandedSections.markets ? <CaretDown size={14} className="text-[var(--text-muted)]" /> : <CaretRight size={14} className="text-[var(--text-muted)]" />}
-            </button>
+            <SectionHeader
+              icon={ClipboardText}
+              title="Markets & Assets"
+              expanded={expandedSections.markets ?? true}
+              onToggle={() => toggleSection('markets')}
+              noteExists={!!sectionNotes.markets}
+              onToggleNote={() => setOpenNoteSection(p => p === 'markets' ? null : 'markets')}
+              unconfigured={isSectionUnconfigured('markets')}
+            />
             <AnimatePresence>
-              {expandedSections.markets && (
+              {(expandedSections.markets ?? true) && (
                 <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  {(plan.allowed_asset_types?.length ?? 0) > 0 && (
-                    <div className="mb-3">
-                      <span className="text-xs text-[var(--text-muted)] block mb-2">Allowed Assets</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {plan.allowed_asset_types!.map(type => (
-                          <Pill key={type} text={type} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {(plan.blocked_tickers?.length ?? 0) > 0 && (
-                    <div>
-                      <span className="text-xs text-[var(--text-muted)] block mb-2">Blocked Tickers</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {plan.blocked_tickers!.map(ticker => (
-                          <Pill key={ticker} text={ticker} variant="danger" />
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {renderNote('markets')}
+                  <span className="text-xs text-[var(--text-muted)] mb-2 block">Allowed Asset Types</span>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {ASSET_TYPES.map(type => {
+                      const selected = (form.allowed_asset_types ?? []).includes(type)
+                      return (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => toggleAssetType(type)}
+                          className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
+                            selected
+                              ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] border-[var(--accent-primary)]/30'
+                              : 'bg-[var(--bg-elevated)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-secondary)]'
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <span className="text-xs text-[var(--text-muted)] mb-2 block">Blocked Tickers</span>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {(form.blocked_tickers ?? []).map((ticker, i) => (
+                      <span key={i} className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-[var(--data-negative)]/10 text-[var(--data-negative)] border-[var(--data-negative)]/20">
+                        {ticker}
+                        <button type="button" onClick={() => removeBlockedTicker(i)} className="hover:text-white transition-colors">
+                          <Trash size={12} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newBlockedTicker}
+                      onChange={e => setNewBlockedTicker(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addBlockedTicker())}
+                      placeholder="e.g. MEME"
+                      className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 text-sm font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
+                    />
+                    <IconTooltip label="Add ticker" side="top">
+                      <button type="button" onClick={addBlockedTicker} className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors">
+                        <Plus size={18} weight="bold" />
+                      </button>
+                    </IconTooltip>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </PelicanCard>
         </motion.div>
-      )}
 
-      {/* Compliance Summary */}
-      <motion.div variants={staggerItem}>
-        <PelicanCard>
-          <SectionHeader icon={Shield} title="Today's Compliance" />
-          <div className="divide-y divide-[var(--border-subtle)] mb-4">
-            {compliance?.openMax != null && (
-              <RuleValue label="Open Positions" value={`${compliance.openCount} / ${compliance.openMax}`} status={compliance.openStatus} />
-            )}
-            {compliance?.todayTradeMax != null && (
-              <RuleValue label="Trades Today" value={`${compliance.todayTradeCount} / ${compliance.todayTradeMax}`} status={compliance.todayTradeStatus} />
-            )}
-            {compliance?.dailyLossMax != null && (
-              <RuleValue label="Daily P&L" value={`$${compliance.todayPnl.toFixed(2)} / -$${compliance.dailyLossMax}`} status={compliance.dailyLossStatus} />
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <PelicanButton
-              onClick={() => onAskPelican(buildPlanComplianceSummary(plan, trades) + '\n\nAm I following my trading plan today? Analyze my compliance and give me feedback.')}
-              variant="secondary"
-              size="sm"
-            >
-              Ask about today
+        {/* Pelican Actions */}
+        {plan && (
+          <motion.div variants={staggerItem}>
+            <div className="flex items-center gap-2">
+              <PelicanButton
+                onClick={() => onAskPelican(buildPlanComplianceSummary(plan, trades) + '\n\nAm I following my trading plan today? Analyze my compliance and give me feedback.')}
+                variant="secondary"
+                size="sm"
+              >
+                Ask about today
+              </PelicanButton>
+              <PelicanButton
+                onClick={() => onAskPelican(buildPlanReviewPrompt(plan, complianceStats || null, tradeStats || null))}
+                variant="secondary"
+                size="sm"
+              >
+                <Sparkle size={14} weight="bold" />
+                Review my plan
+              </PelicanButton>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Plan History */}
+        {plan && historyData && historyData.length > 0 && (
+          <motion.div variants={staggerItem}>
+            <PelicanCard>
+              <SectionHeader
+                icon={ClockCounterClockwise}
+                title="Plan History"
+                expanded={expandedSections.history ?? false}
+                onToggle={() => toggleSection('history')}
+              />
+              <AnimatePresence>
+                {(expandedSections.history ?? false) && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                    <div className="divide-y divide-[var(--border-subtle)]">
+                      {historyData.map(change => (
+                        <HistoryItem key={change.id} change={change} />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </PelicanCard>
+          </motion.div>
+        )}
+
+        {/* Create Actions */}
+        {isCreating && (
+          <div className="flex items-center gap-3 pt-2">
+            <PelicanButton onClick={handleCreate} disabled={saving} variant="primary">
+              {saving ? 'Creating...' : 'Create Plan'}
             </PelicanButton>
-            <PelicanButton
-              onClick={() => onAskPelican(buildPlanReviewPrompt(plan, complianceStats || null, tradeStats || null))}
-              variant="secondary"
-              size="sm"
-            >
-              <Sparkle size={14} weight="bold" />
-              Review my plan
+            <PelicanButton onClick={() => setIsCreating(false)} variant="secondary">
+              Cancel
             </PelicanButton>
           </div>
-        </PelicanCard>
+        )}
       </motion.div>
-    </motion.div>
 
       <ConfirmDestructiveAction
         open={destructive.state.isOpen}
