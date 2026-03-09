@@ -94,7 +94,7 @@ const ASSET_FILTER_OPTIONS: Record<Exclude<AssetClass, 'stocks'>, string[]> = {
 }
 
 // Market-adaptive morning brief prompt configurations
-type MarketType = 'stocks' | 'forex' | 'crypto' | 'futures' | 'options'
+type MarketType = 'stocks' | 'forex' | 'crypto' | 'options'
 
 interface BriefConfig {
   overnightRecap: string
@@ -106,14 +106,13 @@ interface BriefConfig {
 const BRIEF_CONFIGS: Record<MarketType, BriefConfig> = {
   stocks: {
     overnightRecap: `**1. MARKET OVERNIGHT RECAP**
-Search the web for "overnight futures S&P Nasdaq ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "market open ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Search the web for "overnight futures market open ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
 Summarize what happened — direction, magnitude, key drivers.
 Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
-- S&P 500: support, resistance, and pivot levels
-- Nasdaq: support, resistance, and pivot levels
-- VIX: current level and what it signals
-- DXY (dollar index): direction and impact`,
+- Major indices: support, resistance, and pivot levels
+- Volatility readings: current levels and what they signal
+- Dollar index: direction and impact on equities`,
     sectorRotation: `**6. SECTOR ROTATION**
 - Which sectors are showing relative strength/weakness?
 - Any notable sector divergences from the broad market?
@@ -125,14 +124,13 @@ Do not state specific price levels unless the search returns them.`,
   },
   forex: {
     overnightRecap: `**1. SESSION RECAP**
-Search the web for "overnight forex session ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "forex market open ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Search the web for "overnight forex session ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
 Summarize what happened — direction, magnitude, key drivers.
 Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
-- EUR/USD: support, resistance, and pivot levels
-- GBP/USD: support, resistance, and pivot levels
-- USD/JPY: support, resistance, and pivot levels
-- DXY (dollar index): current direction and momentum`,
+- Major currency pairs: support, resistance, and pivot levels
+- Dollar index: current direction and momentum
+- Any pairs at key technical levels?`,
     sectorRotation: `**6. CURRENCY STRENGTH**
 - Which currencies are showing relative strength/weakness today?
 - Any notable divergences between correlated pairs?
@@ -144,13 +142,12 @@ Do not state specific price levels unless the search returns them.`,
   },
   crypto: {
     overnightRecap: `**1. MARKET RECAP (24H)**
-Search the web for "Bitcoin Ethereum 24 hour ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "crypto market today ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Search the web for "crypto market 24 hour ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
 Summarize what happened — direction, magnitude, key drivers.
 Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
-- BTC: support, resistance, and pivot levels
-- ETH: support, resistance, and pivot levels
-- BTC dominance (BTC.D): current level and trend
+- Major cryptocurrencies: support, resistance, and pivot levels
+- Market dominance: current levels and trends
 - Total crypto market cap direction`,
     sectorRotation: `**6. CATEGORY ROTATION**
 - Which categories are leading? (Layer 1, DeFi, Meme, AI, Gaming)
@@ -162,34 +159,14 @@ Do not state specific price levels unless the search returns them.`,
 - Volume pattern analysis (when are the highest-volume windows?)
 - On-chain metrics to watch (exchange flows, stablecoin mints)`,
   },
-  futures: {
-    overnightRecap: `**1. OVERNIGHT SESSION RECAP**
-Search the web for "overnight futures ES NQ ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "futures market open ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
-Summarize what happened — direction, magnitude, key drivers.
-Do not state specific price levels unless the search returns them.`,
-    keyLevels: `**2. KEY LEVELS TODAY**
-- ES (S&P 500 futures): support, resistance, VPOC, and value area
-- NQ (Nasdaq futures): support, resistance, and pivot levels
-- VIX: current level and term structure
-- Any rollover/expiration considerations?`,
-    sectorRotation: `**6. SECTOR ROTATION**
-- Which sectors are showing relative strength/weakness?
-- COT (Commitment of Traders) positioning — any notable shifts?
-- Institutional vs retail positioning signals`,
-    gamePlan: `**10. GAME PLAN**
-- Summarize: what am I doing today?
-- Key price alerts to set on ES, NQ, CL, GC
-- Times to pay attention to (data releases, RTH open, power hour, settlement)
-- Overnight session levels to reference for RTH trading`,
-  },
   options: {
     overnightRecap: `**1. MARKET OVERNIGHT RECAP**
-Search the web for "overnight futures S&P Nasdaq ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "market open volatility ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Search the web for "overnight futures market open volatility ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
 Summarize what happened — direction, magnitude, key drivers.
 Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
-- S&P 500: support, resistance, and gamma exposure flip levels
-- VIX: current level, term structure (contango/backwardation)
+- Major indices: support, resistance, and gamma exposure flip levels
+- Volatility index: current level, term structure (contango/backwardation)
 - Put/Call ratio: current reading and 5-day trend
 - Max pain levels for major indices and my positions`,
     sectorRotation: `**6. VOLATILITY & FLOW ANALYSIS**
@@ -224,12 +201,6 @@ const PULSE_STRIP_PROMPTS: Record<MarketType, Record<string, string>> = {
     COMP: `How is Nasdaq performance affecting crypto sentiment today? Tech-crypto correlation analysis.`,
     DJI: `How are traditional markets influencing crypto flows today?`,
     VIX: `VIX analysis: what does equity volatility signal for crypto? Historical correlation check.`,
-  },
-  futures: {
-    SPX: `ES futures analysis: key levels, value area, VPOC, and overnight session recap.`,
-    COMP: `NQ futures analysis: key levels, relative strength vs ES, and tech sector leadership.`,
-    DJI: `YM futures analysis: Dow futures levels and sector rotation signals.`,
-    VIX: `VIX futures analysis: term structure, contango/backwardation, and hedging signals.`,
   },
   options: {
     SPX: `SPX options analysis: implied volatility, gamma exposure, max pain, and notable flow.`,
@@ -506,11 +477,14 @@ export default function MorningPage() {
       stocks: 'equities/stock',
       forex: 'forex/currency',
       crypto: 'cryptocurrency',
-      futures: 'futures',
       options: 'options',
     }
 
-    let prompt = `Call get_market_summary and get_market_movers now, then give me a morning brief using that data plus my context below.
+    let prompt = `Give me a comprehensive market overview for today.
+
+Use get_market_summary to show all major index performance, market breadth, and the economic calendar.
+Use get_market_movers with limit=10 to show today's top gainers and losers.
+Use get_news to find today's market-moving headlines and catalysts.
 
 Date: ${dateStr}
 Time: ${timeStr}
@@ -524,7 +498,7 @@ ${watchlistSummary}
 TODAY'S TOP MOVERS:
 ${moversSummary || 'Loading...'}
 
-Generate my personalized daily brief covering ALL of the following sections. Be specific with numbers, levels, and tickers. No fluff — write like a Goldman Sachs morning note meets a trading desk briefing.
+Cover these sections in your analysis. Be specific with numbers, levels, and tickers. Dense and actionable.
 
 ${briefConfig.overnightRecap}
 
@@ -532,12 +506,14 @@ ${briefConfig.keyLevels}
 
 **3. MY POSITIONS UPDATE**
 - For each of my open positions: current price vs my entry, how far from stop/target, any overnight news affecting them
+- Use get_news to find catalysts and events affecting my positions
 - Risk assessment: which positions need attention today?
 - Any positions approaching stop loss or take profit?
 
 **4. WATCHLIST OPPORTUNITIES**
 - For each ticker on my watchlist: current setup, key levels to watch, any catalysts today
-- Which watchlist items have the best risk/reward for entry today?
+- Use get_news to identify which watchlist items have the best risk/reward for entry today
+- Which setups match current market conditions?
 
 **5. MACRO & CATALYSTS**
 - Economic data releases today (times, consensus, potential impact)
@@ -549,21 +525,22 @@ ${briefConfig.sectorRotation}
 
 **7. TOP MOVERS ANALYSIS**
 - Why are today's biggest movers moving? (earnings, news, technical breakouts)
+- Use get_news to understand the drivers behind major moves
 - Any of these relevant to my positions or watchlist?
 
 **8. TRADE IDEAS**
-- 1-2 high-conviction trade ideas based on today's setup
+- 2-3 high-conviction setups based on today's conditions
 - Entry, stop, target for each
-- Thesis and catalyst
+- Clear thesis and catalyst
 
 **9. RISK WARNINGS**
-- What could go wrong today? Key risk events
+- Key risk events today
 - Unusual options activity or volatility signals
-- Any signs of market stress?
+- Signs of market stress or regime change
 
 ${briefConfig.gamePlan}
 
-Keep it dense, actionable, and personalized to MY positions and watchlist. Use markdown headers for each section.`
+Use markdown headers for each section. Personalize to my positions and watchlist.`
 
     // Append watchlist custom alert context
     if (watchlistAlertContext) {
