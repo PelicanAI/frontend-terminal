@@ -78,12 +78,12 @@ export function PositionFilters({
         {/* Sort + Search + Log */}
         <div className="flex items-center gap-2 w-full sm:w-auto">
           {(showConnectBroker !== false) && (
-            <ConnectBrokerButton variant="ghost" size="sm" />
+            <ConnectBrokerButton variant="secondary" size="sm" className="whitespace-nowrap flex-shrink-0" />
           )}
           {onLogTrade && (
             <button
               onClick={onLogTrade}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] transition-colors duration-150 whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] transition-colors duration-150 whitespace-nowrap flex-shrink-0"
             >
               <Plus size={14} weight="bold" />
               <span className="hidden sm:inline">Log Position</span>

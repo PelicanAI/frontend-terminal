@@ -378,7 +378,7 @@ export default function JournalPage() {
               ))}
             </div>
 
-            <ConnectBrokerButton variant="ghost" size="lg" />
+            <ConnectBrokerButton variant="secondary" size="lg" className="whitespace-nowrap flex-shrink-0" />
             <PelicanButton
               variant="ghost"
               size="lg"
