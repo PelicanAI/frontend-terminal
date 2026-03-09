@@ -64,6 +64,7 @@ export default function PositionsPage() {
     () => new Set(watchlistItems.map(w => w.ticker.toUpperCase())),
     [watchlistItems]
   )
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const marketsTraded = survey?.markets_traded || ['stocks']
   const primaryMarket = marketsTraded[0] || 'stocks'
 
@@ -253,12 +254,23 @@ export default function PositionsPage() {
           )}
         </div>
         <button
-          onClick={() => refreshPortfolio()}
-          className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors duration-150"
+          onClick={async () => {
+            if (isRefreshing) return
+            setIsRefreshing(true)
+            try {
+              await refreshPortfolio()
+            } catch (e) {
+              console.error('Refresh failed:', e)
+            } finally {
+              setTimeout(() => setIsRefreshing(false), 800)
+            }
+          }}
+          disabled={isRefreshing}
+          className={`flex items-center gap-1.5 text-xs transition-colors duration-150 ${isRefreshing ? 'text-[var(--text-muted)] opacity-50 cursor-not-allowed' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer'}`}
           aria-label="Refresh portfolio"
         >
-          <ArrowsClockwise size={14} weight="regular" />
-          Refresh
+          <ArrowsClockwise size={14} weight="regular" className={isRefreshing ? 'animate-spin' : ''} />
+          {isRefreshing ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
 

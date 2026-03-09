@@ -248,6 +248,7 @@ export default function MorningPage() {
   const [economicLoading, setEconomicLoading] = useState(true)
   const [briefContent, setBriefContent] = useState<string>('')
   const [briefLoading, setBriefLoading] = useState(false)
+  const [moversRefreshing, setMoversRefreshing] = useState(false)
   const [briefError, setBriefError] = useState<string | null>(null)
   const [assetClass, setAssetClass] = useState<AssetClass>('stocks')
   const [activeFilter, setActiveFilter] = useState('All')
@@ -794,11 +795,21 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
               <PelicanButton
                 variant="secondary"
                 size="sm"
-                onClick={() => refetchMovers()}
-                disabled={moversLoading}
+                onClick={async () => {
+                  if (moversRefreshing) return
+                  setMoversRefreshing(true)
+                  try {
+                    await refetchMovers()
+                  } catch (e) {
+                    console.error('Refresh movers failed:', e)
+                  } finally {
+                    setTimeout(() => setMoversRefreshing(false), 800)
+                  }
+                }}
+                disabled={moversRefreshing}
                 aria-label="Refresh movers"
               >
-                <ArrowsClockwise className={`h-4 w-4 ${moversLoading ? "animate-spin" : ""}`} weight="bold" />
+                <ArrowsClockwise className={`h-4 w-4 ${moversRefreshing ? "animate-spin" : ""}`} weight="bold" />
               </PelicanButton>
             </IconTooltip>
           </div>
@@ -859,9 +870,10 @@ Keep it dense, actionable, and personalized to MY positions and watchlist. Use m
                   variant="ghost"
                   size="sm"
                   onClick={handleGenerateBrief}
+                  disabled={briefLoading}
                 >
-                  <ArrowsClockwise className="h-3 w-3" weight="regular" />
-                  Regenerate
+                  <ArrowsClockwise className={`h-3 w-3 ${briefLoading ? 'animate-spin' : ''}`} weight="regular" />
+                  {briefLoading ? 'Regenerating...' : 'Regenerate'}
                 </PelicanButton>
               </div>
             )}
