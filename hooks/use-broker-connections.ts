@@ -18,23 +18,28 @@ export function useBrokerConnections() {
   const { data, error, isLoading, mutate } = useSWR<BrokerConnection[]>(
     user ? ['broker-connections', user.id] : null,
     async () => {
-      const res = await fetch('/api/snaptrade/connections')
-      if (!res.ok) throw new Error('Failed to fetch connections')
-      const json = await res.json()
-      return json.connections ?? []
+      try {
+        const res = await fetch('/api/snaptrade/connections')
+        if (!res.ok) return []
+        const json = await res.json()
+        return json.connections ?? []
+      } catch {
+        return []
+      }
     },
     {
       revalidateOnFocus: false,
       dedupingInterval: 30000,
+      onErrorRetry: () => { /* don't retry — graceful degradation */ },
     }
   )
 
-  const activeConnections = (data ?? []).filter(c => c.status === 'active')
+  const connections = data ?? []
+  const activeConnections = connections.filter(c => c.status === 'active')
 
   return {
-    connections: data ?? [],
+    connections,
     activeConnections,
-    hasConnections: activeConnections.length > 0,
     isLoading,
     error: error ?? null,
     refetch: mutate,

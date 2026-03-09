@@ -60,7 +60,7 @@ export default function PositionsPage() {
   const { openWithPrompt } = usePelicanPanelContext()
   const { closeTrade, refetch: refetchTrades, logTrade } = useTrades()
   const { survey } = useTraderProfile()
-  const { hasConnections: hasBrokerConnections } = useBrokerConnections()
+  const { activeConnections } = useBrokerConnections()
   const { items: watchlistItems } = useWatchlist()
   const watchlistTickers = useMemo(
     () => new Set(watchlistItems.map(w => w.ticker.toUpperCase())),
@@ -285,7 +285,7 @@ export default function PositionsPage() {
         onSortChange={setSortBy}
         onSearchChange={setSearchQuery}
         onLogTrade={() => setShowLogTradeModal(true)}
-        showConnectBroker={!hasBrokerConnections}
+        showConnectBroker={activeConnections.length === 0}
       />
 
       {/* Position cards */}

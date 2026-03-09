@@ -77,7 +77,7 @@ export function PositionFilters({
 
         {/* Sort + Search + Log */}
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          {showConnectBroker && (
+          {(showConnectBroker !== false) && (
             <ConnectBrokerButton variant="ghost" size="sm" />
           )}
           {onLogTrade && (
