@@ -1,17 +1,68 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Zap, Crown } from "lucide-react"
+import { Zap, Crown, AlertTriangle, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { CreditDisplay } from "@/components/credit-display"
 import { ManageSubscriptionButton } from "@/components/manage-subscription-button"
 import { useCreditsContext } from "@/providers/credits-provider"
+import { useToast } from "@/hooks/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export function SubscriptionCard() {
-  const { credits, isSubscribed, isFounder } = useCreditsContext()
+  const { credits, isSubscribed, isFounder, refetch } = useCreditsContext()
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const { toast } = useToast()
+  const router = useRouter()
+
+  const handleCancelSubscription = async () => {
+    setCancelling(true)
+    try {
+      const response = await fetch('/api/stripe/cancel-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to cancel subscription')
+      }
+
+      toast({
+        title: "Subscription cancelled",
+        description: "Your subscription has been cancelled successfully. You&apos;ll retain access until the end of your billing period.",
+      })
+
+      // Refresh credits data and UI
+      await refetch()
+      router.refresh()
+      setShowCancelDialog(false)
+    } catch (error) {
+      console.error('Cancel subscription error:', error)
+      toast({
+        title: "Cancellation failed",
+        description: error instanceof Error ? error.message : "Failed to cancel subscription. Please contact support.",
+        variant: "destructive",
+      })
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   return (
     <Card>
@@ -127,6 +178,16 @@ export function SubscriptionCard() {
                   View All Plans
                 </Link>
               </Button>
+              {!isFounder && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowCancelDialog(true)}
+                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  Cancel Subscription
+                </Button>
+              )}
             </>
           ) : (
             <Button asChild className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
@@ -149,6 +210,43 @@ export function SubscriptionCard() {
           </>
         )}
       </CardContent>
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Subscription?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel your subscription? You&apos;ll retain access until the end of your current billing period.
+              <br /><br />
+              You can resubscribe anytime to continue using Pelican AI.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelling}>Keep Subscription</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault()
+                handleCancelSubscription()
+              }}
+              disabled={cancelling}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {cancelling ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  Yes, Cancel Subscription
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   )
 }

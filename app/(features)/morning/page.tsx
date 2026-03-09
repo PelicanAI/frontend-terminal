@@ -106,9 +106,9 @@ interface BriefConfig {
 const BRIEF_CONFIGS: Record<MarketType, BriefConfig> = {
   stocks: {
     overnightRecap: `**1. MARKET OVERNIGHT RECAP**
-- How did futures trade overnight? Where are S&P, Nasdaq, Dow futures right now?
-- What happened in Asia and Europe sessions?
-- Any overnight gaps or significant moves?`,
+Search the web for "overnight futures S&P Nasdaq ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "market open ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Summarize what happened — direction, magnitude, key drivers.
+Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
 - S&P 500: support, resistance, and pivot levels
 - Nasdaq: support, resistance, and pivot levels
@@ -125,9 +125,9 @@ const BRIEF_CONFIGS: Record<MarketType, BriefConfig> = {
   },
   forex: {
     overnightRecap: `**1. SESSION RECAP**
-- How did the Asian session trade? Any significant moves in JPY, AUD, NZD crosses?
-- European session open outlook — what's the tone?
-- Any overnight gaps or central bank interventions?`,
+Search the web for "overnight forex session ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "forex market open ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Summarize what happened — direction, magnitude, key drivers.
+Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
 - EUR/USD: support, resistance, and pivot levels
 - GBP/USD: support, resistance, and pivot levels
@@ -144,9 +144,9 @@ const BRIEF_CONFIGS: Record<MarketType, BriefConfig> = {
   },
   crypto: {
     overnightRecap: `**1. MARKET RECAP (24H)**
-- How did BTC and ETH trade over the last 24 hours? Any significant moves?
-- What happened during the Asia and US sessions?
-- Any notable liquidation events or large whale movements?`,
+Search the web for "Bitcoin Ethereum 24 hour ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "crypto market today ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Summarize what happened — direction, magnitude, key drivers.
+Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
 - BTC: support, resistance, and pivot levels
 - ETH: support, resistance, and pivot levels
@@ -164,9 +164,9 @@ const BRIEF_CONFIGS: Record<MarketType, BriefConfig> = {
   },
   futures: {
     overnightRecap: `**1. OVERNIGHT SESSION RECAP**
-- How did ES, NQ, and YM trade overnight? Key levels hit?
-- Globex session volume and range — was it trending or range-bound?
-- Any overnight gaps or significant moves? Gap fill probability?`,
+Search the web for "overnight futures ES NQ ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "futures market open ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Summarize what happened — direction, magnitude, key drivers.
+Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
 - ES (S&P 500 futures): support, resistance, VPOC, and value area
 - NQ (Nasdaq futures): support, resistance, and pivot levels
@@ -184,9 +184,9 @@ const BRIEF_CONFIGS: Record<MarketType, BriefConfig> = {
   },
   options: {
     overnightRecap: `**1. MARKET OVERNIGHT RECAP**
-- How did futures trade overnight? Where are S&P, Nasdaq, Dow futures right now?
-- What happened in Asia and Europe sessions?
-- Any overnight gaps or significant moves affecting implied volatility?`,
+Search the web for "overnight futures S&P Nasdaq ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}" and "market open volatility ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}".
+Summarize what happened — direction, magnitude, key drivers.
+Do not state specific price levels unless the search returns them.`,
     keyLevels: `**2. KEY LEVELS TODAY**
 - S&P 500: support, resistance, and gamma exposure flip levels
 - VIX: current level, term structure (contango/backwardation)
@@ -510,7 +510,7 @@ export default function MorningPage() {
       options: 'options',
     }
 
-    let prompt = `You are Pelican, an institutional-grade AI trading assistant delivering a comprehensive daily briefing. My primary market is ${marketLabel[marketType] ?? 'equities/stock'}.
+    let prompt = `Call get_market_summary and get_market_movers now, then give me a morning brief using that data plus my context below.
 
 Date: ${dateStr}
 Time: ${timeStr}
