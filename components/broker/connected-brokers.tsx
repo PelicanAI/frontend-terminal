@@ -21,6 +21,7 @@ function timeAgo(dateStr: string | null): string {
 
 function StatusBadge({ status }: { status: BrokerConnection['status'] }) {
   const config = {
+    pending: { color: 'var(--data-warning)', label: 'Pending', Icon: WarningCircle },
     active: { color: 'var(--data-positive)', label: 'Active', Icon: CheckCircle },
     disabled: { color: 'var(--text-muted)', label: 'Disconnected', Icon: Plug },
     error: { color: 'var(--data-negative)', label: 'Error', Icon: WarningCircle },

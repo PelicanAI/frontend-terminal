@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS broker_connections (
   snaptrade_user_secret TEXT NOT NULL,
   brokerage_authorization_id TEXT,
   brokerage_name TEXT,
-  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'disabled', 'error')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'disabled', 'error')),
   last_synced_at TIMESTAMPTZ,
   connected_at TIMESTAMPTZ DEFAULT now(),
   created_at TIMESTAMPTZ DEFAULT now(),

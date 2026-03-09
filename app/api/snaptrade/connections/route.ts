@@ -49,6 +49,49 @@ export async function GET() {
   }
 }
 
+export async function PATCH(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
+
+    const { success } = await connectionsLimiter.limit(user.id)
+    if (!success) return rateLimitResponse()
+
+    const { authorizationId } = await request.json()
+    if (!authorizationId) {
+      return NextResponse.json({ error: 'Missing authorizationId' }, { status: 400 })
+    }
+
+    // Activate the pending connection row for this user
+    const serviceClient = getServiceClient()
+    const { error: updateError } = await serviceClient
+      .from('broker_connections')
+      .update({
+        brokerage_authorization_id: authorizationId,
+        status: 'active',
+        connected_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', user.id)
+      .is('brokerage_authorization_id', null)
+
+    if (updateError) {
+      console.error('Failed to activate broker connection:', updateError)
+      return NextResponse.json({ error: 'Failed to activate connection' }, { status: 500 })
+    }
+
+    return NextResponse.json({ activated: true }, {
+      headers: { 'Cache-Control': 'no-store' },
+    })
+  } catch (error) {
+    console.error('SnapTrade connections PATCH error:', error)
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createClient()

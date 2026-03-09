@@ -64,9 +64,19 @@ export function ConnectBrokerButton({
     setIsModalOpen(false)
     setRedirectLink(null)
 
-    // Save the authorization ID (update the connection record)
+    // Activate the connection with the authorizationId
     try {
-      // Trigger a sync immediately
+      await fetch('/api/snaptrade/connections', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ authorizationId }),
+      })
+    } catch {
+      // Non-fatal — sync will still work
+    }
+
+    // Trigger a sync
+    try {
       const syncRes = await fetch('/api/snaptrade/sync', { method: 'POST' })
       if (syncRes.ok) {
         const { synced } = await syncRes.json()
@@ -81,15 +91,7 @@ export function ConnectBrokerButton({
       toast({ title: 'Broker connected', description: 'Positions will sync shortly.' })
     }
 
-    // Refetch connection list
     refetch()
-
-    // Store the authorizationId if needed — we can do this via a simple update call
-    void fetch('/api/snaptrade/connections', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ authorizationId }),
-    }).catch(() => { /* non-critical */ })
   }, [refetch])
 
   const handleError = useCallback((error: { detail?: string; statusCode?: string }) => {

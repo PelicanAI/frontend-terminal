@@ -7,7 +7,7 @@ export interface BrokerConnection {
   id: string
   brokerage_authorization_id: string | null
   brokerage_name: string | null
-  status: 'active' | 'disabled' | 'error'
+  status: 'pending' | 'active' | 'disabled' | 'error'
   last_synced_at: string | null
   connected_at: string
 }
@@ -35,7 +35,7 @@ export function useBrokerConnections() {
   )
 
   const connections = data ?? []
-  const activeConnections = connections.filter(c => c.status === 'active')
+  const activeConnections = connections.filter(c => c.status === 'active' && c.brokerage_authorization_id != null)
 
   return {
     connections,

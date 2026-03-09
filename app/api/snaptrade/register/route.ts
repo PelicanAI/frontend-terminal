@@ -65,6 +65,7 @@ export async function POST() {
         user_id: user.id,
         snaptrade_user_id: snaptradeUserId,
         snaptrade_user_secret: userSecret,
+        status: 'pending',
       })
       .select('id')
       .single()
