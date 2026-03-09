@@ -33,6 +33,12 @@ export interface Trade {
   is_paper: boolean
   created_at: string
   updated_at: string
+  // Broker sync fields
+  source?: string
+  broker_connection_id?: string
+  snaptrade_symbol_id?: string
+  last_synced_at?: string
+  broker_fields_locked?: boolean
 }
 
 export interface TradeFormData {

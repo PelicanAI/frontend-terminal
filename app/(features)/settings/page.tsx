@@ -29,6 +29,7 @@ import {
   PrivacySection,
   UploadedImagesSection,
 } from "@/components/settings"
+import { BrokersSection } from "@/components/settings/BrokersSection"
 import { type UserSettings, DEFAULT_SETTINGS } from "@/components/settings/types"
 
 export default function SettingsPage() {
@@ -147,6 +148,10 @@ export default function SettingsPage() {
                 settings={settings}
                 supabase={supabase}
               />
+            )}
+
+            {activeSection === "brokers" && (
+              <BrokersSection />
             )}
 
             {activeSection === "trading" && (
