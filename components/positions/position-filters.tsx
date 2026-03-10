@@ -100,7 +100,7 @@ export function PositionFilters({
             <select
               value={sortBy}
               onChange={(e) => onSortChange(e.target.value)}
-              className="appearance-none bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg text-sm text-[var(--text-secondary)] pl-8 pr-7 py-1.5 focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors cursor-pointer hover:border-[var(--border-hover)]"
+              className="appearance-none bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg text-sm text-[var(--text-secondary)] pl-8 pr-7 py-1.5 min-w-[90px] focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors cursor-pointer hover:border-[var(--border-hover)]"
             >
               <option value="size_desc">Size ↓</option>
               <option value="size_asc">Size ↑</option>

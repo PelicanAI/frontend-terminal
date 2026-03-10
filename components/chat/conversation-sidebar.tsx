@@ -329,7 +329,7 @@ export function ConversationSidebar({
       const matchesSearch = conv.title.toLowerCase().includes(searchQuery.toLowerCase())
       if (!matchesSearch || conv.archived) return false
 
-      // When Actions is toggled on, show only actions; otherwise show non-action chats
+      // When Auto Prompts is toggled on, show only actions; otherwise show non-action chats
       if (showActions) {
         return getConversationClass(conv.metadata) === 'action'
       }
@@ -533,7 +533,7 @@ export function ConversationSidebar({
           )}
         >
           <Lightning size={16} weight={showActions ? 'fill' : 'regular'} />
-          Actions
+          Auto Prompts
         </button>
       </div>
 

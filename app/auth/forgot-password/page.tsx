@@ -55,12 +55,12 @@ export default function ForgotPasswordPage() {
 
         <div className="bg-card border border-border rounded-3xl p-8 shadow-xl">
           <div className="flex flex-col items-center text-center mb-8">
-            <div className="w-12 h-12 mb-4 relative">
+            <div className="w-20 h-20 mb-4 relative">
               <Image
                 src="/pelican-logo-transparent.webp"
                 alt="Pelican Logo"
-                width={48}
-                height={48}
+                width={80}
+                height={80}
                 className="object-contain"
               />
             </div>

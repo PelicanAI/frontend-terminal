@@ -124,7 +124,7 @@ export default function LoginPage() {
                   href="/auth/forgot-password"
                   className="text-xs text-primary hover:text-primary/80 transition-colors"
                 >
-                  Forgot?
+                  Forgot password?
                 </Link>
               </div>
               <div className="relative group">

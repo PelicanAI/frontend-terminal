@@ -21,7 +21,7 @@ export function StrategySort({ filters, onChange }: StrategySortProps) {
       <select
         value={filters.sortBy}
         onChange={(e) => onChange((prev) => ({ ...prev, sortBy: e.target.value as StrategyFilter['sortBy'] }))}
-        className="text-xs bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[var(--accent-primary)] transition-colors cursor-pointer"
+        className="text-xs bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg px-3 py-1.5 min-w-[130px] focus:outline-none focus:border-[var(--accent-primary)] transition-colors cursor-pointer"
       >
         {SORT_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>

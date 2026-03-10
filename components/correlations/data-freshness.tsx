@@ -36,7 +36,9 @@ export function DataFreshness({ calculatedAt }: DataFreshnessProps) {
     <span className="text-xs flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
       Updated {relativeTime}
       {isStale && (
-        <span style={{ color: 'var(--data-warning)' }}> · Data may be stale</span>
+        <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 ml-1.5">
+          Data may be stale
+        </span>
       )}
     </span>
   )

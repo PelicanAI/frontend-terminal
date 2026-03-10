@@ -18,10 +18,10 @@ interface JournalEmptyStateProps {
 }
 
 const features = [
-  { icon: ChartLineUp, text: 'Performance analytics \u2014 win rate, P&L, profit factor' },
-  { icon: MagnifyingGlass, text: 'Pattern detection \u2014 Pelican finds what you can\u2019t see' },
-  { icon: Brain, text: 'AI trade grading \u2014 get each trade scored and reviewed' },
-  { icon: Target, text: 'Playbook tracking \u2014 see which strategies actually work' },
+  { icon: ChartLineUp, text: 'Performance analytics — win rate, P&L, profit factor' },
+  { icon: MagnifyingGlass, text: 'Pattern detection — Pelican finds what you can\'t see' },
+  { icon: Brain, text: 'AI trade grading — get each trade scored and reviewed' },
+  { icon: Target, text: 'Playbook tracking — see which strategies actually work' },
 ]
 
 export function JournalEmptyState({

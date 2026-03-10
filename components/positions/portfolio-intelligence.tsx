@@ -153,7 +153,7 @@ export function PortfolioIntelligence({
                 <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">
                   {card.title}
                 </h3>
-                <p className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                   {card.description}
                 </p>
               </PelicanCard>

@@ -457,7 +457,7 @@ export default function OnboardingPage() {
             {isSubmitting ? (
               <SpinnerGap weight="bold" className="w-5 h-5 animate-spin" />
             ) : isFinalStep ? (
-              'Start Trading \u2192'
+              'Start Trading →'
             ) : (
               'Continue'
             )}
