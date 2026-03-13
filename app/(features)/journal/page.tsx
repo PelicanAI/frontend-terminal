@@ -23,6 +23,7 @@ import { buildReplayNarrationPrompt } from "@/lib/journal/build-replay-prompt"
 import { PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/pelican"
 import { Plus, ChartBar, Funnel, ClipboardText, Brain, UserCircle, X as XIcon, UploadSimple } from "@phosphor-icons/react"
 import { ConnectBrokerButton } from "@/components/broker/connect-broker-button"
+import { useBrokerConnections } from "@/hooks/use-broker-connections"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { trackEvent } from "@/lib/tracking"
 import { toast } from "@/hooks/use-toast"
@@ -81,6 +82,7 @@ export default function JournalPage() {
   const router = useRouter()
 
   const { trades, isLoading: tradesLoading, logTrade, closeTrade, refetch, updateTrade } = useTrades()
+  const { activeConnections } = useBrokerConnections()
 
   // Handle ?tab= from settings modal links (with backward compat)
   const tabParam = searchParams.get('tab')
@@ -378,7 +380,9 @@ export default function JournalPage() {
               ))}
             </div>
 
-            <ConnectBrokerButton variant="secondary" size="lg" className="whitespace-nowrap flex-shrink-0" />
+            {activeConnections.length === 0 && (
+              <ConnectBrokerButton variant="secondary" size="lg" className="whitespace-nowrap flex-shrink-0" />
+            )}
             <PelicanButton
               variant="ghost"
               size="lg"

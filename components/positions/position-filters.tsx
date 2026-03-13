@@ -4,6 +4,7 @@ import { PortfolioPosition } from '@/types/portfolio'
 import { MagnifyingGlass, SortAscending, Plus } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { ConnectBrokerButton } from '@/components/broker/connect-broker-button'
+import { useBrokerConnections } from '@/hooks/use-broker-connections'
 
 interface PositionFiltersProps {
   positions: PortfolioPosition[]
@@ -34,6 +35,9 @@ export function PositionFilters({
   onLogTrade,
   showConnectBroker,
 }: PositionFiltersProps) {
+  const { activeConnections } = useBrokerConnections()
+  const shouldShowConnectBroker = showConnectBroker !== false && activeConnections.length === 0
+
   const tabs = useMemo<FilterTab[]>(() => {
     const longCount = positions.filter((p) => p.direction === 'long').length
     const shortCount = positions.filter((p) => p.direction === 'short').length
@@ -77,7 +81,7 @@ export function PositionFilters({
 
         {/* Sort + Search + Log */}
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          {(showConnectBroker !== false) && (
+          {shouldShowConnectBroker && (
             <ConnectBrokerButton variant="secondary" size="sm" className="whitespace-nowrap flex-shrink-0" />
           )}
           {onLogTrade && (
