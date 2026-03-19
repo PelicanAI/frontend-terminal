@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useCallback, useMemo, useRef } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { useWatchlist } from "@/hooks/use-watchlist"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { ArrowsClockwise, Brain } from "@phosphor-icons/react"
+import { Brain } from "@phosphor-icons/react"
 import { usePortfolioSummary } from "@/hooks/use-portfolio-summary"
 import { useBehavioralInsights } from "@/hooks/use-behavioral-insights"
 import { useTodaysWarnings } from "@/hooks/use-todays-warnings"
@@ -24,8 +24,7 @@ import { PortfolioIntelligence } from "@/components/positions/portfolio-intellig
 import { PositionsEmptyState } from "@/components/positions/positions-empty-state"
 import { CloseTradeModal } from "@/components/journal/close-trade-modal"
 import { LogTradeModal } from "@/components/journal/log-trade-modal"
-import { SessionIndicator } from "@/components/positions/session-indicator"
-import { MarketSessionsStrip } from "@/components/positions/market-sessions-strip"
+import { PortfolioHeroStrip } from "@/components/positions/portfolio-hero-strip"
 import Link from "next/link"
 import { PelicanButton, pageEnter } from "@/components/ui/pelican"
 import { trackEvent } from "@/lib/tracking"
@@ -93,10 +92,6 @@ export default function PositionsPage() {
 
   // Post-close review loop
   const [showPostCloseReview, setShowPostCloseReview] = useState<PortfolioPosition | null>(null)
-
-  // Portfolio grade tooltip
-  const [showGradeTooltip, setShowGradeTooltip] = useState(false)
-  const gradeRef = useRef<HTMLButtonElement>(null)
 
   // Compute portfolio grade
   const portfolioGrade = useMemo(() => {
@@ -199,86 +194,29 @@ export default function PositionsPage() {
       animate="visible"
       className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6"
     >
-      {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-lg sm:text-xl font-semibold text-[var(--text-primary)]">Positions</h1>
-              <SessionIndicator assetType={primaryMarket} />
-            </div>
-            <div className="flex items-center gap-3 mt-0.5">
-              <p className="text-xs text-[var(--text-muted)]">
-                <span className="font-mono tabular-nums">{portfolio.portfolio.total_positions}</span> open
-                {portfolio.portfolio.avg_conviction > 0 && (
-                  <> · <span className="font-mono tabular-nums">{portfolio.portfolio.avg_conviction.toFixed(1)}</span> avg conviction</>
-                )}
-              </p>
-              {marketsTraded.length > 1 && (
-                <MarketSessionsStrip marketsTraded={marketsTraded} />
-              )}
-            </div>
-          </div>
-          {portfolioGrade && (
-            <div className="relative">
-              <button
-                ref={gradeRef}
-                onMouseEnter={() => setShowGradeTooltip(true)}
-                onMouseLeave={() => setShowGradeTooltip(false)}
-                onClick={() => handleSendMessage(
-                  `My portfolio grade is ${portfolioGrade.letter} (${portfolioGrade.score}/100). ` +
-                  `Breakdown: ${portfolioGrade.factors.map(f => `${f.name}: ${f.score}/100 (${f.detail})`).join('. ')}. ` +
-                  `${portfolioGrade.summary}. What should I prioritize to improve my grade?`
-                )}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-hover)] bg-[var(--bg-surface)] transition-all duration-150 hover:translate-y-[-1px] cursor-pointer"
-              >
-                <span
-                  className="text-lg font-bold font-mono"
-                  style={{ color: portfolioGrade.color }}
-                >
-                  {portfolioGrade.letter}
-                </span>
-                <span className="text-xs text-[var(--text-muted)] font-mono tabular-nums">
-                  {portfolioGrade.score}
-                </span>
-              </button>
-              {showGradeTooltip && (
-                <div className="absolute top-full left-0 mt-2 z-50 w-64 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-3 shadow-lg">
-                  <p className="text-xs font-medium text-[var(--text-primary)] mb-2">{portfolioGrade.summary}</p>
-                  <div className="space-y-1.5">
-                    {portfolioGrade.factors.map((f) => (
-                      <div key={f.name} className="flex items-center justify-between text-xs">
-                        <span className="text-[var(--text-secondary)]">{f.name}</span>
-                        <span className="font-mono tabular-nums text-[var(--text-muted)]">{f.score}/100</span>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-[var(--text-muted)] mt-2">Click to discuss with Pelican</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        <button
-          onClick={async () => {
-            if (isRefreshing) return
-            setIsRefreshing(true)
-            try {
-              await refreshPortfolio()
-            } catch (e) {
-              console.error('Refresh failed:', e)
-            } finally {
-              setTimeout(() => setIsRefreshing(false), 800)
-            }
-          }}
-          disabled={isRefreshing}
-          className={`flex items-center gap-1.5 text-xs transition-colors duration-150 ${isRefreshing ? 'text-[var(--text-muted)] opacity-50 cursor-not-allowed' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer'}`}
-          aria-label="Refresh portfolio"
-        >
-          <ArrowsClockwise size={14} weight="regular" className={isRefreshing ? 'animate-spin' : ''} />
-          {isRefreshing ? 'Refreshing...' : 'Refresh'}
-        </button>
-      </div>
+      {/* Hero P&L Strip */}
+      <PortfolioHeroStrip
+        portfolio={portfolio.portfolio}
+        risk={portfolio.risk}
+        positions={portfolio.positions}
+        quotes={quotes}
+        grade={portfolioGrade}
+        primaryMarket={primaryMarket}
+        marketsTraded={marketsTraded}
+        isRefreshing={isRefreshing}
+        onRefresh={async () => {
+          if (isRefreshing) return
+          setIsRefreshing(true)
+          try {
+            await refreshPortfolio()
+          } catch (e) {
+            console.error('Refresh failed:', e)
+          } finally {
+            setTimeout(() => setIsRefreshing(false), 800)
+          }
+        }}
+        onGradeClick={handleSendMessage}
+      />
 
       {/* Warning banner */}
       {warnings.length > 0 && (
@@ -335,55 +273,31 @@ export default function PositionsPage() {
         <PortfolioPnlChart data={pnlHistory} isLoading={pnlHistoryLoading} />
       )}
 
-      {/* Exposure Breakdown */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
-          <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Total Exposure</p>
-          <p className="text-lg font-mono tabular-nums font-semibold text-[var(--text-primary)]">
-            {formatNum(portfolio.portfolio.total_exposure)}
-          </p>
+      {/* Intelligence panel — Actions + Risk side-by-side */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="lg:col-span-3">
+          <TodaysActions
+            positions={portfolio.positions}
+            insights={insights}
+            warnings={warnings}
+            earningsWarnings={earningsWarnings}
+            portfolioStats={portfolio.portfolio}
+            riskSummary={portfolio.risk}
+            onAction={handleSendMessage}
+            onEditPosition={handleEditPosition}
+          />
         </div>
-        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
-          <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Long Exposure</p>
-          <p className="text-lg font-mono tabular-nums font-semibold text-[var(--data-positive)]">
-            {formatNum(portfolio.portfolio.long_exposure)}
-          </p>
-          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
-            {portfolio.portfolio.direction_breakdown.long.count} position{portfolio.portfolio.direction_breakdown.long.count !== 1 ? 's' : ''}
-          </p>
-        </div>
-        <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
-          <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Short Exposure</p>
-          <p className="text-lg font-mono tabular-nums font-semibold text-[var(--data-negative)]">
-            {formatNum(portfolio.portfolio.short_exposure)}
-          </p>
-          <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
-            {portfolio.portfolio.direction_breakdown.short.count} position{portfolio.portfolio.direction_breakdown.short.count !== 1 ? 's' : ''}
-          </p>
+        <div className="lg:col-span-2">
+          <PortfolioOverview
+            portfolio={portfolio.portfolio}
+            risk={portfolio.risk}
+            planCompliance={portfolio.plan_compliance}
+            positions={portfolio.positions}
+            isLoading={portfolioLoading}
+            onSendMessage={handleSendMessage}
+          />
         </div>
       </div>
-
-      {/* Today's Actions */}
-      <TodaysActions
-        positions={portfolio.positions}
-        insights={insights}
-        warnings={warnings}
-        earningsWarnings={earningsWarnings}
-        portfolioStats={portfolio.portfolio}
-        riskSummary={portfolio.risk}
-        onAction={handleSendMessage}
-        onEditPosition={handleEditPosition}
-      />
-
-      {/* Portfolio overview */}
-      <PortfolioOverview
-        portfolio={portfolio.portfolio}
-        risk={portfolio.risk}
-        planCompliance={portfolio.plan_compliance}
-        positions={portfolio.positions}
-        isLoading={portfolioLoading}
-        onSendMessage={handleSendMessage}
-      />
 
       {/* Portfolio intelligence */}
       <PortfolioIntelligence
