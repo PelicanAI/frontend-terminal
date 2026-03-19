@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
 
+export const dynamic = 'force-dynamic'
+
 const QUERY_PATTERNS: Array<{ type: string; patterns: RegExp }> = [
   { type: 'Price Check', patterns: /\b(price|what'?s?\s+(at|trading)|how much|quote|current)\b/i },
   { type: 'Backtest', patterns: /\b(backtest|historical|back\s*test)\b/i },

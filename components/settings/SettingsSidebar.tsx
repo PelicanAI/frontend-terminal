@@ -1,18 +1,18 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { User, TrendingUp, Shield, ImageIcon, Link } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
+import { User, TrendUp, Shield, Image as ImageIcon, Link } from "@phosphor-icons/react"
+import type { Icon } from "@phosphor-icons/react"
 
 interface Section {
   id: string
   label: string
-  icon: LucideIcon
+  icon: Icon
 }
 
 const sections: Section[] = [
   { id: "account", label: "Account", icon: User },
-  { id: "trading", label: "Trading Preferences", icon: TrendingUp },
+  { id: "trading", label: "Trading Preferences", icon: TrendUp },
   { id: "brokers", label: "Broker Connections", icon: Link },
   { id: "privacy", label: "Data & Privacy", icon: Shield },
   { id: "images", label: "Uploaded Images", icon: ImageIcon },
@@ -41,7 +41,7 @@ export function SettingsSidebar({ activeSection, onSectionChange }: SettingsSide
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon size={16} weight="regular" />
                   {section.label}
                 </button>
               )

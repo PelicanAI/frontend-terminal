@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { AlertTriangle, RefreshCw } from "lucide-react"
+import { Warning, ArrowsClockwise } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 
 interface ErrorMessageProps {
@@ -22,7 +22,7 @@ export function ErrorMessage({ message, onRetry, variant = "message" }: ErrorMes
       >
         <div className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center gap-2 text-red-800">
-            <AlertTriangle className="w-4 h-4" />
+            <Warning size={16} weight="regular" />
             <span className="text-sm font-medium">{message}</span>
           </div>
           {onRetry && (
@@ -32,7 +32,7 @@ export function ErrorMessage({ message, onRetry, variant = "message" }: ErrorMes
               onClick={onRetry}
               className="border-red-300 text-red-700 hover:bg-red-100 bg-transparent"
             >
-              <RefreshCw className="w-3 h-3 mr-1" />
+              <ArrowsClockwise size={12} weight="regular" className="mr-1" />
               Retry
             </Button>
           )}
@@ -57,7 +57,7 @@ export function ErrorMessage({ message, onRetry, variant = "message" }: ErrorMes
     >
       <div className="flex-shrink-0">
         <div className="h-9 w-9 bg-red-100 rounded-full flex items-center justify-center">
-          <AlertTriangle className="w-4 h-4 text-red-600" />
+          <Warning size={16} weight="regular" className="text-red-600" />
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export function ErrorMessage({ message, onRetry, variant = "message" }: ErrorMes
                 onClick={onRetry}
                 className="border-red-300 text-red-700 hover:bg-red-100 h-7 bg-transparent"
               >
-                <RefreshCw className="w-3 h-3 mr-1" />
+                <ArrowsClockwise size={12} weight="regular" className="mr-1" />
                 Retry
               </Button>
             </motion.div>

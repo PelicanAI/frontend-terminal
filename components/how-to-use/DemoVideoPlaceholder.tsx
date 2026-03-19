@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { RotateCcw } from 'lucide-react';
+import { ArrowCounterClockwise } from '@phosphor-icons/react';
 
 interface DemoVideoProps {
   demoSrc?: string;
@@ -98,7 +98,7 @@ export default function DemoVideoPlaceholder({ demoSrc }: DemoVideoProps) {
         }}
         title="Replay demo"
       >
-        <RotateCcw size={16} />
+        <ArrowCounterClockwise size={16} weight="regular" />
       </button>
     </div>
   );

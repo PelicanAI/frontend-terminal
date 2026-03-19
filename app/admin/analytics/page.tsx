@@ -6,13 +6,13 @@ import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-  RefreshCw,
+  ArrowsClockwise,
   Users,
   UserCheck,
-  MessageSquare,
+  ChatCircle,
   Clock,
-  DollarSign,
-} from 'lucide-react'
+  CurrencyDollar,
+} from '@phosphor-icons/react'
 import {
   BarChart,
   Bar,
@@ -28,6 +28,7 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts'
+import type { PieLabelRenderProps } from 'recharts'
 
 // --- Types ---
 
@@ -166,9 +167,8 @@ function SkeletonChart() {
 
 // --- Pie label ---
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderPieLabel(props: any) {
-  const { cx, cy, midAngle, innerRadius, outerRadius, name, value, percent } = props
+function renderPieLabel(props: PieLabelRenderProps) {
+  const { cx, cy, midAngle = 0, innerRadius, outerRadius, name, value, percent } = props
   const RADIAN = Math.PI / 180
   const radius = innerRadius + (outerRadius - innerRadius) * 1.5
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
@@ -278,7 +278,7 @@ export default function AdminAnalyticsPage() {
             </span>
           )}
           <Button variant="ghost" size="sm" onClick={() => fetchData(true)} disabled={refreshing}>
-            <RefreshCw className={`size-4 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+            <ArrowsClockwise size={16} weight="regular" className={`mr-1 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -289,7 +289,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-blue-500/10 p-2">
-              <UserCheck className="size-4 text-blue-500" />
+              <UserCheck size={16} weight="regular" className="text-blue-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Active 7d</p>
@@ -300,7 +300,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-blue-500/10 p-2">
-              <Users className="size-4 text-blue-500" />
+              <Users size={16} weight="regular" className="text-blue-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Active 30d</p>
@@ -311,7 +311,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-amber-500/10 p-2">
-              <MessageSquare className="size-4 text-amber-500" />
+              <ChatCircle size={16} weight="regular" className="text-amber-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Avg Msgs/User</p>
@@ -322,7 +322,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-emerald-500/10 p-2">
-              <Clock className="size-4 text-emerald-500" />
+              <Clock size={16} weight="regular" className="text-emerald-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Avg Convo Length</p>
@@ -335,7 +335,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-emerald-500/10 p-2">
-              <DollarSign className="size-4 text-emerald-500" />
+              <CurrencyDollar size={16} weight="regular" className="text-emerald-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">MRR</p>

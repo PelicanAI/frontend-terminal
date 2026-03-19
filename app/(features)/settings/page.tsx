@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useAuth } from "@/lib/providers/auth-provider"
-import { Loader2 } from "lucide-react"
+import { CircleNotch } from "@phosphor-icons/react"
 import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
 import { logger } from "@/lib/logger"
@@ -120,7 +120,7 @@ export default function SettingsPage() {
   if (authLoading || !settings) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <CircleNotch size={32} weight="regular" className="animate-spin text-blue-600" />
       </div>
     )
   }

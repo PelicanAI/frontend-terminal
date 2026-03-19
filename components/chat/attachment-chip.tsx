@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { X, FileText, FileSpreadsheet, ImageIcon, File, RotateCcw, AlertCircle } from "lucide-react"
+import { X, FileText, FileXls, Image as ImageIcon, File, ArrowCounterClockwise, WarningCircle } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 
@@ -18,7 +18,7 @@ interface AttachmentChipProps {
 const getFileIcon = (type: string) => {
   const lowerType = type.toLowerCase()
   if (lowerType.includes("csv") || lowerType.includes("xlsx") || lowerType.includes("xls")) {
-    return <FileSpreadsheet className="h-3 w-3" />
+    return <FileXls size={12} weight="regular" />
   }
   if (
     lowerType.includes("image") ||
@@ -26,12 +26,12 @@ const getFileIcon = (type: string) => {
     lowerType.includes("jpg") ||
     lowerType.includes("jpeg")
   ) {
-    return <ImageIcon className="h-3 w-3" />
+    return <ImageIcon size={12} weight="regular" />
   }
   if (lowerType.includes("pdf") || lowerType.includes("txt") || lowerType.includes("doc")) {
-    return <FileText className="h-3 w-3" />
+    return <FileText size={12} weight="regular" />
   }
-  return <File className="h-3 w-3" />
+  return <File size={12} weight="regular" />
 }
 
 const getFileTypeLabel = (type: string) => {
@@ -71,7 +71,7 @@ export function AttachmentChip({ name, type, onRemove, onClick, isError, onRetry
           "max-w-[200px]",
         )}
       >
-        <AlertCircle className="h-3 w-3" />
+        <WarningCircle size={12} weight="regular" />
         <span className="truncate" title="Upload failed">
           Upload failed
         </span>
@@ -83,7 +83,7 @@ export function AttachmentChip({ name, type, onRemove, onClick, isError, onRetry
               onClick={onRetry}
               className="h-6 w-6 min-h-[44px] min-w-[44px] p-0 ml-1 hover:bg-red-100 dark:hover:bg-red-900/50"
             >
-              <RotateCcw className="h-4 w-4" />
+              <ArrowCounterClockwise size={16} weight="regular" />
               <span className="sr-only">Retry upload</span>
             </Button>
           </IconTooltip>
@@ -99,7 +99,7 @@ export function AttachmentChip({ name, type, onRemove, onClick, isError, onRetry
               }}
               className="h-6 w-6 min-h-[44px] min-w-[44px] p-0 ml-1 hover:bg-red-100 dark:hover:bg-red-900/50"
             >
-              <X className="h-4 w-4" />
+              <X size={16} weight="regular" />
               <span className="sr-only">Remove attachment</span>
             </Button>
           </IconTooltip>

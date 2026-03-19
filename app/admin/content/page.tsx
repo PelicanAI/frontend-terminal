@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { RefreshCw } from 'lucide-react'
+import { ArrowsClockwise } from '@phosphor-icons/react'
 import {
   PieChart,
   Pie,
@@ -27,6 +27,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts'
+import type { PieLabelRenderProps } from 'recharts'
 import Link from 'next/link'
 
 // --- Types ---
@@ -143,9 +144,8 @@ function SkeletonTable() {
 
 // --- Pie label ---
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderPieLabel(props: any) {
-  const { cx, cy, midAngle, innerRadius, outerRadius, name, percent } = props
+function renderPieLabel(props: PieLabelRenderProps) {
+  const { cx, cy, midAngle = 0, innerRadius, outerRadius, name, percent } = props
   if ((percent ?? 0) < 0.05) return null
   const RADIAN = Math.PI / 180
   const radius = innerRadius + (outerRadius - innerRadius) * 1.5
@@ -231,7 +231,7 @@ export default function AdminContentPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Content Intelligence</h1>
         <Button variant="ghost" size="sm" onClick={() => fetchData(true)}>
-          <RefreshCw className="size-4 mr-1" />
+          <ArrowsClockwise size={16} weight="regular" className="mr-1" />
           Refresh
         </Button>
       </div>

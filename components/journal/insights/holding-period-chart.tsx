@@ -20,8 +20,7 @@ function getBarColor(winRate: number): string {
   return "var(--data-negative)"
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const tooltipFormatter: any = (value: number | undefined, name: string | undefined) => {
+const tooltipFormatter = (value: number | undefined, name: string | undefined) => {
   if (name === "winRate") return [`${value ?? 0}%`, "Win Rate"]
   return [value ?? 0, name ?? ""]
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { CaretDown } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 
@@ -36,7 +36,7 @@ export function JumpToLatestButton({ onJumpToLatest, lastNewMessageAt, className
         `}
         aria-label="Jump to latest message"
       >
-        <ChevronDown className="h-4 w-4" />
+        <CaretDown size={16} weight="regular" />
       </Button>
     </IconTooltip>
   )

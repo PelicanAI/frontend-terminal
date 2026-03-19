@@ -1,6 +1,6 @@
 "use client"
 
-import { Upload, FileSpreadsheet, FileText, ImageIcon } from "lucide-react"
+import { UploadSimple, FileXls, FileText, Image as ImageIcon } from "@phosphor-icons/react"
 import { Card } from "@/components/ui/card"
 
 export function DragDropOverlay() {
@@ -9,10 +9,10 @@ export function DragDropOverlay() {
       <Card className="p-8 border-2 border-dashed border-primary/50 bg-primary/5 max-w-md mx-4">
         <div className="text-center space-y-4">
           <div className="flex justify-center gap-2">
-            <Upload className="w-8 h-8 text-primary" />
-            <FileSpreadsheet className="w-8 h-8 text-primary/70" />
-            <FileText className="w-8 h-8 text-primary/70" />
-            <ImageIcon className="w-8 h-8 text-primary/70" />
+            <UploadSimple size={32} weight="regular" className="text-primary" />
+            <FileXls size={32} weight="regular" className="text-primary/70" />
+            <FileText size={32} weight="regular" className="text-primary/70" />
+            <ImageIcon size={32} weight="regular" className="text-primary/70" />
           </div>
 
           <div className="space-y-2">

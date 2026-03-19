@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
-import { LogOut } from "lucide-react"
+import { SignOut } from "@phosphor-icons/react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { logger } from "@/lib/logger"
@@ -76,7 +76,7 @@ export function PrivacySection({ user }: PrivacySectionProps) {
               onClick={handleLogout}
               className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <SignOut size={16} weight="regular" className="mr-2" />
               Log Out
             </Button>
           </CardContent>

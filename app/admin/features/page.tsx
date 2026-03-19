@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { RefreshCw } from 'lucide-react'
+import { ArrowsClockwise } from '@phosphor-icons/react'
 
 // --- Types ---
 
@@ -186,7 +186,7 @@ export default function AdminFeaturesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Feature Adoption</h1>
         <Button variant="ghost" size="sm" onClick={() => fetchData(true)}>
-          <RefreshCw className="size-4 mr-1" />
+          <ArrowsClockwise size={16} weight="regular" className="mr-1" />
           Refresh
         </Button>
       </div>

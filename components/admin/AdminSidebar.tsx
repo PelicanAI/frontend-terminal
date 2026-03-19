@@ -3,28 +3,28 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard,
+  SquaresFour,
   Users,
-  MessageSquare,
+  ChatCircle,
   CreditCard,
-  BarChart3,
-  Search,
-  Puzzle,
-  HeartPulse,
+  ChartBar,
+  MagnifyingGlass,
+  PuzzlePiece,
+  Heartbeat,
   ArrowLeft,
   Shield,
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { href: '/admin/dashboard', label: 'Overview', icon: SquaresFour },
   { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/conversations', label: 'Conversations', icon: MessageSquare },
+  { href: '/admin/conversations', label: 'Conversations', icon: ChatCircle },
   { href: '/admin/revenue', label: 'Revenue', icon: CreditCard },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/content', label: 'Content Intel', icon: Search },
-  { href: '/admin/features', label: 'Feature Adoption', icon: Puzzle },
-  { href: '/admin/health', label: 'System Health', icon: HeartPulse },
+  { href: '/admin/analytics', label: 'Analytics', icon: ChartBar },
+  { href: '/admin/content', label: 'Content Intel', icon: MagnifyingGlass },
+  { href: '/admin/features', label: 'Feature Adoption', icon: PuzzlePiece },
+  { href: '/admin/health', label: 'System Health', icon: Heartbeat },
 ]
 
 export function AdminSidebar({ displayName }: { displayName: string }) {
@@ -33,7 +33,7 @@ export function AdminSidebar({ displayName }: { displayName: string }) {
   return (
     <aside className="flex w-56 flex-col border-r border-border bg-card lg:w-64">
       <div className="flex items-center gap-2 border-b border-border px-4 py-4">
-        <Shield className="size-5 text-primary" />
+        <Shield size={20} weight="regular" className="text-primary" />
         <span className="text-sm font-semibold">Pelican Admin</span>
       </div>
 
@@ -54,7 +54,7 @@ export function AdminSidebar({ displayName }: { displayName: string }) {
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
-              <item.icon className="size-4" />
+              <item.icon size={16} weight="regular" />
               {item.label}
             </Link>
           )
@@ -67,7 +67,7 @@ export function AdminSidebar({ displayName }: { displayName: string }) {
           href="/chat"
           className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="size-3" />
+          <ArrowLeft size={12} weight="regular" />
           Back to App
         </Link>
       </div>

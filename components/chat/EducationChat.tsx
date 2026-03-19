@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, FormEvent } from 'react'
-import { GraduationCap, Send, Trash2 } from 'lucide-react'
+import { GraduationCap, PaperPlaneRight, Trash } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { formatLine } from '@/components/chat/message/format-utils'
@@ -129,7 +129,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
   if (!selectedTerm && messages.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-        <GraduationCap className="h-10 w-10 text-blue-500/40 mb-3" />
+        <GraduationCap size={40} weight="regular" className="text-blue-500/40 mb-3" />
         <p className="text-sm text-muted-foreground leading-relaxed">
           Click any highlighted term in the chat to learn about it. Toggle Learning Mode in the chat header.
         </p>
@@ -142,7 +142,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-2">
-          <GraduationCap className="h-4 w-4 text-blue-500" />
+          <GraduationCap size={16} weight="regular" className="text-blue-500" />
           <span className="text-xs font-medium text-foreground">
             {selectedTerm ? selectedTerm.term : 'Education'}
           </span>
@@ -153,7 +153,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
             className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
             title="Clear conversation"
           >
-            <Trash2 className="h-3 w-3" />
+            <Trash size={12} weight="regular" />
             Clear
           </button>
         )}
@@ -244,7 +244,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
                 : 'bg-blue-600 text-white hover:bg-blue-500 cursor-pointer'
             )}
           >
-            <Send className="h-3.5 w-3.5" />
+            <PaperPlaneRight size={14} weight="regular" />
           </button>
         </form>
         <p className="text-[9px] text-muted-foreground/50 text-center mt-2">

@@ -2,7 +2,7 @@
 
 import { useCredits } from '@/hooks/use-credits'
 import Link from 'next/link'
-import { Zap, AlertTriangle } from 'lucide-react'
+import { Lightning, Warning } from '@phosphor-icons/react'
 
 interface CreditDisplayProps {
   variant?: 'default' | 'compact' | 'detailed'
@@ -31,7 +31,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
     if (variant === 'compact') {
       return (
         <div className={`flex items-center gap-1.5 ${className}`}>
-          <Zap className={`w-3.5 h-3.5 ${isLow ? 'text-amber-400' : 'text-blue-400'}`} />
+          <Lightning size={14} weight="regular" className={` ${isLow ? 'text-amber-400' : 'text-blue-400'}`} />
           <span className={`text-xs font-medium ${isLow ? 'text-amber-400' : 'text-blue-400'}`}>
             {remaining} free
           </span>
@@ -41,7 +41,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
 
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <Zap className={`w-4 h-4 ${isLow ? 'text-amber-400' : 'text-blue-400'}`} />
+        <Lightning size={16} weight="regular" className={` ${isLow ? 'text-amber-400' : 'text-blue-400'}`} />
         <span className={`text-sm font-medium ${isLow ? 'text-amber-400' : 'text-blue-400'}`}>
           {remaining} free question{remaining !== 1 ? 's' : ''} left
         </span>
@@ -61,7 +61,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
         href="/pricing" 
         className={`flex items-center gap-1.5 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors ${className}`}
       >
-        <Zap className="w-4 h-4" />
+        <Lightning size={16} weight="regular" />
         <span>Subscribe to start</span>
       </Link>
     )
@@ -71,7 +71,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
     if (variant === 'compact') {
       return (
         <div className={`flex items-center gap-1.5 ${className}`}>
-          <Zap className="w-3.5 h-3.5 text-amber-400" />
+          <Lightning size={14} weight="regular" className="text-amber-400" />
           <span className="text-xs font-medium text-amber-400">Founder</span>
         </div>
       )
@@ -81,7 +81,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
       return (
         <div className={`space-y-2 ${className}`}>
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-amber-400" />
+            <Lightning size={16} weight="regular" className="text-amber-400" />
             <span className="text-sm font-semibold text-amber-400">Founder Account</span>
           </div>
           <p className="text-xs text-muted-foreground">Unlimited access</p>
@@ -91,7 +91,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
 
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <Zap className="w-4 h-4 text-amber-400" />
+        <Lightning size={16} weight="regular" className="text-amber-400" />
         <span className="text-sm font-medium text-amber-400">Founder</span>
       </div>
     )
@@ -103,7 +103,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
   if (variant === 'compact') {
     return (
       <div className={`flex items-center gap-1.5 ${className}`}>
-        <Zap className={`w-3.5 h-3.5 ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} />
+        <Lightning size={14} weight="regular" className={` ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} />
         <span className={`text-sm font-medium ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-foreground'}`}>
           {credits.balance.toLocaleString()}
         </span>
@@ -142,7 +142,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
             href="/pricing" 
             className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300"
           >
-            <AlertTriangle className="w-3 h-3" />
+            <Warning size={12} weight="regular" />
             Get more credits
           </Link>
         )}
@@ -152,7 +152,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <Zap className={`w-4 h-4 ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} />
+      <Lightning size={16} weight="regular" className={` ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} />
       <span className={`text-sm font-medium ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-foreground'}`}>
         {credits.balance.toLocaleString()} credits
       </span>

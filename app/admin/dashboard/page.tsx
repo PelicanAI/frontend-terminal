@@ -5,21 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
   Users,
-  Activity,
-  TrendingUp,
-  DollarSign,
-  Zap,
-  MessageSquare,
-  RefreshCw,
-  ChevronDown,
-  ChevronUp,
-  AlertTriangle,
+  Pulse,
+  TrendUp,
+  CurrencyDollar,
+  Lightning,
+  ChatCircle,
+  ArrowsClockwise,
+  CaretDown,
+  CaretUp,
+  Warning,
   UserPlus,
   CreditCard,
-  Loader2,
+  CircleNotch,
   ArrowUpRight,
   ArrowDownRight,
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 import Link from 'next/link'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import {
@@ -147,7 +147,7 @@ function AdminStatCard({
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        <Icon className="size-4 text-muted-foreground" />
+        <Icon size={16} weight="regular" className="text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold font-mono tabular-nums">
@@ -157,7 +157,7 @@ function AdminStatCard({
           <div className="flex items-center gap-1 mt-1">
             {hasPositiveDelta && (
               <>
-                <ArrowUpRight className="size-3 text-emerald-500" />
+                <ArrowUpRight size={12} weight="regular" className="text-emerald-500" />
                 <span className="text-xs font-mono tabular-nums text-emerald-500">
                   +{delta!.toLocaleString()}
                 </span>
@@ -165,7 +165,7 @@ function AdminStatCard({
             )}
             {hasNegativeDelta && (
               <>
-                <ArrowDownRight className="size-3 text-red-500" />
+                <ArrowDownRight size={12} weight="regular" className="text-red-500" />
                 <span className="text-xs font-mono tabular-nums text-red-500">
                   {delta!.toLocaleString()}
                 </span>
@@ -349,7 +349,7 @@ export default function AdminDashboardPage() {
             disabled={refreshing}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`size-3 ${refreshing ? 'animate-spin' : ''}`} />
+            <ArrowsClockwise size={12} weight="regular" className={refreshing ? 'animate-spin' : ''} />
             Refresh
           </button>
         </div>
@@ -370,33 +370,33 @@ export default function AdminDashboardPage() {
             value={stats.active7d.value}
             delta={stats.active7d.delta}
             deltaPercent={stats.active7d.deltaPercent}
-            icon={Activity}
+            icon={Pulse}
           />
           <AdminStatCard
             title="Active (30d)"
             value={stats.active30d.value}
             delta={stats.active30d.delta}
             deltaPercent={stats.active30d.deltaPercent}
-            icon={TrendingUp}
+            icon={TrendUp}
           />
           <AdminStatCard
             title="MRR"
             value={stats.mrr.value}
             formattedValue={`$${stats.mrr.value.toLocaleString()}`}
             delta={stats.mrr.delta}
-            icon={DollarSign}
+            icon={CurrencyDollar}
           />
           <AdminStatCard
             title="Credits Used"
             value={stats.creditsUsed.value}
-            icon={Zap}
+            icon={Lightning}
           />
           <AdminStatCard
             title="Messages Today"
             value={stats.messagesToday.value}
             delta={stats.messagesToday.delta}
             deltaPercent={stats.messagesToday.deltaPercent}
-            icon={MessageSquare}
+            icon={ChatCircle}
           />
         </div>
       )}
@@ -620,9 +620,9 @@ export default function AdminDashboardPage() {
                           </div>
                           <div className="ml-2 shrink-0">
                             {isExpanded ? (
-                              <ChevronUp className="size-4 text-muted-foreground" />
+                              <CaretUp size={16} weight="regular" className="text-muted-foreground" />
                             ) : (
-                              <ChevronDown className="size-4 text-muted-foreground" />
+                              <CaretDown size={16} weight="regular" className="text-muted-foreground" />
                             )}
                           </div>
                         </button>
@@ -631,7 +631,7 @@ export default function AdminDashboardPage() {
                             href={`/admin/conversations/${conv.id}`}
                             className="ml-1 shrink-0 p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                           >
-                            <ArrowUpRight className="size-3.5" />
+                            <ArrowUpRight size={14} weight="regular" />
                           </Link>
                         </IconTooltip>
                       </div>
@@ -640,7 +640,7 @@ export default function AdminDashboardPage() {
                         <div className="ml-2 mb-2 border-l-2 border-border pl-3 max-h-[300px] overflow-y-auto">
                           {isLoadingMsg && (
                             <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
-                              <Loader2 className="size-3 animate-spin" />
+                              <CircleNotch size={12} weight="regular" className="animate-spin" />
                               Loading...
                             </div>
                           )}
@@ -686,7 +686,7 @@ export default function AdminDashboardPage() {
               <div className="space-y-3">
                 {stats.alerts.zeroCreditUsers > 0 && (
                   <div className="flex items-start gap-3 text-sm">
-                    <AlertTriangle className="size-4 mt-0.5 text-amber-500 shrink-0" />
+                    <Warning size={16} weight="regular" className="mt-0.5 text-amber-500 shrink-0" />
                     <div>
                       <p className="font-medium">
                         <span className="font-mono tabular-nums">{stats.alerts.zeroCreditUsers}</span> users at zero credits
@@ -699,7 +699,7 @@ export default function AdminDashboardPage() {
                 )}
                 {stats.alerts.nearLimitUsers > 0 && (
                   <div className="flex items-start gap-3 text-sm">
-                    <Zap className="size-4 mt-0.5 text-amber-500 shrink-0" />
+                    <Lightning size={16} weight="regular" className="mt-0.5 text-amber-500 shrink-0" />
                     <div>
                       <p className="font-medium">
                         <span className="font-mono tabular-nums">{stats.alerts.nearLimitUsers}</span> users near credit limit
@@ -712,7 +712,7 @@ export default function AdminDashboardPage() {
                 )}
                 {stats.alerts.newPaidThisWeek > 0 && (
                   <div className="flex items-start gap-3 text-sm">
-                    <CreditCard className="size-4 mt-0.5 text-emerald-500 shrink-0" />
+                    <CreditCard size={16} weight="regular" className="mt-0.5 text-emerald-500 shrink-0" />
                     <div>
                       <p className="font-medium">
                         <span className="font-mono tabular-nums">{stats.alerts.newPaidThisWeek}</span> new paid users this week
@@ -727,7 +727,7 @@ export default function AdminDashboardPage() {
                   stats.alerts.nearLimitUsers === 0 &&
                   stats.alerts.newPaidThisWeek === 0 && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <UserPlus className="size-4" />
+                      <UserPlus size={16} weight="regular" />
                       No alerts right now
                     </div>
                   )}

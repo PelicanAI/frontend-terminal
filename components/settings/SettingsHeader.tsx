@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, User, Save, Loader2 } from "lucide-react"
+import { ArrowLeft, User, FloppyDisk, CircleNotch } from "@phosphor-icons/react"
 import Link from "next/link"
 import { LanguageSelector } from "@/components/language-selector"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
@@ -21,7 +21,7 @@ export function SettingsHeader({ user, isSaving, hasUnsavedChanges, onSave }: Se
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm">
               <Link href="/chat">
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft size={16} weight="regular" className="mr-2" />
                 Back
               </Link>
             </Button>
@@ -37,12 +37,12 @@ export function SettingsHeader({ user, isSaving, hasUnsavedChanges, onSave }: Se
               >
                 {isSaving ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <CircleNotch size={16} weight="regular" className="mr-2 animate-spin" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="h-4 w-4 mr-2" />
+                    <FloppyDisk size={16} weight="regular" className="mr-2" />
                     Save Changes
                   </>
                 )}
@@ -53,7 +53,7 @@ export function SettingsHeader({ user, isSaving, hasUnsavedChanges, onSave }: Se
                 className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
               >
                 <Link href="/auth/signup">
-                  <User className="h-4 w-4 mr-2" />
+                  <User size={16} weight="regular" className="mr-2" />
                   Sign Up to Save
                 </Link>
               </Button>

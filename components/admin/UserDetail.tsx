@@ -5,16 +5,16 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
-  MessageSquare,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
+  ChatCircle,
+  CaretDown,
+  CaretUp,
+  CircleNotch,
   Plus,
   Clock,
   Hash,
   CreditCard,
   ArrowUpRight,
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 import Link from 'next/link'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { formatLine } from '@/components/chat/message/format-utils'
@@ -266,26 +266,26 @@ export function UserDetail({ user }: UserDetailProps) {
       {/* Enhanced stats from API */}
       {detailLoading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-3 animate-spin" />
+          <CircleNotch size={12} weight="regular" className="animate-spin" />
           Loading activity data...
         </div>
       ) : detail ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-              <Hash className="size-3" /> Total Messages
+              <Hash size={12} weight="regular" /> Total Messages
             </div>
             <p className="text-lg font-semibold">{detail.totalMessages.toLocaleString()}</p>
           </div>
           <div className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-              <MessageSquare className="size-3" /> Conversations
+              <ChatCircle size={12} weight="regular" /> Conversations
             </div>
             <p className="text-lg font-semibold">{detail.totalConversations.toLocaleString()}</p>
           </div>
           <div className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-              <Clock className="size-3" /> Last Active
+              <Clock size={12} weight="regular" /> Last Active
             </div>
             <p className="text-lg font-semibold">
               {detail.lastActive ? timeAgo(detail.lastActive) : 'Never'}
@@ -293,7 +293,7 @@ export function UserDetail({ user }: UserDetailProps) {
           </div>
           <div className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-              <CreditCard className="size-3" /> Avg Msgs/Convo
+              <CreditCard size={12} weight="regular" /> Avg Msgs/Convo
             </div>
             <p className="text-lg font-semibold">
               {detail.totalConversations > 0
@@ -321,15 +321,15 @@ export function UserDetail({ user }: UserDetailProps) {
                       onClick={(e) => { e.stopPropagation(); handleConvoToggle(conv.id) }}
                       className="flex-1 flex items-center gap-2 text-sm p-2 rounded-md hover:bg-muted/50 transition-colors text-left min-w-0"
                     >
-                      <MessageSquare className="size-3.5 shrink-0 text-muted-foreground" />
+                      <ChatCircle size={14} weight="regular" className="shrink-0 text-muted-foreground" />
                       <span className="truncate flex-1 font-medium">{conv.title}</span>
                       <span className="text-xs text-muted-foreground shrink-0">
                         {conv.messageCount} msgs &middot; {formatShortDate(conv.createdAt)}
                       </span>
                       {isExpanded ? (
-                        <ChevronUp className="size-3.5 shrink-0 text-muted-foreground" />
+                        <CaretUp size={14} weight="regular" className="shrink-0 text-muted-foreground" />
                       ) : (
-                        <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+                        <CaretDown size={14} weight="regular" className="shrink-0 text-muted-foreground" />
                       )}
                     </button>
                     <IconTooltip label="Open full view">
@@ -338,7 +338,7 @@ export function UserDetail({ user }: UserDetailProps) {
                         className="shrink-0 p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <ArrowUpRight className="size-3.5" />
+                        <ArrowUpRight size={14} weight="regular" />
                       </Link>
                     </IconTooltip>
                   </div>
@@ -347,7 +347,7 @@ export function UserDetail({ user }: UserDetailProps) {
                     <div className="ml-6 mr-2 mb-2 mt-1 border-l-2 border-border pl-3 space-y-2">
                       {isLoading && (
                         <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
-                          <Loader2 className="size-3 animate-spin" />
+                          <CircleNotch size={12} weight="regular" className="animate-spin" />
                           Loading messages...
                         </div>
                       )}
@@ -385,9 +385,9 @@ export function UserDetail({ user }: UserDetailProps) {
           />
           <Button type="submit" size="sm" disabled={granting} onClick={(e) => e.stopPropagation()}>
             {granting ? (
-              <Loader2 className="size-3 animate-spin mr-1" />
+              <CircleNotch size={12} weight="regular" className="animate-spin mr-1" />
             ) : (
-              <Plus className="size-3 mr-1" />
+              <Plus size={12} weight="regular" className="mr-1" />
             )}
             Grant
           </Button>

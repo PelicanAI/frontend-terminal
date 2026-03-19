@@ -19,8 +19,7 @@ function getBarColor(pnl: number): string {
   return pnl >= 0 ? "var(--data-positive)" : "var(--data-negative)"
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const tooltipFormatter: any = (value: number | undefined, name: string | undefined) => {
+const tooltipFormatter = (value: number | undefined, name: string | undefined) => {
   if (name === "pnl") return [`$${(value ?? 0).toFixed(0)}`, "Total P&L"]
   return [value ?? 0, name ?? ""]
 }

@@ -7,7 +7,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Lock, Mail, ArrowLeft } from "lucide-react"
+import { Lock, Envelope, ArrowLeft } from "@phosphor-icons/react"
 import { ReferralCodeInput } from "@/components/ReferralCodeInput"
 
 export default function SignUpPage() {
@@ -123,7 +123,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-[420px] relative z-10 flex flex-col">
         <div className="mb-6 self-start">
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft size={16} weight="regular" className="mr-2" />
             Back to Home
           </Link>
         </div>
@@ -161,7 +161,7 @@ export default function SignUpPage() {
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-muted-foreground ml-1">Email</label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <Envelope size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   type="email"
                   id="email"
@@ -177,7 +177,7 @@ export default function SignUpPage() {
             <div className="space-y-1.5">
               <label htmlFor="password" className="text-sm font-medium text-muted-foreground ml-1">Password</label>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   type="password"
                   id="password"
@@ -192,7 +192,7 @@ export default function SignUpPage() {
             <div className="space-y-1.5">
               <label htmlFor="repeat-password" className="text-sm font-medium text-muted-foreground ml-1">Repeat Password</label>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   type="password"
                   id="repeat-password"

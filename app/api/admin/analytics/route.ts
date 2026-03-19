@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
 import { PLAN_PRICES } from '@/lib/plans'
 
+export const dynamic = 'force-dynamic'
+
 function getLast30Days() {
   const days: string[] = []
   const now = new Date()

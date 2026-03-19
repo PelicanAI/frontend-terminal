@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { Zap, X, ArrowRight } from 'lucide-react'
+import { Lightning, X, ArrowRight } from '@phosphor-icons/react'
 
 interface InsufficientCreditsModalProps {
   isOpen: boolean
@@ -44,12 +44,12 @@ export function InsufficientCreditsModal({
           onClick={onClose}
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
         >
-          <X className="w-5 h-5" />
+          <X size={20} weight="regular" />
         </button>
 
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/10 mb-4">
-            <Zap className="w-7 h-7 text-amber-400" />
+            <Lightning size={28} weight="regular" className="text-amber-400" />
           </div>
           <h2 className="text-xl font-bold text-[var(--text-primary)]">Not enough credits</h2>
           <p className="text-muted-foreground text-sm mt-1">
@@ -63,7 +63,7 @@ export function InsufficientCreditsModal({
             className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-3 px-4 rounded-lg transition-colors"
           >
             <span>Upgrade Plan</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight size={16} weight="regular" />
           </Link>
 
           <button

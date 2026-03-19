@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useCreditsContext } from '@/providers/credits-provider'
-import { Settings, Loader2, ExternalLink } from 'lucide-react'
+import { Gear, CircleNotch, ArrowSquareOut } from '@phosphor-icons/react'
 
 interface ManageSubscriptionButtonProps {
   className?: string
@@ -51,9 +51,9 @@ export function ManageSubscriptionButton({
         className={`text-sm text-blue-400 hover:text-blue-300 disabled:opacity-50 flex items-center gap-1 ${className}`}
       >
         {loading ? (
-          <Loader2 className="w-3 h-3 animate-spin" />
+          <CircleNotch size={12} weight="regular" className="animate-spin" />
         ) : (
-          <ExternalLink className="w-3 h-3" />
+          <ArrowSquareOut size={12} weight="regular" />
         )}
         <span>Manage subscription</span>
       </button>
@@ -67,9 +67,9 @@ export function ManageSubscriptionButton({
       className={`flex items-center gap-2 px-4 py-2 bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] text-[var(--text-secondary)] rounded-lg transition-colors disabled:opacity-50 ${className}`}
     >
       {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <CircleNotch size={16} weight="regular" className="animate-spin" />
       ) : (
-        <Settings className="w-4 h-4" />
+        <Gear size={16} weight="regular" />
       )}
       <span>Manage Subscription</span>
     </button>

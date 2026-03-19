@@ -16,8 +16,7 @@ import { useAuth } from "@/lib/providers/auth-provider"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu } from "lucide-react"
-import { CaretRight, Plus as PlusIcon } from "@phosphor-icons/react"
+import { List, CaretRight, Plus as PlusIcon } from "@phosphor-icons/react"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
@@ -586,7 +585,7 @@ export default function ChatPage() {
                   className="h-11 w-11 min-h-[44px] min-w-[44px] glow-button glow-ghost"
                   aria-label="Open sidebar"
                 >
-                  <Menu className="h-5 w-5 text-foreground" />
+                  <List size={20} weight="regular" className="text-foreground" />
                 </Button>
               </IconTooltip>
             </SheetTrigger>

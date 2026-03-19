@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { X } from "lucide-react"
+import { X } from "@phosphor-icons/react"
 import { AttachmentChip } from "../attachment-chip"
 import type { Attachment } from "@/lib/chat-utils"
 
@@ -33,7 +33,7 @@ function ImageLightbox({ url, alt, onClose }: { url: string; alt: string; onClos
         className="absolute top-4 right-4 p-2 rounded-full text-white/60 hover:text-white hover:bg-white/10 transition-colors"
         onClick={onClose}
       >
-        <X className="w-6 h-6" />
+        <X size={24} weight="regular" />
       </button>
       <Image
         src={url}

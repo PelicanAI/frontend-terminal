@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Copy } from "lucide-react"
+import { Copy } from "@phosphor-icons/react"
 import { motion } from "framer-motion"
 import DOMPurify from "isomorphic-dompurify"
 
@@ -47,7 +47,7 @@ export function CodeBlock({ content, language, index }: CodeBlockProps) {
           onClick={() => navigator.clipboard.writeText(content)}
           aria-label="Copy code"
         >
-          <Copy className="h-5 w-5 sm:h-4 sm:w-4" />
+          <Copy size={20} weight="regular" className="sm:hidden" /><Copy size={16} weight="regular" className="hidden sm:block" />
         </button>
       </div>
     </motion.div>

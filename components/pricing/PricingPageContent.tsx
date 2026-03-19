@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { Zap, Loader2, ShieldCheck } from 'lucide-react'
+import { Lightning, CircleNotch, ShieldCheck } from '@phosphor-icons/react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCreditsContext } from '@/providers/credits-provider'
@@ -28,7 +28,7 @@ function CostBreakdownTable() {
           <div key={key} className="cost-breakdown-row">
             <span className="cost-breakdown-label">{label}</span>
             <span className="cost-breakdown-value">
-              <Zap className="cost-breakdown-icon" />
+              <Lightning weight="regular" className="cost-breakdown-icon" />
               {cost}
             </span>
           </div>
@@ -181,7 +181,7 @@ export default function PricingPageContent() {
   if (creditsLoading) {
     return (
       <div className="pricing-loading">
-        <Loader2 className="pricing-loading-spinner" />
+        <CircleNotch weight="regular" className="pricing-loading-spinner" />
       </div>
     )
   }
@@ -262,7 +262,7 @@ export default function PricingPageContent() {
               </div>
 
               <div className="pricing-card-credits">
-                <Zap className="pricing-card-credits-icon" />
+                <Lightning weight="regular" className="pricing-card-credits-icon" />
                 <span>{plan.credits.toLocaleString()} credits</span>
               </div>
 
@@ -279,7 +279,7 @@ export default function PricingPageContent() {
               >
                 {loadingPlan === plan.id ? (
                   <>
-                    <Loader2 className="pricing-card-cta-spinner" />
+                    <CircleNotch weight="regular" className="pricing-card-cta-spinner" />
                     <span>Loading...</span>
                   </>
                 ) : (
@@ -292,7 +292,7 @@ export default function PricingPageContent() {
       </section>
 
       <div className="pricing-guarantee">
-        <ShieldCheck className="pricing-guarantee-icon" />
+        <ShieldCheck weight="regular" className="pricing-guarantee-icon" />
         <span>7-day money-back guarantee &mdash; no questions asked</span>
       </div>
 

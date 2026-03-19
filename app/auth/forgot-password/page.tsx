@@ -4,7 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Mail } from "lucide-react"
+import { ArrowLeft, Envelope } from "@phosphor-icons/react"
 import { createClient } from "@/lib/supabase/client"
 
 export default function ForgotPasswordPage() {
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-[420px] relative z-10">
         <div className="mb-8 flex items-center justify-between text-sm text-muted-foreground">
           <Link href="/auth/login" className="inline-flex items-center hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft size={16} weight="regular" className="mr-2" />
             Back to sign in
           </Link>
         </div>
@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
                 Email
               </label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <Envelope size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   id="email"
                   type="email"

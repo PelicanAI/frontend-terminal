@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { RefreshCw, Database, Activity, AlertTriangle, FileText } from 'lucide-react'
+import { ArrowsClockwise, Database, Pulse, Warning, FileText } from '@phosphor-icons/react'
 
 // --- Types ---
 
@@ -139,7 +139,7 @@ export default function AdminHealthPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">System Health</h1>
         <Button variant="ghost" size="sm" onClick={() => fetchData(true)}>
-          <RefreshCw className="size-4 mr-1" />
+          <ArrowsClockwise size={16} weight="regular" className="mr-1" />
           Refresh
         </Button>
       </div>
@@ -150,7 +150,7 @@ export default function AdminHealthPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className={`rounded-md p-2 ${isOnline ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
-              <Database className={`size-4 ${isOnline ? 'text-emerald-500' : 'text-red-500'}`} />
+              <Database size={16} weight="regular" className={isOnline ? 'text-emerald-500' : 'text-red-500'} />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Database</p>
@@ -169,7 +169,7 @@ export default function AdminHealthPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-emerald-500/10 p-2">
-              <Activity className="size-4 text-emerald-500" />
+              <Pulse size={16} weight="regular" className="text-emerald-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">API Health</p>
@@ -185,7 +185,7 @@ export default function AdminHealthPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className={`rounded-md p-2 ${fallbackMessages > 10 ? 'bg-orange-500/10' : 'bg-emerald-500/10'}`}>
-              <AlertTriangle className={`size-4 ${fallbackMessages > 10 ? 'text-orange-500' : 'text-emerald-500'}`} />
+              <Warning size={16} weight="regular" className={fallbackMessages > 10 ? 'text-orange-500' : 'text-emerald-500'} />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Fallback Rate</p>
@@ -199,7 +199,7 @@ export default function AdminHealthPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-blue-500/10 p-2">
-              <FileText className="size-4 text-blue-500" />
+              <FileText size={16} weight="regular" className="text-blue-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Avg Message Length</p>

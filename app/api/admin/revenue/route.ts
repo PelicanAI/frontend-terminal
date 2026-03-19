@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
 import { PLAN_PRICES, PLAN_CREDITS } from '@/lib/plans'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const auth = await requireAdmin()

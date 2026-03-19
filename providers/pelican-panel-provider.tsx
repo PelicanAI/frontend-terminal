@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useMemo, ReactNode } from 'react'
 import { usePelicanPanel, type PelicanPanelContext } from '@/hooks/use-pelican-panel'
+import type { Message } from '@/lib/chat-utils'
+import type { TrialExhaustedInfo, InsufficientCreditsInfo } from '@/hooks/use-streaming-chat'
 import type { MessageSource } from '@/lib/chat/message-source'
 
 // =============================================================================
@@ -11,7 +13,7 @@ import type { MessageSource } from '@/lib/chat/message-source'
 interface PelicanPanelContextValue {
   isOpen: boolean
   conversationId: string | null
-  messages: any[]
+  messages: Message[]
   isStreaming: boolean
   ticker: string | null
   context: PelicanPanelContext
@@ -34,8 +36,8 @@ const PelicanPanelContext = createContext<PelicanPanelContextValue | undefined>(
 
 interface PelicanPanelProviderProps {
   children: ReactNode
-  onTrialExhausted?: (info: any) => void
-  onInsufficientCredits?: (info: any) => void
+  onTrialExhausted?: (info: TrialExhaustedInfo) => void
+  onInsufficientCredits?: (info: InsufficientCreditsInfo) => void
   onError?: (error: Error) => void
 }
 

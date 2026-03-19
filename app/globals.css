@@ -112,13 +112,6 @@
   --leading-snug: 1.375;
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
-  --leading-loose: 2;
-
-  /* Shadow depth system */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
 
   /* Scrollbar */
   --scrollbar-thumb: rgba(0, 0, 0, 0.15);
@@ -129,31 +122,17 @@
 
   /* Responsive layout system */
   --page-gutter: clamp(1rem, 4vw, 2rem);
-  --page-gutter-lg: clamp(1.25rem, 5vw, 3rem);
   --page-max-width: 1280px;
   --page-max-width-wide: 1600px;
-  --content-max-width: 72ch;
-  --content-max-width-wide: 90ch;
   --section-padding-y: clamp(3rem, 7vw, 6rem);
   --section-padding-y-tight: clamp(2rem, 5vw, 4rem);
 
   /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  --space-page-x: 2rem;
-  --space-page-y: 1.5rem;
-  --space-section: 2rem;
   --space-card: 1.25rem;
-  --space-card-gap: 1rem;
 
   /* Radius */
   --radius-card: 12px;
   --radius-button: 8px;
-  --radius-modal: 16px;
 }
 
 .dark {
@@ -348,7 +327,6 @@
   --radius-xl: calc(var(--radius) + 4px);
   --radius-card: 12px;
   --radius-button: 8px;
-  --radius-modal: 16px;
 
   /* Z-Index System */
   --z-base: 1000;
@@ -794,37 +772,6 @@
     50% { filter: drop-shadow(0 0 30px oklch(0.6231 0.1880 259.8145 / 0.20)); }
   }
 
-  /* Stat value — glow in dark, clean in light */
-  .stat-positive {
-    color: var(--data-positive);
-  }
-
-  .dark .stat-positive {
-    text-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
-  }
-
-  .stat-negative {
-    color: var(--data-negative);
-  }
-
-  .dark .stat-negative {
-    text-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
-  }
-
-  /* Table row hover */
-  .table-row-hover {
-    transition: background-color 0.15s ease;
-  }
-
-  .table-row-hover:hover {
-    background-color: var(--muted);
-  }
-
-  /* Subtle gradient backgrounds for section headers */
-  .section-header-gradient {
-    background: linear-gradient(135deg, oklch(0.6231 0.1880 259.8145 / 0.08) 0%, transparent 60%);
-  }
-
   /* Animated skeleton for loading states */
   .skeleton {
     background: linear-gradient(
@@ -854,20 +801,6 @@
   .data-negative { color: var(--data-negative); }
   .data-neutral { color: var(--data-neutral); }
 
-  /* Subtle pulse for live indicators */
-  @keyframes live-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
-  .live-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--data-positive);
-    animation: live-pulse 2s ease-in-out infinite;
-  }
-
   /* Hide scrollbars */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
@@ -881,15 +814,6 @@
   /* Subtle border utility for professional UI */
   .border-subtle {
     border-color: var(--border);
-  }
-
-  /* Safe area padding for mobile (notch/bottom bar) */
-  .pb-safe {
-    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
-  }
-
-  .pt-safe {
-    padding-top: max(1rem, env(safe-area-inset-top));
   }
 
   /* Action button staggered entrance */

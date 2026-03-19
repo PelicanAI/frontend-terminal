@@ -1,7 +1,7 @@
 "use client"
 
 import { memo, useEffect, useRef, useState } from "react"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 
 interface TradingViewChartProps {
@@ -90,7 +90,7 @@ function TradingViewChartInner({ symbol, onClose }: TradingViewChartProps) {
           onClick={onClose}
           className="h-8 w-8 hover:bg-muted/50"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft size={16} weight="regular" />
         </Button>
         <span className="text-lg font-bold text-foreground">{symbol}</span>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronDown } from "lucide-react"
+import { CaretDown } from "@phosphor-icons/react"
 import { Button } from "@/components/ui/button"
 
 interface NewMessagesPillProps {
@@ -36,7 +36,7 @@ export function NewMessagesPill({ show, messageCount, onJumpToBottom }: NewMessa
                 ease: "easeInOut",
               }}
             >
-              <ChevronDown className="w-4 h-4" />
+              <CaretDown size={16} weight="regular" />
             </motion.div>
             {messageCount} new message{messageCount !== 1 ? "s" : ""}
           </Button>

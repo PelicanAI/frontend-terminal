@@ -2,7 +2,7 @@
 
 import { Component, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
-import { AlertTriangle, RefreshCw } from 'lucide-react'
+import { Warning, ArrowsClockwise } from '@phosphor-icons/react'
 import * as Sentry from '@sentry/nextjs'
 
 interface Props {
@@ -47,7 +47,7 @@ export class ChatErrorBoundary extends Component<Props, State> {
         <div className="flex flex-col items-center justify-center h-full p-8 bg-background">
           <div className="max-w-md text-center space-y-6">
             <div className="mx-auto w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
+              <Warning size={32} weight="regular" className="text-red-600 dark:text-red-400" />
             </div>
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-foreground">Something went wrong</h2>
@@ -60,7 +60,7 @@ export class ChatErrorBoundary extends Component<Props, State> {
             )}
             <div className="flex gap-3 justify-center">
               <Button variant="outline" onClick={this.handleReset} className="gap-2">
-                <RefreshCw className="w-4 h-4" />
+                <ArrowsClockwise size={16} weight="regular" />
                 Try Again
               </Button>
               <Button onClick={this.handleReload}>Reload Page</Button>

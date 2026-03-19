@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Download } from 'lucide-react'
+import { MagnifyingGlass, CaretDown, CaretUp, CaretLeft, CaretRight, DownloadSimple } from '@phosphor-icons/react'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -204,7 +204,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
       <div className="flex flex-wrap items-end gap-3">
         <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-[200px]">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <MagnifyingGlass size={16} weight="regular" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search by email..."
               value={search}
@@ -252,7 +252,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
 
           <IconTooltip label="Export CSV">
             <Button variant="outline" size="sm" onClick={handleExport}>
-              <Download className="size-4 mr-1" />
+              <DownloadSimple size={16} weight="regular" className="mr-1" />
               CSV
             </Button>
           </IconTooltip>
@@ -327,9 +327,9 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
                     </TableCell>
                     <TableCell>
                       {isExpanded ? (
-                        <ChevronUp className="size-4 text-muted-foreground" />
+                        <CaretUp size={16} weight="regular" className="text-muted-foreground" />
                       ) : (
-                        <ChevronDown className="size-4 text-muted-foreground" />
+                        <CaretDown size={16} weight="regular" className="text-muted-foreground" />
                       )}
                     </TableCell>
                   </TableRow>
@@ -365,7 +365,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
                 onClick={() => goToPage(data.page - 1)}
                 disabled={data.page <= 1 || loading}
               >
-                <ChevronLeft className="size-4" />
+                <CaretLeft size={16} weight="regular" />
               </Button>
             </IconTooltip>
             <IconTooltip label="Next page">
@@ -375,7 +375,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
                 onClick={() => goToPage(data.page + 1)}
                 disabled={data.page >= data.totalPages || loading}
               >
-                <ChevronRight className="size-4" />
+                <CaretRight size={16} weight="regular" />
               </Button>
             </IconTooltip>
           </div>

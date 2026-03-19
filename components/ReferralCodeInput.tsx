@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getStoredReferralCode, type ReferralCodeInfo } from "@/lib/referral";
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle, XCircle, CircleNotch } from "@phosphor-icons/react";
 
 interface ReferralCodeInputProps {
   onReferralReady: (recordFn: (userId: string) => Promise<void>) => void;
@@ -106,13 +106,13 @@ export function ReferralCodeInput({ onReferralReady }: ReferralCodeInputProps) {
         />
         <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
           {validationState === "loading" && (
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            <CircleNotch size={16} weight="regular" className="animate-spin text-muted-foreground" />
           )}
           {validationState === "valid" && (
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <CheckCircle size={16} weight="regular" className="text-green-500" />
           )}
           {validationState === "invalid" && (
-            <XCircle className="h-4 w-4 text-red-500" />
+            <XCircle size={16} weight="regular" className="text-red-500" />
           )}
         </div>
       </div>

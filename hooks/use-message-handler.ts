@@ -15,7 +15,7 @@ interface PendingMessage {
 interface UseMessageHandlerOptions {
   chatLoading: boolean
   currentConversationId: string | null
-  sendMessage: (content: string, options?: { attachments?: any[]; fileIds?: string[]; source?: MessageSource }) => Promise<void>
+  sendMessage: (content: string, options?: { attachments?: Attachment[]; fileIds?: string[]; source?: MessageSource }) => Promise<void>
   chatInputRef: React.RefObject<ChatInputRef>
 }
 
@@ -36,7 +36,7 @@ export function useMessageHandler({
   }, [])
 
   const handleSendMessage = useCallback(
-    async (content: string, options?: { forceQueue?: boolean; fileIds?: string[]; attachments?: any[]; source?: MessageSource }) => {
+    async (content: string, options?: { forceQueue?: boolean; fileIds?: string[]; attachments?: Attachment[]; source?: MessageSource }) => {
       if (chatLoading || options?.forceQueue) {
         setPendingMessage({
           content,
@@ -68,7 +68,7 @@ export function useMessageHandler({
   }, [chatLoading, isDraftWhileStreaming, currentConversationId])
 
   const handleForceQueue = useCallback(
-    (content: string, options?: { fileIds?: string[]; attachments?: any[] }) => {
+    (content: string, options?: { fileIds?: string[]; attachments?: Attachment[] }) => {
       handleSendMessage(content, { forceQueue: true, ...options })
     },
     [handleSendMessage],

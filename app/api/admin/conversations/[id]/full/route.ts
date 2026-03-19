@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
 import { classifyConversation } from '@/lib/admin/classify-conversation'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

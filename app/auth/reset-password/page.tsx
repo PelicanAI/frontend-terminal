@@ -4,7 +4,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Lock } from "lucide-react"
+import { ArrowLeft, Lock } from "@phosphor-icons/react"
 import { createClient } from "@/lib/supabase/client"
 
 function getHashParams() {
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-[420px] relative z-10">
         <div className="mb-8 flex items-center justify-between text-sm text-muted-foreground">
           <Link href="/auth/login" className="inline-flex items-center hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft size={16} weight="regular" className="mr-2" />
             Back to sign in
           </Link>
         </div>
@@ -118,7 +118,7 @@ export default function ResetPasswordPage() {
                 New password
               </label>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   id="password"
                   type="password"
@@ -136,7 +136,7 @@ export default function ResetPasswordPage() {
                 Confirm password
               </label>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   id="confirmPassword"
                   type="password"

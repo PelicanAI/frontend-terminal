@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/hooks/use-toast"
-import { Trash2 } from "lucide-react"
+import { Trash } from "@phosphor-icons/react"
 import { logger } from "@/lib/logger"
 import {
   AlertDialog,
@@ -221,7 +221,7 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
             onClick={() => setShowClearHistoryDialog(true)}
             className="w-full"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            <Trash size={16} weight="regular" className="mr-2" />
             Clear All Conversations
           </Button>
         </CardContent>
@@ -238,7 +238,7 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
             onClick={() => setShowDeleteDialog(true)}
             className="bg-red-600 hover:bg-red-700"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
+            <Trash size={16} weight="regular" className="mr-2" />
             Delete Account
           </Button>
         </CardContent>

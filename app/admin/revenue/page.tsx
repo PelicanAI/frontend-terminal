@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { RefreshCw, DollarSign, TrendingUp, UserCheck } from 'lucide-react'
+import { ArrowsClockwise, CurrencyDollar, TrendUp, UserCheck } from '@phosphor-icons/react'
 import {
   PieChart,
   Pie,
@@ -22,6 +22,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import type { PieLabelRenderProps } from 'recharts'
 
 // --- Types ---
 
@@ -144,9 +145,8 @@ function SkeletonTable() {
 
 // --- Custom Pie Label ---
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderPieLabel(props: any) {
-  const { cx, cy, midAngle, innerRadius, outerRadius, name, value, percent } = props
+function renderPieLabel(props: PieLabelRenderProps) {
+  const { cx, cy, midAngle = 0, innerRadius, outerRadius, name, value, percent } = props
   const RADIAN = Math.PI / 180
   const radius = innerRadius + (outerRadius - innerRadius) * 1.4
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
@@ -239,7 +239,7 @@ export default function AdminRevenuePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Revenue</h1>
         <Button variant="ghost" size="sm" onClick={() => fetchData(true)}>
-          <RefreshCw className="size-4 mr-1" />
+          <ArrowsClockwise size={16} weight="regular" className="mr-1" />
           Refresh
         </Button>
       </div>
@@ -249,7 +249,7 @@ export default function AdminRevenuePage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-emerald-500/10 p-2">
-              <DollarSign className="size-4 text-emerald-500" />
+              <CurrencyDollar size={16} weight="regular" className="text-emerald-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">MRR</p>
@@ -260,7 +260,7 @@ export default function AdminRevenuePage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-blue-500/10 p-2">
-              <TrendingUp className="size-4 text-blue-500" />
+              <TrendUp size={16} weight="regular" className="text-blue-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">ARR</p>
@@ -271,7 +271,7 @@ export default function AdminRevenuePage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-purple-500/10 p-2">
-              <DollarSign className="size-4 text-purple-500" />
+              <CurrencyDollar size={16} weight="regular" className="text-purple-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">ARPU</p>
@@ -282,7 +282,7 @@ export default function AdminRevenuePage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-amber-500/10 p-2">
-              <UserCheck className="size-4 text-amber-500" />
+              <UserCheck size={16} weight="regular" className="text-amber-500" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Paid Users</p>

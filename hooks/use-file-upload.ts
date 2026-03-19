@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react"
 import type { ChatInputRef } from "@/components/chat/chat-input"
+import type { Attachment } from "@/lib/chat-utils"
 import { ACCEPTED_FILE_TYPES, LIMITS, API_ENDPOINTS } from "@/lib/constants"
 import { createClient } from "@/lib/supabase/client"
 import { uploadChatImage } from "@/lib/upload-image"
@@ -27,7 +28,7 @@ interface ImageMetadata {
 }
 
 interface UseFileUploadOptions {
-  sendMessage: (content: string, options?: { attachments?: any[]; fileIds?: string[] }) => Promise<void>
+  sendMessage: (content: string, options?: { attachments?: Attachment[]; fileIds?: string[] }) => Promise<void>
   addSystemMessage: (content: string, retryAction?: () => void) => string
   chatInputRef: React.RefObject<ChatInputRef>
 }

@@ -3,7 +3,7 @@
 import type React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Mail, Lock } from "lucide-react"
+import { ArrowLeft, Envelope, Lock } from "@phosphor-icons/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -78,7 +78,7 @@ export default function LoginPage() {
       <div className="w-full max-w-[420px] relative z-10 flex flex-col">
         <div className="mb-6 self-start">
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft size={16} weight="regular" className="mr-2" />
             Back to Home
           </Link>
         </div>
@@ -104,7 +104,7 @@ export default function LoginPage() {
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-xs font-semibold text-muted-foreground ml-1 uppercase tracking-wider">Email</label>
               <div className="relative group">
-                <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <Envelope size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   type="email"
                   id="email"
@@ -128,7 +128,7 @@ export default function LoginPage() {
                 </Link>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
                 <input
                   type="password"
                   id="password"

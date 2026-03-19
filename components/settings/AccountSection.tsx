@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User } from "lucide-react"
+import { User } from "@phosphor-icons/react"
 import Link from "next/link"
 import { SubscriptionCard } from "./SubscriptionCard"
 import { SecuritySection } from "./SecuritySection"
@@ -27,7 +27,7 @@ export function AccountSection({ user, settings, supabase }: AccountSectionProps
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <User className="h-8 w-8 text-blue-600" />
+                  <User size={32} weight="regular" className="text-blue-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-blue-900 mb-2">
