@@ -10,8 +10,8 @@ const POLYGON_API_KEY = process.env.POLYGON_API_KEY
 
 const VALID_ASSET_TYPES = ['stock', 'etf', 'option', 'crypto', 'forex', 'future', 'other'] as const
 const VALID_DIRECTIONS = ['long', 'short'] as const
-const TICKER_REGEX = /^[A-Z0-9.:]{1,15}$/
-const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/
+const TICKER_REGEX = /^[A-Z.:]{1,20}$/
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}/
 
 interface PositionInput {
   ticker: string
@@ -37,10 +37,18 @@ function validatePosition(pos: unknown, index: number): string | null {
 
   if (typeof p.ticker !== 'string' || !TICKER_REGEX.test(p.ticker))
     return `Position ${index}: ticker must match ${TICKER_REGEX}`
-  if (typeof p.quantity !== 'number' || p.quantity <= 0 || !isFinite(p.quantity))
+
+  // Coerce numeric strings (Supabase numeric columns may return strings)
+  const qty = typeof p.quantity === 'string' ? Number(p.quantity) : p.quantity
+  if (typeof qty !== 'number' || qty <= 0 || !isFinite(qty))
     return `Position ${index}: quantity must be a positive number`
-  if (typeof p.entry_price !== 'number' || p.entry_price <= 0 || !isFinite(p.entry_price))
+  p.quantity = qty
+
+  const price = typeof p.entry_price === 'string' ? Number(p.entry_price) : p.entry_price
+  if (typeof price !== 'number' || price <= 0 || !isFinite(price))
     return `Position ${index}: entry_price must be a positive number`
+  p.entry_price = price
+
   if (typeof p.entry_date !== 'string' || !DATE_REGEX.test(p.entry_date))
     return `Position ${index}: entry_date must match YYYY-MM-DD`
   if (typeof p.asset_type !== 'string' || !VALID_ASSET_TYPES.includes(p.asset_type as typeof VALID_ASSET_TYPES[number]))
