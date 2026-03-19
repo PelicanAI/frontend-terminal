@@ -3,10 +3,6 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
-  Wallet,
-  TrendUp,
-  TrendDown,
-  Scales,
   ShieldCheck,
   Warning,
   CheckCircle,
@@ -50,18 +46,6 @@ function getAssetColor(type: string): string {
 }
 
 // ── Skeleton Loader ────────────────────────────────────────────────────
-function SkeletonCard({ className = '' }: { className?: string }) {
-  return (
-    <PelicanCard className={className}>
-      <div className="p-4 space-y-3">
-        <div className="h-3 w-24 rounded bg-[var(--bg-elevated)] animate-pulse" />
-        <div className="h-6 w-20 rounded bg-[var(--bg-elevated)] animate-pulse" />
-        <div className="h-3 w-16 rounded bg-[var(--bg-elevated)] animate-pulse" />
-      </div>
-    </PelicanCard>
-  )
-}
-
 function SkeletonBlock({ className = '' }: { className?: string }) {
   return (
     <PelicanCard className={className}>
@@ -114,78 +98,20 @@ export function PortfolioOverview({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <SkeletonBlock />
           <SkeletonBlock />
         </div>
-        <SkeletonCard />
+        <SkeletonBlock />
       </div>
     )
   }
 
-  // ── Metric Cards Data ──────────────────────────────────────────────
+  // ── R:R display (used in Risk Budget card) ────────────────────────
   const rrDisplay =
     risk.portfolio_rr_ratio !== null
       ? `${risk.portfolio_rr_ratio.toFixed(2)}:1`
       : '\u2014'
-
-  const longTickers = positions.filter(p => p.direction === 'long').map(p => p.ticker).join(', ')
-  const shortTickers = positions.filter(p => p.direction === 'short').map(p => p.ticker).join(', ')
-
-  const metricCards = [
-    {
-      label: 'Total Exposure',
-      value: formatCompactDollar(portfolio.total_exposure),
-      color: 'var(--text-primary)',
-      sub: `${portfolio.total_positions} position${portfolio.total_positions !== 1 ? 's' : ''}`,
-      icon: Wallet,
-      prompt: `My total portfolio exposure is ${formatCompactDollar(portfolio.total_exposure)} across ${portfolio.total_positions} positions. Is this appropriate for a retail trader? How should I think about position sizing?`,
-    },
-    {
-      label: 'Long',
-      value: formatCompactDollar(portfolio.long_exposure),
-      color: 'var(--data-positive)',
-      sub: `${portfolio.direction_breakdown.long.count} position${portfolio.direction_breakdown.long.count !== 1 ? 's' : ''}`,
-      icon: TrendUp,
-      prompt: `I have ${formatCompactDollar(portfolio.long_exposure)} in long exposure across ${portfolio.direction_breakdown.long.count} positions: ${longTickers || 'none'}. Analyze my long book — am I too concentrated? Any correlation risk?`,
-    },
-    {
-      label: 'Short',
-      value: formatCompactDollar(portfolio.short_exposure),
-      color: 'var(--data-negative)',
-      sub: `${portfolio.direction_breakdown.short.count} position${portfolio.direction_breakdown.short.count !== 1 ? 's' : ''}`,
-      icon: TrendDown,
-      prompt: `I have ${formatCompactDollar(portfolio.short_exposure)} in short exposure across ${portfolio.direction_breakdown.short.count} positions: ${shortTickers || 'none'}. Analyze my short book — is my hedging adequate?`,
-    },
-    {
-      label: 'Net Exposure',
-      value: formatCompactDollar(portfolio.net_exposure),
-      color:
-        portfolio.net_exposure > 0
-          ? 'var(--data-positive)'
-          : portfolio.net_exposure < 0
-            ? 'var(--data-negative)'
-            : 'var(--text-primary)',
-      sub: portfolio.net_exposure > 0 ? 'Net long' : portfolio.net_exposure < 0 ? 'Net short' : 'Neutral',
-      icon: Scales,
-      prompt: `My net exposure is ${formatCompactDollar(portfolio.net_exposure)} (${portfolio.net_exposure > 0 ? 'net long' : portfolio.net_exposure < 0 ? 'net short' : 'neutral'}). Long: ${formatCompactDollar(portfolio.long_exposure)}, Short: ${formatCompactDollar(portfolio.short_exposure)}. Given current market conditions, is this directional bias appropriate? Should I hedge more?`,
-    },
-    {
-      label: 'R:R Ratio',
-      value: rrDisplay,
-      color: 'var(--text-primary)',
-      sub: risk.portfolio_rr_ratio !== null ? 'Risk to reward' : 'No risk defined',
-      icon: ShieldCheck,
-      prompt: risk.portfolio_rr_ratio !== null
-        ? `My portfolio R:R ratio is ${risk.portfolio_rr_ratio.toFixed(2)}:1. Total risk: ${formatCompactDollar(risk.total_risk_usd)}, potential reward: ${formatCompactDollar(risk.total_reward_usd)}. ${risk.positions_without_risk} positions have no defined risk. Is this R:R acceptable? How can I improve it?`
-        : `I have ${risk.positions_without_risk} positions with no defined risk (no stop loss). Help me set appropriate stop losses for my open positions.`,
-    },
-  ]
 
   // ── Donut Data ─────────────────────────────────────────────────────
   const donutData = portfolio.asset_breakdown.map((ab) => ({
@@ -233,58 +159,10 @@ export function PortfolioOverview({
       animate="visible"
       className="space-y-4"
     >
-      {/* ── Row 1: Key Metrics ────────────────────────────────────────── */}
+      {/* ── Visual Breakdowns ──────────────────────────────────────────── */}
       <motion.div
         variants={staggerContainer}
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
-      >
-        {metricCards.map((card) => {
-          const Icon = card.icon
-          const isClickable = !!onSendMessage
-          return (
-            <motion.div key={card.label} variants={staggerItem}>
-              <PelicanCard
-                className={`p-4 group ${isClickable ? 'cursor-pointer hover:translate-y-[-1px] hover:shadow-lg hover:border-[var(--border-hover)] transition-all duration-150' : ''}`}
-                onClick={isClickable ? () => onSendMessage(card.prompt) : undefined}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium">
-                    {card.label}
-                  </span>
-                  <div className="relative">
-                    <Icon
-                      size={16}
-                      weight="regular"
-                      className={`text-[var(--text-muted)] ${isClickable ? 'group-hover:opacity-0 transition-opacity duration-150' : ''}`}
-                    />
-                    {isClickable && (
-                      <ChatCircle
-                        size={16}
-                        weight="fill"
-                        className="text-[var(--accent-primary)] absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-                      />
-                    )}
-                  </div>
-                </div>
-                <div
-                  className="text-xl font-semibold font-mono tabular-nums"
-                  style={{ color: card.color }}
-                >
-                  {card.value}
-                </div>
-                <p className="text-xs text-[var(--text-muted)] mt-1">
-                  {card.sub}
-                </p>
-              </PelicanCard>
-            </motion.div>
-          )
-        })}
-      </motion.div>
-
-      {/* ── Row 2: Visual Breakdowns ──────────────────────────────────── */}
-      <motion.div
-        variants={staggerContainer}
-        className="grid grid-cols-1 lg:grid-cols-2 gap-4"
+        className="grid grid-cols-1 gap-4"
       >
         {/* Card A: Exposure Breakdown Donut */}
         <motion.div variants={staggerItem}>
