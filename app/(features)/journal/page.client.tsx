@@ -543,7 +543,8 @@ export default function JournalPage() {
       {/* Mobile FAB: Log Trade */}
       <button
         onClick={() => setShowLogTradeModal(true)}
-        className="sm:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-[var(--accent-primary)] rounded-full shadow-lg shadow-[var(--accent-primary)]/25 flex items-center justify-center active:scale-95 transition-transform"
+        className="sm:hidden fixed right-6 z-40 w-14 h-14 bg-[var(--accent-primary)] rounded-full shadow-lg shadow-[var(--accent-primary)]/25 flex items-center justify-center active:scale-95 transition-transform"
+        style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
         aria-label="Log Trade"
       >
         <Plus size={24} weight="bold" className="text-white" />

@@ -356,7 +356,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
                 alt=""
                 width={500}
                 height={500}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] object-contain opacity-[0.03] select-none pointer-events-none"
+                className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] object-contain opacity-[0.03] select-none pointer-events-none"
                 style={{ filter: 'brightness(0) invert(1)' }}
                 draggable={false}
                 aria-hidden={true}

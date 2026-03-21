@@ -192,7 +192,7 @@ function PelicanChatPanelInternal({
   return (
     <>
       {/* Mobile: Full-screen overlay */}
-      <div className="md:hidden fixed inset-0 z-50 flex flex-col bg-[var(--bg-surface)]">
+      <div className="md:hidden fixed inset-0 z-40 flex flex-col bg-[var(--bg-surface)]">
         {/* Header — pinned top */}
         <div className="shrink-0 border-b border-[var(--border-subtle)] px-4 py-3 flex items-center justify-between bg-[var(--bg-elevated)]">
           <div className="flex items-center gap-2">

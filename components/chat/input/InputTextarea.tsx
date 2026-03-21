@@ -111,7 +111,6 @@ export const InputTextarea = forwardRef<InputTextareaRef, InputTextareaProps>(
         placeholder={placeholder}
         disabled={disabled}
         className={cn(
-          "text-white",
           "flex-1 bg-transparent outline-none resize-none whitespace-pre-wrap",
           "text-[15px] leading-relaxed font-[var(--font-sans)]",
           "placeholder:text-muted-foreground",

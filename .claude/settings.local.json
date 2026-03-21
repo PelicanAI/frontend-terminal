@@ -1,28 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build:*)",
-      "Bash(timeout:*)",
-      "Bash(grep:*)",
-      "Bash(find:*)",
-      "Bash(node -e:*)",
-      "Bash(for f in messages/*.json)",
-      "Bash(do node -e \"JSON.parse\\(require\\(''fs''\\).readFileSync\\(''$f'',''utf8''\\)\\)\")",
-      "Bash(echo:*)",
-      "Bash(done)",
-      "Bash(tail:*)",
-      "Bash(for file in TypingDots chat-input-simple premium-chat-input perplexity-chat-input chat-welcome chat-sidebar chat-message)",
-      "Bash(npm install:*)",
-      "Bash(curl:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git rm:*)",
-      "Bash(ls:*)",
-      "Bash(cat:*)",
-      "Bash(tee:*)",
-      "Bash(git stash:*)",
-      "Bash(git pull:*)",
-      "Read(//c/Users/grove/Desktop/**)"
+      "Bash(git add -A)"
     ],
     "deny": [],
     "ask": []

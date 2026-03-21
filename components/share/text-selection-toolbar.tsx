@@ -46,8 +46,10 @@ function getSelectionEndPosition(): { x: number; y: number } | null {
   // Clamp to viewport so toolbar never goes off-screen
   const toolbarWidth = 200
   const toolbarHeight = 48
-  const x = Math.max(toolbarWidth / 2 + 8, Math.min(rect.left + rect.width / 2, window.innerWidth - toolbarWidth / 2 - 8))
-  const y = Math.max(toolbarHeight + 8, Math.min(rect.top - 8, window.innerHeight - 16))
+  const clampedLeft = Math.min(Math.max(8, rect.left + rect.width / 2 - toolbarWidth / 2), window.innerWidth - toolbarWidth - 8)
+  const x = clampedLeft + toolbarWidth / 2
+  const clampedTop = Math.min(Math.max(8, rect.top - toolbarHeight - 8), window.innerHeight - toolbarHeight - 8)
+  const y = clampedTop + toolbarHeight
 
   return { x, y }
 }

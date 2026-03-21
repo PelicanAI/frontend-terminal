@@ -116,48 +116,51 @@ export function TopNav({ className }: TopNavProps) {
           </Link>
 
           {/* Tabs — horizontal scroll on mobile, inline on desktop */}
-          <div
-            className="flex items-center gap-1 overflow-x-auto scrollbar-hide min-w-0 flex-1"
-            style={{ WebkitOverflowScrolling: 'touch' }}
-          >
-            {visibleTabs.map((tab) => {
-              const isActive = activeTab === tab.key
+          <div className="relative flex-1 min-w-0">
+            <div
+              className="flex items-center gap-1 overflow-x-auto scrollbar-hide min-w-0"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              {visibleTabs.map((tab) => {
+                const isActive = activeTab === tab.key
 
-              return (
-                <React.Fragment key={tab.key}>
-                  {tab.key === 'heatmap' && (
-                    <div className="hidden md:block h-4 w-px bg-[var(--border-subtle)] mx-1 flex-shrink-0" />
-                  )}
-                  <Link
-                  href={tab.href}
-                  onMouseEnter={() => {
-                    // Prefetch earnings data on hover for instant navigation
-                    if (tab.key === 'earnings') {
-                      const today = new Date()
-                      const monday = new Date(today)
-                      monday.setDate(today.getDate() - today.getDay() + 1)
-                      const friday = new Date(monday)
-                      friday.setDate(monday.getDate() + 4)
-                      const from = monday.toISOString().split('T')[0]
-                      const to = friday.toISOString().split('T')[0]
-                      fetch(`/api/earnings?from=${from}&to=${to}`).catch(() => {})
-                    }
-                  }}
-                  className={cn(
-                    "relative px-3 py-1.5 md:py-4 text-sm font-medium transition-colors duration-150 whitespace-nowrap flex-shrink-0 rounded-lg md:rounded-none active:scale-95",
-                    isActive
-                      ? "text-[var(--text-primary)] bg-[var(--surface-hover)] md:bg-transparent"
-                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--surface-hover)]"
-                  )}
-                >
-                  {getTabLabel(tab)}
-                  {isActive && (
-                    <span className="hidden md:block absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)] rounded-full shadow-[0_0_8px_var(--accent-muted)]" />
-                  )}
-                </Link>
-                </React.Fragment>
-              )
-            })}
+                return (
+                  <React.Fragment key={tab.key}>
+                    {tab.key === 'heatmap' && (
+                      <div className="hidden md:block h-4 w-px bg-[var(--border-subtle)] mx-1 flex-shrink-0" />
+                    )}
+                    <Link
+                    href={tab.href}
+                    onMouseEnter={() => {
+                      // Prefetch earnings data on hover for instant navigation
+                      if (tab.key === 'earnings') {
+                        const today = new Date()
+                        const monday = new Date(today)
+                        monday.setDate(today.getDate() - today.getDay() + 1)
+                        const friday = new Date(monday)
+                        friday.setDate(monday.getDate() + 4)
+                        const from = monday.toISOString().split('T')[0]
+                        const to = friday.toISOString().split('T')[0]
+                        fetch(`/api/earnings?from=${from}&to=${to}`).catch(() => {})
+                      }
+                    }}
+                    className={cn(
+                      "relative px-3 py-1.5 md:py-4 text-sm font-medium transition-colors duration-150 whitespace-nowrap flex-shrink-0 rounded-lg md:rounded-none active:scale-95",
+                      isActive
+                        ? "text-[var(--text-primary)] bg-[var(--surface-hover)] md:bg-transparent"
+                        : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:bg-[var(--surface-hover)]"
+                    )}
+                  >
+                    {getTabLabel(tab)}
+                    {isActive && (
+                      <span className="hidden md:block absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent-primary)] rounded-full shadow-[0_0_8px_var(--accent-muted)]" />
+                    )}
+                  </Link>
+                  </React.Fragment>
+                )
+              })}
+            </div>
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none md:hidden" />
           </div>
         </div>
 

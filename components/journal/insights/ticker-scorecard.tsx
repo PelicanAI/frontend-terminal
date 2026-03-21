@@ -27,7 +27,7 @@ export function TickerScorecard({ data, onAskPelican }: TickerScorecardProps) {
         <span className="text-xs text-[var(--text-muted)] ml-auto">Click a row to ask Pelican</span>
       </div>
       <div className="overflow-x-auto -mx-5">
-        <table className="w-full min-w-[560px]">
+        <table className="w-full md:min-w-[560px]">
           <thead>
             <tr className="text-[var(--text-muted)] text-xs font-medium uppercase tracking-wider">
               <th className="text-left px-5 pb-3">Ticker</th>

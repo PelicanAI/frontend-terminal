@@ -176,7 +176,7 @@ export function DataTable({ data, columns, title = "Market Data", query, summary
         <div className="overflow-x-auto rounded-lg">
           <table className={cn(
             "w-full border-collapse",
-            !compact && "min-w-[640px]"
+            !compact && "md:min-w-[640px]"
           )} aria-label="Data visualization">
             <thead>
               <tr className="border-b-2 border-border/40">

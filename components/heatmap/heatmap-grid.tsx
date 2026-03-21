@@ -21,7 +21,7 @@ function formatGridPrice(price: number, market?: string): string {
 export function HeatmapGrid({ stocks, onStockClick, market, watchlistTickers, addToWatchlist, removeFromWatchlist }: HeatmapGridProps) {
   if (stocks.length === 0) {
     return (
-      <div className="flex items-center justify-center border border-[var(--border-subtle)] rounded-lg bg-surface-1 p-12">
+      <div className="flex items-center justify-center border border-[var(--border-subtle)] rounded-lg bg-surface-1 p-4 sm:p-8 md:p-12">
         <p className="text-foreground/50 text-sm">No data available</p>
       </div>
     )
