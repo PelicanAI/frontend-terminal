@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git commit -m \"fix: use CSS variable for chat input text color instead of Tailwind class\n\ntext-foreground class wasn''t updating dynamically with theme.\nChanged to text-[var(--foreground)] which updates in real-time.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\")"
+      "Bash(git commit -m \"fix: explicitly set chat input container to white background in light mode\n\nbg-card wasn''t rendering correctly on mobile. Changed to explicit\nbg-white for light mode, keeps dark:bg-[oklch(0.25_0_0)] for dark mode.\n\nThis ensures black text on white container in light mode, and white\ntext on dark container in dark mode.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\")"
     ],
     "deny": [],
     "ask": []

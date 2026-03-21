@@ -271,7 +271,7 @@ export const ChatInput = forwardRef<ChatInputRef, ChatInputProps>(
           <div
             className={cn(
               "relative flex items-center gap-2 px-4 py-2",
-              "bg-card dark:bg-[oklch(0.25_0_0)]",
+              "bg-white dark:bg-[oklch(0.25_0_0)]",
               "rounded-[28px]",
               "border border-black/10 dark:border-border",
               "shadow-[0_1px_3px_rgba(0,0,0,0.15)]",
