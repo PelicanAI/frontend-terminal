@@ -114,7 +114,7 @@ export const InputTextarea = forwardRef<InputTextareaRef, InputTextareaProps>(
           "flex-1 bg-transparent outline-none resize-none whitespace-pre-wrap",
           "text-[15px] leading-relaxed font-[var(--font-sans)]",
           "placeholder:text-muted-foreground",
-          "text-foreground",
+          "text-[var(--foreground)]",
           "py-2 px-2",
           "h-[40px] max-h-[168px] overflow-y-auto",
           "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent",
