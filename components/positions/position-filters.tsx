@@ -80,7 +80,7 @@ export function PositionFilters({
         </div>
 
         {/* Sort + Search + Log */}
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
           {shouldShowConnectBroker && (
             <ConnectBrokerButton variant="secondary" size="sm" className="whitespace-nowrap flex-shrink-0" />
           )}
@@ -104,7 +104,7 @@ export function PositionFilters({
             <select
               value={sortBy}
               onChange={(e) => onSortChange(e.target.value)}
-              className="appearance-none bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg text-sm text-[var(--text-secondary)] pl-8 pr-7 py-1.5 min-w-[140px] focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors cursor-pointer hover:border-[var(--border-hover)]"
+              className="appearance-none bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg text-sm text-[var(--text-secondary)] pl-8 pr-7 py-1.5 min-w-[100px] lg:min-w-[140px] focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors cursor-pointer hover:border-[var(--border-hover)]"
             >
               <option value="size_desc">Size ↓</option>
               <option value="size_asc">Size ↑</option>
@@ -138,7 +138,7 @@ export function PositionFilters({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search ticker..."
-              className="w-full sm:w-36 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] pl-8 pr-3 py-1.5 focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors hover:border-[var(--border-hover)]"
+              className="w-full sm:w-28 lg:w-36 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] pl-8 pr-3 py-1.5 focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors hover:border-[var(--border-hover)]"
             />
           </div>
         </div>
