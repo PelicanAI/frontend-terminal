@@ -89,7 +89,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
     for (const w of warnings) {
       if (w.severity === 'critical') {
         list.push({
-          priority: 0, icon: ShieldWarning, iconColor: 'text-red-400',
+          priority: 0, icon: ShieldWarning, iconColor: 'text-red-400/80',
           label: w.title, detail: w.message,
           actionLabel: w.action + ' \u2192', actionType: 'chat',
           chatPrompt: `I have a heads-up worth checking: "${w.title}" — ${w.message}. What should I do?`,
@@ -102,7 +102,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       const rr = riskSummary.portfolio_rr_ratio
       if (rr !== null && rr < 0.5) {
         list.push({
-          priority: 0, icon: ShieldWarning, iconColor: 'text-red-400',
+          priority: 0, icon: ShieldWarning, iconColor: 'text-red-400/80',
           label: `Portfolio R:R is ${rr.toFixed(2)}:1 — risking more than you stand to gain`,
           detail: `Risk: ${formatNum(riskSummary.total_risk_usd)} vs Reward: ${formatNum(riskSummary.total_reward_usd)}`,
           actionLabel: 'Fix R:R \u2192', actionType: 'chat',
@@ -110,7 +110,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
         })
       } else if (rr !== null && rr < 1) {
         list.push({
-          priority: 1, icon: Warning, iconColor: 'text-amber-400',
+          priority: 1, icon: Warning, iconColor: 'text-amber-500/60',
           label: `Portfolio R:R is ${rr.toFixed(2)}:1 — below breakeven`,
           detail: `Risk: ${formatNum(riskSummary.total_risk_usd)} vs Reward: ${formatNum(riskSummary.total_reward_usd)}`,
           actionLabel: 'Improve \u2192', actionType: 'chat',
@@ -127,7 +127,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       )
       if (maxConc.pct > 50 && portfolioStats.asset_breakdown.length > 1) {
         list.push({
-          priority: 2, icon: Scales, iconColor: 'text-amber-400',
+          priority: 2, icon: Scales, iconColor: 'text-amber-500/60',
           label: `${maxConc.pct.toFixed(0)}% concentrated in ${maxConc.type}s`,
           detail: 'Heavy concentration increases risk. Consider diversifying.',
           actionLabel: 'Review \u2192', actionType: 'chat',
@@ -141,7 +141,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
         const longPct = (portfolioStats.direction_breakdown.long.exposure / totalDir) * 100
         if (longPct > 85) {
           list.push({
-            priority: 2, icon: TrendUp, iconColor: 'text-amber-400',
+            priority: 2, icon: TrendUp, iconColor: 'text-amber-500/60',
             label: `${longPct.toFixed(0)}% long — heavy directional bias`,
             detail: 'Consider hedging with a short position or reducing long exposure.',
             actionLabel: 'Hedge \u2192', actionType: 'chat',
@@ -149,7 +149,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
           })
         } else if (longPct < 15) {
           list.push({
-            priority: 2, icon: TrendDown, iconColor: 'text-amber-400',
+            priority: 2, icon: TrendDown, iconColor: 'text-amber-500/60',
             label: `${(100 - longPct).toFixed(0)}% short — heavy directional bias`,
             detail: 'Extremely bearish positioning. Vulnerable to market rallies.',
             actionLabel: 'Review \u2192', actionType: 'chat',
@@ -163,7 +163,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 1 — Tight stop
       if (p.has_stop_loss && p.distance_to_stop_pct != null && Math.abs(p.distance_to_stop_pct) < 2) {
         list.push({
-          priority: 1, icon: Warning, iconColor: 'text-amber-400',
+          priority: 1, icon: Warning, iconColor: 'text-amber-500/60',
           label: `${p.ticker} stop is ${Math.abs(p.distance_to_stop_pct).toFixed(1)}% away`,
           detail: `Tight stop at $${p.stop_loss}. Decide: widen, hold, or exit.`,
           actionLabel: 'Plan \u2192', actionType: 'chat', chatPrompt: buildScanPrompt(p),
@@ -173,7 +173,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 1 — Absurd stop (>30% from entry, likely a typo)
       if (p.has_stop_loss && p.distance_to_stop_pct != null && Math.abs(p.distance_to_stop_pct) > 30) {
         list.push({
-          priority: 1, icon: Warning, iconColor: 'text-red-400',
+          priority: 1, icon: Warning, iconColor: 'text-red-400/80',
           label: `${p.ticker} stop is ${Math.abs(p.distance_to_stop_pct).toFixed(0)}% away — not a real stop`,
           detail: `Stop at $${p.stop_loss} is too far from entry $${p.entry_price}. Possible typo?`,
           actionLabel: 'Fix stop \u2192', actionType: 'edit', position: p,
@@ -183,7 +183,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 1 — No stop loss
       if (!p.has_stop_loss) {
         list.push({
-          priority: 1, icon: ShieldSlash, iconColor: 'text-red-400',
+          priority: 1, icon: ShieldSlash, iconColor: 'text-red-400/80',
           label: `${p.ticker} has no stop loss`,
           detail: `${formatNum(p.position_size_usd)} at risk with no defined exit.`,
           actionLabel: 'Set stop \u2192', actionType: 'edit', position: p,
@@ -193,7 +193,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 2 — Approaching target
       if (p.has_take_profit && p.distance_to_target_pct != null && p.distance_to_target_pct < 5) {
         list.push({
-          priority: 2, icon: Target, iconColor: 'text-emerald-400',
+          priority: 2, icon: Target, iconColor: 'text-emerald-400/80',
           label: `${p.ticker} approaching target ($${p.take_profit})`,
           detail: `${p.distance_to_target_pct.toFixed(1)}% away. Plan your exit strategy.`,
           actionLabel: 'Plan exit \u2192', actionType: 'chat', chatPrompt: buildScanPrompt(p),
@@ -203,7 +203,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 3 — Never scanned, held 7+ days
       if (p.days_held >= 7 && p.pelican_scan_count === 0) {
         list.push({
-          priority: 3, icon: Crosshair, iconColor: 'text-[var(--accent-primary)]',
+          priority: 3, icon: Crosshair, iconColor: 'text-[var(--accent-primary)]/70',
           label: `Review ${p.ticker} \u2014 held ${p.days_held} days, never scanned`,
           detail: "Get Pelican's assessment to validate thesis.",
           actionLabel: 'Scan \u2192', actionType: 'chat', chatPrompt: buildScanPrompt(p),
@@ -213,7 +213,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 4 — Oversized
       if (avgSize > 0 && p.position_size_usd > avgSize * 2.5) {
         list.push({
-          priority: 4, icon: Scales, iconColor: 'text-amber-400',
+          priority: 4, icon: Scales, iconColor: 'text-amber-500/60',
           label: `${p.ticker} is ${(p.position_size_usd / avgSize).toFixed(1)}x avg size`,
           detail: `${formatNum(p.position_size_usd)} vs avg ${formatNum(avgSize)}. Consider trimming.`,
           actionLabel: 'Review \u2192', actionType: 'chat', chatPrompt: buildScanPrompt(p),
@@ -246,7 +246,7 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
         list.push({
           priority: isCritical ? 2 : 2,
           icon: CalendarBlank,
-          iconColor: isCritical ? 'text-red-400' : 'text-amber-400',
+          iconColor: isCritical ? 'text-red-400/80' : 'text-amber-500/60',
           label: `${ew.ticker} ${daysLabel}${hourLabel ? ` (${hourLabel})` : ''}`,
           detail: `${ew.direction.toUpperCase()} from $${ew.entry_price}${ew.position_size_usd ? ` \u00b7 ${formatNum(ew.position_size_usd)}` : ''}${estimatesLine ? ` \u00b7 ${estimatesLine}` : ''}`,
           actionLabel: 'Plan with Pelican \u2192',
@@ -260,7 +260,7 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
     // Priority 3 — Losing streak
     if (insights?.streaks?.current_streak_type === 'losing' && insights.streaks.current_streak_count >= 2) {
       list.push({
-        priority: 3, icon: Flame, iconColor: 'text-red-400',
+        priority: 3, icon: Flame, iconColor: 'text-red-400/80',
         label: `${insights.streaks.current_streak_count}-trade losing streak active`,
         detail: 'Consider reducing sizes until streak breaks.',
         actionLabel: 'Review \u2192', actionType: 'chat',
@@ -276,14 +276,14 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
   if (actions.length === 0) {
     const stopsSet = positions.every((p) => p.has_stop_loss)
     return (
-      <div className="rounded-xl border bg-emerald-500/5 border-emerald-500/20 overflow-hidden">
+      <div className="rounded-lg border bg-emerald-500/5 border-emerald-400/10 overflow-hidden">
         <div className="px-4 pt-3 pb-1">
-          <span className="text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)]">
+          <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-[var(--text-muted)]">
             Today&apos;s Actions
           </span>
         </div>
         <div className="px-4 pb-3 flex items-center gap-2">
-          <CheckCircle size={18} weight="fill" className="text-emerald-400 shrink-0" />
+          <CheckCircle size={18} weight="fill" className="text-emerald-400/80 shrink-0" />
           <div>
             <p className="text-sm font-medium text-[var(--text-primary)]">
               All clear &mdash; no actions needed right now.
@@ -300,9 +300,9 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
 
   // ── Actions list ─────────────────────────────────────────────────────────
   return (
-    <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] overflow-hidden">
+    <div className="rounded-lg border border-[var(--border-subtle)]/40 bg-[var(--bg-surface)] overflow-hidden">
       <div className="px-4 pt-3 pb-1">
-        <span className="text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)]">
+        <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-[var(--text-muted)]">
           Today&apos;s Actions
         </span>
       </div>
@@ -311,12 +311,12 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
         return (
           <div
             key={i}
-            className={`px-4 py-3 flex items-start gap-3${i > 0 ? ' border-t border-[var(--border-subtle)]' : ''}`}
+            className={`px-4 py-2.5 flex items-start gap-3${i > 0 ? ' border-t border-[var(--border-subtle)]/40' : ''}`}
           >
             <Icon size={18} weight="bold" className={`${a.iconColor} shrink-0 mt-0.5`} />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[var(--text-primary)]">{a.label}</p>
-              <p className="text-xs text-[var(--text-muted)]">{a.detail}</p>
+              <p className="text-xs font-medium text-[var(--text-primary)]">{a.label}</p>
+              <p className="text-xs text-[var(--text-muted)] font-[var(--font-geist-mono)] tabular-nums">{a.detail}</p>
             </div>
             <button
               onClick={() => {
@@ -324,7 +324,7 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
                 if (a.actionType === 'chat' && a.chatPrompt) onAction(a.chatPrompt)
                 else if (a.position) onEditPosition(a.position)
               }}
-              className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium whitespace-nowrap transition-colors mt-0.5"
+              className="text-[10px] font-medium uppercase tracking-[0.06em] text-[var(--accent-primary)]/80 hover:text-[var(--accent-primary)] whitespace-nowrap transition-colors mt-0.5"
             >
               {a.actionLabel}
             </button>

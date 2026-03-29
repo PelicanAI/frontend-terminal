@@ -8,7 +8,7 @@ import type { TickerHistory } from '@/hooks/use-ticker-history'
 import type { Quote } from '@/hooks/use-live-quotes'
 import { PositionCard } from './position-card'
 import { FunnelSimple } from '@phosphor-icons/react'
-import { PelicanButton } from '@/components/ui/pelican'
+
 
 interface PositionListProps {
   positions: PortfolioPosition[]
@@ -124,22 +124,21 @@ export function PositionList({
         <p className="text-xs text-[var(--text-muted)] mb-4">
           Try adjusting your search or filter criteria
         </p>
-        <PelicanButton
-          variant="secondary"
-          size="sm"
+        <button
+          className="text-[10px] font-medium uppercase tracking-[0.06em] px-3 py-1.5 rounded border border-[var(--border-subtle)]/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           onClick={() => {
             // Reset is handled by parent — this is a convenience signal
             // Parent should listen for this pattern and reset filters
           }}
         >
           Clear filters
-        </PelicanButton>
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Position cards */}
       {positionData.map((data) => (
         <PositionCard

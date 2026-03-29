@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import {
-  Lightning,
   ChartDonut,
   ShieldWarning,
   GitBranch,
@@ -118,18 +117,8 @@ export function PortfolioIntelligence({
 }: PortfolioIntelligenceProps) {
   return (
     <div>
-      <div className="flex items-center gap-2 mb-3">
-        <Lightning size={20} weight="bold" className="text-[var(--accent-primary)]" />
-        <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-          Portfolio Intelligence
-        </h2>
-      </div>
-      <p className="text-xs text-[var(--text-muted)] mb-4">
-        Ask Pelican to analyze your positions as a system
-      </p>
-
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
@@ -140,20 +129,20 @@ export function PortfolioIntelligence({
             <motion.div key={card.id} variants={staggerItem}>
               <PelicanCard
                 interactive
-                className="p-4 cursor-pointer"
+                className="p-4 cursor-pointer border border-[var(--border-subtle)]/40 rounded-lg hover:border-[var(--border-subtle)]/60 transition-all duration-150"
                 onClick={() =>
                   onSendMessage(card.buildPrompt(positions, portfolio, risk))
                 }
               >
                 <Icon
-                  size={24}
+                  size={20}
                   weight="regular"
-                  className="text-[var(--accent-primary)] mb-3"
+                  className="text-[var(--accent-primary)]/70 mb-2"
                 />
-                <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">
+                <h3 className="text-xs font-semibold text-[var(--text-primary)] mb-1">
                   {card.title}
                 </h3>
-                <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                <p className="text-xs text-[var(--text-muted)] leading-normal">
                   {card.description}
                 </p>
               </PelicanCard>

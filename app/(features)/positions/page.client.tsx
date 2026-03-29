@@ -33,16 +33,12 @@ import type { PortfolioPosition } from "@/types/portfolio"
 
 const PortfolioPnlChart = dynamicImport(
   () => import("@/components/positions/portfolio-pnl-chart").then(m => ({ default: m.PortfolioPnlChart })),
-  { ssr: false, loading: () => <div className="h-64 animate-pulse bg-[var(--bg-surface)] rounded-xl" /> }
+  { ssr: false, loading: () => <div className="h-48 animate-pulse bg-[var(--bg-surface)] rounded-lg" /> }
 )
 const PortfolioOverview = dynamicImport(
   () => import("@/components/positions/portfolio-overview").then(m => ({ default: m.PortfolioOverview })),
-  { ssr: false, loading: () => <div className="h-64 animate-pulse bg-[var(--bg-surface)] rounded-xl" /> }
+  { ssr: false, loading: () => <div className="h-48 animate-pulse bg-[var(--bg-surface)] rounded-lg" /> }
 )
-
-// ============================================================================
-// Helpers
-// ============================================================================
 
 function formatNum(n: number | null | undefined): string {
   if (n == null) return '?'
@@ -51,9 +47,18 @@ function formatNum(n: number | null | undefined): string {
   return `$${n.toLocaleString()}`
 }
 
-// ============================================================================
-// Page
-// ============================================================================
+/** Terminal-style section divider: mono label + hairline */
+function SectionDivider({ label, right }: { label: string; right?: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 pt-1 pb-2">
+      <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--text-muted)] font-[var(--font-geist-mono)] whitespace-nowrap">
+        {label}
+      </span>
+      <div className="flex-1 h-px bg-[var(--border-subtle)]/40" />
+      {right}
+    </div>
+  )
+}
 
 export default function PositionsPage() {
   const router = useRouter()
@@ -73,7 +78,6 @@ export default function PositionsPage() {
   const marketsTraded = survey?.markets_traded || ['stocks']
   const primaryMarket = marketsTraded[0] || 'stocks'
 
-  // Ticker history for position cards
   const openTickers = useMemo(
     () => portfolio?.positions?.map(p => p.ticker) ?? [],
     [portfolio?.positions]
@@ -86,14 +90,10 @@ export default function PositionsPage() {
   const [sortBy, setSortBy] = useState('size_desc')
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Modal state
   const [closingTrade, setClosingTrade] = useState<PortfolioPosition | null>(null)
   const [showLogTradeModal, setShowLogTradeModal] = useState(false)
-
-  // Post-close review loop
   const [showPostCloseReview, setShowPostCloseReview] = useState<PortfolioPosition | null>(null)
 
-  // Compute portfolio grade
   const portfolioGrade = useMemo(() => {
     if (!portfolio) return null
     return computePortfolioGrade(
@@ -104,7 +104,6 @@ export default function PositionsPage() {
     )
   }, [portfolio])
 
-  // Chat integration — send rich prompt to Pelican panel
   const handleSendMessage = useCallback(async (message: string) => {
     await openWithPrompt(null, message, "journal", 'position_fix')
   }, [openWithPrompt])
@@ -122,17 +121,14 @@ export default function PositionsPage() {
       '',
       'Give me: current technicals, whether my thesis is still valid, key levels to watch, and your honest recommendation — hold, add, trim, or exit. Be specific.',
     ].filter(Boolean).join(' ')
-
     trackEvent({ eventType: 'position_monitored', feature: 'positions', ticker: position.ticker })
     await openWithPrompt(position.ticker, parts, "journal", 'position_scan')
   }, [openWithPrompt])
 
-  // Edit: navigate to journal with highlight
   const handleEditPosition = useCallback((position: PortfolioPosition) => {
     router.push(`/journal?highlight=${position.id}`)
   }, [router])
 
-  // Close trade modal
   const handleClosePosition = useCallback((position: PortfolioPosition) => {
     setClosingTrade(position)
   }, [])
@@ -140,14 +136,9 @@ export default function PositionsPage() {
   const handleCloseTradeSubmit = useCallback(async (data: { exit_price: number; exit_date: string; notes?: string | null; mistakes?: string | null }) => {
     if (!closingTrade) return
     const result = await closeTrade(closingTrade.id, data)
-
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to close trade')
-    }
-
+    if (!result.success) throw new Error(result.error || 'Failed to close trade')
     refetchTrades()
     refreshPortfolio()
-    // Show post-close review prompt
     setShowPostCloseReview(closingTrade)
     setClosingTrade(null)
   }, [closingTrade, closeTrade, refetchTrades, refreshPortfolio])
@@ -158,19 +149,27 @@ export default function PositionsPage() {
     refreshPortfolio()
   }, [logTrade, refetchTrades, refreshPortfolio])
 
-  // Loading state
   if (portfolioLoading) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[var(--accent-primary)]/30 border-t-[var(--accent-primary)] rounded-full animate-spin mx-auto mb-2" />
-          <p className="text-[var(--text-muted)] text-sm">Loading portfolio...</p>
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div className="animate-pulse space-y-3">
+          <div className="h-[88px] rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]/20" />
+          <div className="h-9 rounded bg-[var(--bg-surface)]/50" />
+          <div className="space-y-2">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-[60px] rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]/20" />
+            ))}
+          </div>
+          <div className="h-44 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]/20" />
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-3">
+            <div className="xl:col-span-8 h-40 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]/20" />
+            <div className="xl:col-span-4 h-40 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]/20" />
+          </div>
         </div>
       </div>
     )
   }
 
-  // Empty state
   if (!portfolio || portfolio.positions.length === 0) {
     return (
       <>
@@ -178,11 +177,7 @@ export default function PositionsPage() {
           onLogTrade={() => setShowLogTradeModal(true)}
           onAskPelican={() => handleSendMessage('Based on my current portfolio exposure and open positions, suggest what I should be looking at next. Consider my sector concentration, directional bias, and which setups have been working for me.')}
         />
-        <LogTradeModal
-          open={showLogTradeModal}
-          onOpenChange={setShowLogTradeModal}
-          onSubmit={handleLogTrade}
-        />
+        <LogTradeModal open={showLogTradeModal} onOpenChange={setShowLogTradeModal} onSubmit={handleLogTrade} />
       </>
     )
   }
@@ -192,9 +187,8 @@ export default function PositionsPage() {
       variants={pageEnter}
       initial="hidden"
       animate="visible"
-      className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6"
+      className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-4"
     >
-      {/* Hero P&L Strip */}
       <PortfolioHeroStrip
         portfolio={portfolio.portfolio}
         risk={portfolio.risk}
@@ -207,18 +201,12 @@ export default function PositionsPage() {
         onRefresh={async () => {
           if (isRefreshing) return
           setIsRefreshing(true)
-          try {
-            await refreshPortfolio()
-          } catch (e) {
-            console.error('Refresh failed:', e)
-          } finally {
-            setTimeout(() => setIsRefreshing(false), 800)
-          }
+          try { await refreshPortfolio() } catch (e) { console.error('Refresh failed:', e) }
+          finally { setTimeout(() => setIsRefreshing(false), 800) }
         }}
         onGradeClick={handleSendMessage}
       />
 
-      {/* Warning banner */}
       {warnings.length > 0 && (
         <WarningBanner
           warnings={warnings}
@@ -229,7 +217,6 @@ export default function PositionsPage() {
         />
       )}
 
-      {/* Filters + Sort */}
       <PositionFilters
         positions={portfolio.positions}
         activeFilter={activeFilter}
@@ -242,16 +229,15 @@ export default function PositionsPage() {
         showConnectBroker
       />
 
-      {/* Position cards */}
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-[var(--text-muted)]">Open positions</span>
-        <Link
-          href="/journal?tab=trades"
-          className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors"
-        >
-          Review closed trades in Journal &rarr;
-        </Link>
-      </div>
+      <SectionDivider
+        label={`Positions · ${portfolio.positions.length}`}
+        right={
+          <Link href="/journal?tab=trades"
+            className="text-[10px] font-[var(--font-geist-mono)] uppercase tracking-[0.08em] text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors">
+            Closed →
+          </Link>
+        }
+      />
       <PositionList
         positions={portfolio.positions}
         portfolioStats={portfolio.portfolio}
@@ -268,123 +254,85 @@ export default function PositionsPage() {
         onLogTrade={() => setShowLogTradeModal(true)}
       />
 
-      {/* Portfolio P&L History */}
       {portfolio.positions.length > 0 && (
-        <PortfolioPnlChart data={pnlHistory} isLoading={pnlHistoryLoading} />
+        <>
+          <SectionDivider label="P&L History" />
+          <PortfolioPnlChart data={pnlHistory} isLoading={pnlHistoryLoading} />
+        </>
       )}
 
-      {/* Intelligence panel — Actions + Risk side-by-side */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+        <div className="xl:col-span-8">
+          <SectionDivider label="Actions" />
           <TodaysActions
-            positions={portfolio.positions}
-            insights={insights}
-            warnings={warnings}
-            earningsWarnings={earningsWarnings}
-            portfolioStats={portfolio.portfolio}
-            riskSummary={portfolio.risk}
-            onAction={handleSendMessage}
-            onEditPosition={handleEditPosition}
+            positions={portfolio.positions} insights={insights}
+            warnings={warnings} earningsWarnings={earningsWarnings}
+            portfolioStats={portfolio.portfolio} riskSummary={portfolio.risk}
+            onAction={handleSendMessage} onEditPosition={handleEditPosition}
           />
         </div>
-        <div className="lg:col-span-2">
+        <div className="xl:col-span-4">
+          <SectionDivider label="Risk" />
           <PortfolioOverview
-            portfolio={portfolio.portfolio}
-            risk={portfolio.risk}
-            planCompliance={portfolio.plan_compliance}
-            positions={portfolio.positions}
-            isLoading={portfolioLoading}
-            onSendMessage={handleSendMessage}
+            portfolio={portfolio.portfolio} risk={portfolio.risk}
+            planCompliance={portfolio.plan_compliance} positions={portfolio.positions}
+            isLoading={portfolioLoading} onSendMessage={handleSendMessage}
           />
         </div>
       </div>
 
-      {/* Portfolio intelligence */}
+      <SectionDivider label="Intelligence" />
       <PortfolioIntelligence
-        positions={portfolio.positions}
-        portfolio={portfolio.portfolio}
-        risk={portfolio.risk}
-        onSendMessage={handleSendMessage}
+        positions={portfolio.positions} portfolio={portfolio.portfolio}
+        risk={portfolio.risk} onSendMessage={handleSendMessage}
       />
 
-      {/* Close trade modal */}
       {closingTrade && (
         <CloseTradeModal
           open={!!closingTrade}
           onOpenChange={(open) => { if (!open) setClosingTrade(null) }}
           trade={{
-            id: closingTrade.id,
-            ticker: closingTrade.ticker,
-            asset_type: closingTrade.asset_type,
-            direction: closingTrade.direction,
-            quantity: closingTrade.quantity,
-            entry_price: closingTrade.entry_price,
-            stop_loss: closingTrade.stop_loss,
-            take_profit: closingTrade.take_profit,
-            status: 'open' as const,
-            exit_price: null,
-            pnl_amount: null,
-            pnl_percent: null,
-            r_multiple: null,
-            entry_date: closingTrade.entry_date,
-            exit_date: null,
-            thesis: closingTrade.thesis,
-            notes: closingTrade.notes,
-            setup_tags: closingTrade.setup_tags,
-            conviction: closingTrade.conviction,
-            ai_grade: null,
-            plan_rules_followed: null,
-            plan_rules_violated: null,
-            plan_checklist_completed: null,
-            playbook_id: closingTrade.playbook_id ?? null,
-            is_paper: closingTrade.is_paper,
-            user_id: '',
-            created_at: '',
-            updated_at: '',
+            id: closingTrade.id, ticker: closingTrade.ticker,
+            asset_type: closingTrade.asset_type, direction: closingTrade.direction,
+            quantity: closingTrade.quantity, entry_price: closingTrade.entry_price,
+            stop_loss: closingTrade.stop_loss, take_profit: closingTrade.take_profit,
+            status: 'open' as const, exit_price: null, pnl_amount: null,
+            pnl_percent: null, r_multiple: null, entry_date: closingTrade.entry_date,
+            exit_date: null, thesis: closingTrade.thesis, notes: closingTrade.notes,
+            setup_tags: closingTrade.setup_tags, conviction: closingTrade.conviction,
+            ai_grade: null, plan_rules_followed: null, plan_rules_violated: null,
+            plan_checklist_completed: null, playbook_id: closingTrade.playbook_id ?? null,
+            is_paper: closingTrade.is_paper, user_id: '', created_at: '', updated_at: '',
           }}
           onSubmit={handleCloseTradeSubmit}
         />
       )}
 
-      {/* Log trade modal */}
-      <LogTradeModal
-        open={showLogTradeModal}
-        onOpenChange={setShowLogTradeModal}
-        onSubmit={handleLogTrade}
-      />
+      <LogTradeModal open={showLogTradeModal} onOpenChange={setShowLogTradeModal} onSubmit={handleLogTrade} />
 
-      {/* Post-close review modal */}
       {showPostCloseReview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <motion.div
-            initial={{ scale: 0.96, opacity: 0 }}
+            initial={{ scale: 0.97, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.96, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-6 max-w-md mx-4 shadow-2xl"
+            exit={{ scale: 0.97, opacity: 0 }}
+            transition={{ duration: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+            className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-xl p-6 max-w-sm mx-4 shadow-2xl shadow-black/50"
           >
-            <div className="text-center">
-              <div className="h-12 w-12 rounded-full bg-[var(--accent-muted)] flex items-center justify-center mx-auto mb-4">
-                <Brain size={24} weight="bold" className="text-[var(--accent-primary)]" />
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 rounded-lg bg-[var(--accent-primary)]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Brain size={20} weight="bold" className="text-[var(--accent-primary)]" />
               </div>
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1">Trade closed</h3>
-              <p className="text-sm text-[var(--text-secondary)] mb-6">
-                Want Pelican to grade your {showPostCloseReview.ticker} {showPostCloseReview.direction} trade?
-              </p>
-              <div className="flex gap-3">
-                <PelicanButton
-                  variant="secondary"
-                  size="lg"
-                  className="flex-1"
-                  onClick={() => setShowPostCloseReview(null)}
-                >
-                  Skip
-                </PelicanButton>
-                <PelicanButton
-                  variant="primary"
-                  size="lg"
-                  className="flex-1"
-                  onClick={() => {
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                  Grade {showPostCloseReview.ticker} {showPostCloseReview.direction}?
+                </h3>
+                <p className="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
+                  Pelican will grade entry, management, and exit A-F with specific feedback.
+                </p>
+                <div className="flex gap-2 mt-4">
+                  <PelicanButton variant="secondary" size="sm" onClick={() => setShowPostCloseReview(null)}>Skip</PelicanButton>
+                  <PelicanButton variant="primary" size="sm" onClick={() => {
                     const p = showPostCloseReview
                     trackEvent({ eventType: 'trade_graded', feature: 'positions', ticker: p.ticker })
                     handleSendMessage(
@@ -397,10 +345,8 @@ export default function PositionsPage() {
                       `Grade this trade A through F. What did I do right? What should I improve? Be specific and honest.`
                     )
                     setShowPostCloseReview(null)
-                  }}
-                >
-                  Grade this trade
-                </PelicanButton>
+                  }}>Grade trade</PelicanButton>
+                </div>
               </div>
             </div>
           </motion.div>

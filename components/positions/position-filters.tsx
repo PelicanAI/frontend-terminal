@@ -58,89 +58,93 @@ export function PositionFilters({
   }, [positions])
 
   return (
-    <div className="space-y-3">
-      {/* Filter tabs row */}
-      <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
-        {/* Scrollable filter tabs */}
-        <div className="flex gap-1.5 overflow-x-auto pb-1 -mb-1 scrollbar-hide w-full sm:w-auto shrink-0">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => onFilterChange(tab.key)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 whitespace-nowrap ${
-                activeFilter === tab.key
-                  ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] border border-[var(--accent-primary)]/30'
-                  : 'bg-transparent text-[var(--text-muted)] border border-transparent hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
-              }`}
-            >
-              {tab.label}
-              <span className="ml-1 font-mono tabular-nums">({tab.count})</span>
-            </button>
-          ))}
+    <div className="flex items-center gap-2 flex-wrap">
+      {/* Filter pills */}
+      <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide shrink-0">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => onFilterChange(tab.key)}
+            className={`text-[11px] font-medium px-2.5 py-1 rounded whitespace-nowrap transition-colors ${
+              activeFilter === tab.key
+                ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]/80 border border-[var(--accent-primary)]/20'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent'
+            }`}
+          >
+            {tab.label}
+            <span className="ml-1 font-[var(--font-geist-mono)] tabular-nums opacity-50">({tab.count})</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* Actions row */}
+      <div className="flex items-center gap-2 shrink-0">
+        {shouldShowConnectBroker && (
+          <ConnectBrokerButton
+            variant="secondary"
+            size="sm"
+            className="text-[10px] font-medium uppercase tracking-[0.06em] px-3 py-1.5 rounded border border-[var(--border-subtle)]/60 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors whitespace-nowrap flex-shrink-0"
+          />
+        )}
+        {onLogTrade && (
+          <button
+            onClick={onLogTrade}
+            className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.06em] px-3 py-1.5 rounded border border-[var(--accent-primary)]/30 text-[var(--accent-primary)]/80 hover:text-[var(--accent-primary)] transition-colors whitespace-nowrap flex-shrink-0"
+          >
+            <Plus size={12} weight="bold" />
+            <span className="hidden sm:inline">Log Position</span>
+            <span className="sm:hidden">Log</span>
+          </button>
+        )}
+        {/* Sort dropdown */}
+        <div className="relative">
+          <SortAscending
+            size={12}
+            weight="regular"
+            className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
+          />
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value)}
+            className="appearance-none bg-transparent border border-[var(--border-subtle)]/40 hover:border-[var(--border-subtle)]/60 rounded text-[11px] text-[var(--text-secondary)] pl-7 pr-6 py-1 min-w-[90px] lg:min-w-[120px] focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors cursor-pointer"
+          >
+            <option value="size_desc">Size ↓</option>
+            <option value="size_asc">Size ↑</option>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="conviction">Conviction</option>
+            <option value="rr">R:R</option>
+            <option value="health">Health</option>
+          </select>
+          {/* Custom dropdown arrow */}
+          <svg
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]"
+            width="8"
+            height="8"
+            viewBox="0 0 10 10"
+            fill="none"
+          >
+            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
 
-        {/* Sort + Search + Log */}
-        <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
-          {shouldShowConnectBroker && (
-            <ConnectBrokerButton variant="secondary" size="sm" className="whitespace-nowrap flex-shrink-0" />
-          )}
-          {onLogTrade && (
-            <button
-              onClick={onLogTrade}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] transition-colors duration-150 whitespace-nowrap flex-shrink-0"
-            >
-              <Plus size={14} weight="bold" />
-              <span className="hidden sm:inline">Log Position</span>
-              <span className="sm:hidden">Log</span>
-            </button>
-          )}
-          {/* Sort dropdown */}
-          <div className="relative">
-            <SortAscending
-              size={14}
-              weight="regular"
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
-            />
-            <select
-              value={sortBy}
-              onChange={(e) => onSortChange(e.target.value)}
-              className="appearance-none bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg text-sm text-[var(--text-secondary)] pl-8 pr-7 py-1.5 min-w-[100px] lg:min-w-[140px] focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors cursor-pointer hover:border-[var(--border-hover)]"
-            >
-              <option value="size_desc">Size ↓</option>
-              <option value="size_asc">Size ↑</option>
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-              <option value="conviction">Conviction</option>
-              <option value="rr">R:R</option>
-              <option value="health">Health</option>
-            </select>
-            {/* Custom dropdown arrow */}
-            <svg
-              className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]"
-              width="10"
-              height="10"
-              viewBox="0 0 10 10"
-              fill="none"
-            >
-              <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-
-          {/* Search input */}
-          <div className="relative flex-1 sm:flex-none">
-            <MagnifyingGlass
-              size={14}
-              weight="regular"
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search ticker..."
-              className="w-full sm:w-28 lg:w-36 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg text-sm text-[var(--text-secondary)] placeholder:text-[var(--text-muted)] pl-8 pr-3 py-1.5 focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors hover:border-[var(--border-hover)]"
-            />
-          </div>
+        {/* Search input */}
+        <div className="relative">
+          <MagnifyingGlass
+            size={12}
+            weight="regular"
+            className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search ticker..."
+            className="w-24 lg:w-32 text-xs bg-transparent border border-[var(--border-subtle)]/30 hover:border-[var(--border-subtle)]/60 rounded text-[var(--text-secondary)] placeholder:text-[var(--text-muted)]/40 pl-7 pr-2 py-1 focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors"
+          />
         </div>
       </div>
     </div>

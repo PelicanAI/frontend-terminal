@@ -48,8 +48,8 @@ function getAssetColor(type: string): string {
 // ── Skeleton Loader ────────────────────────────────────────────────────
 function SkeletonBlock({ className = '' }: { className?: string }) {
   return (
-    <PelicanCard className={className}>
-      <div className="p-5 space-y-4">
+    <PelicanCard className={`border border-[var(--border-subtle)]/40 rounded-lg ${className}`}>
+      <div className="p-4 space-y-3">
         <div className="h-4 w-32 rounded bg-[var(--bg-elevated)] animate-pulse" />
         <div className="h-32 w-full rounded bg-[var(--bg-elevated)] animate-pulse" />
         <div className="h-3 w-48 rounded bg-[var(--bg-elevated)] animate-pulse" />
@@ -75,10 +75,10 @@ function DonutTooltip({
       <p className="text-xs font-medium text-[var(--text-primary)] capitalize">
         {d.asset_type}
       </p>
-      <p className="text-xs text-[var(--text-secondary)] font-mono tabular-nums">
+      <p className="text-xs text-[var(--text-secondary)] font-[var(--font-geist-mono)] tabular-nums">
         {formatCompactDollar(d.total_exposure)} ({d.pct_of_portfolio.toFixed(1)}%)
       </p>
-      <p className="text-xs text-[var(--text-muted)] font-mono tabular-nums">
+      <p className="text-xs text-[var(--text-muted)] font-[var(--font-geist-mono)] tabular-nums">
         {d.count} position{d.count !== 1 ? 's' : ''}
       </p>
     </div>
@@ -97,8 +97,8 @@ export function PortfolioOverview({
   // ── Loading State ──────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3">
           <SkeletonBlock />
           <SkeletonBlock />
         </div>
@@ -127,10 +127,10 @@ export function PortfolioOverview({
       : 0
   const riskBarColor =
     riskDefinedPct > 80
-      ? 'var(--data-positive)'
+      ? 'rgb(52, 211, 153)' // emerald-400
       : riskDefinedPct >= 50
-        ? 'var(--data-warning)'
-        : 'var(--data-negative)'
+        ? 'rgb(245, 158, 11, 0.6)' // amber-500/60
+        : 'rgb(248, 113, 113, 0.8)' // red-400/80
 
   // ── Plan Compliance ────────────────────────────────────────────────
   const violations: string[] = []
@@ -157,19 +157,19 @@ export function PortfolioOverview({
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
-      className="space-y-4"
+      className="space-y-3"
     >
       {/* ── Visual Breakdowns ──────────────────────────────────────────── */}
       <motion.div
         variants={staggerContainer}
-        className="grid grid-cols-1 gap-4"
+        className="grid grid-cols-1 gap-3"
       >
         {/* Card A: Exposure Breakdown Donut */}
         <motion.div variants={staggerItem}>
-          <PelicanCard className="p-5">
-            <div className="flex items-center gap-2 mb-4">
+          <PelicanCard className="p-4 border border-[var(--border-subtle)]/40 rounded-lg">
+            <div className="flex items-center gap-2 mb-3">
               <ChartPie size={18} weight="regular" className="text-[var(--text-muted)]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+              <h3 className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">
                 Exposure Breakdown
               </h3>
             </div>
@@ -208,7 +208,7 @@ export function PortfolioOverview({
                   </ResponsiveContainer>
                   {/* Center label */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-2xl font-bold font-mono tabular-nums text-[var(--text-primary)]">
+                    <span className="text-2xl font-bold font-[var(--font-geist-mono)] tabular-nums text-[var(--text-primary)]">
                       {portfolio.total_positions}
                     </span>
                     <span className="text-xs text-[var(--text-muted)]">
@@ -242,7 +242,7 @@ export function PortfolioOverview({
                         <span className="text-xs text-[var(--text-secondary)] capitalize">
                           {entry.asset_type}
                         </span>
-                        <span className="text-xs text-[var(--text-muted)] font-mono tabular-nums">
+                        <span className="text-xs text-[var(--text-muted)] font-[var(--font-geist-mono)] tabular-nums">
                           {entry.pct_of_portfolio.toFixed(0)}%
                         </span>
                       </button>
@@ -256,45 +256,39 @@ export function PortfolioOverview({
 
         {/* Card B: Risk Budget */}
         <motion.div variants={staggerItem}>
-          <PelicanCard className="p-5">
-            <div className="flex items-center gap-2 mb-4">
+          <PelicanCard className="p-4 border border-[var(--border-subtle)]/40 rounded-lg">
+            <div className="flex items-center gap-2 mb-3">
               <ShieldCheck size={18} weight="regular" className="text-[var(--text-muted)]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+              <h3 className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">
                 Risk Budget
               </h3>
             </div>
 
             {/* Total at risk / Potential reward */}
-            <div className="grid grid-cols-2 gap-4 mb-5">
+            <div className="grid grid-cols-2 gap-3 mb-4">
               <div>
-                <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">
+                <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)] mb-1">
                   Total at Risk
                 </p>
-                <p
-                  className="text-lg font-semibold font-mono tabular-nums"
-                  style={{ color: 'var(--data-negative)' }}
-                >
+                <p className="text-lg font-semibold font-[var(--font-geist-mono)] tabular-nums text-red-400/80">
                   {formatCompactDollar(risk.total_risk_usd)}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">
+                <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)] mb-1">
                   Potential Reward
                 </p>
-                <p
-                  className="text-lg font-semibold font-mono tabular-nums"
-                  style={{ color: 'var(--data-positive)' }}
-                >
+                <p className="text-lg font-semibold font-[var(--font-geist-mono)] tabular-nums text-emerald-400/80">
                   {formatCompactDollar(risk.total_reward_usd)}
                 </p>
               </div>
             </div>
 
             {/* Portfolio R:R Badge */}
-            <div className="flex items-center gap-2 mb-5">
-              <span className="text-xs text-[var(--text-muted)]">Portfolio R:R</span>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Portfolio R:R</span>
               <span
-                className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold font-mono tabular-nums"
+                className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold font-[var(--font-geist-mono)] tabular-nums"
                 style={{
                   backgroundColor: 'var(--accent-muted)',
                   color: 'var(--accent-primary)',
@@ -311,14 +305,14 @@ export function PortfolioOverview({
                   Risk-Defined Positions
                 </span>
                 <span
-                  className="text-xs font-semibold font-mono tabular-nums"
+                  className="text-xs font-semibold font-[var(--font-geist-mono)] tabular-nums"
                   style={{ color: riskBarColor }}
                 >
                   {riskDefinedPct}%
                 </span>
               </div>
 
-              <div className="h-2 w-full rounded-full bg-[var(--bg-base)] overflow-hidden">
+              <div className="h-1.5 w-full rounded-full bg-[var(--bg-base)] overflow-hidden">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ backgroundColor: riskBarColor }}
@@ -329,7 +323,7 @@ export function PortfolioOverview({
               </div>
 
               <p className="text-xs text-[var(--text-muted)]">
-                <span className="font-mono tabular-nums">
+                <span className="font-[var(--font-geist-mono)] tabular-nums">
                   {risk.positions_with_defined_risk}/{totalPositions}
                 </span>
                 {' '}positions ({riskDefinedPct}%) have defined risk
@@ -356,13 +350,13 @@ export function PortfolioOverview({
                     )
                   }
                 }}
-                className="mt-4 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-all duration-150 hover:translate-y-[-1px]"
+                className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-medium uppercase tracking-[0.06em] transition-all duration-150 hover:translate-y-[-1px]"
                 style={{
                   backgroundColor: riskDefinedPct > 80
-                    ? 'rgba(34, 197, 94, 0.08)'
+                    ? 'rgba(52, 211, 153, 0.06)'
                     : riskDefinedPct >= 50
-                      ? 'rgba(245, 158, 11, 0.08)'
-                      : 'rgba(239, 68, 68, 0.08)',
+                      ? 'rgba(245, 158, 11, 0.05)'
+                      : 'rgba(248, 113, 113, 0.06)',
                   color: riskBarColor,
                 }}
               >
@@ -394,19 +388,18 @@ export function PortfolioOverview({
           <div
             className="rounded-xl px-4 py-3 border"
             style={{
-              backgroundColor: 'rgba(245, 158, 11, 0.06)',
-              borderColor: 'rgba(245, 158, 11, 0.2)',
+              backgroundColor: 'rgba(245, 158, 11, 0.04)',
+              borderColor: 'rgba(245, 158, 11, 0.12)',
             }}
           >
             <div className="flex items-start gap-2">
               <Warning
                 size={18}
                 weight="fill"
-                className="flex-shrink-0 mt-0.5"
-                style={{ color: 'var(--data-warning)' }}
+                className="flex-shrink-0 mt-0.5 text-amber-500/60"
               />
               <div className="space-y-1">
-                <p className="text-sm font-medium" style={{ color: 'var(--data-warning)' }}>
+                <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-amber-500/60">
                   Plan Violations
                 </p>
                 {violations.map((v) => (
@@ -421,14 +414,14 @@ export function PortfolioOverview({
           <div
             className="flex items-center gap-2 rounded-xl px-4 py-3 border"
             style={{
-              backgroundColor: 'rgba(34, 197, 94, 0.06)',
-              borderColor: 'rgba(34, 197, 94, 0.2)',
+              backgroundColor: 'rgba(34, 197, 94, 0.04)',
+              borderColor: 'rgba(34, 197, 94, 0.12)',
             }}
           >
             <CheckCircle
               size={18}
               weight="fill"
-              style={{ color: 'var(--data-positive)' }}
+              className="text-emerald-400/80"
             />
             <span className="text-sm text-[var(--text-secondary)]">
               All positions comply with your trading plan
