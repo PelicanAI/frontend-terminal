@@ -1,7 +1,16 @@
 "use client"
 
 import { useState } from 'react'
-import { X, TrendUp, TrendDown, Minus, CalendarBlank, ChatCircleDots, Briefcase } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Cancel01Icon as X,
+  AnalyticsUpIcon as TrendUp,
+  AnalyticsDownIcon as TrendDown,
+  MinusSignIcon as Minus,
+  Calendar01Icon as CalendarBlank,
+  MessageMultiple01Icon as ChatCircleDots,
+  Briefcase01Icon as Briefcase,
+} from '@hugeicons/core-free-icons'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { RollingChart } from './rolling-chart'
 import { findSignalForPair } from '@/lib/correlation-signals'
@@ -128,7 +137,7 @@ export function PairDetailPanel({
               className="p-1 rounded transition-colors"
               style={{ color: 'var(--text-muted)' }}
             >
-              <X weight="bold" className="w-4 h-4" />
+              <HugeiconsIcon icon={X} className="w-4 h-4" strokeWidth={2} color="currentColor" />
             </button>
           </IconTooltip>
           <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
@@ -136,7 +145,7 @@ export function PairDetailPanel({
           </h3>
           {trend !== 'unknown' && (
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ background: 'var(--bg-base)', color: trendColors[trend] }}>
-              <TrendIcon weight="bold" className="w-3 h-3" />
+              <HugeiconsIcon icon={TrendIcon} className="w-3 h-3" strokeWidth={2} color="currentColor" />
               {trend === 'strengthening' ? 'Strengthening' : trend === 'weakening' ? 'Weakening' : 'Stable'}
             </div>
           )}
@@ -268,7 +277,7 @@ export function PairDetailPanel({
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2 rounded-lg" style={{ background: 'var(--bg-base)' }}>
                   <div className="flex items-center gap-1 mb-1">
-                    <TrendUp weight="bold" className="w-3 h-3" style={{ color: 'var(--data-positive)' }} />
+                    <HugeiconsIcon icon={TrendUp} className="w-3 h-3" style={{ color: 'var(--data-positive)' }} strokeWidth={2} color="currentColor" />
                     <span className="text-xs font-medium" style={{ color: 'var(--data-positive)' }}>
                       Bullish When
                     </span>
@@ -279,7 +288,7 @@ export function PairDetailPanel({
                 </div>
                 <div className="p-2 rounded-lg" style={{ background: 'var(--bg-base)' }}>
                   <div className="flex items-center gap-1 mb-1">
-                    <TrendDown weight="bold" className="w-3 h-3" style={{ color: 'var(--data-negative)' }} />
+                    <HugeiconsIcon icon={TrendDown} className="w-3 h-3" style={{ color: 'var(--data-negative)' }} strokeWidth={2} color="currentColor" />
                     <span className="text-xs font-medium" style={{ color: 'var(--data-negative)' }}>
                       Bearish When
                     </span>
@@ -296,7 +305,7 @@ export function PairDetailPanel({
                     className="text-xs font-semibold mb-1.5 flex items-center gap-1"
                     style={{ color: 'var(--text-muted)' }}
                   >
-                    <CalendarBlank weight="bold" className="w-3 h-3" />
+                    <HugeiconsIcon icon={CalendarBlank} className="w-3 h-3" strokeWidth={2} color="currentColor" />
                     Historical Precedents
                   </h4>
                   <div className="space-y-1.5">
@@ -336,7 +345,7 @@ export function PairDetailPanel({
                 color: 'var(--text-secondary)',
               }}
             >
-              <ChatCircleDots weight="bold" className="w-3.5 h-3.5" style={{ color: 'var(--accent-indigo)' }} />
+              <HugeiconsIcon icon={ChatCircleDots} className="w-3.5 h-3.5" style={{ color: 'var(--accent-indigo)' }} strokeWidth={2} color="currentColor" />
               Ask Pelican About This
             </button>
             {userHoldsAsset && (
@@ -349,7 +358,7 @@ export function PairDetailPanel({
                   color: 'var(--text-secondary)',
                 }}
               >
-                <Briefcase weight="bold" className="w-3.5 h-3.5" style={{ color: 'var(--data-positive)' }} />
+                <HugeiconsIcon icon={Briefcase} className="w-3.5 h-3.5" style={{ color: 'var(--data-positive)' }} strokeWidth={2} color="currentColor" />
                 View on Positions
               </a>
             )}

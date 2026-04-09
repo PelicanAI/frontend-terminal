@@ -2,14 +2,15 @@
 "use client"
 
 import { m } from "framer-motion"
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
 import {
-  ChartLineUp,
-  Briefcase,
-  ShieldCheck,
-  Scales,
-  GraduationCap,
-  Lightning,
-} from "@phosphor-icons/react"
+  ChartLineData01Icon as ChartLineUp,
+  Briefcase01Icon as Briefcase,
+  SecurityCheckIcon as ShieldCheck,
+  BalanceScaleIcon as Scales,
+  Mortarboard01Icon as GraduationCap,
+  FlashIcon as Lightning,
+} from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { useLearningMode } from "@/providers/learning-mode-provider"
 import type { ExpanderKey } from "./action-expanders"
@@ -29,7 +30,7 @@ interface ActionBarProps {
 
 interface ActionButton {
   key: ExpanderKey | "quick"
-  icon: React.ElementType
+  icon: IconSvgElement
   label: string
   show: boolean
 }
@@ -99,7 +100,7 @@ export function ActionBar({
                   : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] border border-transparent",
             )}
           >
-            <Icon size={15} weight={isActive ? "bold" : "regular"} />
+            <HugeiconsIcon icon={Icon} size={15} strokeWidth={isActive ? 2 : 1.5} color="currentColor" />
             <span className="hidden sm:inline">{action.label}</span>
           </button>
         )

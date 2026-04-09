@@ -1,6 +1,11 @@
 'use client'
 
-import { ChartLineUp, Lightbulb, Trophy } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  ChartLineData01Icon as ChartLineUp,
+  BulbIcon as Lightbulb,
+  ChampionIcon as Trophy,
+} from '@hugeicons/core-free-icons'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 import { Section } from '@/components/landing/section'
 
@@ -55,10 +60,7 @@ export function FlywheelSection() {
                   {step.number}
                 </span>
 
-                <Icon
-                  className="h-8 w-8 text-violet-600 mb-4"
-                  weight="duotone"
-                />
+                <HugeiconsIcon icon={Icon} className="h-8 w-8 text-violet-600 mb-4" strokeWidth={1.5} color="currentColor" />
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
                   {step.title}
                 </h3>

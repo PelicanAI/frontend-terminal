@@ -1,6 +1,7 @@
 "use client"
 
-import { PaperPlaneRight, Square } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { SentIcon as PaperPlaneRight, Square01Icon as Square } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { m, AnimatePresence } from "framer-motion"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
@@ -38,7 +39,7 @@ export function SendButton({ isAIResponding, isSendDisabled, onStop, onSend }: S
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.1, ease: 'easeOut' }}
           >
-            {isAIResponding ? <Square size={20} weight="fill" /> : <PaperPlaneRight size={20} weight="fill" />}
+            {isAIResponding ? <HugeiconsIcon icon={Square} size={20} strokeWidth={1.5} color="currentColor" /> : <HugeiconsIcon icon={PaperPlaneRight} size={20} strokeWidth={1.5} color="currentColor" />}
           </m.div>
         </AnimatePresence>
       </m.button>

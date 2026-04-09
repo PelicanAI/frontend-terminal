@@ -14,8 +14,7 @@ export default function NotFound() {
         alignItems: "center",
         justifyContent: "center",
         padding: "2rem",
-        fontFamily:
-          "'Geist Sans', ui-sans-serif, system-ui, -apple-system, sans-serif",
+        fontFamily: "var(--font-sans)",
       }}
     >
       <Image

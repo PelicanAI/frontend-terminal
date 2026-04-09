@@ -47,11 +47,11 @@ export function MarketSessionsStrip({ marketsTraded, className }: MarketSessions
               "w-1.5 h-1.5 rounded-full",
               isOpen ? "bg-emerald-400" : "bg-gray-500"
             )} />
-            <span className="text-[10px] font-medium text-[var(--text-muted)]">
+            <span className="text-xs font-medium text-[var(--text-muted)]">
               {market.name}
             </span>
             {isOpen && status.currentSession && (
-              <span className="text-[10px] text-[var(--text-muted)]/60">
+              <span className="text-xs text-[var(--text-secondary)]">
                 {status.currentSession}
               </span>
             )}

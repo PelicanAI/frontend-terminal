@@ -1,7 +1,8 @@
 "use client"
 
 import { m, AnimatePresence } from "framer-motion"
-import { CaretDown } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowDown01Icon as CaretDown } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
 
 interface NewMessagesPillProps {
@@ -36,7 +37,7 @@ export function NewMessagesPill({ show, messageCount, onJumpToBottom }: NewMessa
                 ease: "easeInOut",
               }}
             >
-              <CaretDown size={16} weight="regular" />
+              <HugeiconsIcon icon={CaretDown} size={16} strokeWidth={1.5} color="currentColor" />
             </m.div>
             {messageCount} new message{messageCount !== 1 ? "s" : ""}
           </Button>

@@ -82,3 +82,46 @@ export const tapScale = {
   scale: 0.98,
   transition: { duration: 0.1 },
 };
+
+/** Orchestrate top-level page sections with wider stagger */
+export const pageSections: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.07,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+/** Individual section reveal within a page */
+export const sectionReveal: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
+
+/** Fast stagger for list items (position cards, action rows) */
+export const listStagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.04,
+    },
+  },
+};
+
+/** Individual list item entrance */
+export const listItem: Variants = {
+  hidden: { opacity: 0, y: 4 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};

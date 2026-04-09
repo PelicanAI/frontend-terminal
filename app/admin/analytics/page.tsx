@@ -5,14 +5,15 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ArrowsClockwise,
-  Users,
-  UserCheck,
-  ChatCircle,
-  Clock,
-  CurrencyDollar,
-} from '@phosphor-icons/react'
+  Refresh01Icon as ArrowsClockwise,
+  UserMultipleIcon as Users,
+  UserCheck01Icon as UserCheck,
+  Chat01Icon as ChatCircle,
+  Clock01Icon as Clock,
+  Dollar01Icon as CurrencyDollar,
+} from '@hugeicons/core-free-icons'
 import {
   BarChart,
   Bar,
@@ -278,7 +279,7 @@ export default function AdminAnalyticsPage() {
             </span>
           )}
           <Button variant="ghost" size="sm" onClick={() => fetchData(true)} disabled={refreshing}>
-            <ArrowsClockwise size={16} weight="regular" className={`mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+            <HugeiconsIcon icon={ArrowsClockwise} size={16} className={`mr-1 ${refreshing ? 'animate-spin' : ''}`} strokeWidth={1.5} color="currentColor" />
             Refresh
           </Button>
         </div>
@@ -289,7 +290,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-blue-500/10 p-2">
-              <UserCheck size={16} weight="regular" className="text-blue-500" />
+              <HugeiconsIcon icon={UserCheck} size={16} className="text-blue-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Active 7d</p>
@@ -300,7 +301,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-blue-500/10 p-2">
-              <Users size={16} weight="regular" className="text-blue-500" />
+              <HugeiconsIcon icon={Users} size={16} className="text-blue-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Active 30d</p>
@@ -311,7 +312,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-amber-500/10 p-2">
-              <ChatCircle size={16} weight="regular" className="text-amber-500" />
+              <HugeiconsIcon icon={ChatCircle} size={16} className="text-amber-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Avg Msgs/User</p>
@@ -322,7 +323,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-emerald-500/10 p-2">
-              <Clock size={16} weight="regular" className="text-emerald-500" />
+              <HugeiconsIcon icon={Clock} size={16} className="text-emerald-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Avg Convo Length</p>
@@ -335,7 +336,7 @@ export default function AdminAnalyticsPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-emerald-500/10 p-2">
-              <CurrencyDollar size={16} weight="regular" className="text-emerald-500" />
+              <HugeiconsIcon icon={CurrencyDollar} size={16} className="text-emerald-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">MRR</p>

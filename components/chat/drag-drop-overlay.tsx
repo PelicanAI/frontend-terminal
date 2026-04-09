@@ -1,6 +1,12 @@
 "use client"
 
-import { UploadSimple, FileXls, FileText, Image as ImageIcon } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Upload01Icon as UploadSimple,
+  Xls01Icon as FileXls,
+  File02Icon as FileText,
+  Image01Icon as ImageIcon,
+} from "@hugeicons/core-free-icons"
 import { Card } from "@/components/ui/card"
 
 export function DragDropOverlay() {
@@ -9,10 +15,10 @@ export function DragDropOverlay() {
       <Card className="p-8 border-2 border-dashed border-primary/50 bg-primary/5 max-w-md mx-4">
         <div className="text-center space-y-4">
           <div className="flex justify-center gap-2">
-            <UploadSimple size={32} weight="regular" className="text-primary" />
-            <FileXls size={32} weight="regular" className="text-primary/70" />
-            <FileText size={32} weight="regular" className="text-primary/70" />
-            <ImageIcon size={32} weight="regular" className="text-primary/70" />
+            <HugeiconsIcon icon={UploadSimple} size={32} className="text-primary" strokeWidth={1.5} color="currentColor" />
+            <HugeiconsIcon icon={FileXls} size={32} className="text-primary/70" strokeWidth={1.5} color="currentColor" />
+            <HugeiconsIcon icon={FileText} size={32} className="text-primary/70" strokeWidth={1.5} color="currentColor" />
+            <HugeiconsIcon icon={ImageIcon} size={32} className="text-primary/70" strokeWidth={1.5} color="currentColor" />
           </div>
 
           <div className="space-y-2">

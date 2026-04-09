@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react"
 import { m } from "framer-motion"
 import Image from "next/image"
-import { X } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Cancel01Icon as X } from "@hugeicons/core-free-icons"
 import { AttachmentChip } from "../attachment-chip"
 import type { Attachment } from "@/lib/chat-utils"
 
@@ -34,7 +35,7 @@ function ImageLightbox({ url, alt, onClose }: { url: string; alt: string; onClos
         onClick={onClose}
         aria-label="Close"
       >
-        <X size={24} weight="regular" />
+        <HugeiconsIcon icon={X} size={24} strokeWidth={1.5} color="currentColor" />
       </button>
       <Image
         src={url}

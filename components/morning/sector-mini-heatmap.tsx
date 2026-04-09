@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { SquaresFour, ArrowRight } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { DashboardSquare01Icon as SquaresFour, ArrowRight01Icon as ArrowRight } from '@hugeicons/core-free-icons'
 import { PelicanCard } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 
@@ -52,7 +53,7 @@ export function SectorMiniHeatmap({ sectors, onSectorClick }: SectorMiniHeatmapP
     <PelicanCard noPadding>
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <div className="flex items-center gap-2">
-          <SquaresFour weight="bold" className="text-[var(--accent-primary)]" size={18} />
+          <HugeiconsIcon icon={SquaresFour} className="text-[var(--accent-primary)]" size={18} strokeWidth={2} color="currentColor" />
           <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
             Sector Rotation
           </h3>
@@ -63,7 +64,7 @@ export function SectorMiniHeatmap({ sectors, onSectorClick }: SectorMiniHeatmapP
           style={{ color: 'var(--text-muted)' }}
         >
           Full Heatmap
-          <ArrowRight size={12} weight="bold" />
+          <HugeiconsIcon icon={ArrowRight} size={12} strokeWidth={2} color="currentColor" />
         </Link>
       </div>
 

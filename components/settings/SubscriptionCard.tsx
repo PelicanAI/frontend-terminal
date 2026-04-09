@@ -5,7 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Lightning, Crown, Warning, CircleNotch } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  FlashIcon as Lightning,
+  CrownIcon as Crown,
+  Alert01Icon as Warning,
+  Loading03Icon as CircleNotch,
+} from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { CreditDisplay } from "@/components/credit-display"
@@ -76,7 +82,7 @@ export function SubscriptionCard() {
           <Label>Current Plan</Label>
           {isFounder ? (
             <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-blue-500/20 rounded-lg">
-              <Crown size={20} weight="regular" className="text-blue-400 flex-shrink-0" />
+              <HugeiconsIcon icon={Crown} size={20} className="text-blue-400 flex-shrink-0" strokeWidth={1.5} color="currentColor" />
               <div>
                 <p className="font-semibold text-blue-400">
                   Founder Account
@@ -88,7 +94,7 @@ export function SubscriptionCard() {
             </div>
           ) : credits?.plan && credits.plan !== 'none' ? (
             <div className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <Lightning size={20} weight="regular" className="text-blue-500 flex-shrink-0" />
+              <HugeiconsIcon icon={Lightning} size={20} className="text-blue-500 flex-shrink-0" strokeWidth={1.5} color="currentColor" />
               <div className="flex-1">
                 <p className="font-semibold text-blue-600 capitalize">
                   {`${credits.plan.charAt(0).toUpperCase() + credits.plan.slice(1)} Plan`}
@@ -101,7 +107,7 @@ export function SubscriptionCard() {
           ) : credits?.plan === 'none' && (credits.freeQuestionsRemaining ?? 0) > 0 ? (
             <div className="space-y-3 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
               <div className="flex items-center gap-3">
-                <Lightning size={20} weight="regular" className="text-amber-500 flex-shrink-0" />
+                <HugeiconsIcon icon={Lightning} size={20} className="text-amber-500 flex-shrink-0" strokeWidth={1.5} color="currentColor" />
                 <div className="flex-1">
                   <p className="font-semibold text-amber-500">
                     Free Trial
@@ -174,7 +180,7 @@ export function SubscriptionCard() {
               <ManageSubscriptionButton className="w-full justify-center" />
               <Button asChild variant="outline" className="w-full">
                 <Link href="/pricing">
-                  <Lightning size={16} weight="regular" className="mr-2" />
+                  <HugeiconsIcon icon={Lightning} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
                   View All Plans
                 </Link>
               </Button>
@@ -184,7 +190,7 @@ export function SubscriptionCard() {
                   onClick={() => setShowCancelDialog(true)}
                   className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
-                  <Warning size={16} weight="regular" className="mr-2" />
+                  <HugeiconsIcon icon={Warning} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
                   Cancel Subscription
                 </Button>
               )}
@@ -192,7 +198,7 @@ export function SubscriptionCard() {
           ) : (
             <Button asChild className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
               <Link href="/pricing">
-                <Lightning size={16} weight="regular" className="mr-2" />
+                <HugeiconsIcon icon={Lightning} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
                 View Plans & Subscribe
               </Link>
             </Button>
@@ -234,12 +240,12 @@ export function SubscriptionCard() {
             >
               {cancelling ? (
                 <>
-                  <CircleNotch size={16} weight="regular" className="mr-2 animate-spin" />
+                  <HugeiconsIcon icon={CircleNotch} size={16} className="mr-2 animate-spin" strokeWidth={1.5} color="currentColor" />
                   Cancelling...
                 </>
               ) : (
                 <>
-                  <Warning size={16} weight="regular" className="mr-2" />
+                  <HugeiconsIcon icon={Warning} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
                   Yes, Cancel Subscription
                 </>
               )}

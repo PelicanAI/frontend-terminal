@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react'
 import { m } from 'framer-motion'
-import { Trophy, ChatTeardropText } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ChampionIcon as Trophy, Comment01Icon as ChatTeardropText } from '@hugeicons/core-free-icons'
 import { PelicanCard, PelicanButton, staggerContainer, staggerItem } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 import type { BehavioralInsights } from '@/hooks/use-behavioral-insights'
@@ -191,7 +192,7 @@ export function EdgeSummary({ insights, onAskPelican, compact = false }: EdgeSum
 
         {/* Header */}
         <div className="flex items-center gap-2 mb-3">
-          <Trophy size={18} weight="regular" className="text-[var(--data-positive)]" />
+          <HugeiconsIcon icon={Trophy} size={18} className="text-[var(--data-positive)]" strokeWidth={1.5} color="currentColor" />
           <h3 className="text-sm font-semibold text-[var(--text-primary)]">Your Edge</h3>
         </div>
 
@@ -238,7 +239,7 @@ export function EdgeSummary({ insights, onAskPelican, compact = false }: EdgeSum
             size="sm"
             onClick={() => onAskPelican(buildPelicanPrompt(insights, edges))}
           >
-            <ChatTeardropText size={14} weight="regular" />
+            <HugeiconsIcon icon={ChatTeardropText} size={14} strokeWidth={1.5} color="currentColor" />
             Deep Dive with Pelican
           </PelicanButton>
         )}

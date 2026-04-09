@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { X, SpinnerGap } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Cancel01Icon as X, Loading03Icon as SpinnerGap } from "@hugeicons/core-free-icons"
 import { ShareButton } from "./share-button"
 import type { ShareFormat, ShareCardType } from "@/types/share-cards"
 
@@ -177,7 +178,7 @@ export function ShareCardPreviewModal({
             onClick={handleClose}
             className="p-1 hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
           >
-            <X size={18} className="text-[var(--text-muted)]" />
+            <HugeiconsIcon icon={X} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
           </button>
         </DialogHeader>
 
@@ -237,11 +238,7 @@ export function ShareCardPreviewModal({
               />
             ) : (
               <div className="flex items-center justify-center py-12">
-                <SpinnerGap
-                  size={24}
-                  weight="regular"
-                  className="animate-spin text-[var(--text-muted)]"
-                />
+                <HugeiconsIcon icon={SpinnerGap} size={24} className="animate-spin text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
               </div>
             )}
           </div>

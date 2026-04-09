@@ -2,7 +2,14 @@
 
 import { useState, useCallback, useEffect, useRef } from "react"
 import { m } from "framer-motion"
-import { ArrowsClockwise, Lightning, ChatCircleDots, X, Info } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Refresh01Icon as ArrowsClockwise,
+  FlashIcon as Lightning,
+  MessageMultiple01Icon as ChatCircleDots,
+  Cancel01Icon as X,
+  InformationCircleIcon as Info,
+} from "@hugeicons/core-free-icons"
 import { useBehavioralInsights } from "@/hooks/use-behavioral-insights"
 import { useTradePatterns, type TradePattern } from "@/hooks/use-trade-patterns"
 import { useDetectPatterns } from "@/hooks/use-detect-patterns"
@@ -118,7 +125,7 @@ function DetectedPatterns({
     return (
       <PelicanCard className="p-5 flex items-center justify-center" noPadding>
         <div className="text-center py-4">
-          <Lightning size={24} weight="regular" className="text-[var(--data-positive)] mx-auto mb-2" />
+          <HugeiconsIcon icon={Lightning} size={24} className="text-[var(--data-positive)] mx-auto mb-2" strokeWidth={1.5} color="currentColor" />
           <p className="text-sm text-[var(--text-secondary)]">No detected patterns</p>
           <p className="text-xs text-[var(--text-muted)] mt-1">Your trading looks healthy</p>
         </div>
@@ -155,7 +162,7 @@ function DetectedPatterns({
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-3">
-        <Info size={18} weight="regular" className="text-[var(--accent-primary)]" />
+        <HugeiconsIcon icon={Info} size={18} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-sm font-medium text-[var(--text-primary)]">
           Detected Patterns
           <span className="ml-1.5 font-mono tabular-nums text-[var(--text-secondary)]">
@@ -197,14 +204,14 @@ function DetectedPatterns({
                       onClick={() => handleAskPelican(p)}
                       className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors flex items-center gap-1"
                     >
-                      <ChatCircleDots size={12} weight="bold" />
+                      <HugeiconsIcon icon={ChatCircleDots} size={12} strokeWidth={2} color="currentColor" />
                       Ask Pelican About This
                     </button>
                     <button
                       onClick={() => handleDismiss(p)}
                       className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors flex items-center gap-1"
                     >
-                      <X size={10} weight="bold" />
+                      <HugeiconsIcon icon={X} size={10} strokeWidth={2} color="currentColor" />
                       Dismiss
                     </button>
                   </div>
@@ -321,11 +328,7 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
           onClick={handleRefresh}
           disabled={refreshing}
         >
-          <ArrowsClockwise
-            size={14}
-            weight="bold"
-            className={cn(refreshing && "animate-spin")}
-          />
+          <HugeiconsIcon icon={ArrowsClockwise} size={14} className={cn(refreshing && "animate-spin")} strokeWidth={2} color="currentColor" />
           {refreshing ? "Analyzing..." : "Refresh Patterns"}
         </PelicanButton>
       </m.div>

@@ -2,7 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ArrowLeft, CheckSquare, Lightning } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  ArrowRight01Icon as ArrowRight,
+  ArrowLeft01Icon as ArrowLeft,
+  CheckmarkSquare01Icon as CheckSquare,
+  FlashIcon as Lightning,
+} from '@hugeicons/core-free-icons'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 import { Section } from '@/components/landing/section'
 
@@ -239,7 +245,7 @@ export function StrategyShowcase() {
       <ScrollReveal>
         <div className="text-center mb-12 md:mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-100 text-violet-600 text-xs font-semibold tracking-wide uppercase mb-6">
-            <Lightning weight="fill" className="w-3.5 h-3.5" />
+            <HugeiconsIcon icon={Lightning} className="w-3.5 h-3.5" strokeWidth={1.5} color="currentColor" />
             Strategy Library
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-800 mb-4">
@@ -267,14 +273,14 @@ export function StrategyShowcase() {
             className="hidden md:flex absolute -left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white border border-slate-200 shadow-md items-center justify-center text-slate-500 hover:text-slate-900 hover:shadow-lg transition-all active:scale-95"
             aria-label="Previous strategy"
           >
-            <ArrowLeft weight="bold" className="w-4 h-4" />
+            <HugeiconsIcon icon={ArrowLeft} className="w-4 h-4" strokeWidth={2} color="currentColor" />
           </button>
           <button
             onClick={goNext}
             className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white border border-slate-200 shadow-md items-center justify-center text-slate-500 hover:text-slate-900 hover:shadow-lg transition-all active:scale-95"
             aria-label="Next strategy"
           >
-            <ArrowRight weight="bold" className="w-4 h-4" />
+            <HugeiconsIcon icon={ArrowRight} className="w-4 h-4" strokeWidth={2} color="currentColor" />
           </button>
 
           {/* Scrollable card container */}
@@ -318,7 +324,7 @@ export function StrategyShowcase() {
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-violet-600/20 hover:shadow-violet-600/30 transition-all duration-150 active:scale-[0.98]"
           >
             Try It Free
-            <ArrowRight weight="bold" className="w-4 h-4" />
+            <HugeiconsIcon icon={ArrowRight} className="w-4 h-4" strokeWidth={2} color="currentColor" />
           </Link>
           <p className="text-sm text-slate-400 mt-4">
             Create and share your own strategies with verified performance stats
@@ -381,7 +387,7 @@ function StrategyCard({ strategy }: { strategy: ShowcaseStrategy }) {
           <ul className="space-y-1.5">
             {strategy.checklist.slice(0, VISIBLE_CHECKLIST).map((item, i) => (
               <li key={i} className="flex items-start gap-2">
-                <CheckSquare weight="regular" className="w-4 h-4 text-slate-300 mt-0.5 flex-shrink-0" />
+                <HugeiconsIcon icon={CheckSquare} className="w-4 h-4 text-slate-300 mt-0.5 flex-shrink-0" strokeWidth={1.5} color="currentColor" />
                 <span className="text-sm text-slate-600 leading-snug">{item}</span>
               </li>
             ))}

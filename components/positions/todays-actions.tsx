@@ -1,20 +1,22 @@
 'use client'
 
 import { useMemo } from 'react'
+import { m } from 'framer-motion'
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
 import {
-  ShieldWarning,
-  Warning,
-  ShieldSlash,
-  Target,
-  Flame,
-  Crosshair,
-  Scales,
-  CheckCircle,
-  TrendUp,
-  TrendDown,
-  CalendarBlank,
-} from '@phosphor-icons/react'
-import type { IconProps } from '@phosphor-icons/react'
+  SecurityWarningIcon as ShieldWarning,
+  Alert01Icon as Warning,
+  ShieldBanIcon as ShieldSlash,
+  Target01Icon as Target,
+  FireIcon as Flame,
+  Target01Icon as Crosshair,
+  BalanceScaleIcon as Scales,
+  CheckmarkCircle01Icon as CheckCircle,
+  AnalyticsUpIcon as TrendUp,
+  AnalyticsDownIcon as TrendDown,
+  Calendar01Icon as CalendarBlank,
+} from '@hugeicons/core-free-icons'
+import { listStagger, listItem } from '@/components/ui/pelican'
 import type { PortfolioPosition, PortfolioStats, RiskSummary } from '@/types/portfolio'
 import type { BehavioralInsights } from '@/hooks/use-behavioral-insights'
 import type { TodayWarning } from '@/hooks/use-todays-warnings'
@@ -38,7 +40,7 @@ interface TodaysActionsProps {
 
 interface Action {
   priority: number
-  icon: React.ComponentType<IconProps>
+  icon: IconSvgElement
   iconColor: string
   label: string
   detail: string
@@ -89,7 +91,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
     for (const w of warnings) {
       if (w.severity === 'critical') {
         list.push({
-          priority: 0, icon: ShieldWarning, iconColor: 'text-red-400/80',
+          priority: 0, icon: ShieldWarning, iconColor: 'text-red-500',
           label: w.title, detail: w.message,
           actionLabel: w.action + ' \u2192', actionType: 'chat',
           chatPrompt: `I have a heads-up worth checking: "${w.title}" — ${w.message}. What should I do?`,
@@ -102,7 +104,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       const rr = riskSummary.portfolio_rr_ratio
       if (rr !== null && rr < 0.5) {
         list.push({
-          priority: 0, icon: ShieldWarning, iconColor: 'text-red-400/80',
+          priority: 0, icon: ShieldWarning, iconColor: 'text-red-500',
           label: `Portfolio R:R is ${rr.toFixed(2)}:1 — risking more than you stand to gain`,
           detail: `Risk: ${formatNum(riskSummary.total_risk_usd)} vs Reward: ${formatNum(riskSummary.total_reward_usd)}`,
           actionLabel: 'Fix R:R \u2192', actionType: 'chat',
@@ -110,7 +112,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
         })
       } else if (rr !== null && rr < 1) {
         list.push({
-          priority: 1, icon: Warning, iconColor: 'text-amber-500/60',
+          priority: 1, icon: Warning, iconColor: 'text-amber-500',
           label: `Portfolio R:R is ${rr.toFixed(2)}:1 — below breakeven`,
           detail: `Risk: ${formatNum(riskSummary.total_risk_usd)} vs Reward: ${formatNum(riskSummary.total_reward_usd)}`,
           actionLabel: 'Improve \u2192', actionType: 'chat',
@@ -127,7 +129,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       )
       if (maxConc.pct > 50 && portfolioStats.asset_breakdown.length > 1) {
         list.push({
-          priority: 2, icon: Scales, iconColor: 'text-amber-500/60',
+          priority: 2, icon: Scales, iconColor: 'text-amber-500',
           label: `${maxConc.pct.toFixed(0)}% concentrated in ${maxConc.type}s`,
           detail: 'Heavy concentration increases risk. Consider diversifying.',
           actionLabel: 'Review \u2192', actionType: 'chat',
@@ -141,7 +143,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
         const longPct = (portfolioStats.direction_breakdown.long.exposure / totalDir) * 100
         if (longPct > 85) {
           list.push({
-            priority: 2, icon: TrendUp, iconColor: 'text-amber-500/60',
+            priority: 2, icon: TrendUp, iconColor: 'text-amber-500',
             label: `${longPct.toFixed(0)}% long — heavy directional bias`,
             detail: 'Consider hedging with a short position or reducing long exposure.',
             actionLabel: 'Hedge \u2192', actionType: 'chat',
@@ -149,7 +151,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
           })
         } else if (longPct < 15) {
           list.push({
-            priority: 2, icon: TrendDown, iconColor: 'text-amber-500/60',
+            priority: 2, icon: TrendDown, iconColor: 'text-amber-500',
             label: `${(100 - longPct).toFixed(0)}% short — heavy directional bias`,
             detail: 'Extremely bearish positioning. Vulnerable to market rallies.',
             actionLabel: 'Review \u2192', actionType: 'chat',
@@ -163,7 +165,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 1 — Tight stop
       if (p.has_stop_loss && p.distance_to_stop_pct != null && Math.abs(p.distance_to_stop_pct) < 2) {
         list.push({
-          priority: 1, icon: Warning, iconColor: 'text-amber-500/60',
+          priority: 1, icon: Warning, iconColor: 'text-amber-500',
           label: `${p.ticker} stop is ${Math.abs(p.distance_to_stop_pct).toFixed(1)}% away`,
           detail: `Tight stop at $${p.stop_loss}. Decide: widen, hold, or exit.`,
           actionLabel: 'Plan \u2192', actionType: 'chat', chatPrompt: buildScanPrompt(p),
@@ -173,7 +175,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 1 — Absurd stop (>30% from entry, likely a typo)
       if (p.has_stop_loss && p.distance_to_stop_pct != null && Math.abs(p.distance_to_stop_pct) > 30) {
         list.push({
-          priority: 1, icon: Warning, iconColor: 'text-red-400/80',
+          priority: 1, icon: Warning, iconColor: 'text-red-500',
           label: `${p.ticker} stop is ${Math.abs(p.distance_to_stop_pct).toFixed(0)}% away — not a real stop`,
           detail: `Stop at $${p.stop_loss} is too far from entry $${p.entry_price}. Possible typo?`,
           actionLabel: 'Fix stop \u2192', actionType: 'edit', position: p,
@@ -183,7 +185,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 1 — No stop loss
       if (!p.has_stop_loss) {
         list.push({
-          priority: 1, icon: ShieldSlash, iconColor: 'text-red-400/80',
+          priority: 1, icon: ShieldSlash, iconColor: 'text-red-500',
           label: `${p.ticker} has no stop loss`,
           detail: `${formatNum(p.position_size_usd)} at risk with no defined exit.`,
           actionLabel: 'Set stop \u2192', actionType: 'edit', position: p,
@@ -193,7 +195,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 2 — Approaching target
       if (p.has_take_profit && p.distance_to_target_pct != null && p.distance_to_target_pct < 5) {
         list.push({
-          priority: 2, icon: Target, iconColor: 'text-emerald-400/80',
+          priority: 2, icon: Target, iconColor: 'text-emerald-500',
           label: `${p.ticker} approaching target ($${p.take_profit})`,
           detail: `${p.distance_to_target_pct.toFixed(1)}% away. Plan your exit strategy.`,
           actionLabel: 'Plan exit \u2192', actionType: 'chat', chatPrompt: buildScanPrompt(p),
@@ -203,7 +205,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 3 — Never scanned, held 7+ days
       if (p.days_held >= 7 && p.pelican_scan_count === 0) {
         list.push({
-          priority: 3, icon: Crosshair, iconColor: 'text-[var(--accent-primary)]/70',
+          priority: 3, icon: Crosshair, iconColor: 'text-[var(--accent-primary)]',
           label: `Review ${p.ticker} \u2014 held ${p.days_held} days, never scanned`,
           detail: "Get Pelican's assessment to validate thesis.",
           actionLabel: 'Scan \u2192', actionType: 'chat', chatPrompt: buildScanPrompt(p),
@@ -213,7 +215,7 @@ export function TodaysActions({ positions, insights, warnings, earningsWarnings,
       // Priority 4 — Oversized
       if (avgSize > 0 && p.position_size_usd > avgSize * 2.5) {
         list.push({
-          priority: 4, icon: Scales, iconColor: 'text-amber-500/60',
+          priority: 4, icon: Scales, iconColor: 'text-amber-500',
           label: `${p.ticker} is ${(p.position_size_usd / avgSize).toFixed(1)}x avg size`,
           detail: `${formatNum(p.position_size_usd)} vs avg ${formatNum(avgSize)}. Consider trimming.`,
           actionLabel: 'Review \u2192', actionType: 'chat', chatPrompt: buildScanPrompt(p),
@@ -246,7 +248,7 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
         list.push({
           priority: isCritical ? 2 : 2,
           icon: CalendarBlank,
-          iconColor: isCritical ? 'text-red-400/80' : 'text-amber-500/60',
+          iconColor: isCritical ? 'text-red-500' : 'text-amber-500',
           label: `${ew.ticker} ${daysLabel}${hourLabel ? ` (${hourLabel})` : ''}`,
           detail: `${ew.direction.toUpperCase()} from $${ew.entry_price}${ew.position_size_usd ? ` \u00b7 ${formatNum(ew.position_size_usd)}` : ''}${estimatesLine ? ` \u00b7 ${estimatesLine}` : ''}`,
           actionLabel: 'Plan with Pelican \u2192',
@@ -260,7 +262,7 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
     // Priority 3 — Losing streak
     if (insights?.streaks?.current_streak_type === 'losing' && insights.streaks.current_streak_count >= 2) {
       list.push({
-        priority: 3, icon: Flame, iconColor: 'text-red-400/80',
+        priority: 3, icon: Flame, iconColor: 'text-red-500',
         label: `${insights.streaks.current_streak_count}-trade losing streak active`,
         detail: 'Consider reducing sizes until streak breaks.',
         actionLabel: 'Review \u2192', actionType: 'chat',
@@ -276,21 +278,19 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
   if (actions.length === 0) {
     const stopsSet = positions.every((p) => p.has_stop_loss)
     return (
-      <div className="rounded-lg border bg-emerald-500/5 border-emerald-400/10 overflow-hidden">
-        <div className="px-4 pt-3 pb-1">
-          <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-[var(--text-muted)]">
-            Today&apos;s Actions
-          </span>
+      <div className="border-b border-[var(--border-default)] pb-1">
+        <div className="pb-2">
+          <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Actions</p>
+          <p className="mt-1 text-xs uppercase tracking-wider text-[var(--text-secondary)]">Today&apos;s Actions</p>
         </div>
-        <div className="px-4 pb-3 flex items-center gap-2">
-          <CheckCircle size={18} weight="fill" className="text-emerald-400/80 shrink-0" />
+        <div className="flex items-start gap-3 border-b border-[var(--border-subtle)] py-2.5">
+          <HugeiconsIcon icon={CheckCircle} size={16} className="mt-0.5 shrink-0 text-emerald-500" strokeWidth={1.5} color="currentColor" />
           <div>
             <p className="text-sm font-medium text-[var(--text-primary)]">
-              All clear &mdash; no actions needed right now.
+              No immediate action items on the blotter.
             </p>
-            <p className="text-xs text-[var(--text-muted)] font-mono tabular-nums">
-              {positions.length} position{positions.length !== 1 ? 's' : ''} healthy
-              {stopsSet ? ' \u00b7 All stops set' : ''}
+            <p className="text-xs text-[var(--text-secondary)]">
+              {positions.length} live position{positions.length !== 1 ? 's' : ''}{stopsSet ? ' · all stops defined' : ''}
             </p>
           </div>
         </div>
@@ -300,37 +300,39 @@ Help me plan: should I hold through earnings, trim my position, add a hedge, or 
 
   // ── Actions list ─────────────────────────────────────────────────────────
   return (
-    <div className="rounded-lg border border-[var(--border-subtle)]/30 bg-[var(--bg-base)]/80 overflow-hidden">
-      <div className="px-4 pt-3 pb-1">
-        <span className="text-[10px] uppercase tracking-[0.08em] font-medium text-[var(--text-muted)]">
-          Today&apos;s Actions
-        </span>
+    <div className="border-b border-[var(--border-default)] pb-1">
+      <div className="pb-2">
+        <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Today&apos;s Actions</p>
       </div>
+      <m.div variants={listStagger} initial="hidden" animate="visible">
       {actions.map((a, i) => {
         const Icon = a.icon
         return (
-          <div
+          <m.div
             key={i}
-            className={`px-4 py-2.5 flex items-start gap-3${i > 0 ? ' border-t border-[var(--border-subtle)]/40' : ''}`}
+            variants={listItem}
+            className={`flex items-start gap-3 py-2.5${i < actions.length - 1 ? ' border-b border-[var(--border-subtle)]' : ''}`}
           >
-            <Icon size={18} weight="bold" className={`${a.iconColor} shrink-0 mt-0.5`} />
+            <HugeiconsIcon icon={Icon} size={16} className={`${a.iconColor} shrink-0 mt-0.5`} strokeWidth={1.7} color="currentColor" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-[var(--text-primary)]">{a.label}</p>
-              <p className="text-xs text-[var(--text-muted)] font-[var(--font-geist-mono)] tabular-nums">{a.detail}</p>
+              <p className="text-sm font-medium text-[var(--text-primary)]">{a.label}</p>
+              <p className="text-xs text-[var(--text-secondary)]">{a.detail}</p>
             </div>
             <button
+              type="button"
               onClick={() => {
                 a.onTrack?.()
                 if (a.actionType === 'chat' && a.chatPrompt) onAction(a.chatPrompt)
                 else if (a.position) onEditPosition(a.position)
               }}
-              className="text-[10px] font-medium uppercase tracking-[0.06em] text-[var(--accent-primary)]/80 hover:text-[var(--accent-primary)] whitespace-nowrap transition-colors mt-0.5"
+              className="inline-flex min-h-11 items-center bg-transparent p-0 text-xs font-medium uppercase tracking-wider text-[var(--accent-primary)] transition-colors duration-150 cursor-pointer whitespace-nowrap hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
             >
-              {a.actionLabel}
+              {a.actionLabel.replace(/\s*\u2192$/, '')}
             </button>
-          </div>
+          </m.div>
         )
       })}
+      </m.div>
     </div>
   )
 }

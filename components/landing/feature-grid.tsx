@@ -1,16 +1,17 @@
 'use client'
 
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ChatCircle,
-  Sun,
-  Crosshair,
-  Notebook,
-  SquaresFour,
-  ChartLineUp,
-  CalendarCheck,
-  Strategy,
-  GraduationCap,
-} from '@phosphor-icons/react'
+  Chat01Icon as ChatCircle,
+  Sun01Icon as Sun,
+  Target01Icon as Crosshair,
+  Notebook01Icon as Notebook,
+  DashboardSquare01Icon as SquaresFour,
+  ChartLineData01Icon as ChartLineUp,
+  CalendarCheckIn01Icon as CalendarCheck,
+  StrategyIcon as Strategy,
+  Mortarboard01Icon as GraduationCap,
+} from '@hugeicons/core-free-icons'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 import { Section } from '@/components/landing/section'
 
@@ -82,10 +83,7 @@ export function FeatureGrid() {
           return (
             <ScrollReveal key={i} delay={i * 0.05}>
               <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                <Icon
-                  className="h-5 w-5 text-violet-600 mb-3"
-                  weight="duotone"
-                />
+                <HugeiconsIcon icon={Icon} className="h-5 w-5 text-violet-600 mb-3" strokeWidth={1.5} color="currentColor" />
                 <h3 className="text-sm font-semibold text-slate-900 mb-1">
                   {feature.title}
                 </h3>

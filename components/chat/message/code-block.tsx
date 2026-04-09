@@ -1,7 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Copy } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Copy01Icon as Copy } from "@hugeicons/core-free-icons"
 import { m } from "framer-motion"
 import DOMPurify from "isomorphic-dompurify"
 
@@ -47,7 +48,7 @@ export function CodeBlock({ content, language, index }: CodeBlockProps) {
           onClick={() => navigator.clipboard.writeText(content)}
           aria-label="Copy code"
         >
-          <Copy size={20} weight="regular" className="sm:hidden" /><Copy size={16} weight="regular" className="hidden sm:block" />
+          <HugeiconsIcon icon={Copy} size={20} className="sm:hidden" strokeWidth={1.5} color="currentColor" /><HugeiconsIcon icon={Copy} size={16} className="hidden sm:block" strokeWidth={1.5} color="currentColor" />
         </button>
       </div>
     </m.div>

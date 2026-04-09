@@ -1,6 +1,11 @@
 'use client'
 
-import { ShieldCheck, Warning, TrendDown } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  SecurityCheckIcon as ShieldCheck,
+  Alert01Icon as Warning,
+  AnalyticsDownIcon as TrendDown,
+} from '@hugeicons/core-free-icons'
 import { PelicanCard } from '@/components/ui/pelican'
 import { RiskInsight } from '@/lib/positions/dashboard-utils'
 
@@ -28,9 +33,9 @@ const severityStyles = {
 
 function SeverityIcon({ severity, size = 18 }: { severity: RiskInsight['severity']; size?: number }) {
   const color = severityStyles[severity].icon
-  if (severity === 'good') return <ShieldCheck size={size} weight="fill" style={{ color }} />
-  if (severity === 'critical') return <TrendDown size={size} weight="bold" style={{ color }} />
-  return <Warning size={size} weight="fill" style={{ color }} />
+  if (severity === 'good') return <HugeiconsIcon icon={ShieldCheck} size={size} style={{ color }} strokeWidth={1.5} color="currentColor" />
+  if (severity === 'critical') return <HugeiconsIcon icon={TrendDown} size={size} style={{ color }} strokeWidth={2} color="currentColor" />
+  return <HugeiconsIcon icon={Warning} size={size} style={{ color }} strokeWidth={1.5} color="currentColor" />
 }
 
 export function RiskCheck({ insights }: RiskCheckProps) {

@@ -3,7 +3,12 @@
 import type React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Envelope, Lock } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  ArrowLeft01Icon as ArrowLeft,
+  Mail01Icon as Envelope,
+  LockIcon as Lock,
+} from "@hugeicons/core-free-icons"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -78,7 +83,7 @@ export default function LoginPage() {
       <div className="w-full max-w-[420px] relative z-10 flex flex-col">
         <div className="mb-6 self-start">
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft size={16} weight="regular" className="mr-2" />
+            <HugeiconsIcon icon={ArrowLeft} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
             Back to Home
           </Link>
         </div>
@@ -104,7 +109,7 @@ export default function LoginPage() {
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-xs font-semibold text-muted-foreground ml-1 uppercase tracking-wider">Email</label>
               <div className="relative group">
-                <Envelope size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <HugeiconsIcon icon={Envelope} size={20} className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" strokeWidth={1.5} color="currentColor" />
                 <input
                   type="email"
                   id="email"
@@ -128,7 +133,7 @@ export default function LoginPage() {
                 </Link>
               </div>
               <div className="relative group">
-                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <HugeiconsIcon icon={Lock} size={20} className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" strokeWidth={1.5} color="currentColor" />
                 <input
                   type="password"
                   id="password"

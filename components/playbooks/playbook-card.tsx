@@ -1,7 +1,15 @@
 "use client"
 
 import { m } from "framer-motion"
-import { CheckSquare, Lightning, DotsThreeVertical, Archive, Trash, X as XIcon } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  CheckmarkSquare01Icon as CheckSquare,
+  FlashIcon as Lightning,
+  MoreVerticalIcon as DotsThreeVertical,
+  ArchiveIcon as Archive,
+  Delete01Icon as Trash,
+  Cancel01Icon as XIcon,
+} from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { staggerItem } from "@/components/ui/pelican"
 import {
@@ -119,7 +127,7 @@ export function PlaybookCard({
                   onClick={(e) => e.stopPropagation()}
                   className="p-1 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
                 >
-                  <DotsThreeVertical size={16} weight="bold" />
+                  <HugeiconsIcon icon={DotsThreeVertical} size={16} strokeWidth={2} color="currentColor" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" sideOffset={4}>
@@ -128,7 +136,7 @@ export function PlaybookCard({
                   <DropdownMenuItem
                     onClick={(e) => { e.stopPropagation(); onActivate(playbook) }}
                   >
-                    <Archive size={14} weight="regular" className="text-[var(--text-secondary)]" />
+                    <HugeiconsIcon icon={Archive} size={14} className="text-[var(--text-secondary)]" strokeWidth={1.5} color="currentColor" />
                     Activate
                   </DropdownMenuItem>
                 )}
@@ -137,7 +145,7 @@ export function PlaybookCard({
                     variant="destructive"
                     onClick={(e) => { e.stopPropagation(); onDelete(playbook) }}
                   >
-                    <Trash size={14} weight="regular" />
+                    <HugeiconsIcon icon={Trash} size={14} strokeWidth={1.5} color="currentColor" />
                     Delete Permanently
                   </DropdownMenuItem>
                 )}
@@ -148,7 +156,7 @@ export function PlaybookCard({
                     variant="destructive"
                     onClick={(e) => { e.stopPropagation(); onUnadopt(playbook) }}
                   >
-                    <XIcon size={14} weight="regular" />
+                    <HugeiconsIcon icon={XIcon} size={14} strokeWidth={1.5} color="currentColor" />
                     Remove from Playbooks
                   </DropdownMenuItem>
                 )}
@@ -158,7 +166,7 @@ export function PlaybookCard({
                   <DropdownMenuItem
                     onClick={(e) => { e.stopPropagation(); onArchive(playbook) }}
                   >
-                    <Archive size={14} weight="regular" className="text-[var(--text-secondary)]" />
+                    <HugeiconsIcon icon={Archive} size={14} className="text-[var(--text-secondary)]" strokeWidth={1.5} color="currentColor" />
                     Archive
                   </DropdownMenuItem>
                 )}
@@ -169,7 +177,7 @@ export function PlaybookCard({
                       variant="destructive"
                       onClick={(e) => { e.stopPropagation(); onDelete(playbook) }}
                     >
-                      <Trash size={14} weight="regular" />
+                      <HugeiconsIcon icon={Trash} size={14} strokeWidth={1.5} color="currentColor" />
                       Delete
                     </DropdownMenuItem>
                   </>
@@ -244,7 +252,7 @@ export function PlaybookCard({
           </span>
           {checklistCount > 0 && (
             <span className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
-              <CheckSquare size={14} weight="regular" />
+              <HugeiconsIcon icon={CheckSquare} size={14} strokeWidth={1.5} color="currentColor" />
               <span className="font-mono tabular-nums">{checklistCount}</span>
             </span>
           )}
@@ -259,7 +267,7 @@ export function PlaybookCard({
               onClick={(e) => { e.stopPropagation(); onScan(playbook) }}
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors"
             >
-              <Lightning size={14} weight="bold" />
+              <HugeiconsIcon icon={Lightning} size={14} strokeWidth={2} color="currentColor" />
               Scan with Pelican
             </button>
           )}

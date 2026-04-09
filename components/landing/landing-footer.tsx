@@ -2,7 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { XLogo } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { TwitterIcon as XLogo } from '@hugeicons/core-free-icons'
 
 const productLinks = [
   { label: 'Features', href: '#platform' },
@@ -94,7 +95,7 @@ export function LandingFooter() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                  <XLogo weight="bold" className="h-3.5 w-3.5" />
+                  <HugeiconsIcon icon={XLogo} className="h-3.5 w-3.5" strokeWidth={2} color="currentColor" />
                   Twitter / X
                 </a>
               </li>

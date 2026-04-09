@@ -1,7 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { ShareNetwork, Link as LinkIcon, XLogo, Check } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Share01Icon as ShareNetwork,
+  Link01Icon as LinkIcon,
+  TwitterIcon as XLogo,
+  Tick01Icon as Check,
+} from "@hugeicons/core-free-icons"
 
 interface ShareButtonProps {
   slug: string
@@ -31,7 +37,7 @@ export function ShareButton({ slug, name }: ShareButtonProps) {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors px-3 py-1.5 rounded-lg hover:bg-[var(--bg-elevated)]"
       >
-        <ShareNetwork size={16} weight="regular" />
+        <HugeiconsIcon icon={ShareNetwork} size={16} strokeWidth={1.5} color="currentColor" />
         Share
       </button>
       {open && (
@@ -40,14 +46,14 @@ export function ShareButton({ slug, name }: ShareButtonProps) {
             onClick={copyLink}
             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
           >
-            {copied ? <Check size={14} weight="bold" className="text-[var(--data-positive)]" /> : <LinkIcon size={14} />}
+            {copied ? <HugeiconsIcon icon={Check} size={14} className="text-[var(--data-positive)]" strokeWidth={2} color="currentColor" /> : <HugeiconsIcon icon={LinkIcon} size={14} strokeWidth={1.5} color="currentColor" />}
             {copied ? "Copied!" : "Copy Link"}
           </button>
           <button
             onClick={shareToX}
             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
           >
-            <XLogo size={14} />
+            <HugeiconsIcon icon={XLogo} size={14} strokeWidth={1.5} color="currentColor" />
             Share on X
           </button>
         </div>

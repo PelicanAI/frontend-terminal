@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { SurveyOptionCard } from '@/components/onboarding/survey-option-card'
-import { CaretDown, Warning } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ArrowDown01Icon as CaretDown, Alert01Icon as Warning } from '@hugeicons/core-free-icons'
 import { m, AnimatePresence } from 'framer-motion'
 
 const ACCOUNT_SIZES = [
@@ -102,10 +103,7 @@ export function RiskStep({
           onClick={() => setExplainerOpen(!explainerOpen)}
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          <CaretDown
-            weight="bold"
-            className={cn('w-3 h-3 transition-transform duration-200', explainerOpen && 'rotate-180')}
-          />
+          <HugeiconsIcon icon={CaretDown} className={cn('w-3 h-3 transition-transform duration-200', explainerOpen && 'rotate-180')} strokeWidth={2} color="currentColor" />
           Not sure what this means?
         </button>
         <AnimatePresence>
@@ -145,7 +143,7 @@ export function RiskStep({
             exit={{ opacity: 0, y: 4 }}
             className="flex items-start gap-3 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4"
           >
-            <Warning weight="fill" className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+            <HugeiconsIcon icon={Warning} className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" strokeWidth={1.5} color="currentColor" />
             <div className="space-y-1">
               <p className="text-sm font-medium text-foreground">PDT Rule Warning</p>
               <p className="text-xs text-muted-foreground">

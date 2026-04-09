@@ -3,7 +3,20 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { m, AnimatePresence } from 'framer-motion'
-import { ArrowsClockwise, Warning, TrendUp, TrendDown, Minus, Shuffle, ChartLineUp, Briefcase, Graph, ChatCircleDots, Plus } from '@phosphor-icons/react'
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
+import {
+  Refresh01Icon as ArrowsClockwise,
+  Alert01Icon as Warning,
+  AnalyticsUpIcon as TrendUp,
+  AnalyticsDownIcon as TrendDown,
+  MinusSignIcon as Minus,
+  ShuffleIcon as Shuffle,
+  ChartLineData01Icon as ChartLineUp,
+  Briefcase01Icon as Briefcase,
+  Analytics01Icon as Graph,
+  MessageMultiple01Icon as ChatCircleDots,
+  Add01Icon as Plus,
+} from '@hugeicons/core-free-icons'
 import { useCorrelationMatrix } from '@/hooks/use-correlations'
 import { CorrelationMatrix } from '@/components/correlations/correlation-matrix'
 import { SignalCards } from '@/components/correlations/signal-cards'
@@ -19,7 +32,7 @@ type ViewTab = 'market' | 'portfolio'
 
 const NEUTRAL_REGIME = { color: 'var(--text-muted)', Icon: Minus, label: 'Neutral' } as const
 
-const regimeConfig: Record<string, { color: string; Icon: typeof TrendUp; label: string }> = {
+const regimeConfig: Record<string, { color: string; Icon: IconSvgElement; label: string }> = {
   risk_on: { color: 'var(--data-positive)', Icon: TrendUp, label: 'Risk On' },
   risk_off: { color: 'var(--data-negative)', Icon: TrendDown, label: 'Risk Off' },
   correlation_breakdown: { color: 'var(--data-warning)', Icon: Warning, label: 'Breakdown' },
@@ -91,12 +104,7 @@ export default function CorrelationsPageClient() {
   if (!isLoading && data && data.correlations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
-        <Graph
-          size={48}
-          weight="thin"
-          className="mb-5"
-          style={{ color: 'var(--text-muted)' }}
-        />
+        <HugeiconsIcon icon={Graph} size={48} className="mb-5" style={{ color: 'var(--text-muted)' }} strokeWidth={1} color="currentColor" />
         <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
           Correlation data is building
         </h2>
@@ -111,7 +119,7 @@ export default function CorrelationsPageClient() {
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150 active:scale-[0.98]"
             style={{ background: 'var(--accent-primary)' }}
           >
-            <Plus size={16} weight="bold" />
+            <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
             Log a Trade
           </Link>
           <Link
@@ -123,7 +131,7 @@ export default function CorrelationsPageClient() {
               background: 'transparent',
             }}
           >
-            <ChatCircleDots size={16} weight="regular" />
+            <HugeiconsIcon icon={ChatCircleDots} size={16} strokeWidth={1.5} color="currentColor" />
             Ask Pelican About Correlations
           </Link>
         </div>
@@ -163,7 +171,7 @@ export default function CorrelationsPageClient() {
                 border: '1px solid var(--border-subtle)',
               }}
             >
-              <RegimeIcon weight="bold" className="w-4 h-4" style={{ color: regimeStyle.color }} />
+              <HugeiconsIcon icon={RegimeIcon} className="w-4 h-4" style={{ color: regimeStyle.color }} strokeWidth={2} color="currentColor" />
               <span className="text-sm font-semibold" style={{ color: regimeStyle.color }}>
                 {regimeStyle.label}
               </span>
@@ -186,7 +194,7 @@ export default function CorrelationsPageClient() {
                 color: activeTab === 'market' ? 'white' : 'var(--text-secondary)',
               }}
             >
-              <ChartLineUp weight={activeTab === 'market' ? 'fill' : 'regular'} className="w-3.5 h-3.5" />
+              <HugeiconsIcon icon={ChartLineUp} className="w-3.5 h-3.5" strokeWidth={1.5} color="currentColor" />
               Market Matrix
             </button>
             <button
@@ -197,7 +205,7 @@ export default function CorrelationsPageClient() {
                 color: activeTab === 'portfolio' ? 'white' : 'var(--text-secondary)',
               }}
             >
-              <Briefcase weight={activeTab === 'portfolio' ? 'fill' : 'regular'} className="w-3.5 h-3.5" />
+              <HugeiconsIcon icon={Briefcase} className="w-3.5 h-3.5" strokeWidth={1.5} color="currentColor" />
               My Portfolio
             </button>
           </div>
@@ -231,7 +239,7 @@ export default function CorrelationsPageClient() {
                   className="p-1.5 rounded-lg transition-colors"
                   style={{ color: 'var(--text-muted)', background: 'var(--bg-base)' }}
                 >
-                  <ArrowsClockwise weight="bold" className={`w-4 h-4 ${calculating ? 'animate-spin' : ''}`} />
+                  <HugeiconsIcon icon={ArrowsClockwise} className={`w-4 h-4 ${calculating ? 'animate-spin' : ''}`} strokeWidth={2} color="currentColor" />
                 </button>
               </IconTooltip>
             </div>
@@ -251,7 +259,7 @@ export default function CorrelationsPageClient() {
         {/* Loading */}
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <ArrowsClockwise weight="bold" className="w-6 h-6 animate-spin" style={{ color: 'var(--accent-indigo)' }} />
+            <HugeiconsIcon icon={ArrowsClockwise} className="w-6 h-6 animate-spin" style={{ color: 'var(--accent-indigo)' }} strokeWidth={2} color="currentColor" />
           </div>
         )}
 

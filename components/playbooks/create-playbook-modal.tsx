@@ -9,7 +9,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { PelicanButton } from "@/components/ui/pelican"
-import { X } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Cancel01Icon as X } from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { cn } from "@/lib/utils"
 
@@ -357,7 +358,7 @@ export function CreatePlaybookModal({
                           onClick={() => handleRemoveInstrument(i)}
                           className="text-[var(--text-muted)] hover:text-[var(--data-negative)] transition-colors p-0.5"
                         >
-                          <X size={14} weight="bold" />
+                          <HugeiconsIcon icon={X} size={14} strokeWidth={2} color="currentColor" />
                         </button>
                       </IconTooltip>
                     </span>
@@ -482,7 +483,7 @@ export function CreatePlaybookModal({
                           onClick={() => handleRemoveChecklistItem(i)}
                           className="text-[var(--text-muted)] hover:text-[var(--data-negative)] transition-colors p-0.5"
                         >
-                          <X size={14} weight="bold" />
+                          <HugeiconsIcon icon={X} size={14} strokeWidth={2} color="currentColor" />
                         </button>
                       </IconTooltip>
                     </li>

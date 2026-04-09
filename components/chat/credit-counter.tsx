@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Lightning } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { FlashIcon as Lightning } from '@hugeicons/core-free-icons'
 import Link from 'next/link'
 import { useCreditsContext } from '@/providers/credits-provider'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
@@ -41,7 +42,7 @@ export function ChatCreditCounter() {
   if (isFounder) {
     return (
       <div className="flex items-center gap-1.5 px-2 py-1 rounded-md text-amber-400">
-        <Lightning size={14} weight="fill" />
+        <HugeiconsIcon icon={Lightning} size={14} strokeWidth={1.5} color="currentColor" />
         <span className="text-xs font-medium">Founder</span>
       </div>
     )
@@ -58,7 +59,7 @@ export function ChatCreditCounter() {
           isLow ? 'text-amber-400' : 'text-muted-foreground'
         }`}
       >
-        <Lightning size={14} weight="fill" />
+        <HugeiconsIcon icon={Lightning} size={14} strokeWidth={1.5} color="currentColor" />
         <span className="text-xs font-medium font-mono tabular-nums">{remaining} free</span>
       </Link>
     )
@@ -93,7 +94,7 @@ export function ChatCreditCounter() {
         onClick={() => setShowPopover(!showPopover)}
         className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors hover:bg-muted/50 ${colorClass}`}
       >
-        <Lightning size={14} weight="fill" />
+        <HugeiconsIcon icon={Lightning} size={14} strokeWidth={1.5} color="currentColor" />
         <span className="text-xs font-medium font-mono tabular-nums">{balance.toLocaleString()}</span>
       </button>
       </IconTooltip>

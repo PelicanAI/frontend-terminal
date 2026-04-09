@@ -1,7 +1,14 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { DownloadSimple, CopySimple, ShareNetwork, Check, SpinnerGap } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Download01Icon as DownloadSimple,
+  Copy01Icon as CopySimple,
+  Share01Icon as ShareNetwork,
+  Tick01Icon as Check,
+  Loading03Icon as SpinnerGap,
+} from "@hugeicons/core-free-icons"
 import { useToast } from "@/hooks/use-toast"
 
 interface ShareButtonProps {
@@ -75,7 +82,7 @@ export function ShareButton({ imageUrl, filename = "pelican-card.png", compact =
             className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors"
             title="Share"
           >
-            <ShareNetwork size={16} weight="regular" />
+            <HugeiconsIcon icon={ShareNetwork} size={16} strokeWidth={1.5} color="currentColor" />
           </button>
         ) : (
           <button
@@ -85,9 +92,9 @@ export function ShareButton({ imageUrl, filename = "pelican-card.png", compact =
             title="Download card"
           >
             {isDownloading ? (
-              <SpinnerGap size={16} weight="regular" className="animate-spin" />
+              <HugeiconsIcon icon={SpinnerGap} size={16} className="animate-spin" strokeWidth={1.5} color="currentColor" />
             ) : (
-              <DownloadSimple size={16} weight="regular" />
+              <HugeiconsIcon icon={DownloadSimple} size={16} strokeWidth={1.5} color="currentColor" />
             )}
           </button>
         )}
@@ -97,9 +104,9 @@ export function ShareButton({ imageUrl, filename = "pelican-card.png", compact =
           title={isCopied ? "Copied!" : "Copy image"}
         >
           {isCopied ? (
-            <Check size={16} weight="regular" className="text-[var(--data-positive)]" />
+            <HugeiconsIcon icon={Check} size={16} className="text-[var(--data-positive)]" strokeWidth={1.5} color="currentColor" />
           ) : (
-            <CopySimple size={16} weight="regular" />
+            <HugeiconsIcon icon={CopySimple} size={16} strokeWidth={1.5} color="currentColor" />
           )}
         </button>
       </div>
@@ -114,11 +121,11 @@ export function ShareButton({ imageUrl, filename = "pelican-card.png", compact =
         className="flex items-center gap-2 px-4 py-2 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] text-white text-sm font-medium rounded-lg transition-colors active:scale-[0.98] disabled:opacity-50"
       >
         {isDownloading ? (
-          <SpinnerGap size={16} weight="regular" className="animate-spin" />
+          <HugeiconsIcon icon={SpinnerGap} size={16} className="animate-spin" strokeWidth={1.5} color="currentColor" />
         ) : canNativeShare ? (
-          <ShareNetwork size={16} weight="regular" />
+          <HugeiconsIcon icon={ShareNetwork} size={16} strokeWidth={1.5} color="currentColor" />
         ) : (
-          <DownloadSimple size={16} weight="regular" />
+          <HugeiconsIcon icon={DownloadSimple} size={16} strokeWidth={1.5} color="currentColor" />
         )}
         {isDownloading ? "Generating..." : canNativeShare ? "Share" : "Download PNG"}
       </button>
@@ -129,12 +136,12 @@ export function ShareButton({ imageUrl, filename = "pelican-card.png", compact =
       >
         {isCopied ? (
           <>
-            <Check size={16} weight="regular" className="text-[var(--data-positive)]" />
+            <HugeiconsIcon icon={Check} size={16} className="text-[var(--data-positive)]" strokeWidth={1.5} color="currentColor" />
             Copied
           </>
         ) : (
           <>
-            <CopySimple size={16} weight="regular" />
+            <HugeiconsIcon icon={CopySimple} size={16} strokeWidth={1.5} color="currentColor" />
             Copy
           </>
         )}

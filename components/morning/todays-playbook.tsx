@@ -1,7 +1,12 @@
 'use client'
 
 import { useMemo, useState, useEffect } from 'react'
-import { CalendarBlank, ChartBar, CaretRight } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Calendar01Icon as CalendarBlank,
+  BarChartIcon as ChartBar,
+  ArrowRight01Icon as CaretRight,
+} from '@hugeicons/core-free-icons'
 import { PelicanCard } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
@@ -175,7 +180,7 @@ export function TodaysPlaybook({ economicEvents, economicLoading, onAnalyze }: T
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <CalendarBlank className="h-4 w-4 text-[var(--accent-primary)]" weight="regular" />
+          <HugeiconsIcon icon={CalendarBlank} className="h-4 w-4 text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
           <h2 className="text-sm font-semibold text-[var(--text-primary)]">Today&apos;s Playbook</h2>
         </div>
         <Link
@@ -183,7 +188,7 @@ export function TodaysPlaybook({ economicEvents, economicLoading, onAnalyze }: T
           className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors"
         >
           View All
-          <CaretRight className="h-3 w-3" weight="bold" />
+          <HugeiconsIcon icon={CaretRight} className="h-3 w-3" strokeWidth={2} color="currentColor" />
         </Link>
       </div>
 
@@ -200,7 +205,7 @@ export function TodaysPlaybook({ economicEvents, economicLoading, onAnalyze }: T
       ) : playbook.length === 0 ? (
         /* Empty state */
         <div className="py-6 text-center">
-          <CalendarBlank className="h-8 w-8 text-[var(--text-muted)] mx-auto mb-2" weight="light" />
+          <HugeiconsIcon icon={CalendarBlank} className="h-8 w-8 text-[var(--text-muted)] mx-auto mb-2" strokeWidth={1} color="currentColor" />
           <p className="text-sm text-[var(--text-secondary)]">No economic releases or earnings today</p>
           <p className="text-xs text-[var(--text-muted)] mt-1">Low-catalyst day — focus on technicals</p>
         </div>
@@ -260,7 +265,7 @@ export function TodaysPlaybook({ economicEvents, economicLoading, onAnalyze }: T
                       className="w-full flex items-center justify-between rounded-lg bg-[var(--accent-muted)] px-3 py-2.5 text-left transition-all duration-150 hover:bg-[var(--accent-primary)]/15 active:scale-[0.98]"
                     >
                       <div className="flex items-center gap-2">
-                        <ChartBar className="h-3.5 w-3.5 text-[var(--accent-primary)]" weight="regular" />
+                        <HugeiconsIcon icon={ChartBar} className="h-3.5 w-3.5 text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
                         <span className="text-sm font-mono font-semibold text-[var(--text-primary)]">{item.ticker}</span>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">

@@ -1,6 +1,7 @@
 "use client"
 
-import { Sparkle, Lock } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { SparklesIcon as Sparkle, LockIcon as Lock } from "@hugeicons/core-free-icons"
 import { PelicanButton } from "@/components/ui/pelican"
 import type { Playbook } from "@/types/trading"
 import type { PlaybookStats } from "@/hooks/use-playbooks"
@@ -24,11 +25,7 @@ export function PlaybookGradeTab({
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center max-w-md mx-auto">
       <div className="w-16 h-16 rounded-2xl bg-[var(--accent-muted)] flex items-center justify-center mb-6">
-        <Sparkle
-          size={32}
-          weight="fill"
-          className="text-[var(--accent-primary)]"
-        />
+        <HugeiconsIcon icon={Sparkle} size={32} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
       </div>
 
       <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
@@ -49,12 +46,12 @@ export function PlaybookGradeTab({
       >
         {canGrade ? (
           <>
-            <Sparkle size={16} weight="bold" />
+            <HugeiconsIcon icon={Sparkle} size={16} strokeWidth={2} color="currentColor" />
             Grade my playbook
           </>
         ) : (
           <>
-            <Lock size={16} weight="regular" />
+            <HugeiconsIcon icon={Lock} size={16} strokeWidth={1.5} color="currentColor" />
             Need {MIN_TRADES_FOR_GRADE - tradeCount} more trades
           </>
         )}

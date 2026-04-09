@@ -2,7 +2,16 @@
 
 import React, { useMemo } from 'react'
 import { m } from 'framer-motion'
-import { Warning, ShieldCheck, Link as LinkIcon, Eye, ArrowRight, Briefcase, Lightning } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Alert01Icon as Warning,
+  SecurityCheckIcon as ShieldCheck,
+  Link01Icon as LinkIcon,
+  ViewIcon as Eye,
+  ArrowRight01Icon as ArrowRight,
+  Briefcase01Icon as Briefcase,
+  FlashIcon as Lightning,
+} from '@hugeicons/core-free-icons'
 import { useTrades } from '@/hooks/use-trades'
 import { getCorrelationProxy, getProxyLabel, groupByProxy } from '@/lib/correlations/portfolio-proxy'
 import { usePelicanPanelContext } from '@/providers/pelican-panel-provider'
@@ -180,7 +189,7 @@ export function PortfolioCorrelations({
   if (positions.length === 0) {
     return (
       <m.div initial={entranceInitial} animate={entranceAnimate} transition={entranceTransition} className="pelican-card p-8 text-center">
-        <Briefcase weight="light" className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-muted)' }} />
+        <HugeiconsIcon icon={Briefcase} className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--text-muted)' }} strokeWidth={1} color="currentColor" />
         <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
           No Open Positions
         </h3>
@@ -190,7 +199,7 @@ export function PortfolioCorrelations({
         <a href="/journal"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:brightness-110 active:scale-[0.98]"
           style={{ background: 'var(--accent-indigo)', color: 'white' }}>
-          Go to Journal <ArrowRight weight="bold" className="w-4 h-4" />
+          Go to Journal <HugeiconsIcon icon={ArrowRight} className="w-4 h-4" strokeWidth={2} color="currentColor" />
         </a>
       </m.div>
     )
@@ -246,7 +255,7 @@ export function PortfolioCorrelations({
       {riskMetrics && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <RiskCard
-            icon={<LinkIcon weight="bold" className="w-4 h-4" />}
+            icon={<HugeiconsIcon icon={LinkIcon} className="w-4 h-4" strokeWidth={2} color="currentColor" />}
             label="Avg Correlation"
             value={riskMetrics.avgCorr.toFixed(2)}
             sublabel={riskMetrics.concentrationLevel.toUpperCase()}
@@ -254,7 +263,7 @@ export function PortfolioCorrelations({
             beginner={beginnerMode ? 'How similar your positions move together' : undefined}
           />
           <RiskCard
-            icon={<Warning weight="bold" className="w-4 h-4" />}
+            icon={<HugeiconsIcon icon={Warning} className="w-4 h-4" strokeWidth={2} color="currentColor" />}
             label="Most Correlated"
             value={Math.abs(riskMetrics.highest.value).toFixed(2)}
             sublabel={`${riskMetrics.highest.a} / ${riskMetrics.highest.b}`}
@@ -262,7 +271,7 @@ export function PortfolioCorrelations({
             beginner={beginnerMode ? 'Your two most similar positions' : undefined}
           />
           <RiskCard
-            icon={<ShieldCheck weight="bold" className="w-4 h-4" />}
+            icon={<HugeiconsIcon icon={ShieldCheck} className="w-4 h-4" strokeWidth={2} color="currentColor" />}
             label="Best Diversifier"
             value={riskMetrics.bestDiv.avg.toFixed(2)}
             sublabel={`${riskMetrics.bestDiv.proxy} (${getProxyLabel(riskMetrics.bestDiv.proxy)})`}
@@ -270,7 +279,7 @@ export function PortfolioCorrelations({
             beginner={beginnerMode ? 'The position least like the rest' : undefined}
           />
           <RiskCard
-            icon={<Eye weight="bold" className="w-4 h-4" />}
+            icon={<HugeiconsIcon icon={Eye} className="w-4 h-4" strokeWidth={2} color="currentColor" />}
             label="Hidden Exposure"
             value={riskMetrics.concentrated.length > 0 ? `${riskMetrics.concentrated.length}` : 'None'}
             sublabel={riskMetrics.concentrated.length > 0
@@ -293,7 +302,7 @@ export function PortfolioCorrelations({
             color: 'var(--text-secondary)',
           }}
         >
-          <Lightning weight="bold" className="w-3.5 h-3.5" style={{ color: 'var(--accent-indigo)' }} />
+          <HugeiconsIcon icon={Lightning} className="w-3.5 h-3.5" style={{ color: 'var(--accent-indigo)' }} strokeWidth={2} color="currentColor" />
           Review Risk with Pelican
         </button>
       )}

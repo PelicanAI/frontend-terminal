@@ -1,7 +1,12 @@
 "use client"
 
 import { Trade } from "@/hooks/use-trades"
-import { X, PlayCircle, PencilSimple } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Cancel01Icon as X,
+  PlayCircleIcon as PlayCircle,
+  PencilEdit01Icon as PencilSimple,
+} from "@hugeicons/core-free-icons"
 import { ShareButton } from "@/components/share/share-button"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { PelicanCard, PelicanButton, DataCell } from "@/components/ui/pelican"
@@ -46,7 +51,7 @@ export function TradeDetailPanel({ trade, onClose, onEdit, onCloseTrade, onRepla
             onClick={onClose}
             className="p-1 hover:bg-[var(--bg-elevated)] rounded-lg transition-colors active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
-            <X size={20} className="text-[var(--text-muted)]" />
+            <HugeiconsIcon icon={X} size={20} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
           </button>
         </IconTooltip>
       </div>
@@ -83,7 +88,7 @@ export function TradeDetailPanel({ trade, onClose, onEdit, onCloseTrade, onRepla
                 onClick={() => onReplay(trade)}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors active:scale-[0.98]"
               >
-                <PlayCircle size={16} weight="fill" />
+                <HugeiconsIcon icon={PlayCircle} size={16} strokeWidth={1.5} color="currentColor" />
                 Replay Trade
               </button>
             )}
@@ -280,7 +285,7 @@ export function TradeDetailPanel({ trade, onClose, onEdit, onCloseTrade, onRepla
             onClick={() => onEdit(trade)}
             className="w-full"
           >
-            <PencilSimple size={16} weight="regular" />
+            <HugeiconsIcon icon={PencilSimple} size={16} strokeWidth={1.5} color="currentColor" />
             Edit Trade
           </PelicanButton>
         )}

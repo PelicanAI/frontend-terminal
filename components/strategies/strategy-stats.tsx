@@ -1,6 +1,7 @@
 "use client"
 
-import { ChartBar } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { BarChartIcon as ChartBar } from "@hugeicons/core-free-icons"
 import type { Playbook } from "@/types/trading"
 
 interface StrategyStatsProps {
@@ -13,7 +14,7 @@ export function StrategyStats({ strategy }: StrategyStatsProps) {
   if (!hasStats) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <ChartBar size={32} weight="thin" className="text-[var(--text-muted)] mb-3" />
+        <HugeiconsIcon icon={ChartBar} size={32} className="text-[var(--text-muted)] mb-3" strokeWidth={1} color="currentColor" />
         <p className="text-sm text-[var(--text-muted)]">
           No verified trade stats available yet.
         </p>

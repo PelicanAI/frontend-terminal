@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowRight } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ArrowRight01Icon as ArrowRight } from '@hugeicons/core-free-icons'
 import { HeroChatDemo } from '@/components/landing/hero-chat-demo'
 
 const ease = [0.25, 0.1, 0.25, 1] as [number, number, number, number]
@@ -48,10 +49,7 @@ export function HeroSection() {
             className="group flex items-center gap-2 rounded-xl bg-violet-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-violet-600/20 transition-all duration-150 hover:bg-violet-700 hover:shadow-violet-600/30 active:scale-[0.98]"
           >
             Start Trading Smarter — It&apos;s Free
-            <ArrowRight
-              weight="bold"
-              className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5"
-            />
+            <HugeiconsIcon icon={ArrowRight} className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" strokeWidth={2} color="currentColor" />
           </Link>
           <Link
             href="/how-to-use"

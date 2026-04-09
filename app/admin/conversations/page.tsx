@@ -5,17 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  MagnifyingGlass,
-  ChatCircle,
-  CaretDown,
-  CaretUp,
-  CircleNotch,
-  User,
-  Robot,
-  Funnel,
-  ArrowUpRight,
-} from '@phosphor-icons/react'
+  Search01Icon as MagnifyingGlass,
+  Chat01Icon as ChatCircle,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  Loading03Icon as CircleNotch,
+  UserIcon as User,
+  Robot01Icon as Robot,
+  FilterIcon as Funnel,
+  ArrowUpRight01Icon as ArrowUpRight,
+} from '@hugeicons/core-free-icons'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { formatLine } from '@/components/chat/message/format-utils'
 import type { ConvoTag } from '@/lib/admin/classify-conversation'
@@ -112,9 +113,9 @@ function MessageRow({ msg }: { msg: ConvoMessage }) {
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
           {isUser ? (
-            <User size={14} weight="regular" className="text-blue-400" />
+            <HugeiconsIcon icon={User} size={14} className="text-blue-400" strokeWidth={1.5} color="currentColor" />
           ) : (
-            <Robot size={14} weight="regular" className="text-muted-foreground" />
+            <HugeiconsIcon icon={Robot} size={14} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
           )}
           <span className={`text-xs font-medium ${isUser ? 'text-blue-400' : 'text-muted-foreground'}`}>
             {isUser ? 'User' : 'Assistant'}
@@ -365,7 +366,7 @@ export default function AdminConversationsPage() {
           <div className="flex flex-wrap gap-3">
             {/* Search */}
             <div className="relative flex-1 min-w-[200px]">
-              <MagnifyingGlass size={16} weight="regular" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <HugeiconsIcon icon={MagnifyingGlass} size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} color="currentColor" />
               <Input
                 placeholder="Search messages..."
                 value={search}
@@ -376,7 +377,7 @@ export default function AdminConversationsPage() {
 
             {/* Email filter */}
             <div className="relative flex-1 min-w-[200px]">
-              <User size={16} weight="regular" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <HugeiconsIcon icon={User} size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} color="currentColor" />
               <Input
                 placeholder="Filter by email..."
                 value={emailFilter}
@@ -439,12 +440,12 @@ export default function AdminConversationsPage() {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <ChatCircle size={16} weight="regular" />
+              <HugeiconsIcon icon={ChatCircle} size={16} strokeWidth={1.5} color="currentColor" />
               {loading ? 'Loading...' : `${displayConversations.length} conversations`}
             </CardTitle>
             {isFiltered && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Funnel size={12} weight="regular" />
+                <HugeiconsIcon icon={Funnel} size={12} strokeWidth={1.5} color="currentColor" />
                 Filtered
               </div>
             )}
@@ -465,7 +466,7 @@ export default function AdminConversationsPage() {
             </div>
           ) : displayConversations.length === 0 ? (
             <div className="text-center py-8">
-              <ChatCircle size={32} weight="regular" className="mx-auto text-muted-foreground/50 mb-2" />
+              <HugeiconsIcon icon={ChatCircle} size={32} className="mx-auto text-muted-foreground/50 mb-2" strokeWidth={1.5} color="currentColor" />
               <p className="text-sm text-muted-foreground">
                 {isFiltered
                   ? 'No conversations match your filters'
@@ -489,7 +490,7 @@ export default function AdminConversationsPage() {
                         onClick={() => handleToggle(conv.id)}
                         className="flex items-center gap-3 flex-1 min-w-0 text-left"
                       >
-                        <ChatCircle size={16} weight="regular" className="text-muted-foreground shrink-0" />
+                        <HugeiconsIcon icon={ChatCircle} size={16} className="text-muted-foreground shrink-0" strokeWidth={1.5} color="currentColor" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium truncate">
@@ -520,9 +521,9 @@ export default function AdminConversationsPage() {
                         </div>
                         <div className="shrink-0">
                           {isExpanded ? (
-                            <CaretUp size={16} weight="regular" className="text-muted-foreground" />
+                            <HugeiconsIcon icon={CaretUp} size={16} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                           ) : (
-                            <CaretDown size={16} weight="regular" className="text-muted-foreground" />
+                            <HugeiconsIcon icon={CaretDown} size={16} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                           )}
                         </div>
                       </button>
@@ -534,7 +535,7 @@ export default function AdminConversationsPage() {
                           className="shrink-0 p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <ArrowUpRight size={16} weight="regular" />
+                          <HugeiconsIcon icon={ArrowUpRight} size={16} strokeWidth={1.5} color="currentColor" />
                         </Link>
                       </IconTooltip>
                     </div>
@@ -544,7 +545,7 @@ export default function AdminConversationsPage() {
                       <div className="ml-7 mr-3 mb-3 mt-1">
                         {isLoadingMsg && (
                           <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground justify-center">
-                            <CircleNotch size={16} weight="regular" className="animate-spin" />
+                            <HugeiconsIcon icon={CircleNotch} size={16} className="animate-spin" strokeWidth={1.5} color="currentColor" />
                             Loading messages...
                           </div>
                         )}
@@ -597,7 +598,7 @@ export default function AdminConversationsPage() {
                                 >
                                   {loadingMoreMessages ? (
                                     <>
-                                      <CircleNotch size={12} weight="regular" className="animate-spin" />
+                                      <HugeiconsIcon icon={CircleNotch} size={12} className="animate-spin" strokeWidth={1.5} color="currentColor" />
                                       Loading...
                                     </>
                                   ) : (
@@ -624,7 +625,7 @@ export default function AdminConversationsPage() {
                   >
                     {loadingMore ? (
                       <>
-                        <CircleNotch size={16} weight="regular" className="animate-spin" />
+                        <HugeiconsIcon icon={CircleNotch} size={16} className="animate-spin" strokeWidth={1.5} color="currentColor" />
                         Loading more...
                       </>
                     ) : (

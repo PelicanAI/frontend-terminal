@@ -2,7 +2,8 @@
 
 import { PelicanCard } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
-import { TrendUp } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { AnalyticsUpIcon as TrendUp } from "@hugeicons/core-free-icons"
 import type { TradeStats } from "@/hooks/use-trade-stats"
 
 interface CoreMetricsCardProps {
@@ -14,7 +15,7 @@ export function CoreMetricsCard({ stats, onAskPelican }: CoreMetricsCardProps) {
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-4">
-        <TrendUp size={18} weight="regular" className="text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={TrendUp} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-sm font-medium text-[var(--text-primary)]">Core Metrics</h3>
       </div>
 

@@ -2,7 +2,12 @@
 
 import { useState } from 'react'
 import { useCreditsContext } from '@/providers/credits-provider'
-import { Gear, CircleNotch, ArrowSquareOut } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Settings01Icon as Gear,
+  Loading03Icon as CircleNotch,
+  SquareArrowDiagonal02Icon as ArrowSquareOut,
+} from '@hugeicons/core-free-icons'
 
 interface ManageSubscriptionButtonProps {
   className?: string
@@ -51,9 +56,9 @@ export function ManageSubscriptionButton({
         className={`text-sm text-blue-400 hover:text-blue-300 disabled:opacity-50 flex items-center gap-1 ${className}`}
       >
         {loading ? (
-          <CircleNotch size={12} weight="regular" className="animate-spin" />
+          <HugeiconsIcon icon={CircleNotch} size={12} className="animate-spin" strokeWidth={1.5} color="currentColor" />
         ) : (
-          <ArrowSquareOut size={12} weight="regular" />
+          <HugeiconsIcon icon={ArrowSquareOut} size={12} strokeWidth={1.5} color="currentColor" />
         )}
         <span>Manage subscription</span>
       </button>
@@ -67,9 +72,9 @@ export function ManageSubscriptionButton({
       className={`flex items-center gap-2 px-4 py-2 bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] text-[var(--text-secondary)] rounded-lg transition-colors disabled:opacity-50 ${className}`}
     >
       {loading ? (
-        <CircleNotch size={16} weight="regular" className="animate-spin" />
+        <HugeiconsIcon icon={CircleNotch} size={16} className="animate-spin" strokeWidth={1.5} color="currentColor" />
       ) : (
-        <Gear size={16} weight="regular" />
+        <HugeiconsIcon icon={Gear} size={16} strokeWidth={1.5} color="currentColor" />
       )}
       <span>Manage Subscription</span>
     </button>

@@ -2,7 +2,8 @@
 
 import { PelicanCard } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
-import { Scales } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { BalanceScaleIcon as Scales } from "@hugeicons/core-free-icons"
 import type { TradeStats } from "@/hooks/use-trade-stats"
 import type { SizingInsight } from "@/hooks/use-behavioral-insights"
 
@@ -17,7 +18,7 @@ export function SizingAnalysisCard({ stats, sizing, onAskPelican }: SizingAnalys
     return (
       <PelicanCard className="p-5" noPadding>
         <div className="flex items-center gap-2 mb-4">
-          <Scales size={18} weight="regular" className="text-[var(--text-muted)]" />
+          <HugeiconsIcon icon={Scales} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
           <h3 className="text-sm font-medium text-[var(--text-primary)]">Position Sizing</h3>
         </div>
         <p className="text-sm text-[var(--text-muted)] text-center py-6">Not enough position size data</p>
@@ -30,7 +31,7 @@ export function SizingAnalysisCard({ stats, sizing, onAskPelican }: SizingAnalys
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-4">
-        <Scales size={18} weight="regular" className="text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={Scales} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-sm font-medium text-[var(--text-primary)]">Position Sizing</h3>
       </div>
 

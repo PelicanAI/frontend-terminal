@@ -1,6 +1,7 @@
 "use client"
 
-import { MagnifyingGlass } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Search01Icon as MagnifyingGlass } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import type { StrategyFilter, StrategyCategory, StrategyDifficulty, StrategySource } from "@/types/trading"
 
@@ -73,7 +74,7 @@ export function StrategyFilters({ filters, onChange }: StrategyFiltersProps) {
       />
       <div className="w-px h-5 bg-[var(--border-subtle)]" />
       <div className="relative">
-        <MagnifyingGlass size={14} weight="regular" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={MagnifyingGlass} size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <input
           type="text"
           placeholder="Search strategies..."

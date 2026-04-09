@@ -85,13 +85,13 @@ export function TradeRecapCard({ trade }: TradeRecapProps) {
             fontWeight: 700,
             color: pnlColor,
             letterSpacing: "-0.03em",
-            fontFamily: "Geist Mono, monospace",
+            fontFamily: "IBM Plex Mono, monospace",
           }}
         >
           {`${isProfit ? "+" : ""}${pnlPercent.toFixed(1)}%`}
         </span>
         <span
-          style={{ fontSize: 28, color: pnlColor, opacity: 0.8, fontFamily: "Geist Mono, monospace" }}
+          style={{ fontSize: 28, color: pnlColor, opacity: 0.8, fontFamily: "IBM Plex Mono, monospace" }}
         >
           {`${isProfit ? "+" : ""}$${Math.abs(pnlAmount).toLocaleString("en-US", {
             minimumFractionDigits: 2,
@@ -106,7 +106,7 @@ export function TradeRecapCard({ trade }: TradeRecapProps) {
           <span style={{ fontSize: 13, color: CARD_COLORS.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Entry
           </span>
-          <span style={{ fontSize: 22, color: CARD_COLORS.textPrimary, fontFamily: "Geist Mono, monospace" }}>
+          <span style={{ fontSize: 22, color: CARD_COLORS.textPrimary, fontFamily: "IBM Plex Mono, monospace" }}>
             {`$${trade.entry_price.toFixed(2)}`}
           </span>
         </div>
@@ -116,7 +116,7 @@ export function TradeRecapCard({ trade }: TradeRecapProps) {
             <span style={{ fontSize: 13, color: CARD_COLORS.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>
               Exit
             </span>
-            <span style={{ fontSize: 22, color: CARD_COLORS.textPrimary, fontFamily: "Geist Mono, monospace" }}>
+            <span style={{ fontSize: 22, color: CARD_COLORS.textPrimary, fontFamily: "IBM Plex Mono, monospace" }}>
               {`$${trade.exit_price.toFixed(2)}`}
             </span>
           </div>
@@ -127,7 +127,7 @@ export function TradeRecapCard({ trade }: TradeRecapProps) {
             <span style={{ fontSize: 13, color: CARD_COLORS.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>
               R-Multiple
             </span>
-            <span style={{ fontSize: 22, color: pnlColor, fontFamily: "Geist Mono, monospace" }}>
+            <span style={{ fontSize: 22, color: pnlColor, fontFamily: "IBM Plex Mono, monospace" }}>
               {`${trade.r_multiple > 0 ? "+" : ""}${trade.r_multiple.toFixed(1)}R`}
             </span>
           </div>

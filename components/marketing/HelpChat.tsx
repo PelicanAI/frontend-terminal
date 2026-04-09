@@ -152,7 +152,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
             overflow: 'hidden',
             boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
             zIndex: 1054,
-            fontFamily: "'Geist Sans', system-ui, sans-serif",
+            fontFamily: 'var(--font-sans)',
           }}
         >
           {/* Header */}
@@ -175,7 +175,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
             />
             <div>
               <div style={{ 
-                fontFamily: "'Geist Sans', system-ui, sans-serif",
+                fontFamily: 'var(--font-sans)',
                 fontSize: '18px',
                 letterSpacing: '0.05em',
                 color: 'var(--foreground)'
@@ -183,7 +183,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
                 Pelican Help
               </div>
               <div style={{ 
-                fontFamily: "'Geist Mono', monospace",
+                fontFamily: 'var(--font-mono)',
                 fontSize: '11px',
                 color: 'var(--data-positive)',
                 textTransform: 'uppercase',
@@ -335,7 +335,7 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
                   borderRadius: '8px',
                   color: 'var(--foreground)',
                   fontSize: '14px',
-                  fontFamily: "'Geist Sans', system-ui, sans-serif",
+                  fontFamily: 'var(--font-sans)',
                   outline: 'none',
                   transition: 'border-color 0.2s',
                 }}
@@ -412,4 +412,3 @@ export default function HelpChat({ logoUrl = '/pelican-logo-transparent.webp' }:
     </>
   );
 }
-

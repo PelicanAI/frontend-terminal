@@ -19,7 +19,17 @@ import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
 import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
 import { buildReplayNarrationPrompt } from "@/lib/journal/build-replay-prompt"
 import { PelicanButton, pageEnter, tabContent, backdrop } from "@/components/ui/pelican"
-import { Plus, ChartBar, Funnel, ClipboardText, Brain, UserCircle, X as XIcon, UploadSimple } from "@phosphor-icons/react"
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
+import {
+  Add01Icon as Plus,
+  BarChartIcon as ChartBar,
+  FilterIcon as Funnel,
+  ClipboardIcon as ClipboardText,
+  Brain01Icon as Brain,
+  UserCircleIcon as UserCircle,
+  Cancel01Icon as XIcon,
+  Upload01Icon as UploadSimple,
+} from "@hugeicons/core-free-icons"
 import { ConnectBrokerButton } from "@/components/broker/connect-broker-button"
 import { useBrokerConnections } from "@/hooks/use-broker-connections"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
@@ -318,7 +328,7 @@ export default function JournalPage() {
   const filterButtons = ['all', 'real', 'paper'] as const
   const filterLabels = { all: 'All', real: 'Real', paper: 'Simulated' }
 
-  const tabs: { key: TabKey; label: string; icon: typeof ChartBar }[] = [
+  const tabs: { key: TabKey; label: string; icon: IconSvgElement }[] = [
     { key: 'performance', label: 'Performance', icon: ChartBar },
     { key: 'trades', label: 'Trades', icon: Funnel },
     { key: 'plan', label: 'Plan', icon: ClipboardText },
@@ -355,7 +365,7 @@ export default function JournalPage() {
               className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
               aria-label="Trader Profile"
             >
-              <UserCircle size={20} weight="regular" />
+              <HugeiconsIcon icon={UserCircle} size={20} strokeWidth={1.5} color="currentColor" />
             </button>
 
             {/* Type Filter */}
@@ -386,7 +396,7 @@ export default function JournalPage() {
               size="lg"
               onClick={() => setShowImportModal(true)}
             >
-              <UploadSimple size={16} weight="regular" />
+              <HugeiconsIcon icon={UploadSimple} size={16} strokeWidth={1.5} color="currentColor" />
               Import CSV
             </PelicanButton>
             <PelicanButton
@@ -394,7 +404,7 @@ export default function JournalPage() {
               size="lg"
               onClick={() => setShowLogTradeModal(true)}
             >
-              <Plus size={16} weight="bold" />
+              <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
               Log Trade
             </PelicanButton>
           </div>
@@ -415,7 +425,7 @@ export default function JournalPage() {
                 }
               `}
             >
-              <Icon size={16} weight={activeTab === key ? 'fill' : 'regular'} />
+              <HugeiconsIcon icon={Icon} size={16} strokeWidth={1.5} color="currentColor" />
               {label}
             </button>
           ))}
@@ -547,7 +557,7 @@ export default function JournalPage() {
         style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
         aria-label="Log Trade"
       >
-        <Plus size={24} weight="bold" className="text-white" />
+        <HugeiconsIcon icon={Plus} size={24} className="text-white" strokeWidth={2} color="currentColor" />
       </button>
 
       {/* Modals */}
@@ -612,7 +622,7 @@ export default function JournalPage() {
                   onClick={() => setReplayTrade(null)}
                   className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
                 >
-                  <XIcon size={16} weight="bold" />
+                  <HugeiconsIcon icon={XIcon} size={16} strokeWidth={2} color="currentColor" />
                 </button>
               </div>
               <div className="p-4">
@@ -651,7 +661,7 @@ export default function JournalPage() {
                   onClick={() => setShowProfileModal(false)}
                   className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition-colors"
                 >
-                  <Plus size={16} weight="bold" className="rotate-45" />
+                  <HugeiconsIcon icon={Plus} size={16} className="rotate-45" strokeWidth={2} color="currentColor" />
                 </button>
               </div>
               <div className="p-5">

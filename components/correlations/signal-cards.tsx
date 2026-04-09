@@ -1,7 +1,14 @@
 "use client"
 
 import { useMemo } from 'react'
-import { Warning, TrendUp, ArrowsClockwise, ArrowRight, Lightning } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Alert01Icon as Warning,
+  AnalyticsUpIcon as TrendUp,
+  Refresh01Icon as ArrowsClockwise,
+  ArrowRight01Icon as ArrowRight,
+  FlashIcon as Lightning,
+} from '@hugeicons/core-free-icons'
 import { findSignalForPair } from '@/lib/correlation-signals'
 import { detectDynamicSignals, type DynamicSignal } from '@/lib/correlations/dynamic-signals'
 import { usePelicanPanelContext } from '@/providers/pelican-panel-provider'
@@ -92,7 +99,7 @@ export function SignalCards({ correlations, correlations90d, beginnerMode, onSel
               style={{ borderLeft: `3px solid ${style.border}`, background: style.bg }}
             >
               <div className="flex items-center gap-1.5 mb-1">
-                <SeverityIcon weight="bold" className="w-3.5 h-3.5" style={{ color: style.border }} />
+                <HugeiconsIcon icon={SeverityIcon} className="w-3.5 h-3.5" style={{ color: style.border }} strokeWidth={2} color="currentColor" />
                 <span className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
                   {sig.headline}
                 </span>
@@ -120,14 +127,14 @@ export function SignalCards({ correlations, correlations90d, beginnerMode, onSel
                   style={{ color: 'var(--accent-indigo)' }}
                   onClick={() => onSelectPair(sig.pair[0], sig.pair[1])}
                 >
-                  View Details <ArrowRight weight="bold" className="w-3 h-3" />
+                  View Details <HugeiconsIcon icon={ArrowRight} className="w-3 h-3" strokeWidth={2} color="currentColor" />
                 </button>
                 <button
                   className="text-xs flex items-center gap-1 transition-colors hover:opacity-80"
                   style={{ color: 'var(--accent-indigo)' }}
                   onClick={() => handleAskPelican(sig)}
                 >
-                  <Lightning weight="bold" className="w-3 h-3" /> Ask Pelican
+                  <HugeiconsIcon icon={Lightning} className="w-3 h-3" strokeWidth={2} color="currentColor" /> Ask Pelican
                 </button>
               </div>
             </div>

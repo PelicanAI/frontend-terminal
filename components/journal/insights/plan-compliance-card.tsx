@@ -1,7 +1,14 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Shield, Check, X, Equals, Sparkle } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Shield01Icon as Shield,
+  Tick01Icon as Check,
+  Cancel01Icon as X,
+  EqualSignIcon as Equals,
+  SparklesIcon as Sparkle,
+} from '@hugeicons/core-free-icons'
 import { PelicanCard } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 import type { RuleComplianceStat } from '@/types/trading'
@@ -139,11 +146,11 @@ export function PlanComplianceCard({ stats, onAskPelican, isLoading }: PlanCompl
     return (
       <PelicanCard>
         <div className="flex items-center gap-2 mb-3">
-          <Shield size={18} weight="bold" className="text-[var(--accent-primary)]" />
+          <HugeiconsIcon icon={Shield} size={18} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
           <h3 className="text-sm font-medium text-[var(--text-primary)]">Plan Compliance</h3>
         </div>
         <div className="text-center py-6">
-          <Shield size={32} weight="thin" className="text-[var(--text-muted)] mx-auto mb-2" />
+          <HugeiconsIcon icon={Shield} size={32} className="text-[var(--text-muted)] mx-auto mb-2" strokeWidth={1} color="currentColor" />
           <p className="text-sm text-[var(--text-secondary)]">No compliance data yet</p>
           <p className="text-xs text-[var(--text-muted)] mt-1 max-w-xs mx-auto">
             Log trades with your trading plan active to see which rules are making you money.
@@ -157,14 +164,14 @@ export function PlanComplianceCard({ stats, onAskPelican, isLoading }: PlanCompl
     <PelicanCard>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Shield size={18} weight="bold" className="text-[var(--accent-primary)]" />
+          <HugeiconsIcon icon={Shield} size={18} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
           <h3 className="text-sm font-medium text-[var(--text-primary)]">Plan Compliance</h3>
         </div>
         <button
           onClick={() => onAskPelican('__plan_review__')}
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors"
         >
-          <Sparkle size={14} weight="bold" />
+          <HugeiconsIcon icon={Sparkle} size={14} strokeWidth={2} color="currentColor" />
           Ask Pelican
         </button>
       </div>
@@ -192,7 +199,7 @@ export function PlanComplianceCard({ stats, onAskPelican, isLoading }: PlanCompl
       {categorized.moneyMakers.length > 0 && (
         <div className="mb-4">
           <div className="flex items-center gap-1.5 mb-2">
-            <Check size={14} weight="bold" className="text-[var(--data-positive)]" />
+            <HugeiconsIcon icon={Check} size={14} className="text-[var(--data-positive)]" strokeWidth={2} color="currentColor" />
             <span className="text-xs font-medium text-[var(--data-positive)] uppercase tracking-wider">
               Rules that make you money
             </span>
@@ -208,7 +215,7 @@ export function PlanComplianceCard({ stats, onAskPelican, isLoading }: PlanCompl
       {categorized.keepBreaking.length > 0 && (
         <div className="mb-4">
           <div className="flex items-center gap-1.5 mb-2">
-            <X size={14} weight="bold" className="text-[var(--data-warning)]" />
+            <HugeiconsIcon icon={X} size={14} className="text-[var(--data-warning)]" strokeWidth={2} color="currentColor" />
             <span className="text-xs font-medium text-[var(--data-warning)] uppercase tracking-wider">
               Rules you keep breaking
             </span>
@@ -224,7 +231,7 @@ export function PlanComplianceCard({ stats, onAskPelican, isLoading }: PlanCompl
       {categorized.dontMatter.length > 0 && (
         <div>
           <div className="flex items-center gap-1.5 mb-2">
-            <Equals size={14} weight="bold" className="text-[var(--text-muted)]" />
+            <HugeiconsIcon icon={Equals} size={14} className="text-[var(--text-muted)]" strokeWidth={2} color="currentColor" />
             <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
               Inconclusive
             </span>

@@ -2,7 +2,8 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { PelicanCard } from "@/components/ui/pelican"
-import { Timer } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Timer01Icon as Timer } from "@hugeicons/core-free-icons"
 import type { HoldingPeriodInsight } from "@/hooks/use-behavioral-insights"
 
 const PERIOD_LABELS: Record<string, string> = {
@@ -41,7 +42,7 @@ export function HoldingPeriodChart({ data, onAskPelican }: HoldingPeriodChartPro
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-4">
-        <Timer size={18} weight="regular" className="text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={Timer} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-sm font-medium text-[var(--text-primary)]">Win Rate by Holding Period</h3>
       </div>
       <div className="h-[220px]">

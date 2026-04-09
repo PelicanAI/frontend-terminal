@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { ChartBar, Lightning } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { BarChartIcon as ChartBar, FlashIcon as Lightning } from "@hugeicons/core-free-icons"
 import { ShareCardPreviewModal } from "./share-card-preview-modal"
 import { extractTickers } from "@/lib/chat/detect-actions"
 import type { ShareCardType } from "@/types/share-cards"
@@ -151,7 +152,7 @@ export function TextSelectionToolbar() {
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-all active:scale-[0.97]"
                 title="Share Trading Stats"
               >
-                <ChartBar size={14} weight="regular" />
+                <HugeiconsIcon icon={ChartBar} size={14} strokeWidth={1.5} color="currentColor" />
                 Share Stats
               </button>
             ) : (
@@ -160,7 +161,7 @@ export function TextSelectionToolbar() {
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-all active:scale-[0.97]"
                 title="Share as Insight Card"
               >
-                <Lightning size={14} weight="regular" />
+                <HugeiconsIcon icon={Lightning} size={14} strokeWidth={1.5} color="currentColor" />
                 Share Insight
               </button>
             )}

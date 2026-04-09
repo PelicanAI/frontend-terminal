@@ -1,6 +1,14 @@
 'use client'
 
-import { Sun, Target, Lightning, Eye, Notebook, Brain } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Sun01Icon as Sun,
+  Target01Icon as Target,
+  FlashIcon as Lightning,
+  ViewIcon as Eye,
+  Notebook01Icon as Notebook,
+  Brain01Icon as Brain,
+} from '@hugeicons/core-free-icons'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 import { Section } from '@/components/landing/section'
 import { cn } from '@/lib/utils'
@@ -101,10 +109,7 @@ export function DayWithPelican() {
                   {/* Content */}
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-3">
-                      <Icon
-                        className="h-5 w-5 text-slate-400"
-                        weight="duotone"
-                      />
+                      <HugeiconsIcon icon={Icon} className="h-5 w-5 text-slate-400" strokeWidth={1.5} color="currentColor" />
                       {'isOngoing' in item && item.isOngoing ? (
                         <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
                           {item.time}

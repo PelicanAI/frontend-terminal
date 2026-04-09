@@ -4,17 +4,18 @@ import { useState, useEffect, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ChatCircle,
-  CaretDown,
-  CaretUp,
-  CircleNotch,
-  Plus,
-  Clock,
-  Hash,
-  CreditCard,
-  ArrowUpRight,
-} from '@phosphor-icons/react'
+  Chat01Icon as ChatCircle,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  Loading03Icon as CircleNotch,
+  Add01Icon as Plus,
+  Clock01Icon as Clock,
+  HashtagIcon as Hash,
+  CreditCardIcon as CreditCard,
+  ArrowUpRight01Icon as ArrowUpRight,
+} from '@hugeicons/core-free-icons'
 import Link from 'next/link'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { formatLine } from '@/components/chat/message/format-utils'
@@ -266,26 +267,26 @@ export function UserDetail({ user }: UserDetailProps) {
       {/* Enhanced stats from API */}
       {detailLoading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <CircleNotch size={12} weight="regular" className="animate-spin" />
+          <HugeiconsIcon icon={CircleNotch} size={12} className="animate-spin" strokeWidth={1.5} color="currentColor" />
           Loading activity data...
         </div>
       ) : detail ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-              <Hash size={12} weight="regular" /> Total Messages
+              <HugeiconsIcon icon={Hash} size={12} strokeWidth={1.5} color="currentColor" /> Total Messages
             </div>
             <p className="text-lg font-semibold">{detail.totalMessages.toLocaleString()}</p>
           </div>
           <div className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-              <ChatCircle size={12} weight="regular" /> Conversations
+              <HugeiconsIcon icon={ChatCircle} size={12} strokeWidth={1.5} color="currentColor" /> Conversations
             </div>
             <p className="text-lg font-semibold">{detail.totalConversations.toLocaleString()}</p>
           </div>
           <div className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-              <Clock size={12} weight="regular" /> Last Active
+              <HugeiconsIcon icon={Clock} size={12} strokeWidth={1.5} color="currentColor" /> Last Active
             </div>
             <p className="text-lg font-semibold">
               {detail.lastActive ? timeAgo(detail.lastActive) : 'Never'}
@@ -293,7 +294,7 @@ export function UserDetail({ user }: UserDetailProps) {
           </div>
           <div className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-              <CreditCard size={12} weight="regular" /> Avg Msgs/Convo
+              <HugeiconsIcon icon={CreditCard} size={12} strokeWidth={1.5} color="currentColor" /> Avg Msgs/Convo
             </div>
             <p className="text-lg font-semibold">
               {detail.totalConversations > 0
@@ -321,15 +322,15 @@ export function UserDetail({ user }: UserDetailProps) {
                       onClick={(e) => { e.stopPropagation(); handleConvoToggle(conv.id) }}
                       className="flex-1 flex items-center gap-2 text-sm p-2 rounded-md hover:bg-muted/50 transition-colors text-left min-w-0"
                     >
-                      <ChatCircle size={14} weight="regular" className="shrink-0 text-muted-foreground" />
+                      <HugeiconsIcon icon={ChatCircle} size={14} className="shrink-0 text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                       <span className="truncate flex-1 font-medium">{conv.title}</span>
                       <span className="text-xs text-muted-foreground shrink-0">
                         {conv.messageCount} msgs &middot; {formatShortDate(conv.createdAt)}
                       </span>
                       {isExpanded ? (
-                        <CaretUp size={14} weight="regular" className="shrink-0 text-muted-foreground" />
+                        <HugeiconsIcon icon={CaretUp} size={14} className="shrink-0 text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                       ) : (
-                        <CaretDown size={14} weight="regular" className="shrink-0 text-muted-foreground" />
+                        <HugeiconsIcon icon={CaretDown} size={14} className="shrink-0 text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                       )}
                     </button>
                     <IconTooltip label="Open full view">
@@ -338,7 +339,7 @@ export function UserDetail({ user }: UserDetailProps) {
                         className="shrink-0 p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <ArrowUpRight size={14} weight="regular" />
+                        <HugeiconsIcon icon={ArrowUpRight} size={14} strokeWidth={1.5} color="currentColor" />
                       </Link>
                     </IconTooltip>
                   </div>
@@ -347,7 +348,7 @@ export function UserDetail({ user }: UserDetailProps) {
                     <div className="ml-6 mr-2 mb-2 mt-1 border-l-2 border-border pl-3 space-y-2">
                       {isLoading && (
                         <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
-                          <CircleNotch size={12} weight="regular" className="animate-spin" />
+                          <HugeiconsIcon icon={CircleNotch} size={12} className="animate-spin" strokeWidth={1.5} color="currentColor" />
                           Loading messages...
                         </div>
                       )}
@@ -385,9 +386,9 @@ export function UserDetail({ user }: UserDetailProps) {
           />
           <Button type="submit" size="sm" disabled={granting} onClick={(e) => e.stopPropagation()}>
             {granting ? (
-              <CircleNotch size={12} weight="regular" className="animate-spin mr-1" />
+              <HugeiconsIcon icon={CircleNotch} size={12} className="animate-spin mr-1" strokeWidth={1.5} color="currentColor" />
             ) : (
-              <Plus size={12} weight="regular" className="mr-1" />
+              <HugeiconsIcon icon={Plus} size={12} className="mr-1" strokeWidth={1.5} color="currentColor" />
             )}
             Grant
           </Button>

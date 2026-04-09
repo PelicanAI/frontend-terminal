@@ -2,17 +2,18 @@
 
 import { useMemo } from 'react'
 import { m } from 'framer-motion'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  UserCircle,
-  Brain,
-  Trophy,
-  TrendUp,
-  Warning,
-  ChartLineUp,
-  Lightning,
-  ArrowRight,
-  Check,
-} from '@phosphor-icons/react'
+  UserCircleIcon as UserCircle,
+  Brain01Icon as Brain,
+  ChampionIcon as Trophy,
+  AnalyticsUpIcon as TrendUp,
+  Alert01Icon as Warning,
+  ChartLineData01Icon as ChartLineUp,
+  FlashIcon as Lightning,
+  ArrowRight01Icon as ArrowRight,
+  Tick01Icon as Check,
+} from '@hugeicons/core-free-icons'
 import type { Trade } from '@/hooks/use-trades'
 import type { TradeStats } from '@/hooks/use-trade-stats'
 import { useTraderProfile } from '@/hooks/use-trader-profile'
@@ -88,7 +89,7 @@ export default function TraderProfileTab({ trades, stats, isLoading, onAskPelica
       <m.section variants={item}>
         <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6">
           <div className="flex items-center gap-3 mb-4">
-            <UserCircle size={24} weight="regular" className="text-[var(--accent-primary)]" />
+            <HugeiconsIcon icon={UserCircle} size={24} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
             <h3 className="text-lg font-semibold text-[var(--text-primary)]">Trader Profile</h3>
           </div>
           {!profile && !survey ? (
@@ -100,7 +101,7 @@ export default function TraderProfileTab({ trades, stats, isLoading, onAskPelica
                 href="/onboarding"
                 className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-white transition-all duration-150 hover:bg-[var(--accent-hover)] active:scale-[0.98]"
               >
-                Complete your profile <ArrowRight size={16} weight="bold" />
+                Complete your profile <HugeiconsIcon icon={ArrowRight} size={16} strokeWidth={2} color="currentColor" />
               </Link>
             </div>
           ) : (
@@ -125,7 +126,7 @@ export default function TraderProfileTab({ trades, stats, isLoading, onAskPelica
       <m.section variants={item}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Brain size={20} weight="regular" className="text-[var(--accent-primary)]" />
+            <HugeiconsIcon icon={Brain} size={20} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
             <h3 className="text-lg font-semibold text-[var(--text-primary)]">Behavioral Insights</h3>
           </div>
           {insights.length > 0 && (
@@ -133,7 +134,7 @@ export default function TraderProfileTab({ trades, stats, isLoading, onAskPelica
               onClick={handleAnalyze}
               className="flex items-center gap-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs font-medium text-[var(--accent-primary)] transition-all duration-150 hover:bg-[var(--accent-muted)] hover:border-[var(--border-hover)] active:scale-[0.98]"
             >
-              <Lightning size={14} weight="bold" /> Ask Pelican to analyze
+              <HugeiconsIcon icon={Lightning} size={14} strokeWidth={2} color="currentColor" /> Ask Pelican to analyze
             </button>
           )}
         </div>
@@ -165,7 +166,7 @@ export default function TraderProfileTab({ trades, stats, isLoading, onAskPelica
       {/* Section C: Milestones */}
       <m.section variants={item}>
         <div className="flex items-center gap-2 mb-4">
-          <Trophy size={20} weight="regular" className="text-[var(--accent-primary)]" />
+          <HugeiconsIcon icon={Trophy} size={20} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
           <h3 className="text-lg font-semibold text-[var(--text-primary)]">Milestones</h3>
           <span className="ml-auto text-xs font-mono tabular-nums text-[var(--text-muted)]">
             {completedCount}/{milestones.length}
@@ -184,7 +185,7 @@ export default function TraderProfileTab({ trades, stats, isLoading, onAskPelica
                     : 'bg-[var(--accent-muted)] text-[var(--text-muted)]'
                 }`}
               >
-                {completed ? <Check size={18} weight="bold" /> : <ChartLineUp size={18} weight="regular" />}
+                {completed ? <HugeiconsIcon icon={Check} size={18} strokeWidth={2} color="currentColor" /> : <HugeiconsIcon icon={ChartLineUp} size={18} strokeWidth={1.5} color="currentColor" />}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[var(--text-primary)]">{milestone.name}</p>
@@ -215,13 +216,13 @@ export default function TraderProfileTab({ trades, stats, isLoading, onAskPelica
             onClick={handleAnalyze}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--accent-primary)] px-5 py-3 text-sm font-medium text-white shadow transition-all duration-150 hover:bg-[var(--accent-hover)] active:scale-[0.98]"
           >
-            <TrendUp size={18} weight="bold" /> Analyze my trading
+            <HugeiconsIcon icon={TrendUp} size={18} strokeWidth={2} color="currentColor" /> Analyze my trading
           </button>
           <button
             onClick={handlePlanReview}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-5 py-3 text-sm font-medium text-[var(--text-primary)] transition-all duration-150 hover:bg-[var(--bg-elevated)] hover:border-[var(--border-hover)] active:scale-[0.98]"
           >
-            <Warning size={18} weight="regular" /> Review my plan
+            <HugeiconsIcon icon={Warning} size={18} strokeWidth={1.5} color="currentColor" /> Review my plan
           </button>
         </div>
       </m.section>

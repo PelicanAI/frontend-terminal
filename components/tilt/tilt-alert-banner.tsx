@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import type { TiltAlert } from '@/lib/tilt/tilt-detector'
-import { Warning, X } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Alert01Icon as Warning, Cancel01Icon as X } from '@hugeicons/core-free-icons'
 
 interface TiltAlertBannerProps {
   alerts: TiltAlert[]
@@ -25,14 +26,10 @@ export function TiltAlertBanner({ alerts }: TiltAlertBannerProps) {
     )}>
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3">
-          <Warning
-            size={18}
-            weight="fill"
-            className={cn(
+          <HugeiconsIcon icon={Warning} size={18} className={cn(
               "flex-shrink-0 mt-0.5",
               hasCritical ? "text-[var(--data-negative)]" : "text-[var(--data-warning)]"
-            )}
-          />
+            )} strokeWidth={1.5} color="currentColor" />
           <div>
             <p className={cn(
               "font-semibold text-sm",
@@ -55,7 +52,7 @@ export function TiltAlertBanner({ alerts }: TiltAlertBannerProps) {
           onClick={() => setDismissed(visible.map(a => a.pattern))}
           className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors ml-4 flex-shrink-0"
         >
-          <X size={14} />
+          <HugeiconsIcon icon={X} size={14} strokeWidth={1.5} color="currentColor" />
         </button>
       </div>
     </div>

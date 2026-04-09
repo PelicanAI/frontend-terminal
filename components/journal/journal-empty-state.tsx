@@ -1,15 +1,16 @@
 'use client'
 
 import { m } from 'framer-motion'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ChartLineUp,
-  MagnifyingGlass,
-  Brain,
-  Target,
-  Check,
-  Plus,
-  ChatCircleDots,
-} from '@phosphor-icons/react'
+  ChartLineData01Icon as ChartLineUp,
+  Search01Icon as MagnifyingGlass,
+  Brain01Icon as Brain,
+  Target01Icon as Target,
+  Tick01Icon as Check,
+  Add01Icon as Plus,
+  MessageMultiple01Icon as ChatCircleDots,
+} from '@hugeicons/core-free-icons'
 import { PelicanButton, staggerContainer, staggerItem } from '@/components/ui/pelican'
 
 interface JournalEmptyStateProps {
@@ -36,11 +37,7 @@ export function JournalEmptyState({
       animate="visible"
     >
       <m.div variants={staggerItem}>
-        <ChartLineUp
-          size={48}
-          weight="thin"
-          className="text-[var(--text-muted)] mb-5"
-        />
+        <HugeiconsIcon icon={ChartLineUp} size={48} className="text-[var(--text-muted)] mb-5" strokeWidth={1} color="currentColor" />
       </m.div>
 
       <m.h2
@@ -70,11 +67,7 @@ export function JournalEmptyState({
             className="flex items-start gap-3"
           >
             <div className="mt-0.5 flex-shrink-0 rounded-full p-1 bg-[var(--accent-muted)]">
-              <Check
-                size={12}
-                weight="bold"
-                className="text-[var(--accent-primary)]"
-              />
+              <HugeiconsIcon icon={Check} size={12} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
             </div>
             <span className="text-xs text-[var(--text-secondary)] leading-relaxed">
               {feature.text}
@@ -95,11 +88,11 @@ export function JournalEmptyState({
         className="flex flex-col sm:flex-row items-center gap-3"
       >
         <PelicanButton onClick={onLogTrade}>
-          <Plus size={16} weight="bold" />
+          <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
           Log Your First Trade
         </PelicanButton>
         <PelicanButton variant="secondary" onClick={onAskPelican}>
-          <ChatCircleDots size={16} weight="regular" />
+          <HugeiconsIcon icon={ChatCircleDots} size={16} strokeWidth={1.5} color="currentColor" />
           Get a Trade Idea
         </PelicanButton>
       </m.div>

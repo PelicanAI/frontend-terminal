@@ -2,7 +2,8 @@
 
 import { useCredits } from '@/hooks/use-credits'
 import Link from 'next/link'
-import { Lightning, Warning } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { FlashIcon as Lightning, Alert01Icon as Warning } from '@hugeicons/core-free-icons'
 
 interface CreditDisplayProps {
   variant?: 'default' | 'compact' | 'detailed'
@@ -31,7 +32,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
     if (variant === 'compact') {
       return (
         <div className={`flex items-center gap-1.5 ${className}`}>
-          <Lightning size={14} weight="regular" className={` ${isLow ? 'text-amber-400' : 'text-blue-400'}`} />
+          <HugeiconsIcon icon={Lightning} size={14} className={` ${isLow ? 'text-amber-400' : 'text-blue-400'}`} strokeWidth={1.5} color="currentColor" />
           <span className={`text-xs font-medium ${isLow ? 'text-amber-400' : 'text-blue-400'}`}>
             {remaining} free
           </span>
@@ -41,7 +42,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
 
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <Lightning size={16} weight="regular" className={` ${isLow ? 'text-amber-400' : 'text-blue-400'}`} />
+        <HugeiconsIcon icon={Lightning} size={16} className={` ${isLow ? 'text-amber-400' : 'text-blue-400'}`} strokeWidth={1.5} color="currentColor" />
         <span className={`text-sm font-medium ${isLow ? 'text-amber-400' : 'text-blue-400'}`}>
           {remaining} free question{remaining !== 1 ? 's' : ''} left
         </span>
@@ -61,7 +62,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
         href="/pricing" 
         className={`flex items-center gap-1.5 text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors ${className}`}
       >
-        <Lightning size={16} weight="regular" />
+        <HugeiconsIcon icon={Lightning} size={16} strokeWidth={1.5} color="currentColor" />
         <span>Subscribe to start</span>
       </Link>
     )
@@ -71,7 +72,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
     if (variant === 'compact') {
       return (
         <div className={`flex items-center gap-1.5 ${className}`}>
-          <Lightning size={14} weight="regular" className="text-amber-400" />
+          <HugeiconsIcon icon={Lightning} size={14} className="text-amber-400" strokeWidth={1.5} color="currentColor" />
           <span className="text-xs font-medium text-amber-400">Founder</span>
         </div>
       )
@@ -81,7 +82,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
       return (
         <div className={`space-y-2 ${className}`}>
           <div className="flex items-center gap-2">
-            <Lightning size={16} weight="regular" className="text-amber-400" />
+            <HugeiconsIcon icon={Lightning} size={16} className="text-amber-400" strokeWidth={1.5} color="currentColor" />
             <span className="text-sm font-semibold text-amber-400">Founder Account</span>
           </div>
           <p className="text-xs text-muted-foreground">Unlimited access</p>
@@ -91,7 +92,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
 
     return (
       <div className={`flex items-center gap-2 ${className}`}>
-        <Lightning size={16} weight="regular" className="text-amber-400" />
+        <HugeiconsIcon icon={Lightning} size={16} className="text-amber-400" strokeWidth={1.5} color="currentColor" />
         <span className="text-sm font-medium text-amber-400">Founder</span>
       </div>
     )
@@ -103,7 +104,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
   if (variant === 'compact') {
     return (
       <div className={`flex items-center gap-1.5 ${className}`}>
-        <Lightning size={14} weight="regular" className={` ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} />
+        <HugeiconsIcon icon={Lightning} size={14} className={` ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} strokeWidth={1.5} color="currentColor" />
         <span className={`text-sm font-medium ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-foreground'}`}>
           {credits.balance.toLocaleString()}
         </span>
@@ -142,7 +143,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
             href="/pricing" 
             className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300"
           >
-            <Warning size={12} weight="regular" />
+            <HugeiconsIcon icon={Warning} size={12} strokeWidth={1.5} color="currentColor" />
             Get more credits
           </Link>
         )}
@@ -152,7 +153,7 @@ export function CreditDisplay({ variant = 'default', className = '' }: CreditDis
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <Lightning size={16} weight="regular" className={` ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} />
+      <HugeiconsIcon icon={Lightning} size={16} className={` ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-muted-foreground'}`} strokeWidth={1.5} color="currentColor" />
       <span className={`text-sm font-medium ${isCritical ? 'text-red-400' : isLow ? 'text-amber-400' : 'text-foreground'}`}>
         {credits.balance.toLocaleString()} credits
       </span>

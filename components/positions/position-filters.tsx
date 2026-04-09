@@ -1,10 +1,15 @@
 'use client'
 
-import { PortfolioPosition } from '@/types/portfolio'
-import { MagnifyingGlass, SortAscending, Plus } from '@phosphor-icons/react'
 import { useMemo } from 'react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Add01Icon as Plus,
+  Search01Icon as MagnifyingGlass,
+  SortByUp01Icon as SortAscending,
+} from '@hugeicons/core-free-icons'
 import { ConnectBrokerButton } from '@/components/broker/connect-broker-button'
 import { useBrokerConnections } from '@/hooks/use-broker-connections'
+import { PortfolioPosition } from '@/types/portfolio'
 
 interface PositionFiltersProps {
   positions: PortfolioPosition[]
@@ -39,12 +44,12 @@ export function PositionFilters({
   const shouldShowConnectBroker = showConnectBroker !== false && activeConnections.length === 0
 
   const tabs = useMemo<FilterTab[]>(() => {
-    const longCount = positions.filter((p) => p.direction === 'long').length
-    const shortCount = positions.filter((p) => p.direction === 'short').length
-    const stockCount = positions.filter((p) => p.asset_type === 'stock').length
-    const cryptoCount = positions.filter((p) => p.asset_type === 'crypto').length
-    const forexCount = positions.filter((p) => p.asset_type === 'forex').length
-    const optionCount = positions.filter((p) => p.asset_type === 'option').length
+    const longCount = positions.filter((position) => position.direction === 'long').length
+    const shortCount = positions.filter((position) => position.direction === 'short').length
+    const stockCount = positions.filter((position) => position.asset_type === 'stock').length
+    const cryptoCount = positions.filter((position) => position.asset_type === 'crypto').length
+    const forexCount = positions.filter((position) => position.asset_type === 'forex').length
+    const optionCount = positions.filter((position) => position.asset_type === 'option').length
 
     return [
       { key: 'all', label: 'All', count: positions.length },
@@ -54,97 +59,108 @@ export function PositionFilters({
       { key: 'crypto', label: 'Crypto', count: cryptoCount },
       { key: 'forex', label: 'Forex', count: forexCount },
       { key: 'option', label: 'Options', count: optionCount },
-    ]
-  }, [positions])
+    ].filter((tab) => tab.key === 'all' || tab.key === activeFilter || tab.count > 0)
+  }, [positions, activeFilter])
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      {/* Filter pills */}
-      <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide shrink-0">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => onFilterChange(tab.key)}
-            className={`text-[11px] font-medium px-2.5 py-1 rounded whitespace-nowrap transition-colors ${
-              activeFilter === tab.key
-                ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]/80 border border-[var(--accent-primary)]/20'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] border border-transparent'
-            }`}
-          >
-            {tab.label}
-            <span className="ml-1 font-[var(--font-geist-mono)] tabular-nums opacity-50">({tab.count})</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Actions row */}
-      <div className="flex items-center gap-2 shrink-0">
-        {shouldShowConnectBroker && (
-          <ConnectBrokerButton
-            variant="secondary"
-            size="sm"
-            className="text-[10px] font-medium uppercase tracking-[0.06em] px-3 py-1.5 rounded border border-[var(--border-subtle)]/60 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors whitespace-nowrap flex-shrink-0"
-          />
-        )}
-        {onLogTrade && (
-          <button
-            onClick={onLogTrade}
-            className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-[0.06em] px-3 py-1.5 rounded border border-[var(--accent-primary)]/30 text-[var(--accent-primary)]/80 hover:text-[var(--accent-primary)] transition-colors whitespace-nowrap flex-shrink-0"
-          >
-            <Plus size={12} weight="bold" />
-            <span className="hidden sm:inline">Log Position</span>
-            <span className="sm:hidden">Log</span>
-          </button>
-        )}
-        {/* Sort dropdown */}
-        <div className="relative">
-          <SortAscending
-            size={12}
-            weight="regular"
-            className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
-          />
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value)}
-            className="appearance-none bg-transparent border border-[var(--border-subtle)]/40 hover:border-[var(--border-subtle)]/60 rounded text-[11px] text-[var(--text-secondary)] pl-7 pr-6 py-1 min-w-[90px] lg:min-w-[120px] focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors cursor-pointer"
-          >
-            <option value="size_desc">Size ↓</option>
-            <option value="size_asc">Size ↑</option>
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="conviction">Conviction</option>
-            <option value="rr">R:R</option>
-            <option value="health">Health</option>
-          </select>
-          {/* Custom dropdown arrow */}
-          <svg
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text-muted)]"
-            width="8"
-            height="8"
-            viewBox="0 0 10 10"
-            fill="none"
-          >
-            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+    <div className="border-b border-[var(--border-default)] pb-2">
+      <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-nowrap items-center gap-1 overflow-x-auto scrollbar-hide">
+          {tabs.map((tab) => {
+            const isActive = activeFilter === tab.key
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => onFilterChange(tab.key)}
+                className={`min-h-11 shrink-0 border-b-2 px-2 py-2 text-sm font-medium uppercase tracking-wider whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)] ${
+                  isActive
+                    ? 'cursor-pointer border-[var(--accent-primary)] text-[var(--text-primary)]'
+                    : 'cursor-pointer border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {tab.label}
+                <span className="ml-1 font-mono tabular-nums text-[var(--text-muted)]">({tab.count})</span>
+              </button>
+            )
+          })}
         </div>
 
-        {/* Search input */}
-        <div className="relative">
-          <MagnifyingGlass
-            size={12}
-            weight="regular"
-            className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search ticker..."
-            className="w-24 lg:w-32 text-xs bg-transparent border border-[var(--border-subtle)]/30 hover:border-[var(--border-subtle)]/60 rounded text-[var(--text-secondary)] placeholder:text-[var(--text-muted)]/40 pl-7 pr-2 py-1 focus:outline-none focus:border-[var(--accent-primary)]/40 transition-colors"
-          />
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {shouldShowConnectBroker && (
+            <ConnectBrokerButton
+              variant="ghost"
+              size="sm"
+              className="h-11 px-2 text-xs uppercase tracking-wider text-[var(--text-secondary)] hover:bg-transparent hover:text-[var(--text-primary)] border-0 shadow-none rounded-none transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
+            />
+          )}
+
+          {onLogTrade && (
+            <button
+              type="button"
+              onClick={onLogTrade}
+              className="flex h-11 items-center gap-1.5 bg-[var(--accent-glow)] px-3 text-xs uppercase tracking-wider text-[var(--accent-primary)] transition-colors duration-150 cursor-pointer hover:bg-[var(--surface-active)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
+            >
+              <HugeiconsIcon icon={Plus} size={14} strokeWidth={1.8} color="currentColor" />
+              <span>Log Position</span>
+            </button>
+          )}
+
+          <div className="relative">
+            <HugeiconsIcon
+              icon={SortAscending}
+              size={14}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+              strokeWidth={1.5}
+              color="currentColor"
+            />
+            <select
+              value={sortBy}
+              onChange={(event) => onSortChange(event.target.value)}
+              className="h-11 min-w-[120px] appearance-none border border-[var(--border-default)] bg-transparent pl-9 pr-8 text-sm text-[var(--text-primary)] shadow-none transition-colors duration-150 cursor-pointer hover:border-[var(--border-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
+            >
+              <option value="size_desc">Size ↓</option>
+              <option value="size_asc">Size ↑</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="conviction">Conviction</option>
+              <option value="rr">R:R</option>
+              <option value="health">Health</option>
+            </select>
+            <svg
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+              width="8"
+              height="8"
+              viewBox="0 0 10 10"
+              fill="none"
+            >
+              <path
+                d="M2 3.5L5 6.5L8 3.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+
+          <div className="relative">
+            <HugeiconsIcon
+              icon={MagnifyingGlass}
+              size={14}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+              strokeWidth={1.5}
+              color="currentColor"
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder="Search ticker"
+              className="h-11 w-32 border border-[var(--border-default)] bg-transparent pl-9 pr-3 text-sm text-[var(--text-primary)] shadow-none transition-colors duration-150 placeholder:text-[var(--text-muted)] hover:border-[var(--border-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)] lg:w-40"
+            />
+          </div>
+
         </div>
       </div>
     </div>

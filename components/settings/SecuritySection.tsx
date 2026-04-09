@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/hooks/use-toast"
-import { Trash } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Delete01Icon as Trash } from "@hugeicons/core-free-icons"
 import { logger } from "@/lib/logger"
 import {
   AlertDialog,
@@ -221,7 +222,7 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
             onClick={() => setShowClearHistoryDialog(true)}
             className="w-full"
           >
-            <Trash size={16} weight="regular" className="mr-2" />
+            <HugeiconsIcon icon={Trash} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
             Clear All Conversations
           </Button>
         </CardContent>
@@ -238,7 +239,7 @@ export function SecuritySection({ user, supabase }: SecuritySectionProps) {
             onClick={() => setShowDeleteDialog(true)}
             className="bg-red-600 hover:bg-red-700"
           >
-            <Trash size={16} weight="regular" className="mr-2" />
+            <HugeiconsIcon icon={Trash} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
             Delete Account
           </Button>
         </CardContent>

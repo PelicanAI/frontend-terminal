@@ -4,7 +4,8 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Lock } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowLeft01Icon as ArrowLeft, LockIcon as Lock } from "@hugeicons/core-free-icons"
 import { createClient } from "@/lib/supabase/client"
 
 function getHashParams() {
@@ -90,7 +91,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-[420px] relative z-10">
         <div className="mb-8 flex items-center justify-between text-sm text-muted-foreground">
           <Link href="/auth/login" className="inline-flex items-center hover:text-foreground transition-colors">
-            <ArrowLeft size={16} weight="regular" className="mr-2" />
+            <HugeiconsIcon icon={ArrowLeft} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
             Back to sign in
           </Link>
         </div>
@@ -118,7 +119,7 @@ export default function ResetPasswordPage() {
                 New password
               </label>
               <div className="relative group">
-                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <HugeiconsIcon icon={Lock} size={20} className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" strokeWidth={1.5} color="currentColor" />
                 <input
                   id="password"
                   type="password"
@@ -136,7 +137,7 @@ export default function ResetPasswordPage() {
                 Confirm password
               </label>
               <div className="relative group">
-                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <HugeiconsIcon icon={Lock} size={20} className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" strokeWidth={1.5} color="currentColor" />
                 <input
                   id="confirmPassword"
                   type="password"

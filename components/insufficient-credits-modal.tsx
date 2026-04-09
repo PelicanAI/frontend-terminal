@@ -2,7 +2,12 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { Lightning, X, ArrowRight } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  FlashIcon as Lightning,
+  Cancel01Icon as X,
+  ArrowRight01Icon as ArrowRight,
+} from '@hugeicons/core-free-icons'
 
 interface InsufficientCreditsModalProps {
   isOpen: boolean
@@ -45,12 +50,12 @@ export function InsufficientCreditsModal({
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Close"
         >
-          <X size={20} weight="regular" />
+          <HugeiconsIcon icon={X} size={20} strokeWidth={1.5} color="currentColor" />
         </button>
 
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/10 mb-4">
-            <Lightning size={28} weight="regular" className="text-amber-400" />
+            <HugeiconsIcon icon={Lightning} size={28} className="text-amber-400" strokeWidth={1.5} color="currentColor" />
           </div>
           <h2 className="text-xl font-bold text-[var(--text-primary)]">Not enough credits</h2>
           <p className="text-muted-foreground text-sm mt-1">
@@ -64,7 +69,7 @@ export function InsufficientCreditsModal({
             className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-3 px-4 rounded-lg transition-colors"
           >
             <span>Upgrade Plan</span>
-            <ArrowRight size={16} weight="regular" />
+            <HugeiconsIcon icon={ArrowRight} size={16} strokeWidth={1.5} color="currentColor" />
           </Link>
 
           <button

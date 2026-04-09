@@ -4,7 +4,8 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { m, AnimatePresence } from "framer-motion"
 import { PelicanButton } from "@/components/ui/pelican"
-import { ArrowRight, Warning } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowRight01Icon as ArrowRight, Alert01Icon as Warning } from "@hugeicons/core-free-icons"
 import { useAntiTradeCheck, type AntiTradeWarning } from "@/hooks/use-anti-trade-check"
 import { cn } from "@/lib/utils"
 import type { Trade } from "@/hooks/use-trades"
@@ -116,7 +117,7 @@ function AnalyzeExpander({ onSend, onClose }: ExpanderBaseProps) {
           <option value="weekly">Weekly</option>
         </select>
         <PelicanButton size="sm" onClick={handleSubmit} disabled={!ticker.trim()}>
-          <ArrowRight size={14} weight="bold" />
+          <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
         </PelicanButton>
       </div>
     </ExpanderShell>
@@ -245,7 +246,7 @@ function PreTradeExpander({ onSend, onClose }: ExpanderBaseProps) {
           </button>
         </div>
         <PelicanButton size="sm" onClick={handleCheck} disabled={!ticker.trim()}>
-          <ArrowRight size={14} weight="bold" />
+          <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
         </PelicanButton>
       </div>
       {warnings.length > 0 && (
@@ -260,15 +261,11 @@ function PreTradeExpander({ onSend, onClose }: ExpanderBaseProps) {
                   : "bg-[var(--data-warning)]/[0.08]",
               )}
             >
-              <Warning
-                size={14}
-                weight="bold"
-                className={
+              <HugeiconsIcon icon={Warning} size={14} className={
                   w.severity === "critical"
                     ? "text-[var(--data-negative)] shrink-0 mt-0.5"
                     : "text-[var(--data-warning)] shrink-0 mt-0.5"
-                }
-              />
+                } strokeWidth={2} color="currentColor" />
               <div>
                 <p className="font-medium text-[var(--text-primary)]">{w.title}</p>
                 <p className="text-[var(--text-muted)] mt-0.5">{w.message}</p>
@@ -324,7 +321,7 @@ function CompareExpander({ onSend, onClose }: ExpanderBaseProps) {
           className="flex-1 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] transition-colors"
         />
         <PelicanButton size="sm" onClick={handleSubmit} disabled={!tickerA.trim() || !tickerB.trim()}>
-          <ArrowRight size={14} weight="bold" />
+          <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
         </PelicanButton>
       </div>
     </ExpanderShell>
@@ -361,7 +358,7 @@ function LearnExpander({ onSend, onClose }: ExpanderBaseProps) {
           className="flex-1 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] transition-colors"
         />
         <PelicanButton size="sm" onClick={handleSubmit} disabled={!topic.trim()}>
-          <ArrowRight size={14} weight="bold" />
+          <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
         </PelicanButton>
       </div>
     </ExpanderShell>

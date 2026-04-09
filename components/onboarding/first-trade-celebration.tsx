@@ -2,7 +2,14 @@
 
 import { useEffect, useRef } from "react"
 import { m, AnimatePresence } from "framer-motion"
-import { Crosshair, ChartBar, Sun, MagnifyingGlass, ArrowRight } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Target01Icon as Crosshair,
+  BarChartIcon as ChartBar,
+  Sun01Icon as Sun,
+  Search01Icon as MagnifyingGlass,
+  ArrowRight01Icon as ArrowRight,
+} from "@hugeicons/core-free-icons"
 import { PelicanButton } from "@/components/ui/pelican"
 
 const CELEBRATED_KEY = "pelican-first-trade-celebrated"
@@ -83,11 +90,7 @@ export function FirstTradeCelebration({
               {/* Hero icon */}
               <div className="flex justify-center mb-5">
                 <div className="w-12 h-12 rounded-xl bg-[var(--accent-muted)] border border-[var(--accent-primary)]/20 flex items-center justify-center">
-                  <Crosshair
-                    size={24}
-                    weight="bold"
-                    className="text-[var(--accent-primary)]"
-                  />
+                  <HugeiconsIcon icon={Crosshair} size={24} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
                 </div>
               </div>
 
@@ -111,11 +114,7 @@ export function FirstTradeCelebration({
                     key={label}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]"
                   >
-                    <Icon
-                      size={18}
-                      weight="regular"
-                      className="text-[var(--text-secondary)] flex-shrink-0"
-                    />
+                    <HugeiconsIcon icon={Icon} size={18} className="text-[var(--text-secondary)] flex-shrink-0" strokeWidth={1.5} color="currentColor" />
                     <div className="text-sm">
                       <span className="text-[var(--text-primary)] font-medium">
                         {label}
@@ -145,7 +144,7 @@ export function FirstTradeCelebration({
                   className="flex-1 gap-1.5"
                 >
                   View My Position
-                  <ArrowRight size={14} weight="bold" />
+                  <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
                 </PelicanButton>
               </div>
             </div>

@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { GraduationCap } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Mortarboard01Icon as GraduationCap } from '@hugeicons/core-free-icons'
 
 const STORAGE_KEY = 'pelican-beginner-mode'
 
@@ -25,7 +26,7 @@ export function BeginnerToggle({ value, onChange }: BeginnerToggleProps) {
         border: `1px solid ${value ? 'var(--accent-indigo)' : 'var(--border-default)'}`,
       }}
     >
-      <GraduationCap weight={value ? 'fill' : 'regular'} className="w-3.5 h-3.5" />
+      <HugeiconsIcon icon={GraduationCap} className="w-3.5 h-3.5" strokeWidth={1.5} color="currentColor" />
       Beginner Mode
     </button>
   )

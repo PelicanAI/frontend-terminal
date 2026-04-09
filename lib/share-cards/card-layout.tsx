@@ -36,7 +36,7 @@ export function CardLayout({
         flexDirection: "column",
         width: "100%",
         height: "100%",
-        fontFamily: "Geist Sans, sans-serif",
+        fontFamily: "IBM Plex Sans, sans-serif",
         position: "relative",
         overflow: "hidden",
       }}

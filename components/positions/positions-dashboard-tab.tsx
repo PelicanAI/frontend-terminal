@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react'
 import { m } from 'framer-motion'
-import { TrendUp, Plus } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { AnalyticsUpIcon as TrendUp, Add01Icon as Plus } from '@hugeicons/core-free-icons'
 import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Trade } from '@/hooks/use-trades'
 import { TradeStats, EquityCurvePoint } from '@/hooks/use-trade-stats'
@@ -117,7 +118,7 @@ export function PositionsDashboardTab({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[var(--accent-primary)]/30 border-t-[var(--accent-primary)] rounded-full animate-spin mx-auto mb-2" />
+          <div className="w-8 h-8 border-2 border-[var(--border-default)] border-t-[var(--accent-primary)] rounded-full animate-spin motion-reduce:animate-none mx-auto mb-2" />
           <p className="text-[var(--text-muted)] text-sm">Loading dashboard...</p>
         </div>
       </div>
@@ -128,7 +129,7 @@ export function PositionsDashboardTab({
   if (trades.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh]">
-        <TrendUp size={40} className="text-[var(--text-muted)] mb-3" />
+        <HugeiconsIcon icon={TrendUp} size={40} className="text-[var(--text-muted)] mb-3" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">
           No positions yet
         </h3>
@@ -142,7 +143,7 @@ export function PositionsDashboardTab({
             className="mt-4"
             onClick={onOpenLogTrade}
           >
-            <Plus size={16} weight="bold" />
+            <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
             Log Trade
           </PelicanButton>
         )}
@@ -275,7 +276,7 @@ export function PositionsDashboardTab({
         <m.div variants={staggerItem}>
           <PelicanCard>
             <div className="flex flex-col items-center justify-center py-12">
-              <TrendUp size={32} className="text-[var(--text-muted)]" />
+              <HugeiconsIcon icon={TrendUp} size={32} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
               <p className="text-sm mt-3 text-[var(--text-secondary)]">
                 Close your first trade to see your equity curve
               </p>

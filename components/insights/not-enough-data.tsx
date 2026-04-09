@@ -1,7 +1,8 @@
 'use client'
 
 import { m } from 'framer-motion'
-import { ChartBar } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { BarChartIcon as ChartBar } from '@hugeicons/core-free-icons'
 import { PelicanCard, PelicanButton } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 
@@ -37,7 +38,7 @@ export function NotEnoughData({ totalTrades, minNeeded, onLogTrade }: NotEnoughD
             'bg-[var(--accent-primary)]/10',
           )}
         >
-          <ChartBar size={24} weight="light" className="text-[var(--accent-primary)]" />
+          <HugeiconsIcon icon={ChartBar} size={24} className="text-[var(--accent-primary)]" strokeWidth={1} color="currentColor" />
         </div>
 
         {/* Heading */}

@@ -1,6 +1,7 @@
 "use client"
 
-import { CalendarBlank, Funnel } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Calendar01Icon as CalendarBlank, FilterIcon as Funnel } from "@hugeicons/core-free-icons"
 import { PelicanButton } from "@/components/ui/pelican"
 
 interface EarningsEmptyStateProps {
@@ -12,10 +13,7 @@ export function EarningsEmptyState({ variant, onClearFilters }: EarningsEmptySta
   if (variant === "no-data") {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4">
-        <CalendarBlank
-          weight="thin"
-          className="w-16 h-16 text-[var(--text-disabled)] mb-4"
-        />
+        <HugeiconsIcon icon={CalendarBlank} className="w-16 h-16 text-[var(--text-disabled)] mb-4" strokeWidth={1} color="currentColor" />
         <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1">
           No earnings data available
         </h3>
@@ -29,10 +27,7 @@ export function EarningsEmptyState({ variant, onClearFilters }: EarningsEmptySta
 
   return (
     <div className="flex flex-col items-center justify-center py-20 px-4">
-      <Funnel
-        weight="thin"
-        className="w-16 h-16 text-[var(--text-disabled)] mb-4"
-      />
+      <HugeiconsIcon icon={Funnel} className="w-16 h-16 text-[var(--text-disabled)] mb-4" strokeWidth={1} color="currentColor" />
       <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1">
         No earnings match your filters
       </h3>

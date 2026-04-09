@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Check } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Tick01Icon as Check } from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import { Section } from '@/components/landing/section'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
@@ -111,10 +112,7 @@ export function PricingSection() {
               <ul className="space-y-3 mb-8 flex-1">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2.5">
-                    <Check
-                      weight="bold"
-                      className="h-4 w-4 text-violet-600 mt-0.5 shrink-0"
-                    />
+                    <HugeiconsIcon icon={Check} className="h-4 w-4 text-violet-600 mt-0.5 shrink-0" strokeWidth={2} color="currentColor" />
                     <span className="text-sm text-slate-500">{feature}</span>
                   </li>
                 ))}

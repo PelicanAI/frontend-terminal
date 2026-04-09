@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
-import { Warning, Trash } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Alert01Icon as Warning, Delete01Icon as Trash } from "@hugeicons/core-free-icons"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -88,7 +89,7 @@ export function ConfirmDestructiveAction({
         <AlertDialogHeader>
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--data-negative)]/10 flex items-center justify-center">
-              <Warning size={20} weight="bold" className="text-[var(--data-negative)]" />
+              <HugeiconsIcon icon={Warning} size={20} className="text-[var(--data-negative)]" strokeWidth={2} color="currentColor" />
             </div>
             <div className="flex-1 min-w-0">
               <AlertDialogTitle className="text-[var(--text-primary)] text-base font-semibold">
@@ -160,7 +161,7 @@ export function ConfirmDestructiveAction({
               </span>
             ) : (
               <span className="flex items-center gap-1.5">
-                <Trash size={14} weight="bold" />
+                <HugeiconsIcon icon={Trash} size={14} strokeWidth={2} color="currentColor" />
                 {confirmText}
               </span>
             )}

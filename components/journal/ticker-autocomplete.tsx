@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import { MagnifyingGlass } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Search01Icon as MagnifyingGlass } from "@hugeicons/core-free-icons"
 import { TickerSearchResult } from "@/app/api/tickers/search/route"
 
 interface TickerAutocompleteProps {
@@ -133,7 +134,7 @@ export function TickerAutocomplete({
   return (
     <div className="relative">
       <div className="relative">
-        <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={MagnifyingGlass} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <input
           ref={inputRef}
           type="text"

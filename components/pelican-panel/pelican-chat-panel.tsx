@@ -3,7 +3,14 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { X, PaperPlaneRight, SpinnerGap, ArrowsClockwise, ArrowsOut } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Cancel01Icon as X,
+  SentIcon as PaperPlaneRight,
+  Loading03Icon as SpinnerGap,
+  Refresh01Icon as ArrowsClockwise,
+  ArrowExpand01Icon as ArrowsOut,
+} from '@hugeicons/core-free-icons'
 import { Button } from '@/components/ui/button'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { cn } from '@/lib/utils'
@@ -218,7 +225,7 @@ function PelicanChatPanelInternal({
                 onClick={handleExpandToFullChat}
                 className="h-9 w-9"
               >
-                <ArrowsOut className="h-4 w-4" weight="regular" />
+                <HugeiconsIcon icon={ArrowsOut} className="h-4 w-4" strokeWidth={1.5} color="currentColor" />
               </Button>
             </IconTooltip>
             <IconTooltip label="Close panel" side="bottom">
@@ -228,7 +235,7 @@ function PelicanChatPanelInternal({
                 onClick={onClose}
                 className="h-9 w-9"
               >
-                <X className="h-5 w-5" weight="bold" />
+                <HugeiconsIcon icon={X} className="h-5 w-5" strokeWidth={2} color="currentColor" />
               </Button>
             </IconTooltip>
           </div>
@@ -273,9 +280,9 @@ function PelicanChatPanelInternal({
                 className="h-10 w-10 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
               >
                 {isStreaming ? (
-                  <SpinnerGap className="h-4 w-4 animate-spin" weight="bold" />
+                  <HugeiconsIcon icon={SpinnerGap} className="h-4 w-4 animate-spin" strokeWidth={2} color="currentColor" />
                 ) : (
-                  <PaperPlaneRight className="h-4 w-4" weight="fill" />
+                  <HugeiconsIcon icon={PaperPlaneRight} className="h-4 w-4" strokeWidth={1.5} color="currentColor" />
                 )}
               </Button>
             </IconTooltip>
@@ -324,7 +331,7 @@ function PelicanChatPanelInternal({
                 onClick={handleExpandToFullChat}
                 className="h-8 w-8 hover:bg-white/[0.06]"
               >
-                <ArrowsOut className="h-3.5 w-3.5" weight="regular" />
+                <HugeiconsIcon icon={ArrowsOut} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />
               </Button>
             </IconTooltip>
             <IconTooltip label="Close panel" side="bottom">
@@ -334,7 +341,7 @@ function PelicanChatPanelInternal({
                 onClick={onClose}
                 className="h-8 w-8 hover:bg-white/[0.06]"
               >
-                <X className="h-4 w-4" weight="bold" />
+                <HugeiconsIcon icon={X} className="h-4 w-4" strokeWidth={2} color="currentColor" />
               </Button>
             </IconTooltip>
           </div>
@@ -362,7 +369,7 @@ function PelicanChatPanelInternal({
                   onClick={onRegenerate}
                   className="text-xs text-[var(--text-muted)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-muted)]"
                 >
-                  <ArrowsClockwise className="h-3 w-3 mr-1.5" weight="bold" />
+                  <HugeiconsIcon icon={ArrowsClockwise} className="h-3 w-3 mr-1.5" strokeWidth={2} color="currentColor" />
                   Regenerate
                 </Button>
               </div>
@@ -408,9 +415,9 @@ function PelicanChatPanelInternal({
                 className="h-10 w-10 bg-[var(--accent-primary)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
               >
                 {isStreaming ? (
-                  <SpinnerGap className="h-4 w-4 animate-spin" weight="bold" />
+                  <HugeiconsIcon icon={SpinnerGap} className="h-4 w-4 animate-spin" strokeWidth={2} color="currentColor" />
                 ) : (
-                  <PaperPlaneRight className="h-4 w-4" weight="fill" />
+                  <HugeiconsIcon icon={PaperPlaneRight} className="h-4 w-4" strokeWidth={1.5} color="currentColor" />
                 )}
               </Button>
             </IconTooltip>

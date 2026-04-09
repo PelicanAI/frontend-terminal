@@ -2,7 +2,12 @@
 
 import { useState } from "react"
 import { m, AnimatePresence } from "framer-motion"
-import { X, CheckCircle, Warning } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Cancel01Icon as X,
+  CheckmarkCircle01Icon as CheckCircle,
+  Alert01Icon as Warning,
+} from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { modal, backdrop } from "@/components/ui/pelican"
 import { usePublishPlaybook } from "@/hooks/use-strategies"
@@ -69,13 +74,13 @@ export function PublishModal({ playbook, open, onOpenChange, onPublished }: Publ
               {success ? "Published!" : "Publish to Community"}
             </h2>
             <button onClick={() => onOpenChange(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" aria-label="Close">
-              <X size={20} />
+              <HugeiconsIcon icon={X} size={20} strokeWidth={1.5} color="currentColor" />
             </button>
           </div>
 
           {success ? (
             <div className="text-center py-6">
-              <CheckCircle size={48} weight="fill" className="text-[var(--data-positive)] mx-auto mb-3" />
+              <HugeiconsIcon icon={CheckCircle} size={48} className="text-[var(--data-positive)] mx-auto mb-3" strokeWidth={1.5} color="currentColor" />
               <p className="text-sm text-[var(--text-secondary)]">
                 Your strategy is now live at <span className="font-mono text-[var(--accent-primary)]">/strategies/{slug}</span>
               </p>
@@ -92,9 +97,9 @@ export function PublishModal({ playbook, open, onOpenChange, onPublished }: Publ
                 ].map(({ label, met }) => (
                   <div key={label} className="flex items-center gap-2 text-sm">
                     {met ? (
-                      <CheckCircle size={16} weight="fill" className="text-[var(--data-positive)]" />
+                      <HugeiconsIcon icon={CheckCircle} size={16} className="text-[var(--data-positive)]" strokeWidth={1.5} color="currentColor" />
                     ) : (
-                      <Warning size={16} weight="fill" className="text-[var(--data-negative)]" />
+                      <HugeiconsIcon icon={Warning} size={16} className="text-[var(--data-negative)]" strokeWidth={1.5} color="currentColor" />
                     )}
                     <span className={met ? "text-[var(--text-secondary)]" : "text-[var(--data-negative)]"}>{label}</span>
                   </div>

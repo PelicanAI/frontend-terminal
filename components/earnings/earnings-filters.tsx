@@ -1,6 +1,7 @@
 "use client"
 
-import { MagnifyingGlass, Briefcase } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Search01Icon as MagnifyingGlass, Briefcase01Icon as Briefcase } from '@hugeicons/core-free-icons'
 import { FilterPill } from '@/components/earnings/filter-pill'
 import type { EarningsFilters as EarningsFiltersType } from '@/types/earnings'
 
@@ -23,10 +24,7 @@ export function EarningsFilters({
     <div className="flex items-center gap-3 flex-wrap mb-4">
       {/* Search input */}
       <div className="relative">
-        <MagnifyingGlass
-          weight="regular"
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]"
-        />
+        <HugeiconsIcon icon={MagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <input
           type="text"
           placeholder="Search ticker..."
@@ -42,7 +40,7 @@ export function EarningsFilters({
           active={filters.myPortfolio}
           onClick={() => onToggle('myPortfolio')}
           label="My Positions"
-          icon={<Briefcase weight="regular" className="h-3.5 w-3.5" />}
+          icon={<HugeiconsIcon icon={Briefcase} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />}
           count={portfolioCount > 0 ? portfolioCount : undefined}
         />
         <FilterPill

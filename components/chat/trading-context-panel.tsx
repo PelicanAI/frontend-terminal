@@ -1,7 +1,27 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { TrendUp, TrendDown, Pulse, Star, CaretDown, CaretUp, CaretRight, GraduationCap, X, Plus, ChartLineUp, ChatCircle, Briefcase, Trash, MagnifyingGlass, Bell, BellRinging, BellSimple } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  AnalyticsUpIcon as TrendUp,
+  AnalyticsDownIcon as TrendDown,
+  Pulse01Icon as Pulse,
+  StarIcon as Star,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  ArrowRight01Icon as CaretRight,
+  Mortarboard01Icon as GraduationCap,
+  Cancel01Icon as X,
+  Add01Icon as Plus,
+  ChartLineData01Icon as ChartLineUp,
+  Chat01Icon as ChatCircle,
+  Briefcase01Icon as Briefcase,
+  Delete01Icon as Trash,
+  Search01Icon as MagnifyingGlass,
+  Notification01Icon as Bell,
+  Notification03Icon as BellRinging,
+  Notification01Icon as BellSimple,
+} from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { cn, normalizeTicker } from "@/lib/utils"
 import { useState, useRef } from "react"
@@ -420,7 +440,7 @@ export function TradingContextPanel({
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-                  <GraduationCap size={40} weight="thin" className="text-[var(--accent-primary)]/40 mb-3" />
+                  <HugeiconsIcon icon={GraduationCap} size={40} className="text-[var(--accent-primary)]/40 mb-3" strokeWidth={1} color="currentColor" />
                   <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
                     Learn mode highlights trading terms in Pelican&apos;s responses. Click any term to get the definition.
                   </p>
@@ -497,7 +517,7 @@ export function TradingContextPanel({
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="text-muted-foreground hover:text-foreground transition-colors duration-150 p-0.5"
             >
-              {isCollapsed ? <CaretUp size={14} weight="regular" /> : <CaretDown size={14} weight="regular" />}
+              {isCollapsed ? <HugeiconsIcon icon={CaretUp} size={14} strokeWidth={1.5} color="currentColor" /> : <HugeiconsIcon icon={CaretDown} size={14} strokeWidth={1.5} color="currentColor" />}
             </button>
           </IconTooltip>
           {onToggleCollapse && (
@@ -541,7 +561,7 @@ export function TradingContextPanel({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-                    <Star size={12} weight="regular" />
+                    <HugeiconsIcon icon={Star} size={12} strokeWidth={1.5} color="currentColor" />
                     Watchlist
                   </h4>
                   <button
@@ -564,7 +584,7 @@ export function TradingContextPanel({
                 {/* Empty state */}
                 {!watchlistLoading && watchlistTickers.length === 0 && !editingWatchlist && (
                   <div className="p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-center">
-                    <Star size={20} weight="thin" className="text-[var(--text-muted)] mx-auto mb-1.5" />
+                    <HugeiconsIcon icon={Star} size={20} className="text-[var(--text-muted)] mx-auto mb-1.5" strokeWidth={1} color="currentColor" />
                     <p className="text-[10px] text-[var(--text-muted)] leading-relaxed">
                       No tickers on your watchlist.<br />Use chat to add stocks or click Edit.
                     </p>
@@ -587,7 +607,7 @@ export function TradingContextPanel({
                             onClick={() => removeFromWatchlist(ticker.symbol)}
                             className="p-1.5 rounded-md text-[var(--data-negative)] hover:bg-[var(--data-negative)]/10 transition-colors duration-150"
                           >
-                            <X size={14} weight="bold" />
+                            <HugeiconsIcon icon={X} size={14} strokeWidth={2} color="currentColor" />
                           </button>
                         </>
                       ) : (
@@ -608,10 +628,10 @@ export function TradingContextPanel({
                               <div className="flex items-center gap-1.5">
                                 <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
                                 {ticker.customPrompt && (
-                                  <BellRinging size={10} weight="fill" className="text-[var(--accent-primary)]" />
+                                  <HugeiconsIcon icon={BellRinging} size={10} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
                                 )}
                                 {(ticker.alertPriceAbove != null || ticker.alertPriceBelow != null) && (
-                                  <BellSimple size={10} weight="fill" className="text-[var(--data-warning)]" />
+                                  <HugeiconsIcon icon={BellSimple} size={10} className="text-[var(--data-warning)]" strokeWidth={1.5} color="currentColor" />
                                 )}
                               </div>
                               <div className="flex flex-col items-end">
@@ -634,20 +654,20 @@ export function TradingContextPanel({
                                   className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors duration-150"
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <CaretDown size={12} weight="regular" />
+                                  <HugeiconsIcon icon={CaretDown} size={12} strokeWidth={1.5} color="currentColor" />
                                 </button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-48">
                                 <DropdownMenuItem onClick={() => showChart(ticker.symbol)}>
-                                  <ChartLineUp size={14} weight="regular" className="mr-2" />
+                                  <HugeiconsIcon icon={ChartLineUp} size={14} className="mr-2" strokeWidth={1.5} color="currentColor" />
                                   Open Chart
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => onPrefillChat?.(`Analyze ${ticker.symbol}`)}>
-                                  <ChatCircle size={14} weight="regular" className="mr-2" />
+                                  <HugeiconsIcon icon={ChatCircle} size={14} className="mr-2" strokeWidth={1.5} color="currentColor" />
                                   Ask Pelican
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => onPrefillChat?.(`Deep dive on ${ticker.symbol} — technicals, fundamentals, and sentiment`)}>
-                                  <MagnifyingGlass size={14} weight="regular" className="mr-2" />
+                                  <HugeiconsIcon icon={MagnifyingGlass} size={14} className="mr-2" strokeWidth={1.5} color="currentColor" />
                                   Deep Dive
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -657,7 +677,7 @@ export function TradingContextPanel({
                                     setPriceBelowInput(ticker.alertPriceBelow != null ? String(ticker.alertPriceBelow) : "")
                                   }}
                                 >
-                                  <BellSimple size={14} weight="regular" className="mr-2" />
+                                  <HugeiconsIcon icon={BellSimple} size={14} className="mr-2" strokeWidth={1.5} color="currentColor" />
                                   {(ticker.alertPriceAbove != null || ticker.alertPriceBelow != null) ? 'Edit Price Alerts...' : 'Set Price Alerts...'}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -667,14 +687,14 @@ export function TradingContextPanel({
                                     setTimeout(() => alertInputRef.current?.focus(), 50)
                                   }}
                                 >
-                                  <Bell size={14} weight="regular" className="mr-2" />
+                                  <HugeiconsIcon icon={Bell} size={14} className="mr-2" strokeWidth={1.5} color="currentColor" />
                                   {ticker.customPrompt ? 'Edit Custom Alert...' : 'Set Custom Alert...'}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => removeFromWatchlist(ticker.symbol)}
                                   className="text-[var(--data-negative)] focus:text-[var(--data-negative)]"
                                 >
-                                  <Trash size={14} weight="regular" className="mr-2" />
+                                  <HugeiconsIcon icon={Trash} size={14} className="mr-2" strokeWidth={1.5} color="currentColor" />
                                   Remove
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
@@ -685,7 +705,7 @@ export function TradingContextPanel({
                           {priceAlertEditId === ticker.id && (
                             <div className="mt-1.5 p-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--accent-primary)]/30">
                               <div className="flex items-center gap-1.5 mb-1.5">
-                                <BellSimple size={12} weight="bold" className="text-[var(--accent-primary)]" />
+                                <HugeiconsIcon icon={BellSimple} size={12} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
                                 <span className="text-[10px] font-medium text-[var(--accent-primary)]">Price Alerts</span>
                               </div>
                               <div className="space-y-1.5">
@@ -758,7 +778,7 @@ export function TradingContextPanel({
                           {alertEditTicker === ticker.symbol && (
                             <div className="mt-1.5 p-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--accent-primary)]/30">
                               <div className="flex items-center gap-1.5 mb-1.5">
-                                <BellRinging size={12} weight="bold" className="text-[var(--accent-primary)]" />
+                                <HugeiconsIcon icon={BellRinging} size={12} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
                                 <span className="text-[10px] font-medium text-[var(--accent-primary)]">Custom Alert</span>
                               </div>
                               <input
@@ -819,7 +839,7 @@ export function TradingContextPanel({
                 {editingWatchlist && (
                   <div className="flex items-center gap-1.5">
                     <div className="flex-1 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] focus-within:border-[var(--accent-primary)] transition-colors duration-150">
-                      <Plus size={12} weight="regular" className="text-[var(--text-muted)] shrink-0" />
+                      <HugeiconsIcon icon={Plus} size={12} className="text-[var(--text-muted)] shrink-0" strokeWidth={1.5} color="currentColor" />
                       <input
                         ref={addInputRef}
                         type="text"
@@ -849,7 +869,7 @@ export function TradingContextPanel({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1.5">
-                      <Briefcase size={12} weight="regular" />
+                      <HugeiconsIcon icon={Briefcase} size={12} strokeWidth={1.5} color="currentColor" />
                       Active Positions
                     </h4>
                     <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">{openTrades.length}</span>
@@ -914,13 +934,13 @@ export function TradingContextPanel({
                             )}
                           >
                             {sector.changePercent >= 0 ? (
-                              <TrendUp size={12} weight="regular" className="text-[var(--data-positive)]" />
+                              <HugeiconsIcon icon={TrendUp} size={12} className="text-[var(--data-positive)]" strokeWidth={1.5} color="currentColor" />
                             ) : (
-                              <TrendDown size={12} weight="regular" className="text-[var(--data-negative)]" />
+                              <HugeiconsIcon icon={TrendDown} size={12} className="text-[var(--data-negative)]" strokeWidth={1.5} color="currentColor" />
                             )}
                           </div>
                         )}
-                        <CaretRight size={12} weight="regular" className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                        <HugeiconsIcon icon={CaretRight} size={12} className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity duration-150" strokeWidth={1.5} color="currentColor" />
                       </div>
                     </button>
                   ))}
@@ -933,7 +953,7 @@ export function TradingContextPanel({
                 <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Volatility</h4>
                 <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                   <div className="flex items-center gap-2">
-                    <Pulse size={16} weight="regular" className="text-[var(--data-warning)]" />
+                    <HugeiconsIcon icon={Pulse} size={16} className="text-[var(--data-warning)]" strokeWidth={1.5} color="currentColor" />
                     <div className="flex flex-col">
                       <span className="text-xs font-medium text-[var(--text-primary)]">{marketConfig.volatilityLabel}</span>
                       <span className="text-[10px] text-[var(--text-muted)]">{marketConfig.volatilitySubLabel}</span>

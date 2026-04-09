@@ -1,7 +1,15 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { MagnifyingGlass, CaretDown, CaretUp, CaretLeft, CaretRight, DownloadSimple } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Search01Icon as MagnifyingGlass,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  ArrowLeft01Icon as CaretLeft,
+  ArrowRight01Icon as CaretRight,
+  Download01Icon as DownloadSimple,
+} from '@hugeicons/core-free-icons'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -204,7 +212,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
       <div className="flex flex-wrap items-end gap-3">
         <form onSubmit={handleSearch} className="flex gap-2 flex-1 min-w-[200px]">
           <div className="relative flex-1 max-w-sm">
-            <MagnifyingGlass size={16} weight="regular" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <HugeiconsIcon icon={MagnifyingGlass} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" strokeWidth={1.5} color="currentColor" />
             <Input
               placeholder="Search by email..."
               value={search}
@@ -252,7 +260,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
 
           <IconTooltip label="Export CSV">
             <Button variant="outline" size="sm" onClick={handleExport}>
-              <DownloadSimple size={16} weight="regular" className="mr-1" />
+              <HugeiconsIcon icon={DownloadSimple} size={16} className="mr-1" strokeWidth={1.5} color="currentColor" />
               CSV
             </Button>
           </IconTooltip>
@@ -327,9 +335,9 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
                     </TableCell>
                     <TableCell>
                       {isExpanded ? (
-                        <CaretUp size={16} weight="regular" className="text-muted-foreground" />
+                        <HugeiconsIcon icon={CaretUp} size={16} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                       ) : (
-                        <CaretDown size={16} weight="regular" className="text-muted-foreground" />
+                        <HugeiconsIcon icon={CaretDown} size={16} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                       )}
                     </TableCell>
                   </TableRow>
@@ -365,7 +373,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
                 onClick={() => goToPage(data.page - 1)}
                 disabled={data.page <= 1 || loading}
               >
-                <CaretLeft size={16} weight="regular" />
+                <HugeiconsIcon icon={CaretLeft} size={16} strokeWidth={1.5} color="currentColor" />
               </Button>
             </IconTooltip>
             <IconTooltip label="Next page">
@@ -375,7 +383,7 @@ export function UsersTable({ initialData }: { initialData: UsersResponse }) {
                 onClick={() => goToPage(data.page + 1)}
                 disabled={data.page >= data.totalPages || loading}
               >
-                <CaretRight size={16} weight="regular" />
+                <HugeiconsIcon icon={CaretRight} size={16} strokeWidth={1.5} color="currentColor" />
               </Button>
             </IconTooltip>
           </div>

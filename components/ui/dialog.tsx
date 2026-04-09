@@ -2,7 +2,8 @@
 
 import type * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { X } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Cancel01Icon as X } from "@hugeicons/core-free-icons"
 
 import { cn } from "@/lib/utils"
 
@@ -62,7 +63,7 @@ function DialogContent({
             data-slot="dialog-close"
             className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           >
-            <X size={16} />
+            <HugeiconsIcon icon={X} size={16} strokeWidth={1.5} color="currentColor" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}

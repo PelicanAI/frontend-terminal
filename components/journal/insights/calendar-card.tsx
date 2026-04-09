@@ -2,7 +2,8 @@
 
 import { PelicanCard } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
-import { CalendarCheck } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { CalendarCheckIn01Icon as CalendarCheck } from "@hugeicons/core-free-icons"
 import type { CalendarInsight } from "@/hooks/use-behavioral-insights"
 
 interface CalendarCardProps {
@@ -59,7 +60,7 @@ export function CalendarCard({ data, onAskPelican }: CalendarCardProps) {
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-4">
-        <CalendarCheck size={18} weight="regular" className="text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={CalendarCheck} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-sm font-medium text-[var(--text-primary)]">Calendar Patterns</h3>
       </div>
 

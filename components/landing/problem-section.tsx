@@ -2,13 +2,14 @@
 
 import { Section } from '@/components/landing/section'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  Table,
-  ChartLineUp,
-  UserCircle,
-  Funnel,
-  ArrowRight,
-} from '@phosphor-icons/react'
+  Table01Icon as Table,
+  ChartLineData01Icon as ChartLineUp,
+  UserCircleIcon as UserCircle,
+  FilterIcon as Funnel,
+  ArrowRight01Icon as ArrowRight,
+} from '@hugeicons/core-free-icons'
 
 const problems = [
   {
@@ -57,9 +58,11 @@ export function ProblemSection() {
         {problems.map((problem, i) => (
           <ScrollReveal key={problem.tool} delay={0.1 + i * 0.1}>
             <div className="rounded-xl border border-slate-200 bg-white p-4 transition-all duration-150 hover:border-slate-300 hover:bg-slate-50">
-              <problem.icon
-                weight="regular"
+              <HugeiconsIcon
+                icon={problem.icon}
                 className="mb-3 h-8 w-8 text-slate-300"
+                strokeWidth={1.5}
+                color="currentColor"
               />
               <div className="text-sm font-medium text-slate-900">{problem.tool}</div>
               <div className="mt-0.5 text-xs font-medium text-red-500">
@@ -80,7 +83,7 @@ export function ProblemSection() {
           </p>
           <p className="mt-3 flex items-center justify-center gap-2 text-base text-violet-600">
             And an AI connected all of it — for you, automatically.
-            <ArrowRight weight="bold" className="h-4 w-4" />
+            <HugeiconsIcon icon={ArrowRight} className="h-4 w-4" strokeWidth={2} color="currentColor" />
           </p>
         </div>
       </ScrollReveal>

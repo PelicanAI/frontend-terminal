@@ -12,4 +12,8 @@ export {
   backdrop,
   cardHover,
   tapScale,
+  pageSections,
+  sectionReveal,
+  listStagger,
+  listItem,
 } from './motion-variants';

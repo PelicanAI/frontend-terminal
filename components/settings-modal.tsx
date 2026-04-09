@@ -7,7 +7,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { User, UserCircle, ClipboardText } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  UserIcon as User,
+  UserCircleIcon as UserCircle,
+  ClipboardIcon as ClipboardText,
+} from "@hugeicons/core-free-icons"
 
 interface SettingsModalProps {
   open: boolean
@@ -80,21 +85,21 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
               onClick={() => { onOpenChange(false); router.push('/settings') }}
               className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
             >
-              <User weight="regular" className="w-4 h-4" />
+              <HugeiconsIcon icon={User} className="w-4 h-4" strokeWidth={1.5} color="currentColor" />
               Account
             </button>
             <button
               onClick={() => { onOpenChange(false); router.push('/journal?tab=profile') }}
               className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
             >
-              <UserCircle weight="regular" className="w-4 h-4" />
+              <HugeiconsIcon icon={UserCircle} className="w-4 h-4" strokeWidth={1.5} color="currentColor" />
               Trader Profile
             </button>
             <button
               onClick={() => { onOpenChange(false); router.push('/journal?tab=plan') }}
               className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
             >
-              <ClipboardText weight="regular" className="w-4 h-4" />
+              <HugeiconsIcon icon={ClipboardText} className="w-4 h-4" strokeWidth={1.5} color="currentColor" />
               Trading Plan
             </button>
           </div>

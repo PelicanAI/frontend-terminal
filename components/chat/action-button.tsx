@@ -1,32 +1,32 @@
 'use client'
 
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
 import {
-  Eye,
-  MagnifyingGlass,
-  XCircle,
-  ClockCounterClockwise,
-  NotePencil,
-  Star,
-  ArrowsOutSimple,
-  ArrowsLeftRight,
-  ClipboardText,
-  SquaresFour,
-  GitBranch,
-  Brain,
-  Shield,
-  ChartLineUp,
-} from '@phosphor-icons/react'
+  ViewIcon as Eye,
+  Search01Icon as MagnifyingGlass,
+  CancelCircleIcon as XCircle,
+  ClockArrowDownIcon as ClockCounterClockwise,
+  NoteEditIcon as NotePencil,
+  StarIcon as Star,
+  ArrowExpand01Icon as ArrowsOutSimple,
+  ArrowLeftRightIcon as ArrowsLeftRight,
+  ClipboardIcon as ClipboardText,
+  DashboardSquare01Icon as SquaresFour,
+  GitBranchIcon as GitBranch,
+  Brain01Icon as Brain,
+  Shield01Icon as Shield,
+  ChartLineData01Icon as ChartLineUp,
+} from '@hugeicons/core-free-icons'
 import type { MessageAction, ActionType } from '@/types/action-buttons'
-import type { IconWeight } from '@phosphor-icons/react'
 
-const ACTION_ICONS: Record<ActionType, { icon: React.ElementType; weight?: IconWeight }> = {
+const ACTION_ICONS: Record<ActionType, { icon: IconSvgElement }> = {
   view_position: { icon: Eye },
   pelican_scan: { icon: MagnifyingGlass },
   close_trade: { icon: XCircle },
   review_trade: { icon: ClockCounterClockwise },
   log_trade: { icon: NotePencil },
   add_watchlist: { icon: Star },
-  remove_watchlist: { icon: Star, weight: 'fill' },
+  remove_watchlist: { icon: Star },
   deep_dive: { icon: ArrowsOutSimple },
   compare: { icon: ArrowsLeftRight },
   show_heatmap: { icon: SquaresFour },
@@ -56,7 +56,7 @@ export function ActionButton({ action, onClick, loading }: ActionButtonProps) {
       {loading ? (
         <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
       ) : (
-        Icon && <Icon size={14} weight={config.weight || 'regular'} />
+        Icon && <HugeiconsIcon icon={Icon} size={14} strokeWidth={1.5} color="currentColor" />
       )}
       <span>{action.label}</span>
     </button>

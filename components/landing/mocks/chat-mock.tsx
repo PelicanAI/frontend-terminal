@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { User } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { UserIcon as User } from '@hugeicons/core-free-icons'
 import Image from 'next/image'
 
 export function ChatMock() {
@@ -31,7 +32,7 @@ export function ChatMock() {
             <p className="text-sm text-slate-900">Analyze NVDA before earnings</p>
           </div>
           <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <User weight="regular" className="w-3.5 h-3.5 text-slate-400" />
+            <HugeiconsIcon icon={User} className="w-3.5 h-3.5 text-slate-400" strokeWidth={1.5} color="currentColor" />
           </div>
         </div>
 

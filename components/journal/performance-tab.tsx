@@ -2,7 +2,12 @@
 
 import { useMemo } from 'react'
 import { m } from 'framer-motion'
-import { Lightning, Notebook, CalendarCheck } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  FlashIcon as Lightning,
+  Notebook01Icon as Notebook,
+  CalendarCheckIn01Icon as CalendarCheck,
+} from '@hugeicons/core-free-icons'
 import { Trade } from '@/hooks/use-trades'
 import { formatPnl } from '@/lib/formatters'
 import { TradeStats, EquityCurvePoint } from '@/hooks/use-trade-stats'
@@ -95,7 +100,7 @@ function PeriodComparison({ trades }: { trades: Trade[] }) {
   return (
     <PelicanCard>
       <div className="flex items-center gap-2 mb-3">
-        <Lightning size={16} weight="bold" className="text-[var(--accent-primary)]" />
+        <HugeiconsIcon icon={Lightning} size={16} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
         <span className="text-xs uppercase tracking-wider font-medium text-[var(--text-muted)]">
           This Week vs Last Week
         </span>
@@ -187,7 +192,7 @@ function ReviewCTAs({ trades, onAskPelican }: { trades: Trade[]; onAskPelican: (
       <PelicanCard interactive onClick={() => onAskPelican(buildWeeklyPrompt())} className="cursor-pointer">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-lg bg-[var(--accent-muted)] flex items-center justify-center shrink-0">
-            <Notebook size={18} weight="bold" className="text-[var(--accent-primary)]" />
+            <HugeiconsIcon icon={Notebook} size={18} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
           </div>
           <div>
             <p className="text-sm font-medium text-[var(--text-primary)]">Weekly Review</p>
@@ -200,7 +205,7 @@ function ReviewCTAs({ trades, onAskPelican }: { trades: Trade[]; onAskPelican: (
       <PelicanCard interactive onClick={() => onAskPelican(buildMonthlyPrompt())} className="cursor-pointer">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-lg bg-[var(--accent-muted)] flex items-center justify-center shrink-0">
-            <CalendarCheck size={18} weight="bold" className="text-[var(--accent-primary)]" />
+            <HugeiconsIcon icon={CalendarCheck} size={18} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
           </div>
           <div>
             <p className="text-sm font-medium text-[var(--text-primary)]">Monthly Review</p>

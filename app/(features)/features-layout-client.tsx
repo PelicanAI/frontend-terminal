@@ -29,7 +29,8 @@ import { PelicanContainer } from '@/components/ui/pelican-container'
 import { usePageTracking } from '@/hooks/use-page-tracking'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
-import { ChatCircle } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Chat01Icon as ChatCircle } from '@hugeicons/core-free-icons'
 import { TrialExhaustedModal } from '@/components/trial-exhausted-modal'
 import { InsufficientCreditsModal } from '@/components/insufficient-credits-modal'
 import { toast } from '@/hooks/use-toast'
@@ -120,7 +121,7 @@ function FeaturesLayoutInner({ children }: { children: React.ReactNode }) {
           style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
           onClick={() => setMobilePanelOpen(true)}
         >
-          <ChatCircle size={20} weight="fill" className="text-white" />
+          <HugeiconsIcon icon={ChatCircle} size={20} className="text-white" strokeWidth={1.5} color="currentColor" />
         </button>
       )}
 

@@ -2,7 +2,14 @@
 
 import Link from "next/link"
 import { m } from "framer-motion"
-import { Star, Users, ShieldCheck, Lightning, CheckCircle } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  StarIcon as Star,
+  UserMultipleIcon as Users,
+  SecurityCheckIcon as ShieldCheck,
+  FlashIcon as Lightning,
+  CheckmarkCircle01Icon as CheckCircle,
+} from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { staggerItem } from "@/components/ui/pelican"
 import type { Playbook } from "@/types/trading"
@@ -61,7 +68,7 @@ export function StrategyCard({ strategy, isAdopted }: StrategyCardProps) {
           <div className="flex items-center gap-2">
             {strategy.is_curated && (
               <span className="flex items-center gap-1 text-[10px] font-medium text-[var(--accent-primary)]">
-                <Lightning size={12} weight="fill" />
+                <HugeiconsIcon icon={Lightning} size={12} strokeWidth={1.5} color="currentColor" />
                 Curated
               </span>
             )}
@@ -90,25 +97,25 @@ export function StrategyCard({ strategy, isAdopted }: StrategyCardProps) {
         {/* Stats row */}
         <div className="flex items-center gap-4 pt-3 border-t border-[var(--border-subtle)]">
           <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
-            <Users size={13} weight="regular" />
+            <HugeiconsIcon icon={Users} size={13} strokeWidth={1.5} color="currentColor" />
             <span className="font-mono tabular-nums">{strategy.adoption_count}</span>
           </div>
           {strategy.community_rating != null && strategy.rating_count > 0 && (
             <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
-              <Star size={13} weight="fill" className="text-amber-400" />
+              <HugeiconsIcon icon={Star} size={13} className="text-amber-400" strokeWidth={1.5} color="currentColor" />
               <span className="font-mono tabular-nums">{strategy.community_rating.toFixed(1)}</span>
               <span className="text-[var(--text-disabled)]">({strategy.rating_count})</span>
             </div>
           )}
           {strategy.stats_verified && (
             <div className="flex items-center gap-1 text-xs text-[var(--data-positive)]">
-              <ShieldCheck size={13} weight="fill" />
+              <HugeiconsIcon icon={ShieldCheck} size={13} strokeWidth={1.5} color="currentColor" />
               <span>Verified</span>
             </div>
           )}
           {isAdopted && (
             <div className="flex items-center gap-1 text-xs text-emerald-400">
-              <CheckCircle size={12} weight="fill" />
+              <HugeiconsIcon icon={CheckCircle} size={12} strokeWidth={1.5} color="currentColor" />
               <span>In playbooks</span>
             </div>
           )}

@@ -2,7 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Check, ArrowSquareOut } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Add01Icon as Plus,
+  Tick01Icon as Check,
+  SquareArrowDiagonal02Icon as ArrowSquareOut,
+} from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { useAdoptTemplate } from "@/hooks/use-strategies"
 import { createClient } from "@/lib/supabase/client"
@@ -45,14 +50,14 @@ export function AdoptButton({ strategy, adoption }: AdoptButtonProps) {
     return (
       <div className="flex flex-col items-end gap-2">
         <div className="flex items-center gap-1.5 text-sm text-[var(--data-positive)]">
-          <Check size={16} weight="bold" />
+          <HugeiconsIcon icon={Check} size={16} strokeWidth={2} color="currentColor" />
           Added to Playbooks
         </div>
         <button
           onClick={() => router.push('/playbooks')}
           className="flex items-center gap-1 text-xs text-[var(--accent-primary)] hover:underline"
         >
-          <ArrowSquareOut size={12} />
+          <HugeiconsIcon icon={ArrowSquareOut} size={12} strokeWidth={1.5} color="currentColor" />
           View in Playbooks
         </button>
       </div>
@@ -70,7 +75,7 @@ export function AdoptButton({ strategy, adoption }: AdoptButtonProps) {
         isAdopting && "opacity-60 cursor-not-allowed"
       )}
     >
-      <Plus size={16} weight="bold" />
+      <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
       {isAdopting ? "Adding..." : "Use This Strategy"}
     </button>
   )

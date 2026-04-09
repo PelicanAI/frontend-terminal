@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/hooks/use-toast"
-import { SignOut } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Logout01Icon as SignOut } from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { logger } from "@/lib/logger"
@@ -76,7 +77,7 @@ export function PrivacySection({ user }: PrivacySectionProps) {
               onClick={handleLogout}
               className="w-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
             >
-              <SignOut size={16} weight="regular" className="mr-2" />
+              <HugeiconsIcon icon={SignOut} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
               Log Out
             </Button>
           </CardContent>

@@ -3,7 +3,15 @@
 import { useState, useRef, useCallback } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { PelicanButton } from "@/components/ui/pelican"
-import { UploadSimple, FileText, ArrowRight, ArrowLeft, Warning, CheckCircle } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Upload01Icon as UploadSimple,
+  File02Icon as FileText,
+  ArrowRight01Icon as ArrowRight,
+  ArrowLeft01Icon as ArrowLeft,
+  Alert01Icon as Warning,
+  CheckmarkCircle01Icon as CheckCircle,
+} from "@hugeicons/core-free-icons"
 import { parseCSV, mapRowsToTrades, type CSVParseResult, type ColumnMapping, type ParsedTrade, type RowError } from "@/lib/csv/parse-trades"
 
 interface CSVImportModalProps {
@@ -186,7 +194,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
                     ? 'bg-[var(--accent-primary)] text-white'
                     : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
                 }`}>
-                  {step > s ? <CheckCircle size={14} weight="bold" /> : s}
+                  {step > s ? <HugeiconsIcon icon={CheckCircle} size={14} strokeWidth={2} color="currentColor" /> : s}
                 </div>
                 {s < 3 && (
                   <div className={`w-8 h-0.5 ${step > s ? 'bg-[var(--accent-primary)]' : 'bg-[var(--border-subtle)]'}`} />
@@ -215,7 +223,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
               onClick={() => fileInputRef.current?.click()}
               aria-label="Upload CSV file"
             >
-              <UploadSimple size={32} weight="regular" className="text-[var(--text-muted)]" />
+              <HugeiconsIcon icon={UploadSimple} size={32} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
               <p className="text-sm text-[var(--text-primary)] font-medium">
                 Drop your CSV file here
               </p>
@@ -229,7 +237,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
                   fileInputRef.current?.click()
                 }}
               >
-                <FileText size={16} weight="regular" />
+                <HugeiconsIcon icon={FileText} size={16} strokeWidth={1.5} color="currentColor" />
                 Browse Files
               </PelicanButton>
               <input
@@ -243,7 +251,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
 
             {parseError && (
               <div className="flex items-center gap-2 rounded-lg bg-[var(--data-negative)]/10 border border-[var(--data-negative)]/30 px-4 py-3 text-sm text-[var(--data-negative)]">
-                <Warning size={16} weight="bold" className="flex-shrink-0" />
+                <HugeiconsIcon icon={Warning} size={16} className="flex-shrink-0" strokeWidth={2} color="currentColor" />
                 {parseError}
               </div>
             )}
@@ -256,7 +264,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
             {/* Info bar */}
             <div className="flex flex-wrap items-center gap-3 px-4 py-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
               <div className="flex items-center gap-2">
-                <FileText size={16} weight="regular" className="text-[var(--text-muted)]" />
+                <HugeiconsIcon icon={FileText} size={16} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
                 <span className="text-sm text-[var(--text-primary)] font-medium truncate max-w-[200px]">{fileName}</span>
               </div>
               {csvResult.detectedBroker && (
@@ -322,7 +330,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
             {/* Missing required error */}
             {missingRequired.length > 0 && (
               <div className="flex items-center gap-2 rounded-lg bg-[var(--data-warning)]/10 border border-[var(--data-warning)]/30 px-4 py-3 text-sm text-[var(--data-warning)]">
-                <Warning size={16} weight="bold" className="flex-shrink-0" />
+                <HugeiconsIcon icon={Warning} size={16} className="flex-shrink-0" strokeWidth={2} color="currentColor" />
                 Missing required: {missingRequired.map(f => FIELD_LABELS[f].label).join(', ')}
               </div>
             )}
@@ -333,7 +341,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
                 variant="ghost"
                 onClick={() => setStep(1)}
               >
-                <ArrowLeft size={16} weight="bold" />
+                <HugeiconsIcon icon={ArrowLeft} size={16} strokeWidth={2} color="currentColor" />
                 Back
               </PelicanButton>
               <PelicanButton
@@ -342,7 +350,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
                 disabled={missingRequired.length > 0}
               >
                 Next
-                <ArrowRight size={16} weight="bold" />
+                <HugeiconsIcon icon={ArrowRight} size={16} strokeWidth={2} color="currentColor" />
               </PelicanButton>
             </div>
           </div>
@@ -354,14 +362,14 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
             {/* Summary bar */}
             <div className="flex items-center gap-4 px-4 py-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
               <div className="flex items-center gap-2">
-                <CheckCircle size={18} weight="bold" className="text-[var(--data-positive)]" />
+                <HugeiconsIcon icon={CheckCircle} size={18} className="text-[var(--data-positive)]" strokeWidth={2} color="currentColor" />
                 <span className="text-sm text-[var(--text-primary)] font-medium font-mono tabular-nums">
                   {validCount} valid trades
                 </span>
               </div>
               {errorCount > 0 && (
                 <div className="flex items-center gap-2">
-                  <Warning size={18} weight="bold" className="text-[var(--data-negative)]" />
+                  <HugeiconsIcon icon={Warning} size={18} className="text-[var(--data-negative)]" strokeWidth={2} color="currentColor" />
                   <span className="text-sm text-[var(--data-negative)] font-medium font-mono tabular-nums">
                     {errorCount} errors
                   </span>
@@ -436,7 +444,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
             {errorCount > 0 && (
               <details className="rounded-lg border border-[var(--data-negative)]/20 overflow-hidden">
                 <summary className="px-4 py-3 text-sm font-medium text-[var(--data-negative)] cursor-pointer hover:bg-[var(--data-negative)]/5 transition-colors">
-                  <Warning size={14} weight="bold" className="inline mr-2" />
+                  <HugeiconsIcon icon={Warning} size={14} className="inline mr-2" strokeWidth={2} color="currentColor" />
                   {errorCount} row{errorCount !== 1 ? 's' : ''} with errors
                 </summary>
                 <div className="px-4 py-3 border-t border-[var(--data-negative)]/10 space-y-1.5 max-h-40 overflow-y-auto">
@@ -456,7 +464,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
                 variant="ghost"
                 onClick={() => setStep(2)}
               >
-                <ArrowLeft size={16} weight="bold" />
+                <HugeiconsIcon icon={ArrowLeft} size={16} strokeWidth={2} color="currentColor" />
                 Back
               </PelicanButton>
               <PelicanButton
@@ -475,7 +483,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
           <div className="flex flex-col items-center gap-4 py-8">
             {importResult.imported > 0 ? (
               <>
-                <CheckCircle size={48} weight="bold" className="text-[var(--data-positive)]" />
+                <HugeiconsIcon icon={CheckCircle} size={48} className="text-[var(--data-positive)]" strokeWidth={2} color="currentColor" />
                 <div className="text-center space-y-1">
                   <p className="text-lg font-medium text-[var(--text-primary)]">
                     Successfully imported <span className="font-mono tabular-nums">{importResult.imported}</span> trades
@@ -489,7 +497,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
               </>
             ) : (
               <>
-                <Warning size={48} weight="bold" className="text-[var(--data-negative)]" />
+                <HugeiconsIcon icon={Warning} size={48} className="text-[var(--data-negative)]" strokeWidth={2} color="currentColor" />
                 <div className="text-center space-y-1">
                   <p className="text-lg font-medium text-[var(--text-primary)]">
                     Import failed

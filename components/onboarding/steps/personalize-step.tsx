@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { SurveyOptionCard } from '@/components/onboarding/survey-option-card'
 import { SurveyPillSelect } from '@/components/onboarding/survey-pill-select'
-import { BookOpenText } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { BookOpenTextIcon as BookOpenText } from '@hugeicons/core-free-icons'
 import { m } from 'framer-motion'
 
 const TIMEFRAME_OPTIONS = [
@@ -109,7 +110,7 @@ export function PersonalizeStep({
         'flex items-center justify-between rounded-xl border border-border bg-card p-4'
       )}>
         <div className="flex items-center gap-3">
-          <BookOpenText weight="regular" className="w-5 h-5 text-primary" />
+          <HugeiconsIcon icon={BookOpenText} className="w-5 h-5 text-primary" strokeWidth={1.5} color="currentColor" />
           <div>
             <p className="text-sm font-medium text-foreground">Learning Mode</p>
             <p className="text-xs text-muted-foreground">

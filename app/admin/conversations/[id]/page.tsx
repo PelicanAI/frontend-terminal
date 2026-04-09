@@ -5,19 +5,20 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ArrowLeft,
-  Copy,
-  Check,
-  User,
-  Robot,
-  Clock,
-  ChatCircle,
-  CircleNotch,
-  FileCode,
-  CaretDown,
-  CaretUp,
-} from '@phosphor-icons/react'
+  ArrowLeft01Icon as ArrowLeft,
+  Copy01Icon as Copy,
+  Tick01Icon as Check,
+  UserIcon as User,
+  Robot01Icon as Robot,
+  Clock01Icon as Clock,
+  Chat01Icon as ChatCircle,
+  Loading03Icon as CircleNotch,
+  FileCodeIcon as FileCode,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+} from '@hugeicons/core-free-icons'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { formatLine } from '@/components/chat/message/format-utils'
 import type { ConvoTag } from '@/lib/admin/classify-conversation'
@@ -134,9 +135,9 @@ function CopyButton({ label, text, icon }: { label: string; text: string; icon?:
       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-border bg-background hover:bg-muted transition-colors"
     >
       {copied ? (
-        <Check size={12} weight="regular" className="text-green-400" />
+        <HugeiconsIcon icon={Check} size={12} className="text-green-400" strokeWidth={1.5} color="currentColor" />
       ) : (
-        icon ?? <Copy size={12} weight="regular" />
+        icon ?? <HugeiconsIcon icon={Copy} size={12} strokeWidth={1.5} color="currentColor" />
       )}
       {copied ? 'Copied!' : label}
     </button>
@@ -161,9 +162,9 @@ function MessageBlock({ msg, index, total }: { msg: FullConversation['messages']
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {isUser ? (
-            <User size={14} weight="regular" className="text-blue-400" />
+            <HugeiconsIcon icon={User} size={14} className="text-blue-400" strokeWidth={1.5} color="currentColor" />
           ) : (
-            <Robot size={14} weight="regular" className="text-muted-foreground" />
+            <HugeiconsIcon icon={Robot} size={14} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
           )}
           <span className={`text-xs font-medium ${isUser ? 'text-blue-400' : 'text-muted-foreground'}`}>
             {isUser ? 'User' : 'Pelican'}
@@ -219,7 +220,7 @@ export default function ConversationFullPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <CircleNotch size={24} weight="regular" className="animate-spin text-muted-foreground" />
+        <HugeiconsIcon icon={CircleNotch} size={24} className="animate-spin text-muted-foreground" strokeWidth={1.5} color="currentColor" />
       </div>
     )
   }
@@ -228,7 +229,7 @@ export default function ConversationFullPage() {
     return (
       <div className="space-y-4">
         <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft size={16} weight="regular" />
+          <HugeiconsIcon icon={ArrowLeft} size={16} strokeWidth={1.5} color="currentColor" />
           Back
         </button>
         <p className="text-sm text-red-400">{error || 'Conversation not found'}</p>
@@ -273,7 +274,7 @@ export default function ConversationFullPage() {
           onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-3"
         >
-          <ArrowLeft size={16} weight="regular" />
+          <HugeiconsIcon icon={ArrowLeft} size={16} strokeWidth={1.5} color="currentColor" />
           Back to Conversations
         </button>
 
@@ -299,9 +300,9 @@ export default function ConversationFullPage() {
       {/* Copy buttons */}
       <div className="flex flex-wrap gap-2">
         <CopyButton label="Copy All" text={copyAll} />
-        <CopyButton label="Copy User Only" text={copyUserOnly} icon={<User size={12} weight="regular" />} />
-        <CopyButton label="Copy Assistant Only" text={copyAssistantOnly} icon={<Robot size={12} weight="regular" />} />
-        <CopyButton label="Copy Raw JSON" text={copyRaw} icon={<FileCode size={12} weight="regular" />} />
+        <CopyButton label="Copy User Only" text={copyUserOnly} icon={<HugeiconsIcon icon={User} size={12} strokeWidth={1.5} color="currentColor" />} />
+        <CopyButton label="Copy Assistant Only" text={copyAssistantOnly} icon={<HugeiconsIcon icon={Robot} size={12} strokeWidth={1.5} color="currentColor" />} />
+        <CopyButton label="Copy Raw JSON" text={copyRaw} icon={<HugeiconsIcon icon={FileCode} size={12} strokeWidth={1.5} color="currentColor" />} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
@@ -355,25 +356,25 @@ export default function ConversationFullPage() {
             <CardContent className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-1.5">
-                  <ChatCircle size={12} weight="regular" /> Total
+                  <HugeiconsIcon icon={ChatCircle} size={12} strokeWidth={1.5} color="currentColor" /> Total
                 </span>
                 <span className="font-mono tabular-nums">{stats.total_messages}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-1.5">
-                  <User size={12} weight="regular" /> User
+                  <HugeiconsIcon icon={User} size={12} strokeWidth={1.5} color="currentColor" /> User
                 </span>
                 <span className="font-mono tabular-nums">{stats.user_messages}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Robot size={12} weight="regular" /> Assistant
+                  <HugeiconsIcon icon={Robot} size={12} strokeWidth={1.5} color="currentColor" /> Assistant
                 </span>
                 <span className="font-mono tabular-nums">{stats.assistant_messages}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground flex items-center gap-1.5">
-                  <Clock size={12} weight="regular" /> Duration
+                  <HugeiconsIcon icon={Clock} size={12} strokeWidth={1.5} color="currentColor" /> Duration
                 </span>
                 <span className="font-mono tabular-nums">{formatDuration(stats.duration_minutes)}</span>
               </div>
@@ -410,7 +411,7 @@ export default function ConversationFullPage() {
                 <CardTitle className="text-sm font-medium">Raw Metadata</CardTitle>
                 <IconTooltip label={metadataOpen ? 'Collapse metadata' : 'Expand metadata'}>
                   <span className="shrink-0">
-                    {metadataOpen ? <CaretUp size={16} weight="regular" /> : <CaretDown size={16} weight="regular" />}
+                    {metadataOpen ? <HugeiconsIcon icon={CaretUp} size={16} strokeWidth={1.5} color="currentColor" /> : <HugeiconsIcon icon={CaretDown} size={16} strokeWidth={1.5} color="currentColor" />}
                   </span>
                 </IconTooltip>
               </button>

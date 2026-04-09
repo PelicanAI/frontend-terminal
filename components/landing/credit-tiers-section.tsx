@@ -1,12 +1,13 @@
 'use client'
 
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ChatCircle,
-  CurrencyDollar,
-  ChartLineUp,
-  Calendar,
-  Brain,
-} from '@phosphor-icons/react'
+  Chat01Icon as ChatCircle,
+  Dollar01Icon as CurrencyDollar,
+  ChartLineData01Icon as ChartLineUp,
+  Calendar01Icon as Calendar,
+  Brain01Icon as Brain,
+} from '@hugeicons/core-free-icons'
 import { Section } from '@/components/landing/section'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
@@ -63,10 +64,7 @@ export function CreditTiersSection() {
           return (
             <ScrollReveal key={tier.label} delay={i * 0.08}>
               <div className="rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm hover:shadow-md transition-shadow">
-                <Icon
-                  className="h-7 w-7 text-violet-600 mx-auto mb-3"
-                  weight="duotone"
-                />
+                <HugeiconsIcon icon={Icon} className="h-7 w-7 text-violet-600 mx-auto mb-3" strokeWidth={1.5} color="currentColor" />
                 <div className="font-mono text-2xl font-bold text-violet-600 tabular-nums mb-1">
                   {tier.credits}
                 </div>

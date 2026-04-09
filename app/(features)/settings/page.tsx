@@ -11,7 +11,8 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useAuth } from "@/lib/providers/auth-provider"
-import { CircleNotch } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Loading03Icon as CircleNotch } from "@hugeicons/core-free-icons"
 import useSWR from "swr"
 import { createClient } from "@/lib/supabase/client"
 import { logger } from "@/lib/logger"
@@ -120,7 +121,7 @@ export default function SettingsPage() {
   if (authLoading || !settings) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <CircleNotch size={32} weight="regular" className="animate-spin text-blue-600" />
+        <HugeiconsIcon icon={CircleNotch} size={32} className="animate-spin text-blue-600" strokeWidth={1.5} color="currentColor" />
       </div>
     )
   }

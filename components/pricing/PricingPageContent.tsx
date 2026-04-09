@@ -3,7 +3,12 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { User } from '@supabase/supabase-js'
-import { Lightning, CircleNotch, ShieldCheck } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  FlashIcon as Lightning,
+  Loading03Icon as CircleNotch,
+  SecurityCheckIcon as ShieldCheck,
+} from '@hugeicons/core-free-icons'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCreditsContext } from '@/providers/credits-provider'
@@ -28,7 +33,7 @@ function CostBreakdownTable() {
           <div key={key} className="cost-breakdown-row">
             <span className="cost-breakdown-label">{label}</span>
             <span className="cost-breakdown-value">
-              <Lightning weight="regular" className="cost-breakdown-icon" />
+              <HugeiconsIcon icon={Lightning} className="cost-breakdown-icon" strokeWidth={1.5} color="currentColor" />
               {cost}
             </span>
           </div>
@@ -181,7 +186,7 @@ export default function PricingPageContent() {
   if (creditsLoading) {
     return (
       <div className="pricing-loading">
-        <CircleNotch weight="regular" className="pricing-loading-spinner" />
+        <HugeiconsIcon icon={CircleNotch} className="pricing-loading-spinner" strokeWidth={1.5} color="currentColor" />
       </div>
     )
   }
@@ -262,7 +267,7 @@ export default function PricingPageContent() {
               </div>
 
               <div className="pricing-card-credits">
-                <Lightning weight="regular" className="pricing-card-credits-icon" />
+                <HugeiconsIcon icon={Lightning} className="pricing-card-credits-icon" strokeWidth={1.5} color="currentColor" />
                 <span>{plan.credits.toLocaleString()} credits</span>
               </div>
 
@@ -279,7 +284,7 @@ export default function PricingPageContent() {
               >
                 {loadingPlan === plan.id ? (
                   <>
-                    <CircleNotch weight="regular" className="pricing-card-cta-spinner" />
+                    <HugeiconsIcon icon={CircleNotch} className="pricing-card-cta-spinner" strokeWidth={1.5} color="currentColor" />
                     <span>Loading...</span>
                   </>
                 ) : (
@@ -292,7 +297,7 @@ export default function PricingPageContent() {
       </section>
 
       <div className="pricing-guarantee">
-        <ShieldCheck weight="regular" className="pricing-guarantee-icon" />
+        <HugeiconsIcon icon={ShieldCheck} className="pricing-guarantee-icon" strokeWidth={1.5} color="currentColor" />
         <span>7-day money-back guarantee &mdash; no questions asked</span>
       </div>
 

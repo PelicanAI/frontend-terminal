@@ -1,7 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { CheckSquare, Square } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { CheckmarkSquare01Icon as CheckSquare, Square01Icon as Square } from '@hugeicons/core-free-icons'
 
 const stats = [
   { label: 'Win Rate', value: '67%' },
@@ -71,9 +72,9 @@ export function PlaybookMock() {
             {checklist.map((item, i) => (
               <div key={i} className="flex items-center gap-2">
                 {item.checked ? (
-                  <CheckSquare weight="fill" className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                  <HugeiconsIcon icon={CheckSquare} className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" strokeWidth={1.5} color="currentColor" />
                 ) : (
-                  <Square weight="regular" className="w-3.5 h-3.5 text-slate-300 flex-shrink-0" />
+                  <HugeiconsIcon icon={Square} className="w-3.5 h-3.5 text-slate-300 flex-shrink-0" strokeWidth={1.5} color="currentColor" />
                 )}
                 <p className={cn(
                   'text-xs',

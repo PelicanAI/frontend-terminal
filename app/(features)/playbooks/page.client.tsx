@@ -3,7 +3,14 @@
 import { useState, useCallback, useMemo, useEffect } from "react"
 import Link from "next/link"
 import { m } from "framer-motion"
-import { Plus, SortAscending, Info, X, Compass } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Add01Icon as Plus,
+  SortByUp01Icon as SortAscending,
+  InformationCircleIcon as Info,
+  Cancel01Icon as X,
+  Compass01Icon as Compass,
+} from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { usePlaybooks, useSuggestedStrategies } from "@/hooks/use-playbooks"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
@@ -271,7 +278,7 @@ export default function PlaybooksPage() {
               size="md"
               onClick={() => setShowCreateModal(true)}
             >
-              <Plus size={16} weight="bold" />
+              <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
               New Playbook
             </PelicanButton>
           ) : undefined
@@ -300,7 +307,7 @@ export default function PlaybooksPage() {
 
           {/* Sort dropdown */}
           <div className="flex items-center gap-1.5">
-            <SortAscending size={14} className="text-[var(--text-muted)]" />
+            <HugeiconsIcon icon={SortAscending} size={14} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortKey)}
@@ -329,7 +336,7 @@ export default function PlaybooksPage() {
           exit={{ opacity: 0, y: -8 }}
           className="flex items-start gap-3 mb-5 p-4 rounded-xl bg-[var(--accent-muted)] border border-[var(--accent-primary)]/20"
         >
-          <Info size={18} weight="regular" className="text-[var(--accent-primary)] mt-0.5 shrink-0" />
+          <HugeiconsIcon icon={Info} size={18} className="text-[var(--accent-primary)] mt-0.5 shrink-0" strokeWidth={1.5} color="currentColor" />
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed flex-1">
             Tag trades to your playbooks to track performance per strategy. When logging or editing a trade, select a playbook to link it.
           </p>
@@ -337,7 +344,7 @@ export default function PlaybooksPage() {
             onClick={handleDismissHint}
             className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors shrink-0"
           >
-            <X size={16} weight="regular" />
+            <HugeiconsIcon icon={X} size={16} strokeWidth={1.5} color="currentColor" />
           </button>
         </m.div>
       )}
@@ -509,7 +516,7 @@ export default function PlaybooksPage() {
             className="sm:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-[var(--accent-primary)] rounded-full shadow-lg shadow-[var(--accent-primary)]/25 flex items-center justify-center active:scale-95 transition-transform"
             aria-label="New Playbook"
           >
-            <Plus size={24} weight="bold" className="text-white" />
+            <HugeiconsIcon icon={Plus} size={24} className="text-white" strokeWidth={2} color="currentColor" />
           </button>
         </IconTooltip>
       )}
@@ -601,7 +608,7 @@ function PlaybookSection({
               onClick={onNewPlaybook}
               className="flex flex-col items-center justify-center gap-2 min-h-[12rem] rounded-xl border-2 border-dashed border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-secondary)] transition-all cursor-pointer"
             >
-              <Plus size={24} weight="regular" />
+              <HugeiconsIcon icon={Plus} size={24} strokeWidth={1.5} color="currentColor" />
               <span className="text-sm font-medium">New Playbook</span>
             </m.button>
           )}
@@ -622,7 +629,7 @@ function GlobalEmptyState({ onCreatePlaybook }: { onCreatePlaybook: () => void }
       className="flex flex-col items-center justify-center py-24 px-6 text-center"
     >
       <div className="w-16 h-16 rounded-2xl bg-[var(--accent-muted)] flex items-center justify-center mb-6">
-        <Plus size={32} weight="thin" className="text-[var(--accent-primary)]" />
+        <HugeiconsIcon icon={Plus} size={32} className="text-[var(--accent-primary)]" strokeWidth={1} color="currentColor" />
       </div>
 
       <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
@@ -639,7 +646,7 @@ function GlobalEmptyState({ onCreatePlaybook }: { onCreatePlaybook: () => void }
           onClick={onCreatePlaybook}
           className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-5 hover:border-[var(--border-hover)] transition-all text-left group"
         >
-          <Plus size={24} weight="regular" className="text-[var(--accent-primary)] mb-3" />
+          <HugeiconsIcon icon={Plus} size={24} className="text-[var(--accent-primary)] mb-3" strokeWidth={1.5} color="currentColor" />
           <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Start from Scratch</h3>
           <p className="text-xs text-[var(--text-muted)] leading-relaxed">Define your own setup with custom entry, exit, and risk rules.</p>
         </button>
@@ -647,7 +654,7 @@ function GlobalEmptyState({ onCreatePlaybook }: { onCreatePlaybook: () => void }
           href="/strategies"
           className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl p-5 hover:border-[var(--border-hover)] transition-all group"
         >
-          <Compass size={24} weight="regular" className="text-[var(--accent-primary)] mb-3" />
+          <HugeiconsIcon icon={Compass} size={24} className="text-[var(--accent-primary)] mb-3" strokeWidth={1.5} color="currentColor" />
           <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Browse Templates &amp; Customize</h3>
           <p className="text-xs text-[var(--text-muted)] leading-relaxed">Browse proven strategies from the Pelican team and community.</p>
         </Link>

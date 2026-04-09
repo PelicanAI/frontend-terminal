@@ -1,15 +1,15 @@
 import { ImageResponse } from "next/og"
 import { NextRequest } from "next/server"
-import { getGeistSans, getGeistMono } from "@/lib/share-cards/fonts"
+import { getPlexSans, getPlexMono } from "@/lib/share-cards/fonts"
 import { TradeRecapCard } from "@/lib/share-cards/trade-recap"
 import { PelicanInsightCard } from "@/lib/share-cards/pelican-insight"
 import { StatsTableCard } from "@/lib/share-cards/stats-table"
 import { createClient } from "@/lib/supabase/server"
 
-function getFonts(geistSans: ArrayBuffer, geistMono: ArrayBuffer) {
+function getFonts(plexSans: ArrayBuffer, plexMono: ArrayBuffer) {
   return [
-    { name: "Geist Sans", data: geistSans, weight: 600 as const, style: "normal" as const },
-    { name: "Geist Mono", data: geistMono, weight: 400 as const, style: "normal" as const },
+    { name: "IBM Plex Sans", data: plexSans, weight: 600 as const, style: "normal" as const },
+    { name: "IBM Plex Mono", data: plexMono, weight: 400 as const, style: "normal" as const },
   ]
 }
 
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     const format = searchParams.get("format") || "og"
 
     const dimensions = getDimensions(format)
-    const [geistSans, geistMono] = await Promise.all([getGeistSans(), getGeistMono()])
+    const [plexSans, plexMono] = await Promise.all([getPlexSans(), getPlexMono()])
 
     let cardContent: React.ReactElement
 
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 
     const response = new ImageResponse(cardContent, {
       ...dimensions,
-      fonts: getFonts(geistSans, geistMono),
+      fonts: getFonts(plexSans, plexMono),
     })
     response.headers.set("Cache-Control", "no-store, max-age=0")
     return response
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     const { type, format } = body
 
     const dimensions = getDimensions(format || "og")
-    const [geistSans, geistMono] = await Promise.all([getGeistSans(), getGeistMono()])
+    const [plexSans, plexMono] = await Promise.all([getPlexSans(), getPlexMono()])
 
     let cardContent: React.ReactElement
 
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
 
     const response = new ImageResponse(cardContent, {
       ...dimensions,
-      fonts: getFonts(geistSans, geistMono),
+      fonts: getFonts(plexSans, plexMono),
     })
     response.headers.set("Cache-Control", "no-store, max-age=0")
     return response

@@ -1,9 +1,13 @@
 'use client'
 
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
-import { PelicanCard } from '@/components/ui/pelican'
+import { m } from 'framer-motion'
+import { Area, AreaChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  ArrowDown01Icon as ChevronDown,
+  ChartLineData01Icon as ChartLineUp,
+} from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
-import { ChartLineUp } from '@phosphor-icons/react'
 import type { PnlPoint } from '@/hooks/use-portfolio-pnl'
 
 interface PortfolioPnlChartProps {
@@ -16,101 +20,122 @@ export function PortfolioPnlChart({ data, isLoading }: PortfolioPnlChartProps) {
 
   if (isLoading) {
     return (
-      <PelicanCard className="bg-[var(--bg-base)]/80 border border-[var(--border-subtle)]/30 p-5" noPadding>
-        <div className="flex items-center gap-2 mb-4">
-          <ChartLineUp size={18} weight="regular" className="text-[var(--text-muted)]" />
-          <h3 className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Portfolio P&L History</h3>
+      <div className="border-b border-[var(--border-default)] pb-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">P&amp;L History</h3>
+          <HugeiconsIcon icon={ChevronDown} size={14} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         </div>
-        <div className="h-[200px] flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-[var(--accent-primary)]/30 border-t-[var(--accent-primary)] rounded-full animate-spin" />
+        <div className="mt-4 text-xs uppercase tracking-wider text-[var(--text-secondary)]">Portfolio P&amp;L History</div>
+        <div className="mt-6 flex h-[180px] items-center justify-center">
+          <p className="font-mono text-sm text-[var(--text-secondary)]">Loading portfolio P&amp;L feed…</p>
         </div>
-      </PelicanCard>
+      </div>
     )
   }
 
   if (data.length === 0) {
     return (
-      <PelicanCard className="bg-[var(--bg-base)]/80 border border-[var(--border-subtle)]/30 p-5" noPadding>
-        <div className="flex items-center gap-2 mb-4">
-          <ChartLineUp size={18} weight="regular" className="text-[var(--text-muted)]" />
-          <h3 className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Portfolio P&L History</h3>
+      <div className="border-b border-[var(--border-default)] pb-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">P&amp;L History</h3>
+          <HugeiconsIcon icon={ChevronDown} size={14} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         </div>
-        <div className="h-[200px] flex flex-col items-center justify-center">
-          <ChartLineUp size={24} className="text-[var(--text-muted)] mb-2" />
-          <p className="text-xs text-[var(--text-muted)]">P&L history will appear after market close</p>
+        <div className="mt-4 flex items-center gap-2 text-xs uppercase tracking-wider text-[var(--text-secondary)]">
+          <HugeiconsIcon icon={ChartLineUp} size={14} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
+          <span>Portfolio P&amp;L History</span>
         </div>
-      </PelicanCard>
+        <div className="mt-6 flex h-[180px] items-center justify-center">
+          <p className="font-mono text-sm text-[var(--text-secondary)]">No P&amp;L history has printed yet.</p>
+        </div>
+      </div>
     )
   }
 
   return (
-    <PelicanCard className="bg-[var(--bg-base)]/80 border border-[var(--border-subtle)]/30 p-5" noPadding>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <ChartLineUp size={18} weight="regular" className="text-[var(--text-muted)]" />
-          <h3 className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Portfolio P&L History</h3>
-        </div>
-        {latestPnl !== null && (
-          <span className={cn(
-            "text-sm font-[var(--font-geist-mono)] tabular-nums font-semibold",
-            latestPnl >= 0 ? "text-emerald-400/80" : "text-red-400/80"
-          )}>
-            {latestPnl >= 0 ? '+' : ''}${latestPnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-        )}
+    <m.div
+      className="border-b border-[var(--border-default)] pb-4"
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">P&amp;L History</h3>
+        <HugeiconsIcon icon={ChevronDown} size={14} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
       </div>
-      <div className="h-[200px]">
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-[var(--text-secondary)]">Portfolio P&amp;L History</p>
+          <div className="mt-1 flex items-center gap-2">
+            <HugeiconsIcon icon={ChartLineUp} size={15} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
+            <span
+              className={cn(
+                'font-mono tabular-nums text-lg',
+                latestPnl !== null && latestPnl >= 0 ? 'text-emerald-400' : 'text-red-400',
+              )}
+            >
+              {latestPnl !== null ? `${latestPnl >= 0 ? '+' : ''}$${latestPnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -8 }}>
+          <AreaChart data={data} margin={{ top: 8, right: 0, bottom: 0, left: -10 }}>
             <defs>
-              <linearGradient id="pnlGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--data-positive)" stopOpacity={0.3} />
-                <stop offset="50%" stopColor="var(--data-positive)" stopOpacity={0.05} />
-                <stop offset="50%" stopColor="var(--data-negative)" stopOpacity={0.05} />
-                <stop offset="100%" stopColor="var(--data-negative)" stopOpacity={0.3} />
+              <linearGradient id="positionsPnlGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--data-positive)" stopOpacity={0.18} />
+                <stop offset="55%" stopColor="var(--data-positive)" stopOpacity={0.03} />
+                <stop offset="55%" stopColor="var(--data-negative)" stopOpacity={0.03} />
+                <stop offset="100%" stopColor="var(--data-negative)" stopOpacity={0.18} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="date"
-              tick={{ fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
+              tick={{ fill: 'var(--text-muted)', fontSize: 12, fontFamily: 'var(--font-mono)' }}
               tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               axisLine={false}
               tickLine={false}
               minTickGap={40}
             />
             <YAxis
-              tick={{ fill: 'var(--text-muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}
-              tickFormatter={(v) => `$${v >= 0 ? '' : '-'}${Math.abs(v).toLocaleString()}`}
+              tick={{ fill: 'var(--text-muted)', fontSize: 12, fontFamily: 'var(--font-mono)' }}
+              tickFormatter={(value) => `$${value >= 0 ? '' : '-'}${Math.abs(value).toLocaleString()}`}
               axisLine={false}
               tickLine={false}
-              width={60}
+              width={64}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'var(--bg-elevated)',
+                backgroundColor: 'var(--bg-surface)',
                 border: '1px solid var(--border-default)',
-                borderRadius: '12px',
                 color: 'var(--text-primary)',
                 fontFamily: 'var(--font-mono)',
                 fontSize: 12,
               }}
-              labelFormatter={(value) => new Date(value as string).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              formatter={((value: number | undefined) => [`$${(value ?? 0).toFixed(2)}`, 'Portfolio P&L']) as any}
+              labelFormatter={(value) =>
+                new Date(value as string).toLocaleDateString('en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                })
+              }
+              formatter={((value: number | undefined) => [`$${(value ?? 0).toFixed(2)}`, 'Portfolio P&L']) as never}
             />
-            <ReferenceLine y={0} stroke="var(--border-subtle)" strokeDasharray="3 3" />
+            <ReferenceLine y={0} stroke="var(--border-default)" strokeDasharray="2 4" />
             <Area
               type="monotone"
               dataKey="total_pnl"
               stroke={latestPnl != null && latestPnl >= 0 ? 'var(--data-positive)' : 'var(--data-negative)'}
-              strokeWidth={2}
-              fill="url(#pnlGradient)"
+              strokeWidth={1.8}
+              fill="url(#positionsPnlGradient)"
               dot={false}
-              activeDot={{ r: 4, strokeWidth: 0 }}
+              activeDot={{ r: 3, strokeWidth: 0 }}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
-    </PelicanCard>
+    </m.div>
   )
 }

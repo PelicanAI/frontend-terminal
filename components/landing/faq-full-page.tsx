@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { CaretDown } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ArrowDown01Icon as CaretDown } from '@hugeicons/core-free-icons'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Section } from '@/components/landing/section'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
@@ -209,10 +210,7 @@ export function FAQFullPage() {
                             transition={{ duration: 0.2 }}
                             className="shrink-0 ml-4"
                           >
-                            <CaretDown
-                              weight="bold"
-                              className="h-4 w-4 text-slate-400"
-                            />
+                            <HugeiconsIcon icon={CaretDown} className="h-4 w-4 text-slate-400" strokeWidth={2} color="currentColor" />
                           </motion.span>
                         </button>
 

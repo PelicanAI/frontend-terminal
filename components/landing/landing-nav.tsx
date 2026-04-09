@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { List, X } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ListViewIcon as List, Cancel01Icon as X } from '@hugeicons/core-free-icons'
 
 export function LandingNav() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -83,9 +84,9 @@ export function LandingNav() {
             aria-label="Toggle menu"
           >
             {mobileOpen ? (
-              <X weight="bold" className="h-6 w-6 text-slate-700" />
+              <HugeiconsIcon icon={X} className="h-6 w-6 text-slate-700" strokeWidth={2} color="currentColor" />
             ) : (
-              <List weight="bold" className="h-6 w-6 text-slate-700" />
+              <HugeiconsIcon icon={List} className="h-6 w-6 text-slate-700" strokeWidth={2} color="currentColor" />
             )}
           </button>
         </div>

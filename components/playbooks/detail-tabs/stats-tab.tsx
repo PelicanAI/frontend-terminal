@@ -14,7 +14,8 @@ import {
 } from "recharts"
 import { cn } from "@/lib/utils"
 import type { PlaybookStats } from "@/hooks/use-playbooks"
-import { ChartBar, Flask } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { BarChartIcon as ChartBar, TestTubeIcon as Flask } from "@hugeicons/core-free-icons"
 
 interface PlaybookStatsTabProps {
   stats: PlaybookStats | null
@@ -38,11 +39,7 @@ export function PlaybookStatsTab({ stats, isLoading }: PlaybookStatsTabProps) {
   if (!stats || stats.totalTrades === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <ChartBar
-          size={32}
-          weight="thin"
-          className="text-[var(--text-muted)] mb-3"
-        />
+        <HugeiconsIcon icon={ChartBar} size={32} className="text-[var(--text-muted)] mb-3" strokeWidth={1} color="currentColor" />
         <p className="text-sm text-[var(--text-muted)]">
           No closed trades tagged with this playbook yet.
         </p>
@@ -264,7 +261,7 @@ export function PlaybookStatsTab({ stats, isLoading }: PlaybookStatsTabProps) {
       {/* Pelican Backtest Placeholder */}
       <div className="mt-8 border border-[var(--border-subtle)] rounded-xl p-6 text-center">
         <div className="flex items-center justify-center gap-2 mb-3">
-          <Flask size={20} weight="regular" className="text-[var(--accent-primary)]" />
+          <HugeiconsIcon icon={Flask} size={20} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
           <h3 className="text-lg font-semibold text-[var(--text-primary)]">Pelican Backtest</h3>
         </div>
         <p className="text-sm text-[var(--text-secondary)] mb-4">

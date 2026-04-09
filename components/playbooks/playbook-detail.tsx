@@ -2,19 +2,20 @@
 
 import { useState } from "react"
 import { m, AnimatePresence } from "framer-motion"
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
 import {
-  ArrowLeft,
-  Eye,
-  ChartBar,
-  List,
-  Sparkle,
-  Globe,
-  DotsThreeVertical,
-  Archive,
-  Trash,
-  X as XIcon,
-  PencilSimple,
-} from "@phosphor-icons/react"
+  ArrowLeft01Icon as ArrowLeft,
+  ViewIcon as Eye,
+  BarChartIcon as ChartBar,
+  ListViewIcon as List,
+  SparklesIcon as Sparkle,
+  GlobeIcon as Globe,
+  MoreVerticalIcon as DotsThreeVertical,
+  ArchiveIcon as Archive,
+  Delete01Icon as Trash,
+  Cancel01Icon as XIcon,
+  PencilEdit01Icon as PencilSimple,
+} from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { PelicanButton, pageEnter, tabContent } from "@/components/ui/pelican"
 import { usePlaybooks, usePlaybookStats } from "@/hooks/use-playbooks"
@@ -45,7 +46,7 @@ interface PlaybookDetailProps {
   onUnadopt?: (playbook: Playbook) => void
 }
 
-const tabs: { key: TabKey; label: string; icon: typeof Eye }[] = [
+const tabs: { key: TabKey; label: string; icon: IconSvgElement }[] = [
   { key: "overview", label: "Overview", icon: Eye },
   { key: "stats", label: "Stats", icon: ChartBar },
   { key: "trades", label: "Trades", icon: List },
@@ -75,7 +76,7 @@ export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadop
       {/* Back + title */}
       <div className="flex items-center gap-3 mb-6">
         <PelicanButton variant="ghost" size="sm" onClick={onBack}>
-          <ArrowLeft size={16} weight="bold" />
+          <HugeiconsIcon icon={ArrowLeft} size={16} strokeWidth={2} color="currentColor" />
           Back
         </PelicanButton>
         <div className="flex-1 min-w-0">
@@ -102,12 +103,12 @@ export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadop
               className="p-2 rounded-lg hover:bg-white/5 transition-colors"
               title="Edit playbook"
             >
-              <PencilSimple size={18} weight="regular" className="text-[var(--text-secondary)]" />
+              <HugeiconsIcon icon={PencilSimple} size={18} className="text-[var(--text-secondary)]" strokeWidth={1.5} color="currentColor" />
             </button>
           )}
           {canPublish && (
             <PelicanButton variant="secondary" size="sm" onClick={() => setShowPublishModal(true)}>
-              <Globe size={14} weight="regular" />
+              <HugeiconsIcon icon={Globe} size={14} strokeWidth={1.5} color="currentColor" />
               Publish
             </PelicanButton>
           )}
@@ -115,7 +116,7 @@ export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadop
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors" aria-label="More options">
-                  <DotsThreeVertical size={18} weight="bold" />
+                  <HugeiconsIcon icon={DotsThreeVertical} size={18} strokeWidth={2} color="currentColor" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" sideOffset={4}>
@@ -124,14 +125,14 @@ export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadop
                     variant="destructive"
                     onClick={() => onUnadopt(playbook)}
                   >
-                    <XIcon size={14} weight="regular" />
+                    <HugeiconsIcon icon={XIcon} size={14} strokeWidth={1.5} color="currentColor" />
                     Remove from Playbooks
                   </DropdownMenuItem>
                 ) : (
                   <>
                     {onArchive && (
                       <DropdownMenuItem onClick={() => onArchive(playbook)}>
-                        <Archive size={14} weight="regular" className="text-[var(--text-secondary)]" />
+                        <HugeiconsIcon icon={Archive} size={14} className="text-[var(--text-secondary)]" strokeWidth={1.5} color="currentColor" />
                         Archive Playbook
                       </DropdownMenuItem>
                     )}
@@ -142,7 +143,7 @@ export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadop
                           variant="destructive"
                           onClick={() => onDelete(playbook)}
                         >
-                          <Trash size={14} weight="regular" />
+                          <HugeiconsIcon icon={Trash} size={14} strokeWidth={1.5} color="currentColor" />
                           Delete Playbook
                         </DropdownMenuItem>
                       </>
@@ -183,10 +184,7 @@ export function PlaybookDetail({ playbook, onBack, onArchive, onDelete, onUnadop
                 : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]"
             )}
           >
-            <Icon
-              size={16}
-              weight={activeTab === key ? "fill" : "regular"}
-            />
+            <HugeiconsIcon icon={Icon} size={16} strokeWidth={1.5} color="currentColor" />
             {label}
           </button>
         ))}

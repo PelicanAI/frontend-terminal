@@ -2,18 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  SquaresFour,
-  Users,
-  ChatCircle,
-  CreditCard,
-  ChartBar,
-  MagnifyingGlass,
-  PuzzlePiece,
-  Heartbeat,
-  ArrowLeft,
-  Shield,
-} from '@phosphor-icons/react'
+  DashboardSquare01Icon as SquaresFour,
+  UserMultipleIcon as Users,
+  Chat01Icon as ChatCircle,
+  CreditCardIcon as CreditCard,
+  BarChartIcon as ChartBar,
+  Search01Icon as MagnifyingGlass,
+  PuzzleIcon as PuzzlePiece,
+  Cardiogram01Icon as Heartbeat,
+  ArrowLeft01Icon as ArrowLeft,
+  Shield01Icon as Shield,
+} from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -33,7 +34,7 @@ export function AdminSidebar({ displayName }: { displayName: string }) {
   return (
     <aside className="flex w-56 flex-col border-r border-border bg-card lg:w-64">
       <div className="flex items-center gap-2 border-b border-border px-4 py-4">
-        <Shield size={20} weight="regular" className="text-primary" />
+        <HugeiconsIcon icon={Shield} size={20} className="text-primary" strokeWidth={1.5} color="currentColor" />
         <span className="text-sm font-semibold">Pelican Admin</span>
       </div>
 
@@ -54,7 +55,7 @@ export function AdminSidebar({ displayName }: { displayName: string }) {
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
-              <item.icon size={16} weight="regular" />
+              <HugeiconsIcon icon={item.icon} size={16} strokeWidth={1.5} color="currentColor" />
               {item.label}
             </Link>
           )
@@ -67,7 +68,7 @@ export function AdminSidebar({ displayName }: { displayName: string }) {
           href="/chat"
           className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft size={12} weight="regular" />
+          <HugeiconsIcon icon={ArrowLeft} size={12} strokeWidth={1.5} color="currentColor" />
           Back to App
         </Link>
       </div>

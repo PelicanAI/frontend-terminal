@@ -1,7 +1,8 @@
 "use client"
 
 import { m } from "framer-motion"
-import { Warning, ArrowsClockwise } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Alert01Icon as Warning, Refresh01Icon as ArrowsClockwise } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
 
 interface ErrorMessageProps {
@@ -22,7 +23,7 @@ export function ErrorMessage({ message, onRetry, variant = "message" }: ErrorMes
       >
         <div className="flex items-center justify-between max-w-4xl mx-auto">
           <div className="flex items-center gap-2 text-red-800">
-            <Warning size={16} weight="regular" />
+            <HugeiconsIcon icon={Warning} size={16} strokeWidth={1.5} color="currentColor" />
             <span className="text-sm font-medium">{message}</span>
           </div>
           {onRetry && (
@@ -32,7 +33,7 @@ export function ErrorMessage({ message, onRetry, variant = "message" }: ErrorMes
               onClick={onRetry}
               className="border-red-300 text-red-700 hover:bg-red-100 bg-transparent"
             >
-              <ArrowsClockwise size={12} weight="regular" className="mr-1" />
+              <HugeiconsIcon icon={ArrowsClockwise} size={12} className="mr-1" strokeWidth={1.5} color="currentColor" />
               Retry
             </Button>
           )}
@@ -57,7 +58,7 @@ export function ErrorMessage({ message, onRetry, variant = "message" }: ErrorMes
     >
       <div className="flex-shrink-0">
         <div className="h-9 w-9 bg-red-100 rounded-full flex items-center justify-center">
-          <Warning size={16} weight="regular" className="text-red-600" />
+          <HugeiconsIcon icon={Warning} size={16} className="text-red-600" strokeWidth={1.5} color="currentColor" />
         </div>
       </div>
 
@@ -81,7 +82,7 @@ export function ErrorMessage({ message, onRetry, variant = "message" }: ErrorMes
                 onClick={onRetry}
                 className="border-red-300 text-red-700 hover:bg-red-100 h-7 bg-transparent"
               >
-                <ArrowsClockwise size={12} weight="regular" className="mr-1" />
+                <HugeiconsIcon icon={ArrowsClockwise} size={12} className="mr-1" strokeWidth={1.5} color="currentColor" />
                 Retry
               </Button>
             </m.div>

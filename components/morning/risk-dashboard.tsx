@@ -1,7 +1,12 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ShieldCheck, Warning, CaretRight } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  SecurityCheckIcon as ShieldCheck,
+  Alert01Icon as Warning,
+  ArrowRight01Icon as CaretRight,
+} from '@hugeicons/core-free-icons'
 import { PelicanCard } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 
@@ -126,7 +131,7 @@ export function RiskDashboard({ openTrades, closedTrades, quotes, onAnalyze }: R
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-[var(--accent-primary)]" weight="regular" />
+          <HugeiconsIcon icon={ShieldCheck} className="h-4 w-4 text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
           <h2 className="text-sm font-semibold text-[var(--text-primary)]">Risk Dashboard</h2>
         </div>
       </div>
@@ -144,13 +149,10 @@ export function RiskDashboard({ openTrades, closedTrades, quotes, onAnalyze }: R
                   : 'bg-[var(--data-warning)]/10 border border-[var(--data-warning)]/20'
               )}
             >
-              <Warning
-                className={cn(
+              <HugeiconsIcon icon={Warning} className={cn(
                   "h-4 w-4 mt-0.5 shrink-0",
                   warn.severity === 'red' ? 'text-[var(--data-negative)]' : 'text-[var(--data-warning)]'
-                )}
-                weight="bold"
-              />
+                )} strokeWidth={2} color="currentColor" />
               <span className={cn(
                 "text-xs",
                 warn.severity === 'red' ? 'text-[var(--data-negative)]' : 'text-[var(--data-warning)]'
@@ -263,7 +265,7 @@ export function RiskDashboard({ openTrades, closedTrades, quotes, onAnalyze }: R
         className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-xs text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-secondary)]"
       >
         Check My Trading Plan
-        <CaretRight className="h-3 w-3" weight="bold" />
+        <HugeiconsIcon icon={CaretRight} className="h-3 w-3" strokeWidth={2} color="currentColor" />
       </button>
     </PelicanCard>
   )

@@ -1,7 +1,8 @@
 "use client"
 
 import { memo, useEffect, useRef, useState } from "react"
-import { ArrowLeft } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowLeft01Icon as ArrowLeft } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
 
 interface TradingViewChartProps {
@@ -90,7 +91,7 @@ function TradingViewChartInner({ symbol, onClose }: TradingViewChartProps) {
           onClick={onClose}
           className="h-8 w-8 hover:bg-muted/50"
         >
-          <ArrowLeft size={16} weight="regular" />
+          <HugeiconsIcon icon={ArrowLeft} size={16} strokeWidth={1.5} color="currentColor" />
         </Button>
         <span className="text-lg font-bold text-foreground">{symbol}</span>
       </div>

@@ -18,12 +18,13 @@ import {
   staggerContainer,
   staggerItem,
 } from "@/components/ui/pelican"
+import { HugeiconsIcon } from "@hugeicons/react"
 import {
-  ArrowsClockwise,
-  Lightning,
-  Briefcase,
-  ChatCircleDots,
-} from "@phosphor-icons/react"
+  Refresh01Icon as ArrowsClockwise,
+  FlashIcon as Lightning,
+  Briefcase01Icon as Briefcase,
+  MessageMultiple01Icon as ChatCircleDots,
+} from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { getMarketStatus } from "@/hooks/use-market-data"
 import { LogoImg } from "@/components/ui/logo-img"
@@ -754,7 +755,7 @@ export default function MorningPage() {
                 disabled={moversRefreshing}
                 aria-label="Refresh movers"
               >
-                <ArrowsClockwise className={`h-4 w-4 ${moversRefreshing ? "animate-spin" : ""}`} weight="bold" />
+                <HugeiconsIcon icon={ArrowsClockwise} className={`h-4 w-4 ${moversRefreshing ? "animate-spin" : ""}`} strokeWidth={2} color="currentColor" />
               </PelicanButton>
             </IconTooltip>
           </div>
@@ -792,7 +793,7 @@ export default function MorningPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Lightning className={`h-5 w-5 text-[var(--accent-primary)] ${briefLoading ? 'animate-pulse' : ''}`} weight="bold" />
+              <HugeiconsIcon icon={Lightning} className={`h-5 w-5 text-[var(--accent-primary)] ${briefLoading ? 'animate-pulse' : ''}`} strokeWidth={2} color="currentColor" />
               <h3 className="font-semibold text-lg text-[var(--text-primary)]">Pelican Brief</h3>
               {briefLoading && briefContent && (
                 <span className="text-xs text-[var(--text-muted)] animate-pulse">Streaming...</span>
@@ -808,7 +809,7 @@ export default function MorningPage() {
                     openWithPrompt(null, `Give me your honest assessment of my portfolio risk today. What's the biggest threat to my open positions and what should I be watching for?`, 'morning', 'brief_action')
                   }}
                 >
-                  <ChatCircleDots className="h-3 w-3" weight="regular" />
+                  <HugeiconsIcon icon={ChatCircleDots} className="h-3 w-3" strokeWidth={1.5} color="currentColor" />
                   Discuss
                 </PelicanButton>
                 <PelicanButton
@@ -817,7 +818,7 @@ export default function MorningPage() {
                   onClick={handleGenerateBrief}
                   disabled={briefLoading}
                 >
-                  <ArrowsClockwise className={`h-3 w-3 ${briefLoading ? 'animate-spin' : ''}`} weight="regular" />
+                  <HugeiconsIcon icon={ArrowsClockwise} className={`h-3 w-3 ${briefLoading ? 'animate-spin' : ''}`} strokeWidth={1.5} color="currentColor" />
                   {briefLoading ? 'Regenerating...' : 'Regenerate'}
                 </PelicanButton>
               </div>
@@ -834,7 +835,7 @@ export default function MorningPage() {
                 variant="primary"
                 onClick={handleGenerateBrief}
               >
-                <Lightning className="h-4 w-4" weight="bold" />
+                <HugeiconsIcon icon={Lightning} className="h-4 w-4" strokeWidth={2} color="currentColor" />
                 Generate Brief
               </PelicanButton>
             </>
@@ -911,7 +912,7 @@ export default function MorningPage() {
                 </div>
               ) : openTrades.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <Briefcase className="h-8 w-8 text-[var(--text-muted)] mb-2" weight="light" />
+                  <HugeiconsIcon icon={Briefcase} className="h-8 w-8 text-[var(--text-muted)] mb-2" strokeWidth={1} color="currentColor" />
                   <p className="text-sm text-[var(--text-muted)]">No open positions</p>
                   <p className="text-xs text-[var(--text-muted)] mt-1">Log trades in the Journal to see them here</p>
                 </div>

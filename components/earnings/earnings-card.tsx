@@ -1,7 +1,8 @@
 "use client"
 
 import { m } from "framer-motion"
-import { Briefcase, BookmarkSimple } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Briefcase01Icon as Briefcase, Bookmark01Icon as BookmarkSimple } from "@hugeicons/core-free-icons"
 import { LogoImg } from "@/components/ui/logo-img"
 import { staggerItem } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
@@ -62,10 +63,7 @@ export function EarningsCard({ event, onClick, highlighted, isWatched, onToggleW
                 {event.symbol}
               </span>
               {event.inPortfolio && (
-                <Briefcase
-                  weight="fill"
-                  className="w-3 h-3 text-[var(--accent-primary)] flex-shrink-0"
-                />
+                <HugeiconsIcon icon={Briefcase} className="w-3 h-3 text-[var(--accent-primary)] flex-shrink-0" strokeWidth={1.5} color="currentColor" />
               )}
             </div>
             {event.name && (
@@ -143,11 +141,7 @@ export function EarningsCard({ event, onClick, highlighted, isWatched, onToggleW
             className="p-1 rounded hover:bg-white/5 transition-colors flex-shrink-0 appearance-none bg-transparent border-none m-0 cursor-pointer"
             aria-label={isWatched ? 'Remove from Watchlist' : 'Add to Watchlist'}
           >
-            <BookmarkSimple
-              size={16}
-              weight={isWatched ? 'fill' : 'regular'}
-              className={isWatched ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}
-            />
+            <HugeiconsIcon icon={BookmarkSimple} size={16} className={isWatched ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'} strokeWidth={1.5} color="currentColor" />
           </button>
         )}
       </div>

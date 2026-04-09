@@ -16,7 +16,15 @@ import { SectorLegend } from "@/components/heatmap/sector-legend"
 import { getSectors, type SP500Sector } from "@/lib/data/sp500-constituents"
 import { getForexCategories } from "@/lib/data/forex-pairs"
 import { getCryptoCategories } from "@/lib/data/crypto-tokens"
-import { ArrowsClockwise, GridFour, SquaresFour, Lightning, Crosshair, BookmarkSimple } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Refresh01Icon as ArrowsClockwise,
+  GridViewIcon as GridFour,
+  DashboardSquare01Icon as SquaresFour,
+  FlashIcon as Lightning,
+  Target01Icon as Crosshair,
+  Bookmark01Icon as BookmarkSimple,
+} from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { getMarketStatus } from "@/hooks/use-market-data"
@@ -512,7 +520,7 @@ function HeatmapPageInner() {
                     : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-[var(--border-hover)]'
                 )}
               >
-                <Crosshair className="w-3.5 h-3.5" weight={showMyStocks ? "fill" : "regular"} />
+                <HugeiconsIcon icon={Crosshair} className="w-3.5 h-3.5" strokeWidth={1.5} color="currentColor" />
                 My {activeMarket === 'forex' ? 'Pairs' : activeMarket === 'crypto' ? 'Tokens' : 'Stocks'}
               </button>
 
@@ -526,7 +534,7 @@ function HeatmapPageInner() {
                     : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-[var(--border-hover)]'
                 )}
               >
-                <Lightning className="w-3 h-3" weight={autoRefresh ? "fill" : "regular"} />
+                <HugeiconsIcon icon={Lightning} className="w-3 h-3" strokeWidth={1.5} color="currentColor" />
                 Auto
               </button>
 
@@ -537,7 +545,7 @@ function HeatmapPageInner() {
                   disabled={isLoading}
                   className="px-3 py-1.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] hover:border-[var(--border-hover)] transition-all duration-150 disabled:opacity-50"
                 >
-                  <ArrowsClockwise className={cn("w-4 h-4 text-[var(--text-secondary)]", isLoading && 'animate-spin')} />
+                  <HugeiconsIcon icon={ArrowsClockwise} className={cn("w-4 h-4 text-[var(--text-secondary)]", isLoading && 'animate-spin')} strokeWidth={1.5} color="currentColor" />
                 </button>
               </IconTooltip>
 
@@ -553,7 +561,7 @@ function HeatmapPageInner() {
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     )}
                   >
-                    <SquaresFour className="w-4 h-4" weight={viewMode === 'treemap' ? "fill" : "regular"} />
+                    <HugeiconsIcon icon={SquaresFour} className="w-4 h-4" strokeWidth={1.5} color="currentColor" />
                   </button>
                 </IconTooltip>
                 <IconTooltip label="Grid view" side="bottom">
@@ -566,7 +574,7 @@ function HeatmapPageInner() {
                         : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     )}
                   >
-                    <GridFour className="w-4 h-4" weight={viewMode === 'grid' ? "fill" : "regular"} />
+                    <HugeiconsIcon icon={GridFour} className="w-4 h-4" strokeWidth={1.5} color="currentColor" />
                   </button>
                 </IconTooltip>
               </div>
@@ -670,7 +678,7 @@ function HeatmapPageInner() {
           {isLoading && stocks.length === 0 && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <ArrowsClockwise className="w-8 h-8 text-[var(--accent-primary)] animate-spin mx-auto mb-2" />
+                <HugeiconsIcon icon={ArrowsClockwise} className="w-8 h-8 text-[var(--accent-primary)] animate-spin mx-auto mb-2" strokeWidth={1.5} color="currentColor" />
                 <p className="text-[var(--text-muted)] text-sm">Loading heatmap data...</p>
               </div>
             </div>
@@ -772,11 +780,7 @@ function HeatmapPageInner() {
                           className="p-1 rounded hover:bg-white/10 transition-colors appearance-none bg-transparent border-none m-0 cursor-pointer"
                           aria-label={watchlistTickers.has(stock.ticker.toUpperCase()) ? 'Remove from Watchlist' : 'Add to Watchlist'}
                         >
-                          <BookmarkSimple
-                            size={14}
-                            weight={watchlistTickers.has(stock.ticker.toUpperCase()) ? 'fill' : 'regular'}
-                            className={watchlistTickers.has(stock.ticker.toUpperCase()) ? 'text-[var(--accent-primary)]' : 'text-white/40 hover:text-white/60'}
-                          />
+                          <HugeiconsIcon icon={BookmarkSimple} size={14} className={watchlistTickers.has(stock.ticker.toUpperCase()) ? 'text-[var(--accent-primary)]' : 'text-white/40 hover:text-white/60'} strokeWidth={1.5} color="currentColor" />
                         </button>
                       </div>
                     </button>

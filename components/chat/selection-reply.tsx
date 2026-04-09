@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Quotes } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { QuotesIcon as Quotes } from "@hugeicons/core-free-icons"
 import { m, AnimatePresence } from "framer-motion"
 
 interface SelectionReplyProps {
@@ -120,7 +121,7 @@ export function SelectionReply({ containerRef, onReply }: SelectionReplyProps) {
             top: `${Math.max(8, position.y)}px`,
           }}
         >
-          <Quotes size={12} weight="bold" />
+          <HugeiconsIcon icon={Quotes} size={12} strokeWidth={2} color="currentColor" />
           Reply
         </m.button>
       )}

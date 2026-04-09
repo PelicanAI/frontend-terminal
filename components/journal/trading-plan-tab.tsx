@@ -3,19 +3,20 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { m, AnimatePresence } from 'framer-motion'
 import useSWR from 'swr'
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
 import {
-  ClipboardText,
-  Plus,
-  Shield,
-  Warning,
-  Check,
-  Trash,
-  CaretDown,
-  CaretRight,
-  Sparkle,
-  ClockCounterClockwise,
-  NotePencil,
-} from '@phosphor-icons/react'
+  ClipboardIcon as ClipboardText,
+  Add01Icon as Plus,
+  Shield01Icon as Shield,
+  Alert01Icon as Warning,
+  Tick01Icon as Check,
+  Delete01Icon as Trash,
+  ArrowDown01Icon as CaretDown,
+  ArrowRight01Icon as CaretRight,
+  SparklesIcon as Sparkle,
+  ClockArrowDownIcon as ClockCounterClockwise,
+  NoteEditIcon as NotePencil,
+} from '@hugeicons/core-free-icons'
 import { toast } from '@/hooks/use-toast'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import { ConfirmDestructiveAction, useDestructiveAction } from '@/components/ui/confirm-destructive-action'
@@ -192,7 +193,7 @@ function SectionHeader({
   onToggleNote,
   unconfigured,
 }: {
-  icon: React.ElementType
+  icon: IconSvgElement
   title: string
   status?: 'green' | 'amber' | 'red' | 'gray'
   expanded: boolean
@@ -204,7 +205,7 @@ function SectionHeader({
   return (
     <button type="button" className="flex items-center justify-between w-full mb-1 appearance-none bg-transparent border-none p-0 m-0 cursor-pointer text-left" onClick={onToggle} aria-expanded={expanded} aria-label={`${title} section`}>
       <div className="flex items-center gap-2">
-        <Icon size={18} weight="bold" className="text-[var(--accent-primary)]" />
+        <HugeiconsIcon icon={Icon} size={18} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
         <h3 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wider">{title}</h3>
         {status && <div className={`w-2 h-2 rounded-full ${STATUS_COLORS[status]}`} />}
       </div>
@@ -216,15 +217,15 @@ function SectionHeader({
             className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors appearance-none bg-transparent border-none m-0 cursor-pointer"
             aria-label={noteExists ? 'Edit note' : 'Add note'}
           >
-            <NotePencil size={14} weight={noteExists ? 'fill' : 'regular'} />
+            <HugeiconsIcon icon={NotePencil} size={14} strokeWidth={1.5} color="currentColor" />
           </button>
         )}
         {!expanded && unconfigured && (
           <span className="text-[10px] text-[var(--text-muted)] italic mr-1">Click to configure</span>
         )}
         {expanded
-          ? <CaretDown size={14} className="text-[var(--text-muted)]" />
-          : <CaretRight size={14} className="text-[var(--text-muted)]" />}
+          ? <HugeiconsIcon icon={CaretDown} size={14} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
+          : <HugeiconsIcon icon={CaretRight} size={14} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />}
       </div>
     </button>
   )
@@ -494,14 +495,14 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
   if (!plan && !isCreating) {
     return (
       <m.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="flex flex-col items-center justify-center py-16 text-center">
-        <ClipboardText size={48} weight="thin" className="text-[var(--text-muted)] mb-4" />
+        <HugeiconsIcon icon={ClipboardText} size={48} className="text-[var(--text-muted)] mb-4" strokeWidth={1} color="currentColor" />
         <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No Trading Plan Yet</h3>
         <p className="text-sm text-[var(--text-secondary)] max-w-sm mb-6">
           Define your risk rules, requirements, and discipline guidelines to keep yourself accountable.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <PelicanButton onClick={() => { setForm(DEFAULT_FORM); setIsCreating(true) }} variant="primary">
-            <Plus size={16} weight="bold" />
+            <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
             Create Trading Plan
           </PelicanButton>
           <PelicanButton
@@ -572,7 +573,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
                 {plan && (
                   <IconTooltip label="Delete plan" side="top">
                     <button onClick={handleDelete} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--data-negative)] hover:bg-[var(--bg-elevated)] transition-colors" aria-label="Delete plan">
-                      <Trash size={16} />
+                      <HugeiconsIcon icon={Trash} size={16} strokeWidth={1.5} color="currentColor" />
                     </button>
                   </IconTooltip>
                 )}
@@ -685,10 +686,10 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
                   <div className="space-y-2">
                     {(form.pre_entry_checklist ?? []).map((item, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-                        <Check size={14} weight="bold" className="text-[var(--data-positive)] shrink-0" />
+                        <HugeiconsIcon icon={Check} size={14} className="text-[var(--data-positive)] shrink-0" strokeWidth={2} color="currentColor" />
                         <span className="flex-1">{item}</span>
                         <button type="button" onClick={() => removeChecklistItem(i)} className="text-[var(--text-muted)] hover:text-[var(--data-negative)] transition-colors" aria-label="Remove checklist item">
-                          <Trash size={14} />
+                          <HugeiconsIcon icon={Trash} size={14} strokeWidth={1.5} color="currentColor" />
                         </button>
                       </div>
                     ))}
@@ -703,7 +704,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
                       />
                       <IconTooltip label="Add item" side="top">
                         <button type="button" onClick={addChecklistItem} className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors">
-                          <Plus size={18} weight="bold" />
+                          <HugeiconsIcon icon={Plus} size={18} strokeWidth={2} color="currentColor" />
                         </button>
                       </IconTooltip>
                     </div>
@@ -756,7 +757,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
                       <span key={i} className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border bg-[var(--data-negative)]/10 text-[var(--data-negative)] border-[var(--data-negative)]/20">
                         {ticker}
                         <button type="button" onClick={() => removeBlockedTicker(i)} className="hover:text-white transition-colors" aria-label="Remove ticker">
-                          <Trash size={12} />
+                          <HugeiconsIcon icon={Trash} size={12} strokeWidth={1.5} color="currentColor" />
                         </button>
                       </span>
                     ))}
@@ -772,7 +773,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
                     />
                     <IconTooltip label="Add ticker" side="top">
                       <button type="button" onClick={addBlockedTicker} className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors">
-                        <Plus size={18} weight="bold" />
+                        <HugeiconsIcon icon={Plus} size={18} strokeWidth={2} color="currentColor" />
                       </button>
                     </IconTooltip>
                   </div>
@@ -798,7 +799,7 @@ export function TradingPlanTab({ trades, onAskPelican, complianceStats, tradeSta
                 variant="secondary"
                 size="sm"
               >
-                <Sparkle size={14} weight="bold" />
+                <HugeiconsIcon icon={Sparkle} size={14} strokeWidth={2} color="currentColor" />
                 Review my plan
               </PelicanButton>
             </div>

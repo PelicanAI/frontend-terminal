@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getStoredReferralCode, type ReferralCodeInfo } from "@/lib/referral";
-import { CheckCircle, XCircle, CircleNotch } from "@phosphor-icons/react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  CheckmarkCircle01Icon as CheckCircle,
+  CancelCircleIcon as XCircle,
+  Loading03Icon as CircleNotch,
+} from "@hugeicons/core-free-icons";
 
 interface ReferralCodeInputProps {
   onReferralReady: (recordFn: (userId: string) => Promise<void>) => void;
@@ -106,13 +111,13 @@ export function ReferralCodeInput({ onReferralReady }: ReferralCodeInputProps) {
         />
         <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
           {validationState === "loading" && (
-            <CircleNotch size={16} weight="regular" className="animate-spin text-muted-foreground" />
+            <HugeiconsIcon icon={CircleNotch} size={16} className="animate-spin text-muted-foreground" strokeWidth={1.5} color="currentColor" />
           )}
           {validationState === "valid" && (
-            <CheckCircle size={16} weight="regular" className="text-green-500" />
+            <HugeiconsIcon icon={CheckCircle} size={16} className="text-green-500" strokeWidth={1.5} color="currentColor" />
           )}
           {validationState === "invalid" && (
-            <XCircle size={16} weight="regular" className="text-red-500" />
+            <HugeiconsIcon icon={XCircle} size={16} className="text-red-500" strokeWidth={1.5} color="currentColor" />
           )}
         </div>
       </div>

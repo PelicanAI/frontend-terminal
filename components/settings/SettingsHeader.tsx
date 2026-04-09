@@ -1,7 +1,13 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, User, FloppyDisk, CircleNotch } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  ArrowLeft01Icon as ArrowLeft,
+  UserIcon as User,
+  FloppyDiskIcon as FloppyDisk,
+  Loading03Icon as CircleNotch,
+} from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { LanguageSelector } from "@/components/language-selector"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
@@ -21,7 +27,7 @@ export function SettingsHeader({ user, isSaving, hasUnsavedChanges, onSave }: Se
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm">
               <Link href="/chat">
-                <ArrowLeft size={16} weight="regular" className="mr-2" />
+                <HugeiconsIcon icon={ArrowLeft} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
                 Back
               </Link>
             </Button>
@@ -37,12 +43,12 @@ export function SettingsHeader({ user, isSaving, hasUnsavedChanges, onSave }: Se
               >
                 {isSaving ? (
                   <>
-                    <CircleNotch size={16} weight="regular" className="mr-2 animate-spin" />
+                    <HugeiconsIcon icon={CircleNotch} size={16} className="mr-2 animate-spin" strokeWidth={1.5} color="currentColor" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <FloppyDisk size={16} weight="regular" className="mr-2" />
+                    <HugeiconsIcon icon={FloppyDisk} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
                     Save Changes
                   </>
                 )}
@@ -53,7 +59,7 @@ export function SettingsHeader({ user, isSaving, hasUnsavedChanges, onSave }: Se
                 className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
               >
                 <Link href="/auth/signup">
-                  <User size={16} weight="regular" className="mr-2" />
+                  <HugeiconsIcon icon={User} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
                   Sign Up to Save
                 </Link>
               </Button>

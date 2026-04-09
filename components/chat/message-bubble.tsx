@@ -5,7 +5,17 @@ import Image from "next/image"
 
 import { m } from "framer-motion"
 import { useState, useCallback, useMemo, useRef, useEffect, memo } from "react"
-import { Copy, Check, PencilSimple, ArrowsClockwise, SpinnerGap, CaretDown, CaretUp, BookmarkSimple } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Copy01Icon as Copy,
+  Tick01Icon as Check,
+  PencilEdit01Icon as PencilSimple,
+  Refresh01Icon as ArrowsClockwise,
+  Loading03Icon as SpinnerGap,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  Bookmark01Icon as BookmarkSimple,
+} from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { getMessageAnimationVariant } from "@/lib/animation-config"
@@ -253,12 +263,12 @@ export const MessageBubble = memo(function MessageBubble({
                       >
                         {isExpanded ? (
                           <>
-                            <CaretUp size={12} weight="bold" />
+                            <HugeiconsIcon icon={CaretUp} size={12} strokeWidth={2} color="currentColor" />
                             Show less
                           </>
                         ) : (
                           <>
-                            <CaretDown size={12} weight="bold" />
+                            <HugeiconsIcon icon={CaretDown} size={12} strokeWidth={2} color="currentColor" />
                             Show more
                           </>
                         )}
@@ -275,7 +285,7 @@ export const MessageBubble = memo(function MessageBubble({
                         className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                         title="Edit message"
                       >
-                        <PencilSimple size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" />
+                        <HugeiconsIcon icon={PencilSimple} size={16} className="sm:!w-3 sm:!h-3 mr-1" strokeWidth={1.5} color="currentColor" />
                         Edit
                       </Button>
                     )}
@@ -286,7 +296,7 @@ export const MessageBubble = memo(function MessageBubble({
                       className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                       title="Copy message"
                     >
-                      {copied ? <Check size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" /> : <Copy size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" />}
+                      {copied ? <HugeiconsIcon icon={Check} size={16} className="sm:!w-3 sm:!h-3 mr-1" strokeWidth={1.5} color="currentColor" /> : <HugeiconsIcon icon={Copy} size={16} className="sm:!w-3 sm:!h-3 mr-1" strokeWidth={1.5} color="currentColor" />}
                       {copied ? "Copied" : "Copy"}
                     </Button>
                   </div>
@@ -343,7 +353,7 @@ export const MessageBubble = memo(function MessageBubble({
                 className="h-11 sm:h-7 px-3 sm:px-2 min-h-[44px] sm:min-h-0 text-xs text-muted-foreground hover:text-foreground"
                 title="Copy message"
               >
-                {copied ? <Check size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" /> : <Copy size={16} weight="regular" className="sm:!w-3 sm:!h-3 mr-1" />}
+                {copied ? <HugeiconsIcon icon={Check} size={16} className="sm:!w-3 sm:!h-3 mr-1" strokeWidth={1.5} color="currentColor" /> : <HugeiconsIcon icon={Copy} size={16} className="sm:!w-3 sm:!h-3 mr-1" strokeWidth={1.5} color="currentColor" />}
                 {copied ? "Copied" : "Copy"}
               </Button>
 
@@ -357,9 +367,9 @@ export const MessageBubble = memo(function MessageBubble({
                   title={isRegenerating ? "Regenerating..." : "Regenerate response"}
                 >
                   {isRegenerating ? (
-                    <SpinnerGap size={18} weight="regular" className="mr-1.5 animate-spin" />
+                    <HugeiconsIcon icon={SpinnerGap} size={18} className="mr-1.5 animate-spin" strokeWidth={1.5} color="currentColor" />
                   ) : (
-                    <ArrowsClockwise size={18} weight="regular" className="mr-1.5" />
+                    <HugeiconsIcon icon={ArrowsClockwise} size={18} className="mr-1.5" strokeWidth={1.5} color="currentColor" />
                   )}
                   {isRegenerating ? "Regenerating..." : "Regenerate"}
                 </Button>
@@ -374,9 +384,9 @@ export const MessageBubble = memo(function MessageBubble({
                   title={insightSaved ? "Saved!" : "Save this insight"}
                 >
                   {insightSaved ? (
-                    <Check size={18} weight="regular" className="mr-1.5" />
+                    <HugeiconsIcon icon={Check} size={18} className="mr-1.5" strokeWidth={1.5} color="currentColor" />
                   ) : (
-                    <BookmarkSimple size={18} weight="regular" className="mr-1.5" />
+                    <HugeiconsIcon icon={BookmarkSimple} size={18} className="mr-1.5" strokeWidth={1.5} color="currentColor" />
                   )}
                   {insightSaved ? "Saved" : "Save Insight"}
                 </Button>

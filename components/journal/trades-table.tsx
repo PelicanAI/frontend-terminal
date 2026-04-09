@@ -1,7 +1,16 @@
 "use client"
 
 import { Trade } from "@/hooks/use-trades"
-import { CaretUp, CaretDown, CaretUpDown, PlayCircle, ArrowRight, X as XIcon, PencilSimple } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  ArrowUp01Icon as CaretUp,
+  ArrowDown01Icon as CaretDown,
+  ArrowUpDownIcon as CaretUpDown,
+  PlayCircleIcon as PlayCircle,
+  ArrowRight01Icon as ArrowRight,
+  Cancel01Icon as XIcon,
+  PencilEdit01Icon as PencilSimple,
+} from "@hugeicons/core-free-icons"
 import { useState } from "react"
 import Link from "next/link"
 import { m } from "framer-motion"
@@ -146,11 +155,11 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
   })
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <CaretUpDown size={12} className="text-[var(--text-disabled)]" />
+    if (sortField !== field) return <HugeiconsIcon icon={CaretUpDown} size={12} className="text-[var(--text-disabled)]" strokeWidth={1.5} color="currentColor" />
     return sortDirection === 'asc' ? (
-      <CaretUp size={12} weight="bold" className="text-[var(--accent-primary)]" />
+      <HugeiconsIcon icon={CaretUp} size={12} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
     ) : (
-      <CaretDown size={12} weight="bold" className="text-[var(--accent-primary)]" />
+      <HugeiconsIcon icon={CaretDown} size={12} className="text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
     )
   }
 
@@ -206,7 +215,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
           <p className="text-xs text-[var(--text-secondary)]">
             Managing live positions? Positions dashboard has real-time health scores and alerts{' '}
             <Link href="/positions" className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors font-medium inline-flex items-center gap-0.5">
-              Go to Positions <ArrowRight size={12} weight="bold" />
+              Go to Positions <HugeiconsIcon icon={ArrowRight} size={12} strokeWidth={2} color="currentColor" />
             </Link>
           </p>
           <button
@@ -217,7 +226,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
             className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors shrink-0"
             aria-label="Dismiss"
           >
-            <XIcon size={14} weight="bold" />
+            <HugeiconsIcon icon={XIcon} size={14} strokeWidth={2} color="currentColor" />
           </button>
         </div>
       )}
@@ -459,7 +468,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                           }}
                           className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors active:scale-95"
                         >
-                          <PencilSimple size={14} weight="regular" />
+                          <HugeiconsIcon icon={PencilSimple} size={14} strokeWidth={1.5} color="currentColor" />
                         </button>
                       </IconTooltip>
                     )}
@@ -482,7 +491,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                               }}
                               className="p-1.5 rounded-lg text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors active:scale-95"
                             >
-                              <PlayCircle size={16} weight="fill" />
+                              <HugeiconsIcon icon={PlayCircle} size={16} strokeWidth={1.5} color="currentColor" />
                             </button>
                           </IconTooltip>
                         )}
@@ -641,7 +650,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                           }}
                           className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
                         >
-                          <PencilSimple size={14} weight="regular" />
+                          <HugeiconsIcon icon={PencilSimple} size={14} strokeWidth={1.5} color="currentColor" />
                         </button>
                       )}
                       {trade.status === 'open' ? (
@@ -663,7 +672,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                                 }}
                                 className="p-1.5 rounded-lg text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
                               >
-                                <PlayCircle size={16} weight="fill" />
+                                <HugeiconsIcon icon={PlayCircle} size={16} strokeWidth={1.5} color="currentColor" />
                               </button>
                             </IconTooltip>
                           )}

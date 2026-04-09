@@ -9,16 +9,17 @@ import { useTrades } from "@/hooks/use-trades"
 import { useTraderProfile } from "@/hooks/use-trader-profile"
 import { useTradePatterns } from "@/hooks/use-trade-patterns"
 import { trackEvent } from "@/lib/tracking"
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
 import {
-  Warning,
-  Fire,
-  Briefcase,
-  Brain,
-  Newspaper,
-  ChartLineUp,
-  TrendDown,
-  Lightning,
-} from "@phosphor-icons/react"
+  Alert01Icon as Warning,
+  FireIcon as Fire,
+  Briefcase01Icon as Briefcase,
+  Brain01Icon as Brain,
+  News01Icon as Newspaper,
+  ChartLineData01Icon as ChartLineUp,
+  AnalyticsDownIcon as TrendDown,
+  FlashIcon as Lightning,
+} from "@hugeicons/core-free-icons"
 
 // Market-specific default prompts (fallback when no personalization data)
 const MARKET_DEFAULT_PROMPTS: Record<string, string[]> = {
@@ -53,7 +54,7 @@ const MARKET_DEFAULT_PROMPTS: Record<string, string[]> = {
 const DEFAULT_PROMPTS = MARKET_DEFAULT_PROMPTS.stocks!
 
 interface SuggestedChip {
-  icon: React.ElementType
+  icon: IconSvgElement
   label: string
   prompt: string
   priority: number
@@ -249,7 +250,7 @@ export function SuggestedPrompts({ onSelect, disabled }: SuggestedPromptsProps) 
                       : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/20 hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] cursor-pointer"
               )}
             >
-              <Icon size={16} weight="regular" />
+              <HugeiconsIcon icon={Icon} size={16} strokeWidth={1.5} color="currentColor" />
               {chip.label}
             </m.button>
           )

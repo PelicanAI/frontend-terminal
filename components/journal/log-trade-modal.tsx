@@ -7,7 +7,14 @@ import { Trade, TradeFormData, useTrades } from "@/hooks/use-trades"
 import { useTradingPlan } from "@/hooks/use-trading-plan"
 import { checkTradeAgainstPlan, deriveComplianceData } from "@/lib/trading/plan-check"
 import { PelicanButton } from "@/components/ui/pelican"
-import { Warning, Shield, Check, Brain, CheckSquare } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Alert01Icon as Warning,
+  Shield01Icon as Shield,
+  Tick01Icon as Check,
+  Brain01Icon as Brain,
+  CheckmarkSquare01Icon as CheckSquare,
+} from "@hugeicons/core-free-icons"
 import { usePlaybooks } from "@/hooks/use-playbooks"
 import { useRiskBudget } from "@/hooks/use-risk-budget"
 import { useAntiTradeCheck } from "@/hooks/use-anti-trade-check"
@@ -757,7 +764,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
               {selectedPlaybook?.checklist && selectedPlaybook.checklist.length > 0 && (
                 <div className="p-3 rounded-lg bg-[var(--accent-muted)] border border-[var(--accent-primary)]/20 mt-3">
                   <h4 className="text-xs font-medium text-[var(--accent-primary)] mb-2 flex items-center gap-1.5">
-                    <CheckSquare size={14} weight="bold" />
+                    <HugeiconsIcon icon={CheckSquare} size={14} strokeWidth={2} color="currentColor" />
                     Pre-Trade Checklist: {selectedPlaybook.name}
                   </h4>
                   <div className="space-y-1.5">
@@ -806,7 +813,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
           {antiTradeWarnings.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)]">
-                <Brain size={14} weight="bold" />
+                <HugeiconsIcon icon={Brain} size={14} strokeWidth={2} color="currentColor" />
                 Pelican Pattern Check
               </div>
               {antiTradeWarnings.map((warning, i) => (
@@ -819,14 +826,10 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                       : 'bg-[var(--data-warning)]/10 border border-[var(--data-warning)]/20'
                   )}
                 >
-                  <Warning
-                    size={14}
-                    weight="bold"
-                    className={cn(
+                  <HugeiconsIcon icon={Warning} size={14} className={cn(
                       "flex-shrink-0 mt-0.5",
                       warning.severity === 'critical' ? 'text-[var(--data-negative)]' : 'text-[var(--data-warning)]'
-                    )}
-                  />
+                    )} strokeWidth={2} color="currentColor" />
                   <div>
                     <div className={cn(
                       "font-medium",
@@ -960,7 +963,7 @@ function PlanCheckSection({
       {hasViolations && (
         <div className="space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)]">
-            <Shield size={14} weight="bold" />
+            <HugeiconsIcon icon={Shield} size={14} strokeWidth={2} color="currentColor" />
             Plan Check: &ldquo;{plan.name}&rdquo;
           </div>
           {planCheck.violations.map((v, i) => (
@@ -972,7 +975,7 @@ function PlanCheckSection({
                   : 'bg-[var(--data-warning)]/10 border border-[var(--data-warning)]/20 text-[var(--data-warning)]'
               }`}
             >
-              <Warning size={14} weight="bold" className="flex-shrink-0 mt-0.5" />
+              <HugeiconsIcon icon={Warning} size={14} className="flex-shrink-0 mt-0.5" strokeWidth={2} color="currentColor" />
               <span>{v.rule_text}</span>
             </div>
           ))}
@@ -983,7 +986,7 @@ function PlanCheckSection({
       {hasChecklist && (
         <div className="space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)]">
-            <Check size={14} weight="bold" />
+            <HugeiconsIcon icon={Check} size={14} strokeWidth={2} color="currentColor" />
             Pre-Entry Checklist
           </div>
           <div className="space-y-1.5 p-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">

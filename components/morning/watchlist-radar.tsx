@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Crosshair, Warning } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Target01Icon as Crosshair, Alert01Icon as Warning } from '@hugeicons/core-free-icons'
 import { PelicanCard } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 
@@ -102,7 +103,7 @@ export function WatchlistRadar({ watchlistItems, quotes, onAnalyze }: WatchlistR
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Crosshair className="h-4 w-4 text-[var(--accent-primary)]" weight="regular" />
+          <HugeiconsIcon icon={Crosshair} className="h-4 w-4 text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
           <h2 className="text-sm font-semibold text-[var(--text-primary)]">Watchlist Radar</h2>
         </div>
         <span className="text-xs font-mono tabular-nums text-[var(--text-muted)]">
@@ -113,7 +114,7 @@ export function WatchlistRadar({ watchlistItems, quotes, onAnalyze }: WatchlistR
       {watchlistItems.length === 0 ? (
         /* Empty state */
         <div className="flex flex-col items-center justify-center py-6 text-center">
-          <Crosshair className="h-8 w-8 text-[var(--text-muted)] mb-2" weight="light" />
+          <HugeiconsIcon icon={Crosshair} className="h-8 w-8 text-[var(--text-muted)] mb-2" strokeWidth={1} color="currentColor" />
           <p className="text-sm text-[var(--text-muted)]">No watchlist tickers</p>
           <p className="text-xs text-[var(--text-muted)] mt-1">Add tickers from chat or the sidebar to track them here</p>
         </div>
@@ -136,7 +137,7 @@ export function WatchlistRadar({ watchlistItems, quotes, onAnalyze }: WatchlistR
                   <span className="font-mono text-sm font-semibold text-[var(--text-primary)]">{item.ticker}</span>
                   {item.isNearStop && (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[var(--data-negative)]/10 text-[var(--data-negative)]">
-                      <Warning className="h-3 w-3" weight="bold" />
+                      <HugeiconsIcon icon={Warning} className="h-3 w-3" strokeWidth={2} color="currentColor" />
                       NEAR STOP
                     </span>
                   )}

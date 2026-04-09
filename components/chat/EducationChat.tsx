@@ -1,7 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect, FormEvent } from 'react'
-import { GraduationCap, PaperPlaneRight, Trash } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Mortarboard01Icon as GraduationCap,
+  SentIcon as PaperPlaneRight,
+  Delete01Icon as Trash,
+} from '@hugeicons/core-free-icons'
 import { cn } from '@/lib/utils'
 import { m, AnimatePresence } from 'framer-motion'
 import { formatLine } from '@/components/chat/message/format-utils'
@@ -129,7 +134,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
   if (!selectedTerm && messages.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-        <GraduationCap size={40} weight="regular" className="text-blue-500/40 mb-3" />
+        <HugeiconsIcon icon={GraduationCap} size={40} className="text-blue-500/40 mb-3" strokeWidth={1.5} color="currentColor" />
         <p className="text-sm text-muted-foreground leading-relaxed">
           Click any highlighted term in the chat to learn about it. Toggle Learning Mode in the chat header.
         </p>
@@ -142,7 +147,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-2">
-          <GraduationCap size={16} weight="regular" className="text-blue-500" />
+          <HugeiconsIcon icon={GraduationCap} size={16} className="text-blue-500" strokeWidth={1.5} color="currentColor" />
           <span className="text-xs font-medium text-foreground">
             {selectedTerm ? selectedTerm.term : 'Education'}
           </span>
@@ -153,7 +158,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
             className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
             title="Clear conversation"
           >
-            <Trash size={12} weight="regular" />
+            <HugeiconsIcon icon={Trash} size={12} strokeWidth={1.5} color="currentColor" />
             Clear
           </button>
         )}
@@ -244,7 +249,7 @@ export function EducationChat({ selectedTerm, onClear }: EducationChatProps) {
                 : 'bg-blue-600 text-white hover:bg-blue-500 cursor-pointer'
             )}
           >
-            <PaperPlaneRight size={14} weight="regular" />
+            <HugeiconsIcon icon={PaperPlaneRight} size={14} strokeWidth={1.5} color="currentColor" />
           </button>
         </form>
         <p className="text-[9px] text-muted-foreground/50 text-center mt-2">

@@ -2,10 +2,16 @@
 
 import { useState, useMemo } from 'react'
 import { m, AnimatePresence } from 'framer-motion'
-import { CaretLeft, CaretRight, CalendarBlank, X } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  ArrowLeft01Icon as CaretLeft,
+  ArrowRight01Icon as CaretRight,
+  Calendar01Icon as CalendarBlank,
+  Cancel01Icon as X,
+  Add01Icon as Plus,
+} from '@hugeicons/core-free-icons'
 import { Trade } from '@/hooks/use-trades'
 import { PelicanCard, PelicanButton, staggerContainer, staggerItem } from '@/components/ui/pelican'
-import { Plus } from '@phosphor-icons/react'
 import {
   buildCalendarGrid,
   calculateMonthStats,
@@ -81,7 +87,7 @@ export function CalendarTab({ trades, isLoading, onOpenLogTrade }: CalendarTabPr
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[var(--accent-primary)]/30 border-t-[var(--accent-primary)] rounded-full animate-spin mx-auto mb-2" />
+          <div className="w-8 h-8 border-2 border-[var(--border-default)] border-t-[var(--accent-primary)] rounded-full animate-spin motion-reduce:animate-none mx-auto mb-2" />
           <p className="text-[var(--text-muted)] text-sm">Loading calendar...</p>
         </div>
       </div>
@@ -91,7 +97,7 @@ export function CalendarTab({ trades, isLoading, onOpenLogTrade }: CalendarTabPr
   if (trades.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh]">
-        <CalendarBlank size={40} className="text-[var(--text-muted)] mb-3" />
+        <HugeiconsIcon icon={CalendarBlank} size={40} className="text-[var(--text-muted)] mb-3" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">
           Your trade calendar starts here
         </h3>
@@ -105,7 +111,7 @@ export function CalendarTab({ trades, isLoading, onOpenLogTrade }: CalendarTabPr
             className="mt-4"
             onClick={onOpenLogTrade}
           >
-            <Plus size={16} weight="bold" />
+            <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
             Log Trade
           </PelicanButton>
         )}
@@ -134,11 +140,12 @@ export function CalendarTab({ trades, isLoading, onOpenLogTrade }: CalendarTabPr
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={() => navigateMonth(-1)}
-                className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-elevated)]"
+                className="cursor-pointer p-1.5 rounded-md transition-colors duration-150 hover:bg-[var(--bg-elevated)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
                 style={{ color: 'var(--text-secondary)' }}
               >
-                <CaretLeft size={16} />
+                <HugeiconsIcon icon={CaretLeft} size={16} strokeWidth={1.5} color="currentColor" />
               </button>
 
               <h3 className="text-sm font-semibold text-[var(--text-primary)] min-w-[140px] text-center">
@@ -146,19 +153,21 @@ export function CalendarTab({ trades, isLoading, onOpenLogTrade }: CalendarTabPr
               </h3>
 
               <button
+                type="button"
                 onClick={() => navigateMonth(1)}
-                className="p-1.5 rounded-md transition-colors hover:bg-[var(--bg-elevated)]"
+                className="cursor-pointer p-1.5 rounded-md transition-colors duration-150 hover:bg-[var(--bg-elevated)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
                 style={{ color: 'var(--text-secondary)' }}
               >
-                <CaretRight size={16} />
+                <HugeiconsIcon icon={CaretRight} size={16} strokeWidth={1.5} color="currentColor" />
               </button>
 
               <button
+                type="button"
                 onClick={() => {
                   setCurrentMonth(new Date())
                   setSelectedDate(null)
                 }}
-                className="px-2 py-1 text-xs rounded-md transition-colors hover:bg-[var(--bg-elevated)]"
+                className="cursor-pointer px-2 py-1 text-xs rounded-md transition-colors duration-150 hover:bg-[var(--bg-elevated)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
                 style={{
                   color: 'var(--text-muted)',
                   border: '1px solid var(--border-subtle)',
@@ -245,7 +254,7 @@ export function CalendarTab({ trades, isLoading, onOpenLogTrade }: CalendarTabPr
         <m.div variants={staggerItem}>
           <PelicanCard>
             <div className="flex flex-col items-center justify-center py-10">
-              <CalendarBlank size={28} className="text-[var(--text-muted)]" />
+              <HugeiconsIcon icon={CalendarBlank} size={28} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
               <p className="text-sm mt-2 text-[var(--text-secondary)]">
                 No closed trades in {monthName.split(' ')[0]}
               </p>
@@ -280,11 +289,12 @@ function CalendarCell({
 
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={!hasTrades}
       className={`
         relative flex flex-col items-start p-1.5 sm:p-2 min-h-[60px] sm:min-h-[80px]
-        transition-all duration-150 text-left
+        transition-all duration-150 text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-inset
         ${hasTrades ? 'hover:brightness-110 cursor-pointer' : 'cursor-default'}
         ${isSelected ? 'ring-1 ring-[var(--accent-primary)] ring-inset' : ''}
         ${!day.isCurrentMonth ? 'opacity-30' : ''}
@@ -304,7 +314,7 @@ function CalendarCell({
         }}
       >
         {day.isToday ? (
-          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[var(--accent-primary)] text-white text-[10px] font-bold">
+          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[var(--accent-primary)] text-[var(--primary-foreground)] text-xs font-bold">
             {day.dayNumber}
           </span>
         ) : (
@@ -316,7 +326,7 @@ function CalendarCell({
       {hasTrades && (
         <div className="mt-auto w-full">
           <span
-            className="text-[10px] sm:text-xs font-mono font-semibold tabular-nums block truncate"
+            className="text-xs font-mono font-semibold tabular-nums block truncate"
             style={{
               color: day.data!.isWinningDay
                 ? 'var(--data-positive)'
@@ -333,7 +343,7 @@ function CalendarCell({
           </span>
           <div className="flex items-center gap-0.5 mt-0.5">
             <span
-              className="text-[10px] font-mono hidden sm:inline"
+              className="text-xs font-mono hidden sm:inline"
               style={{ color: 'var(--text-muted)' }}
             >
               {day.data!.tradeCount}
@@ -404,11 +414,12 @@ function DayDetailPanel({
             Total: {formatCurrencySigned(totalPnl, true)}
           </span>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded-md hover:bg-[var(--bg-elevated)] transition-colors"
+            className="cursor-pointer p-1 rounded-md hover:bg-[var(--bg-elevated)] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
             style={{ color: 'var(--text-muted)' }}
           >
-            <X size={14} />
+            <HugeiconsIcon icon={X} size={14} strokeWidth={1.5} color="currentColor" />
           </button>
         </div>
       </div>
@@ -430,7 +441,7 @@ function DayDetailPanel({
                   {trade.ticker}
                 </span>
                 <span
-                  className="px-1.5 py-0.5 rounded text-[10px] font-medium uppercase"
+                  className="px-1.5 py-0.5 rounded text-xs font-medium uppercase"
                   style={{
                     background:
                       trade.direction === 'long'
@@ -579,7 +590,7 @@ function MonthSummary({
 
         {stats.bestDay && (
           <div className="ml-auto text-right hidden sm:block">
-            <span className="text-[10px] text-[var(--text-muted)]">
+            <span className="text-xs text-[var(--text-muted)]">
               Best Day
             </span>
             <p
@@ -598,7 +609,7 @@ function MonthSummary({
 
         {stats.worstDay && (
           <div className="text-right hidden sm:block">
-            <span className="text-[10px] text-[var(--text-muted)]">
+            <span className="text-xs text-[var(--text-muted)]">
               Worst Day
             </span>
             <p
@@ -624,7 +635,7 @@ function MonthSummary({
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <span className="text-[10px] text-[var(--text-muted)]">{label}</span>
+      <span className="text-xs text-[var(--text-muted)]">{label}</span>
       <p className="text-xs font-mono font-semibold tabular-nums text-[var(--text-primary)]">
         {value}
       </p>

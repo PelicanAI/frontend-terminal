@@ -1,7 +1,14 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { ArrowsClockwise, Plug, Trash, WarningCircle, CheckCircle } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Refresh01Icon as ArrowsClockwise,
+  Plug01Icon as Plug,
+  Delete01Icon as Trash,
+  AlertCircleIcon as WarningCircle,
+  CheckmarkCircle01Icon as CheckCircle,
+} from '@hugeicons/core-free-icons'
 import { PelicanButton } from '@/components/ui/pelican'
 import { toast } from '@/hooks/use-toast'
 import { useBrokerConnections, type BrokerConnection } from '@/hooks/use-broker-connections'
@@ -29,7 +36,7 @@ function StatusBadge({ status }: { status: BrokerConnection['status'] }) {
 
   return (
     <span className="inline-flex items-center gap-1 text-xs" style={{ color: config.color }}>
-      <config.Icon size={12} weight="fill" />
+      <HugeiconsIcon icon={config.Icon} size={12} strokeWidth={1.5} color="currentColor" />
       {config.label}
     </span>
   )
@@ -120,7 +127,7 @@ export function ConnectedBrokers() {
               onClick={handleSync}
               disabled={syncing}
             >
-              <ArrowsClockwise size={14} weight="regular" className={syncing ? 'animate-spin' : ''} />
+              <HugeiconsIcon icon={ArrowsClockwise} size={14} className={syncing ? 'animate-spin' : ''} strokeWidth={1.5} color="currentColor" />
               {syncing ? 'Syncing...' : 'Sync Now'}
             </PelicanButton>
           )}
@@ -130,7 +137,7 @@ export function ConnectedBrokers() {
 
       {activeConnections.length === 0 ? (
         <div className="text-center py-8">
-          <Plug size={32} weight="light" className="mx-auto mb-3 text-[var(--text-muted)]" />
+          <HugeiconsIcon icon={Plug} size={32} className="mx-auto mb-3 text-[var(--text-muted)]" strokeWidth={1} color="currentColor" />
           <p className="text-sm text-[var(--text-secondary)]">No brokers connected</p>
           <p className="text-xs text-[var(--text-muted)] mt-1">
             Connect your brokerage to auto-sync positions
@@ -145,7 +152,7 @@ export function ConnectedBrokers() {
             >
               <div className="flex items-center gap-3">
                 <div className="h-8 w-8 rounded-lg bg-[var(--bg-elevated)] flex items-center justify-center">
-                  <Plug size={16} weight="regular" className="text-[var(--text-secondary)]" />
+                  <HugeiconsIcon icon={Plug} size={16} className="text-[var(--text-secondary)]" strokeWidth={1.5} color="currentColor" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[var(--text-primary)]">
@@ -165,7 +172,7 @@ export function ConnectedBrokers() {
                 className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--data-negative)] hover:bg-[var(--data-negative)]/10 transition-colors duration-150"
                 aria-label="Disconnect broker"
               >
-                <Trash size={16} weight="regular" />
+                <HugeiconsIcon icon={Trash} size={16} strokeWidth={1.5} color="currentColor" />
               </button>
             </div>
           ))}

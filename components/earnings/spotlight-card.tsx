@@ -1,7 +1,13 @@
 "use client"
 
 import { m } from 'framer-motion'
-import { Sun, Moon, Briefcase, Binoculars } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Sun01Icon as Sun,
+  MoonIcon as Moon,
+  Briefcase01Icon as Briefcase,
+  BinocularsIcon as Binoculars,
+} from '@hugeicons/core-free-icons'
 import { LogoImg } from '@/components/ui/logo-img'
 import { staggerItem } from '@/components/ui/pelican/motion-variants'
 import { cn } from '@/lib/utils'
@@ -57,12 +63,12 @@ export function SpotlightCard({ event, onClick }: SpotlightCardProps) {
         >
           {event.inPortfolio ? (
             <>
-              <Briefcase weight="bold" className="h-2.5 w-2.5" />
+              <HugeiconsIcon icon={Briefcase} className="h-2.5 w-2.5" strokeWidth={2} color="currentColor" />
               Position
             </>
           ) : (
             <>
-              <Binoculars weight="bold" className="h-2.5 w-2.5" />
+              <HugeiconsIcon icon={Binoculars} className="h-2.5 w-2.5" strokeWidth={2} color="currentColor" />
               Watching
             </>
           )}
@@ -77,13 +83,13 @@ export function SpotlightCard({ event, onClick }: SpotlightCardProps) {
         </span>
         {event.hour === 'bmo' && (
           <span className="ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[var(--data-warning)]/10 text-[var(--data-warning)]">
-            <Sun weight="bold" className="h-3 w-3" />
+            <HugeiconsIcon icon={Sun} className="h-3 w-3" strokeWidth={2} color="currentColor" />
             Before Open
           </span>
         )}
         {event.hour === 'amc' && (
           <span className="ml-auto flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]">
-            <Moon weight="bold" className="h-3 w-3" />
+            <HugeiconsIcon icon={Moon} className="h-3 w-3" strokeWidth={2} color="currentColor" />
             After Close
           </span>
         )}

@@ -13,7 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ArrowsClockwise, Database, Pulse, Warning, FileText } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Refresh01Icon as ArrowsClockwise,
+  DatabaseIcon as Database,
+  Pulse01Icon as Pulse,
+  Alert01Icon as Warning,
+  File02Icon as FileText,
+} from '@hugeicons/core-free-icons'
 
 // --- Types ---
 
@@ -139,7 +146,7 @@ export default function AdminHealthPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">System Health</h1>
         <Button variant="ghost" size="sm" onClick={() => fetchData(true)}>
-          <ArrowsClockwise size={16} weight="regular" className="mr-1" />
+          <HugeiconsIcon icon={ArrowsClockwise} size={16} className="mr-1" strokeWidth={1.5} color="currentColor" />
           Refresh
         </Button>
       </div>
@@ -150,7 +157,7 @@ export default function AdminHealthPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className={`rounded-md p-2 ${isOnline ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
-              <Database size={16} weight="regular" className={isOnline ? 'text-emerald-500' : 'text-red-500'} />
+              <HugeiconsIcon icon={Database} size={16} className={isOnline ? 'text-emerald-500' : 'text-red-500'} strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Database</p>
@@ -169,7 +176,7 @@ export default function AdminHealthPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-emerald-500/10 p-2">
-              <Pulse size={16} weight="regular" className="text-emerald-500" />
+              <HugeiconsIcon icon={Pulse} size={16} className="text-emerald-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">API Health</p>
@@ -185,7 +192,7 @@ export default function AdminHealthPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className={`rounded-md p-2 ${fallbackMessages > 10 ? 'bg-orange-500/10' : 'bg-emerald-500/10'}`}>
-              <Warning size={16} weight="regular" className={fallbackMessages > 10 ? 'text-orange-500' : 'text-emerald-500'} />
+              <HugeiconsIcon icon={Warning} size={16} className={fallbackMessages > 10 ? 'text-orange-500' : 'text-emerald-500'} strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Fallback Rate</p>
@@ -199,7 +206,7 @@ export default function AdminHealthPage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-blue-500/10 p-2">
-              <FileText size={16} weight="regular" className="text-blue-500" />
+              <HugeiconsIcon icon={FileText} size={16} className="text-blue-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Avg Message Length</p>

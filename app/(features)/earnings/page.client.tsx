@@ -3,7 +3,12 @@
 import { useState, useMemo, useCallback } from "react"
 import { m } from "framer-motion"
 import Image from "next/image"
-import { CaretLeft, CaretRight, ArrowsClockwise } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  ArrowLeft01Icon as CaretLeft,
+  ArrowRight01Icon as CaretRight,
+  Refresh01Icon as ArrowsClockwise,
+} from "@hugeicons/core-free-icons"
 import { useEnrichedEarnings, applyEarningsFilters } from "@/hooks/use-enriched-earnings"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useWatchlist } from "@/hooks/use-watchlist"
@@ -255,7 +260,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
                   onClick={prevWeek}
                   className="min-h-[44px] min-w-[44px]"
                 >
-                  <CaretLeft weight="bold" className="h-4 w-4" />
+                  <HugeiconsIcon icon={CaretLeft} className="h-4 w-4" strokeWidth={2} color="currentColor" />
                 </PelicanButton>
               </IconTooltip>
               <span className="text-sm font-medium text-[var(--text-primary)] min-w-[220px] text-center">
@@ -268,7 +273,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
                   onClick={nextWeek}
                   className="min-h-[44px] min-w-[44px]"
                 >
-                  <CaretRight weight="bold" className="h-4 w-4" />
+                  <HugeiconsIcon icon={CaretRight} className="h-4 w-4" strokeWidth={2} color="currentColor" />
                 </PelicanButton>
               </IconTooltip>
               {weekOffset !== 0 && (
@@ -291,7 +296,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
                 disabled={isLoading}
                 className="min-h-[44px] min-w-[44px]"
               >
-                <ArrowsClockwise className={cn("h-4 w-4", isLoading && "animate-spin")} />
+                <HugeiconsIcon icon={ArrowsClockwise} className={cn("h-4 w-4", isLoading && "animate-spin")} strokeWidth={1.5} color="currentColor" />
               </PelicanButton>
             </IconTooltip>
           </div>

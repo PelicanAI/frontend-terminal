@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Cancel01Icon as X } from '@hugeicons/core-free-icons'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/providers/auth-provider'
@@ -46,7 +47,7 @@ export function OnboardingSkipBanner() {
         }}
         className="text-muted-foreground hover:text-foreground ml-4 flex-shrink-0"
       >
-        <X size={16} weight="bold" />
+        <HugeiconsIcon icon={X} size={16} strokeWidth={2} color="currentColor" />
       </button>
     </div>
   )

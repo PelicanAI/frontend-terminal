@@ -7,7 +7,8 @@ import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { useCreditsContext } from '@/providers/credits-provider'
 import { useTraderProfile } from '@/hooks/use-trader-profile'
-import { Gear } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Settings01Icon as Gear } from '@hugeicons/core-free-icons'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 
 // =============================================================================
@@ -174,7 +175,7 @@ export function TopNav({ className }: TopNavProps) {
               className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] active:scale-95 transition-all"
               aria-label="Settings"
             >
-              <Gear size={18} weight="regular" />
+              <HugeiconsIcon icon={Gear} size={18} strokeWidth={1.5} color="currentColor" />
             </Link>
           </IconTooltip>
           <IconTooltip label="Credit balance" side="bottom">

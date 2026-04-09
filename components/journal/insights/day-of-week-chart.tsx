@@ -2,7 +2,8 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { PelicanCard } from "@/components/ui/pelican"
-import { CalendarBlank } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Calendar01Icon as CalendarBlank } from "@hugeicons/core-free-icons"
 import type { DayOfWeekStats } from "@/hooks/use-trade-stats"
 
 const SHORT_DAYS: Record<string, string> = {
@@ -34,7 +35,7 @@ export function DayOfWeekChart({ data, onAskPelican }: DayOfWeekChartProps) {
     return (
       <PelicanCard className="p-5" noPadding>
         <div className="flex items-center gap-2 mb-4">
-          <CalendarBlank size={18} weight="regular" className="text-[var(--text-muted)]" />
+          <HugeiconsIcon icon={CalendarBlank} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
           <h3 className="text-sm font-medium text-[var(--text-primary)]">P&L by Day of Week</h3>
         </div>
         <p className="text-sm text-[var(--text-muted)] text-center py-8">Not enough data</p>
@@ -56,7 +57,7 @@ export function DayOfWeekChart({ data, onAskPelican }: DayOfWeekChartProps) {
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-4">
-        <CalendarBlank size={18} weight="regular" className="text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={CalendarBlank} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-sm font-medium text-[var(--text-primary)]">P&L by Day of Week</h3>
       </div>
       <div className="h-[220px]">

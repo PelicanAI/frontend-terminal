@@ -1,7 +1,8 @@
 "use client"
 
 import React, { useMemo } from 'react'
-import { Warning } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Alert01Icon as Warning } from '@hugeicons/core-free-icons'
 import type { CorrelationAsset, CorrelationPair } from '@/types/correlations'
 
 interface CorrelationListViewProps {
@@ -141,7 +142,7 @@ export const CorrelationListView = React.memo(function CorrelationListView({
       {anomalies.length > 0 && (
         <section>
           <h4 className="text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
-            <Warning weight="bold" size={14} style={{ color: 'var(--data-warning)' }} />
+            <HugeiconsIcon icon={Warning} size={14} style={{ color: 'var(--data-warning)' }} strokeWidth={2} color="currentColor" />
             Biggest Anomalies
           </h4>
           <div className="flex flex-col gap-1.5">

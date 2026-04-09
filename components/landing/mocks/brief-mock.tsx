@@ -1,7 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Sun, TrendUp, Crosshair } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Sun01Icon as Sun,
+  AnalyticsUpIcon as TrendUp,
+  Target01Icon as Crosshair,
+} from '@hugeicons/core-free-icons'
 
 export function BriefMock() {
   return (
@@ -9,7 +14,7 @@ export function BriefMock() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
         <div className="flex items-center gap-2">
-          <Sun weight="fill" className="w-4 h-4 text-amber-400" />
+          <HugeiconsIcon icon={Sun} className="w-4 h-4 text-amber-400" strokeWidth={1.5} color="currentColor" />
           <span className="text-sm font-medium text-slate-900">Pelican Brief</span>
           <span className="text-[10px] text-slate-400 font-mono">&mdash; Feb 21, 2026</span>
         </div>
@@ -24,7 +29,7 @@ export function BriefMock() {
         {/* Market Overnight */}
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
-            <TrendUp weight="bold" className="w-3.5 h-3.5 text-violet-600" />
+            <HugeiconsIcon icon={TrendUp} className="w-3.5 h-3.5 text-violet-600" strokeWidth={2} color="currentColor" />
             <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600">Market Overnight</p>
           </div>
           <div className="bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 space-y-1">
@@ -55,7 +60,7 @@ export function BriefMock() {
         {/* Your Positions */}
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
-            <Crosshair weight="bold" className="w-3.5 h-3.5 text-violet-600" />
+            <HugeiconsIcon icon={Crosshair} className="w-3.5 h-3.5 text-violet-600" strokeWidth={2} color="currentColor" />
             <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600">Your Positions</p>
           </div>
           <div className="bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 space-y-1.5">
@@ -79,7 +84,7 @@ export function BriefMock() {
         {/* Today's Focus */}
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
-            <Sun weight="bold" className="w-3.5 h-3.5 text-violet-600" />
+            <HugeiconsIcon icon={Sun} className="w-3.5 h-3.5 text-violet-600" strokeWidth={2} color="currentColor" />
             <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600">Today&apos;s Focus</p>
           </div>
           <div className="bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 space-y-1">

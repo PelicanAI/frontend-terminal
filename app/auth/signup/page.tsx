@@ -7,7 +7,12 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Lock, Envelope, ArrowLeft } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  LockIcon as Lock,
+  Mail01Icon as Envelope,
+  ArrowLeft01Icon as ArrowLeft,
+} from "@hugeicons/core-free-icons"
 import { ReferralCodeInput } from "@/components/ReferralCodeInput"
 
 export default function SignUpPage() {
@@ -123,7 +128,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-[420px] relative z-10 flex flex-col">
         <div className="mb-6 self-start">
           <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft size={16} weight="regular" className="mr-2" />
+            <HugeiconsIcon icon={ArrowLeft} size={16} className="mr-2" strokeWidth={1.5} color="currentColor" />
             Back to Home
           </Link>
         </div>
@@ -161,7 +166,7 @@ export default function SignUpPage() {
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-muted-foreground ml-1">Email</label>
               <div className="relative group">
-                <Envelope size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <HugeiconsIcon icon={Envelope} size={20} className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" strokeWidth={1.5} color="currentColor" />
                 <input
                   type="email"
                   id="email"
@@ -177,7 +182,7 @@ export default function SignUpPage() {
             <div className="space-y-1.5">
               <label htmlFor="password" className="text-sm font-medium text-muted-foreground ml-1">Password</label>
               <div className="relative group">
-                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <HugeiconsIcon icon={Lock} size={20} className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" strokeWidth={1.5} color="currentColor" />
                 <input
                   type="password"
                   id="password"
@@ -192,7 +197,7 @@ export default function SignUpPage() {
             <div className="space-y-1.5">
               <label htmlFor="repeat-password" className="text-sm font-medium text-muted-foreground ml-1">Repeat Password</label>
               <div className="relative group">
-                <Lock size={20} weight="regular" className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                <HugeiconsIcon icon={Lock} size={20} className="absolute left-3.5 top-3.5 text-muted-foreground/50 group-focus-within:text-primary transition-colors" strokeWidth={1.5} color="currentColor" />
                 <input
                   type="password"
                   id="repeat-password"

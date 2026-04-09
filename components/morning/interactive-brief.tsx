@@ -1,12 +1,27 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
 import {
-  CaretDown, CaretUp, Export, Copy, FileText, XLogo,
-  Moon, Target, Briefcase, Eye, Globe, Factory,
-  TrendUp, Lightbulb, Warning, GameController, Article,
-  BookOpenText,
-} from '@phosphor-icons/react'
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  Share01Icon as Export,
+  Copy01Icon as Copy,
+  File02Icon as FileText,
+  TwitterIcon as XLogo,
+  MoonIcon as Moon,
+  Target01Icon as Target,
+  Briefcase01Icon as Briefcase,
+  ViewIcon as Eye,
+  GlobeIcon as Globe,
+  FactoryIcon as Factory,
+  AnalyticsUpIcon as TrendUp,
+  BulbIcon as Lightbulb,
+  Alert01Icon as Warning,
+  GameController01Icon as GameController,
+  News01Icon as Article,
+  BookOpenTextIcon as BookOpenText,
+} from '@hugeicons/core-free-icons'
 import { m, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { formatLine, applyTickerLinks } from '@/components/chat/message/format-utils'
@@ -37,7 +52,7 @@ const BRIEF_SECTIONS = [
   { pattern: /setup|playbook/i, id: 'setups', label: 'Setups' },
 ]
 
-const SECTION_ICONS: Record<string, React.ElementType> = {
+const SECTION_ICONS: Record<string, IconSvgElement> = {
   overnight: Moon,
   levels: Target,
   positions: Briefcase,
@@ -208,13 +223,10 @@ export function InteractiveBrief({ content, isStreaming, onTickerClick, onShare 
           className="flex items-center gap-1.5 group"
           aria-label={briefCollapsed ? 'Expand brief' : 'Collapse brief'}
         >
-          <CaretDown
-            className={cn(
+          <HugeiconsIcon icon={CaretDown} className={cn(
               "h-4 w-4 text-[var(--text-muted)] transition-transform duration-200 shrink-0",
               briefCollapsed && "-rotate-90"
-            )}
-            weight="bold"
-          />
+            )} strokeWidth={2} color="currentColor" />
           <span className="text-xs font-medium text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors uppercase tracking-wider">
             {briefCollapsed ? 'Show Brief' : 'Hide Brief'}
           </span>
@@ -270,29 +282,29 @@ export function InteractiveBrief({ content, isStreaming, onTickerClick, onShare 
                     className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
                   >
                     {collapsedSections.size === 0 ? (
-                      <><CaretUp size={12} weight="bold" /> Collapse all</>
+                      <><HugeiconsIcon icon={CaretUp} size={12} strokeWidth={2} color="currentColor" /> Collapse all</>
                     ) : (
-                      <><CaretDown size={12} weight="bold" /> Expand all</>
+                      <><HugeiconsIcon icon={CaretDown} size={12} strokeWidth={2} color="currentColor" /> Expand all</>
                     )}
                   </button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors">
-                        <Export className="h-3.5 w-3.5" weight="regular" />
+                        <HugeiconsIcon icon={Export} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />
                         Share
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => onShare('full')}>
-                        <Copy className="h-3.5 w-3.5 mr-2" weight="regular" />
+                        <HugeiconsIcon icon={Copy} className="h-3.5 w-3.5 mr-2" strokeWidth={1.5} color="currentColor" />
                         Copy Full Brief
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onShare('summary')}>
-                        <FileText className="h-3.5 w-3.5 mr-2" weight="regular" />
+                        <HugeiconsIcon icon={FileText} className="h-3.5 w-3.5 mr-2" strokeWidth={1.5} color="currentColor" />
                         Copy Summary
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onShare('twitter')}>
-                        <XLogo className="h-3.5 w-3.5 mr-2" weight="regular" />
+                        <HugeiconsIcon icon={XLogo} className="h-3.5 w-3.5 mr-2" strokeWidth={1.5} color="currentColor" />
                         Copy for X/Twitter
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -327,22 +339,20 @@ export function InteractiveBrief({ content, isStreaming, onTickerClick, onShare 
                         onClick={() => toggleSection(section.id)}
                         className="flex items-center gap-3 w-full px-4 py-3 text-left hover:bg-[var(--bg-elevated)] transition-colors"
                       >
-                        <SectionIcon
+                        <HugeiconsIcon
+                          icon={SectionIcon}
                           size={16}
-                          weight="regular"
                           className="text-[var(--accent-primary)] flex-shrink-0"
+                          strokeWidth={1.5}
+                          color="currentColor"
                         />
                         <span className="font-medium text-sm text-[var(--text-primary)] flex-1">
                           {section.title}
                         </span>
-                        <CaretDown
-                          size={14}
-                          weight="bold"
-                          className={cn(
+                        <HugeiconsIcon icon={CaretDown} size={14} className={cn(
                             "text-[var(--text-muted)] transition-transform duration-200",
                             !isCollapsed && "rotate-180"
-                          )}
-                        />
+                          )} strokeWidth={2} color="currentColor" />
                       </button>
 
                       {/* Section content */}

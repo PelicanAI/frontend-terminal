@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Providers } from "@/lib/providers"
 import { Suspense } from "react"
@@ -9,6 +8,20 @@ import * as Sentry from '@sentry/nextjs'
 import SentryErrorBoundary from "@/components/sentry-error-boundary"
 import { ReferralCapture } from "@/components/ReferralCapture"
 import "./globals.css"
+
+const plex = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-plex-sans",
+  display: "swap",
+})
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
+  display: "swap",
+})
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -66,7 +79,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${GeistSans.className} antialiased bg-background ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className={`${plex.className} antialiased bg-background ${plex.variable} ${plexMono.variable}`}>
         <ReferralCapture />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded">Skip to main content</a>
         <SentryErrorBoundary>

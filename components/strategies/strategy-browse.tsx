@@ -4,7 +4,8 @@ import { useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { m } from "framer-motion"
-import { ArrowLeft } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowLeft01Icon as ArrowLeft } from "@hugeicons/core-free-icons"
 import { useStrategies } from "@/hooks/use-strategies"
 import { pageEnter, staggerContainer } from "@/components/ui/pelican"
 import { StrategyCard } from "./strategy-card"
@@ -31,7 +32,7 @@ export function StrategyBrowse() {
             <span className="text-sm font-medium text-[var(--text-primary)]">Strategies</span>
           </div>
           <Link href="/playbooks" className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
-            <ArrowLeft size={14} weight="bold" />
+            <HugeiconsIcon icon={ArrowLeft} size={14} strokeWidth={2} color="currentColor" />
             My Playbooks
           </Link>
         </div>

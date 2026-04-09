@@ -1,6 +1,7 @@
 "use client"
 
-import { SortAscending } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { SortByUp01Icon as SortAscending } from "@hugeicons/core-free-icons"
 import type { StrategyFilter } from "@/types/trading"
 
 interface StrategySortProps {
@@ -17,7 +18,7 @@ const SORT_OPTIONS = [
 export function StrategySort({ filters, onChange }: StrategySortProps) {
   return (
     <div className="flex items-center gap-2">
-      <SortAscending size={14} weight="regular" className="text-[var(--text-muted)]" />
+      <HugeiconsIcon icon={SortAscending} size={14} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
       <select
         value={filters.sortBy}
         onChange={(e) => onChange((prev) => ({ ...prev, sortBy: e.target.value as StrategyFilter['sortBy'] }))}

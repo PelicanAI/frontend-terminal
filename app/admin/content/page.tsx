@@ -14,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ArrowsClockwise } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Refresh01Icon as ArrowsClockwise } from '@hugeicons/core-free-icons'
 import {
   PieChart,
   Pie,
@@ -231,7 +232,7 @@ export default function AdminContentPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Content Intelligence</h1>
         <Button variant="ghost" size="sm" onClick={() => fetchData(true)}>
-          <ArrowsClockwise size={16} weight="regular" className="mr-1" />
+          <HugeiconsIcon icon={ArrowsClockwise} size={16} className="mr-1" strokeWidth={1.5} color="currentColor" />
           Refresh
         </Button>
       </div>

@@ -13,26 +13,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { HugeiconsIcon } from "@hugeicons/react"
 import {
-  Plus,
-  MagnifyingGlass,
-  ChatCircle,
-  Trash,
-  PencilSimple,
-  Gear,
-  User,
-  SignOut,
-  Shield,
-  CaretLeft,
-  Sun,
-  Moon,
-  BookmarkSimple,
-  CaretDown,
-  CaretUp,
-  ArrowLeft,
-  DotsThree,
-  Lightning,
-} from "@phosphor-icons/react"
+  Add01Icon as Plus,
+  Search01Icon as MagnifyingGlass,
+  Chat01Icon as ChatCircle,
+  Delete01Icon as Trash,
+  PencilEdit01Icon as PencilSimple,
+  Settings01Icon as Gear,
+  UserIcon as User,
+  Logout01Icon as SignOut,
+  Shield01Icon as Shield,
+  ArrowLeft01Icon as CaretLeft,
+  Sun01Icon as Sun,
+  MoonIcon as Moon,
+  Bookmark01Icon as BookmarkSimple,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  ArrowLeft01Icon as ArrowLeft,
+  MoreHorizontalIcon as DotsThree,
+  FlashIcon as Lightning,
+} from "@hugeicons/core-free-icons"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -140,7 +141,7 @@ const ConversationItem = React.memo(function ConversationItem({
           <div className="text-sm text-foreground truncate font-medium flex items-center gap-1">
             {conversation.title || newChatLabel}
             {getConversationClass(conversation.metadata) === 'action' && (
-              <span className="shrink-0" title="Quick action"><Lightning size={12} weight="fill" className="text-[var(--accent-primary)]" /></span>
+              <span className="shrink-0" title="Quick action"><HugeiconsIcon icon={Lightning} size={12} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" /></span>
             )}
           </div>
         </div>
@@ -154,7 +155,7 @@ const ConversationItem = React.memo(function ConversationItem({
               className="opacity-0 group-hover:opacity-100 h-6 w-6 rounded-md flex items-center justify-center hover:bg-accent/10 text-muted-foreground transition-opacity shrink-0 appearance-none bg-transparent border-none p-0 m-0 cursor-pointer"
               aria-label="More options"
             >
-              <DotsThree size={16} weight="bold" />
+              <HugeiconsIcon icon={DotsThree} size={16} strokeWidth={2} color="currentColor" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" side="bottom" className="w-40">
@@ -164,7 +165,7 @@ const ConversationItem = React.memo(function ConversationItem({
                 onStartEdit(conversation.id, conversation.title || newChatLabel)
               }}
             >
-              <PencilSimple size={14} weight="regular" className="mr-2" />
+              <HugeiconsIcon icon={PencilSimple} size={14} className="mr-2" strokeWidth={1.5} color="currentColor" />
               Rename
             </DropdownMenuItem>
             {/* TODO: Pin Chat — add pin functionality */}
@@ -175,7 +176,7 @@ const ConversationItem = React.memo(function ConversationItem({
               }}
               className="text-destructive focus:text-destructive"
             >
-              <Trash size={14} weight="regular" className="mr-2" />
+              <HugeiconsIcon icon={Trash} size={14} className="mr-2" strokeWidth={1.5} color="currentColor" />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -212,7 +213,7 @@ function ThemeRow() {
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors"
     >
-      {isDark ? <Sun size={14} weight="regular" /> : <Moon size={14} weight="regular" />}
+      {isDark ? <HugeiconsIcon icon={Sun} size={14} strokeWidth={1.5} color="currentColor" /> : <HugeiconsIcon icon={Moon} size={14} strokeWidth={1.5} color="currentColor" />}
       {isDark ? 'Light Mode' : 'Dark Mode'}
     </button>
   )
@@ -451,7 +452,7 @@ export function ConversationSidebar({
             onClick={onNewConversation}
             className="flex items-center gap-2.5 flex-1 px-3 py-2 rounded-lg text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors text-left"
           >
-            <Plus size={16} weight="bold" />
+            <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
             New Chat
           </button>
           {onToggleCollapse && !isMobileSheet && (
@@ -460,7 +461,7 @@ export function ConversationSidebar({
                 onClick={onToggleCollapse}
                 className="h-8 w-8 flex items-center justify-center rounded-lg flex-shrink-0 text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
               >
-                <CaretLeft size={14} weight="regular" />
+                <HugeiconsIcon icon={CaretLeft} size={14} strokeWidth={1.5} color="currentColor" />
               </button>
             </IconTooltip>
           )}
@@ -472,12 +473,12 @@ export function ConversationSidebar({
             onClick={() => setSearchExpanded(true)}
             className="flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors text-left"
           >
-            <MagnifyingGlass size={16} weight="regular" />
+            <HugeiconsIcon icon={MagnifyingGlass} size={16} strokeWidth={1.5} color="currentColor" />
             Search
           </button>
         ) : (
           <div className="relative">
-            <MagnifyingGlass size={16} weight="regular" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <HugeiconsIcon icon={MagnifyingGlass} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" strokeWidth={1.5} color="currentColor" />
             <Input
               placeholder={t.common.search}
               value={searchQuery}
@@ -506,19 +507,16 @@ export function ConversationSidebar({
             )}
           >
             <span className="flex items-center gap-2.5">
-              <BookmarkSimple size={16} weight={sidebarView === 'insights' ? 'fill' : 'regular'} />
+              <HugeiconsIcon icon={BookmarkSimple} size={16} strokeWidth={1.5} color="currentColor" />
               Saved Insights
               <span className="text-xs text-[var(--text-muted)]">
                 ({savedInsights.length})
               </span>
             </span>
-            <CaretDown
-              size={12}
-              style={{
+            <HugeiconsIcon icon={CaretDown} size={12} style={{
                 transform: sidebarView === 'insights' ? 'rotate(180deg)' : 'rotate(0)',
                 transition: 'transform 150ms ease',
-              }}
-            />
+              }} strokeWidth={1.5} color="currentColor" />
           </button>
         )}
 
@@ -532,7 +530,7 @@ export function ConversationSidebar({
               : "text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]"
           )}
         >
-          <Lightning size={16} weight={showActions ? 'fill' : 'regular'} />
+          <HugeiconsIcon icon={Lightning} size={16} strokeWidth={1.5} color="currentColor" />
           Auto Prompts
         </button>
       </div>
@@ -554,7 +552,7 @@ export function ConversationSidebar({
               </div>
             ) : filteredConversations.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 px-6 text-center">
-                <ChatCircle size={32} weight="regular" className="mb-2 text-muted-foreground/20" />
+                <HugeiconsIcon icon={ChatCircle} size={32} className="mb-2 text-muted-foreground/20" strokeWidth={1.5} color="currentColor" />
                 <p className="text-xs font-medium text-muted-foreground/60">
                   {t.chat.emptyConversations}
                 </p>
@@ -740,13 +738,13 @@ export function ConversationSidebar({
               className="flex items-center gap-1 px-2 py-2 mb-2 text-xs transition-colors rounded-md hover:bg-[var(--surface-hover)]"
               style={{ color: 'var(--text-secondary)' }}
             >
-              <ArrowLeft size={14} />
+              <HugeiconsIcon icon={ArrowLeft} size={14} strokeWidth={1.5} color="currentColor" />
               Back to conversations
             </button>
 
             {savedInsights.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
-                <BookmarkSimple size={28} style={{ color: 'var(--text-muted)' }} />
+                <HugeiconsIcon icon={BookmarkSimple} size={28} style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} color="currentColor" />
                 <p className="text-sm mt-3" style={{ color: 'var(--text-secondary)' }}>
                   No saved insights yet
                 </p>
@@ -809,7 +807,7 @@ export function ConversationSidebar({
                           style={{ color: 'var(--text-muted)' }}
                           aria-label="Delete insight"
                         >
-                          <Trash size={12} />
+                          <HugeiconsIcon icon={Trash} size={12} strokeWidth={1.5} color="currentColor" />
                         </button>
                       </IconTooltip>
                     </div>
@@ -833,7 +831,7 @@ export function ConversationSidebar({
                 className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs font-medium text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors duration-150"
                 onClick={() => setShowProfileMenu(false)}
               >
-                <Shield size={14} weight="regular" />
+                <HugeiconsIcon icon={Shield} size={14} strokeWidth={1.5} color="currentColor" />
                 <span>Admin Panel</span>
               </Link>
             )}
@@ -842,7 +840,7 @@ export function ConversationSidebar({
               className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors"
               onClick={() => setShowProfileMenu(false)}
             >
-              <Gear size={14} weight="regular" />
+              <HugeiconsIcon icon={Gear} size={14} strokeWidth={1.5} color="currentColor" />
               Settings
             </Link>
             <button
@@ -852,7 +850,7 @@ export function ConversationSidebar({
               }}
               className="flex items-center gap-2.5 w-full px-2 py-1.5 rounded-md text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
             >
-              <SignOut size={14} weight="regular" />
+              <HugeiconsIcon icon={SignOut} size={14} strokeWidth={1.5} color="currentColor" />
               Sign out
             </button>
           </div>
@@ -863,16 +861,12 @@ export function ConversationSidebar({
           onClick={() => setShowProfileMenu(!showProfileMenu)}
           className="flex items-center gap-2.5 w-full px-3 py-3 text-xs text-muted-foreground hover:text-foreground hover:bg-accent/5 transition-colors"
         >
-          <User size={14} weight="regular" />
+          <HugeiconsIcon icon={User} size={14} strokeWidth={1.5} color="currentColor" />
           <span className="flex-1 text-left font-medium">{t.common.account}</span>
-          <CaretUp
-            size={12}
-            weight="regular"
-            className={cn(
+          <HugeiconsIcon icon={CaretUp} size={12} className={cn(
               "transition-transform duration-150",
               showProfileMenu ? "rotate-180" : "rotate-0"
-            )}
-          />
+            )} strokeWidth={1.5} color="currentColor" />
         </button>
       </div>
 
@@ -904,7 +898,7 @@ export function ConversationSidebar({
         <AlertDialogContent className="sm:max-w-[425px]">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <Trash size={20} weight="regular" className="text-destructive" />
+              <HugeiconsIcon icon={Trash} size={20} className="text-destructive" strokeWidth={1.5} color="currentColor" />
               Delete Conversation
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base">

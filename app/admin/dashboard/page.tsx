@@ -3,23 +3,24 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
 import {
-  Users,
-  Pulse,
-  TrendUp,
-  CurrencyDollar,
-  Lightning,
-  ChatCircle,
-  ArrowsClockwise,
-  CaretDown,
-  CaretUp,
-  Warning,
-  UserPlus,
-  CreditCard,
-  CircleNotch,
-  ArrowUpRight,
-  ArrowDownRight,
-} from '@phosphor-icons/react'
+  UserMultipleIcon as Users,
+  Pulse01Icon as Pulse,
+  AnalyticsUpIcon as TrendUp,
+  Dollar01Icon as CurrencyDollar,
+  FlashIcon as Lightning,
+  Chat01Icon as ChatCircle,
+  Refresh01Icon as ArrowsClockwise,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  Alert01Icon as Warning,
+  UserAdd01Icon as UserPlus,
+  CreditCardIcon as CreditCard,
+  Loading03Icon as CircleNotch,
+  ArrowUpRight01Icon as ArrowUpRight,
+  ArrowDownRight01Icon as ArrowDownRight,
+} from '@hugeicons/core-free-icons'
 import Link from 'next/link'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
 import {
@@ -135,7 +136,7 @@ function AdminStatCard({
   formattedValue?: string
   delta?: number
   deltaPercent?: number
-  icon: React.ElementType
+  icon: IconSvgElement
 }) {
   const hasPositiveDelta = delta !== undefined && delta > 0
   const hasNegativeDelta = delta !== undefined && delta < 0
@@ -147,7 +148,7 @@ function AdminStatCard({
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        <Icon size={16} weight="regular" className="text-muted-foreground" />
+        <HugeiconsIcon icon={Icon} size={16} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold font-mono tabular-nums">
@@ -157,7 +158,7 @@ function AdminStatCard({
           <div className="flex items-center gap-1 mt-1">
             {hasPositiveDelta && (
               <>
-                <ArrowUpRight size={12} weight="regular" className="text-emerald-500" />
+                <HugeiconsIcon icon={ArrowUpRight} size={12} className="text-emerald-500" strokeWidth={1.5} color="currentColor" />
                 <span className="text-xs font-mono tabular-nums text-emerald-500">
                   +{delta!.toLocaleString()}
                 </span>
@@ -165,7 +166,7 @@ function AdminStatCard({
             )}
             {hasNegativeDelta && (
               <>
-                <ArrowDownRight size={12} weight="regular" className="text-red-500" />
+                <HugeiconsIcon icon={ArrowDownRight} size={12} className="text-red-500" strokeWidth={1.5} color="currentColor" />
                 <span className="text-xs font-mono tabular-nums text-red-500">
                   {delta!.toLocaleString()}
                 </span>
@@ -349,7 +350,7 @@ export default function AdminDashboardPage() {
             disabled={refreshing}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors disabled:opacity-50"
           >
-            <ArrowsClockwise size={12} weight="regular" className={refreshing ? 'animate-spin' : ''} />
+            <HugeiconsIcon icon={ArrowsClockwise} size={12} className={refreshing ? 'animate-spin' : ''} strokeWidth={1.5} color="currentColor" />
             Refresh
           </button>
         </div>
@@ -620,9 +621,9 @@ export default function AdminDashboardPage() {
                           </div>
                           <div className="ml-2 shrink-0">
                             {isExpanded ? (
-                              <CaretUp size={16} weight="regular" className="text-muted-foreground" />
+                              <HugeiconsIcon icon={CaretUp} size={16} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                             ) : (
-                              <CaretDown size={16} weight="regular" className="text-muted-foreground" />
+                              <HugeiconsIcon icon={CaretDown} size={16} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
                             )}
                           </div>
                         </button>
@@ -631,7 +632,7 @@ export default function AdminDashboardPage() {
                             href={`/admin/conversations/${conv.id}`}
                             className="ml-1 shrink-0 p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                           >
-                            <ArrowUpRight size={14} weight="regular" />
+                            <HugeiconsIcon icon={ArrowUpRight} size={14} strokeWidth={1.5} color="currentColor" />
                           </Link>
                         </IconTooltip>
                       </div>
@@ -640,7 +641,7 @@ export default function AdminDashboardPage() {
                         <div className="ml-2 mb-2 border-l-2 border-border pl-3 max-h-[300px] overflow-y-auto">
                           {isLoadingMsg && (
                             <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
-                              <CircleNotch size={12} weight="regular" className="animate-spin" />
+                              <HugeiconsIcon icon={CircleNotch} size={12} className="animate-spin" strokeWidth={1.5} color="currentColor" />
                               Loading...
                             </div>
                           )}
@@ -686,7 +687,7 @@ export default function AdminDashboardPage() {
               <div className="space-y-3">
                 {stats.alerts.zeroCreditUsers > 0 && (
                   <div className="flex items-start gap-3 text-sm">
-                    <Warning size={16} weight="regular" className="mt-0.5 text-amber-500 shrink-0" />
+                    <HugeiconsIcon icon={Warning} size={16} className="mt-0.5 text-amber-500 shrink-0" strokeWidth={1.5} color="currentColor" />
                     <div>
                       <p className="font-medium">
                         <span className="font-mono tabular-nums">{stats.alerts.zeroCreditUsers}</span> users at zero credits
@@ -699,7 +700,7 @@ export default function AdminDashboardPage() {
                 )}
                 {stats.alerts.nearLimitUsers > 0 && (
                   <div className="flex items-start gap-3 text-sm">
-                    <Lightning size={16} weight="regular" className="mt-0.5 text-amber-500 shrink-0" />
+                    <HugeiconsIcon icon={Lightning} size={16} className="mt-0.5 text-amber-500 shrink-0" strokeWidth={1.5} color="currentColor" />
                     <div>
                       <p className="font-medium">
                         <span className="font-mono tabular-nums">{stats.alerts.nearLimitUsers}</span> users near credit limit
@@ -712,7 +713,7 @@ export default function AdminDashboardPage() {
                 )}
                 {stats.alerts.newPaidThisWeek > 0 && (
                   <div className="flex items-start gap-3 text-sm">
-                    <CreditCard size={16} weight="regular" className="mt-0.5 text-emerald-500 shrink-0" />
+                    <HugeiconsIcon icon={CreditCard} size={16} className="mt-0.5 text-emerald-500 shrink-0" strokeWidth={1.5} color="currentColor" />
                     <div>
                       <p className="font-medium">
                         <span className="font-mono tabular-nums">{stats.alerts.newPaidThisWeek}</span> new paid users this week
@@ -727,7 +728,7 @@ export default function AdminDashboardPage() {
                   stats.alerts.nearLimitUsers === 0 &&
                   stats.alerts.newPaidThisWeek === 0 && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <UserPlus size={16} weight="regular" />
+                      <HugeiconsIcon icon={UserPlus} size={16} strokeWidth={1.5} color="currentColor" />
                       No alerts right now
                     </div>
                   )}

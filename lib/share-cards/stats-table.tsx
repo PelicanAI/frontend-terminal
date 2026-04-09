@@ -174,7 +174,7 @@ export function StatsTableCard({ period, rows }: StatsTableProps) {
                 fontSize: 15,
                 fontWeight: 700,
                 color: getColor(row.color),
-                fontFamily: "Geist Mono, monospace",
+                fontFamily: "IBM Plex Mono, monospace",
                 justifyContent: "flex-end",
               }}
             >

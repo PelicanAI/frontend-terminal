@@ -2,7 +2,8 @@
 
 import { PelicanCard } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
-import { Table } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Table01Icon as Table } from "@hugeicons/core-free-icons"
 import type { TickerInsight } from "@/hooks/use-behavioral-insights"
 
 interface TickerScorecardProps {
@@ -22,7 +23,7 @@ export function TickerScorecard({ data, onAskPelican }: TickerScorecardProps) {
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-4">
-        <Table size={18} weight="regular" className="text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={Table} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-sm font-medium text-[var(--text-primary)]">Ticker Scorecard</h3>
         <span className="text-xs text-[var(--text-muted)] ml-auto">Click a row to ask Pelican</span>
       </div>

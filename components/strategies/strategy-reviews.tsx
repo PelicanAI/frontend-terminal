@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Star, ChatCircle } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { StarIcon as Star, Chat01Icon as ChatCircle } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { useRateStrategy } from "@/hooks/use-strategies"
 import type { Playbook, StrategyRating } from "@/types/trading"
@@ -39,14 +40,10 @@ export function StrategyReviews({ strategy, ratings }: StrategyReviewsProps) {
                 onClick={() => setUserRating(star)}
                 className="p-0.5 transition-transform hover:scale-110"
               >
-                <Star
-                  size={24}
-                  weight={(hoverRating || userRating) >= star ? "fill" : "regular"}
-                  className={cn(
+                <HugeiconsIcon icon={Star} size={24} className={cn(
                     "transition-colors",
                     (hoverRating || userRating) >= star ? "text-amber-400" : "text-[var(--text-muted)]"
-                  )}
-                />
+                  )} strokeWidth={1.5} color="currentColor" />
               </button>
             ))}
           </div>
@@ -84,7 +81,7 @@ export function StrategyReviews({ strategy, ratings }: StrategyReviewsProps) {
               <div className="flex items-center gap-2 mb-2">
                 <div className="flex items-center gap-0.5">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} size={14} weight={r.rating >= star ? "fill" : "regular"} className={r.rating >= star ? "text-amber-400" : "text-[var(--text-disabled)]"} />
+                    <HugeiconsIcon icon={Star} key={star} size={14} className={r.rating >= star ? "text-amber-400" : "text-[var(--text-disabled)]"} strokeWidth={1.5} color="currentColor" />
                   ))}
                 </div>
                 <span className="text-xs text-[var(--text-muted)]">
@@ -99,7 +96,7 @@ export function StrategyReviews({ strategy, ratings }: StrategyReviewsProps) {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <ChatCircle size={32} weight="thin" className="text-[var(--text-muted)] mb-3" />
+          <HugeiconsIcon icon={ChatCircle} size={32} className="text-[var(--text-muted)] mb-3" strokeWidth={1} color="currentColor" />
           <p className="text-sm text-[var(--text-muted)]">No reviews yet. Be the first!</p>
         </div>
       )}

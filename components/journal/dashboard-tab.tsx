@@ -2,7 +2,14 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { TradeStats, EquityCurvePoint } from '@/hooks/use-trade-stats'
-import { TrendUp, TrendDown, Target, Trophy, ChartBar } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  AnalyticsUpIcon as TrendUp,
+  AnalyticsDownIcon as TrendDown,
+  Target01Icon as Target,
+  ChampionIcon as Trophy,
+  BarChartIcon as ChartBar,
+} from '@hugeicons/core-free-icons'
 import { m } from 'framer-motion'
 import { Line, LineChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { PelicanCard, staggerContainer, staggerItem } from '@/components/ui/pelican'
@@ -118,7 +125,7 @@ export function DashboardTab({ stats, equityCurve, isLoading }: DashboardTabProp
                   <span className="text-[var(--text-muted)] uppercase text-xs tracking-wider font-medium">
                     {card.label}
                   </span>
-                  <Icon size={18} className="text-[var(--text-muted)]" />
+                  <HugeiconsIcon icon={Icon} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
                 </div>
                 <div className={`text-2xl font-bold font-mono tabular-nums ${card.color}`}>
                   {card.value}
@@ -242,7 +249,7 @@ export function DashboardTab({ stats, equityCurve, isLoading }: DashboardTabProp
         <m.div variants={staggerItem}>
           <PelicanCard>
             <div className="flex flex-col items-center justify-center py-16">
-              <TrendUp size={32} className="text-[var(--text-muted)]" />
+              <HugeiconsIcon icon={TrendUp} size={32} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
               <p className="text-sm mt-3 text-[var(--text-secondary)]">
                 Close your first trade to see performance charts
               </p>

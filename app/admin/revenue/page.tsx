@@ -14,7 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ArrowsClockwise, CurrencyDollar, TrendUp, UserCheck } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Refresh01Icon as ArrowsClockwise,
+  Dollar01Icon as CurrencyDollar,
+  AnalyticsUpIcon as TrendUp,
+  UserCheck01Icon as UserCheck,
+} from '@hugeicons/core-free-icons'
 import {
   PieChart,
   Pie,
@@ -239,7 +245,7 @@ export default function AdminRevenuePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Revenue</h1>
         <Button variant="ghost" size="sm" onClick={() => fetchData(true)}>
-          <ArrowsClockwise size={16} weight="regular" className="mr-1" />
+          <HugeiconsIcon icon={ArrowsClockwise} size={16} className="mr-1" strokeWidth={1.5} color="currentColor" />
           Refresh
         </Button>
       </div>
@@ -249,7 +255,7 @@ export default function AdminRevenuePage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-emerald-500/10 p-2">
-              <CurrencyDollar size={16} weight="regular" className="text-emerald-500" />
+              <HugeiconsIcon icon={CurrencyDollar} size={16} className="text-emerald-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">MRR</p>
@@ -260,7 +266,7 @@ export default function AdminRevenuePage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-blue-500/10 p-2">
-              <TrendUp size={16} weight="regular" className="text-blue-500" />
+              <HugeiconsIcon icon={TrendUp} size={16} className="text-blue-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">ARR</p>
@@ -271,7 +277,7 @@ export default function AdminRevenuePage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-purple-500/10 p-2">
-              <CurrencyDollar size={16} weight="regular" className="text-purple-500" />
+              <HugeiconsIcon icon={CurrencyDollar} size={16} className="text-purple-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">ARPU</p>
@@ -282,7 +288,7 @@ export default function AdminRevenuePage() {
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <div className="rounded-md bg-amber-500/10 p-2">
-              <UserCheck size={16} weight="regular" className="text-amber-500" />
+              <HugeiconsIcon icon={UserCheck} size={16} className="text-amber-500" strokeWidth={1.5} color="currentColor" />
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Paid Users</p>

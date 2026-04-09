@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { ArrowCounterClockwise } from '@phosphor-icons/react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowReloadHorizontalIcon as ArrowCounterClockwise } from '@hugeicons/core-free-icons';
 
 interface DemoVideoProps {
   demoSrc?: string;
@@ -98,7 +99,7 @@ export default function DemoVideoPlaceholder({ demoSrc }: DemoVideoProps) {
         }}
         title="Replay demo"
       >
-        <ArrowCounterClockwise size={16} weight="regular" />
+        <HugeiconsIcon icon={ArrowCounterClockwise} size={16} strokeWidth={1.5} color="currentColor" />
       </button>
     </div>
   );

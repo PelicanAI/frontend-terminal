@@ -2,7 +2,8 @@
 
 import { PelicanCard } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
-import { TrendDown } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { AnalyticsDownIcon as TrendDown } from "@hugeicons/core-free-icons"
 import type { StreakInsight } from "@/hooks/use-behavioral-insights"
 
 interface StreakCardProps {
@@ -20,7 +21,7 @@ export function StreakCard({ streaks, winRate, onAskPelican }: StreakCardProps) 
   return (
     <PelicanCard className="p-5" noPadding>
       <div className="flex items-center gap-2 mb-4">
-        <TrendDown size={18} weight="regular" className="text-[var(--text-muted)]" />
+        <HugeiconsIcon icon={TrendDown} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
         <h3 className="text-sm font-medium text-[var(--text-primary)]">Streaks &amp; Drawdowns</h3>
       </div>
 

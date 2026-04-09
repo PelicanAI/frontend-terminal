@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { CaretDown } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowDown01Icon as CaretDown } from "@hugeicons/core-free-icons"
 import { Button } from "@/components/ui/button"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 
@@ -36,7 +37,7 @@ export function JumpToLatestButton({ onJumpToLatest, lastNewMessageAt, className
         `}
         aria-label="Jump to latest message"
       >
-        <CaretDown size={16} weight="regular" />
+        <HugeiconsIcon icon={CaretDown} size={16} strokeWidth={1.5} color="currentColor" />
       </Button>
     </IconTooltip>
   )

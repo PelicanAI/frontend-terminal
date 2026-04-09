@@ -1,6 +1,12 @@
 'use client'
 
-import { User, Warning, Clock, ShieldCheck } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  UserIcon as User,
+  Alert01Icon as Warning,
+  Clock01Icon as Clock,
+  SecurityCheckIcon as ShieldCheck,
+} from '@hugeicons/core-free-icons'
 import Image from 'next/image'
 
 export function CoachingMock() {
@@ -30,7 +36,7 @@ export function CoachingMock() {
             <p className="text-sm text-slate-900">Should I short TSLA here?</p>
           </div>
           <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <User weight="regular" className="w-3.5 h-3.5 text-slate-400" />
+            <HugeiconsIcon icon={User} className="w-3.5 h-3.5 text-slate-400" strokeWidth={1.5} color="currentColor" />
           </div>
         </div>
 
@@ -48,7 +54,7 @@ export function CoachingMock() {
               {/* Warning */}
               <div>
                 <div className="flex items-center gap-1.5 mb-1">
-                  <Warning weight="fill" className="w-3 h-3 text-red-600" />
+                  <HugeiconsIcon icon={Warning} className="w-3 h-3 text-red-600" strokeWidth={1.5} color="currentColor" />
                   <p className="text-[10px] font-medium uppercase tracking-wider text-red-600">Warning</p>
                 </div>
                 <p className="text-xs text-slate-600">
@@ -60,7 +66,7 @@ export function CoachingMock() {
               {/* Context */}
               <div>
                 <div className="flex items-center gap-1.5 mb-1">
-                  <Clock weight="fill" className="w-3 h-3 text-amber-500" />
+                  <HugeiconsIcon icon={Clock} className="w-3 h-3 text-amber-500" strokeWidth={1.5} color="currentColor" />
                   <p className="text-[10px] font-medium uppercase tracking-wider text-amber-600">Context</p>
                 </div>
                 <p className="text-xs text-slate-600">
@@ -71,7 +77,7 @@ export function CoachingMock() {
               {/* Coaching */}
               <div className="pt-1 border-t border-slate-200">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <ShieldCheck weight="fill" className="w-3 h-3 text-violet-600" />
+                  <HugeiconsIcon icon={ShieldCheck} className="w-3 h-3 text-violet-600" strokeWidth={1.5} color="currentColor" />
                   <p className="text-[10px] font-medium uppercase tracking-wider text-violet-600">Coaching</p>
                 </div>
                 <p className="text-xs text-slate-600 mb-1.5">Before entering, answer three things:</p>

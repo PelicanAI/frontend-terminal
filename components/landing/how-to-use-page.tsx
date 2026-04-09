@@ -1,17 +1,18 @@
 'use client'
 
 import Link from 'next/link'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ChatCircle,
-  Notebook,
-  Crosshair,
-  Sun,
-  SquaresFour,
-  Strategy,
-  CalendarCheck,
-  LinkSimple,
-  Brain,
-} from '@phosphor-icons/react'
+  Chat01Icon as ChatCircle,
+  Notebook01Icon as Notebook,
+  Target01Icon as Crosshair,
+  Sun01Icon as Sun,
+  DashboardSquare01Icon as SquaresFour,
+  StrategyIcon as Strategy,
+  CalendarCheckIn01Icon as CalendarCheck,
+  Link01Icon as LinkSimple,
+  Brain01Icon as Brain,
+} from '@hugeicons/core-free-icons'
 import { Section } from '@/components/landing/section'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
@@ -195,7 +196,7 @@ export function HowToUsePage() {
                     }}
                     className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
                   >
-                    <Icon weight="duotone" className="h-4 w-4 text-violet-600 shrink-0" />
+                    <HugeiconsIcon icon={Icon} className="h-4 w-4 text-violet-600 shrink-0" strokeWidth={1.5} color="currentColor" />
                     {section.title.split(' — ')[0]}
                   </a>
                 )
@@ -213,7 +214,7 @@ export function HowToUsePage() {
                 <div id={section.id} className="scroll-mt-24">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-violet-50">
-                      <Icon weight="duotone" className="h-5 w-5 text-violet-600" />
+                      <HugeiconsIcon icon={Icon} className="h-5 w-5 text-violet-600" strokeWidth={1.5} color="currentColor" />
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-slate-900">
@@ -264,7 +265,7 @@ export function HowToUsePage() {
             <div id="intelligence" className="scroll-mt-24">
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-violet-50">
-                  <Brain weight="duotone" className="h-5 w-5 text-violet-600" />
+                  <HugeiconsIcon icon={Brain} className="h-5 w-5 text-violet-600" strokeWidth={1.5} color="currentColor" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">

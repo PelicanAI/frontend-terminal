@@ -16,7 +16,12 @@ import { useAuth } from "@/lib/providers/auth-provider"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { List, CaretRight, Plus as PlusIcon } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  ListViewIcon as List,
+  ArrowRight01Icon as CaretRight,
+  Add01Icon as PlusIcon,
+} from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
@@ -517,7 +522,7 @@ export default function ChatPage() {
                 onClick={handleSidebarToggle}
                 className="h-8 w-8 flex items-center justify-center rounded-md text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] transition-colors"
               >
-                <CaretRight size={16} weight="regular" />
+                <HugeiconsIcon icon={CaretRight} size={16} strokeWidth={1.5} color="currentColor" />
               </button>
             </IconTooltip>
             <IconTooltip label="New chat" side="right" kbd="N">
@@ -525,7 +530,7 @@ export default function ChatPage() {
                 onClick={handleNewConversation}
                 className="h-8 w-8 flex items-center justify-center rounded-md text-[var(--accent-indigo)] hover:bg-[var(--accent-indigo-muted)] transition-colors"
               >
-                <PlusIcon size={16} weight="bold" />
+                <HugeiconsIcon icon={PlusIcon} size={16} strokeWidth={2} color="currentColor" />
               </button>
             </IconTooltip>
           </div>
@@ -584,7 +589,7 @@ export default function ChatPage() {
               aria-label="Open sidebar"
               onClick={() => setMobileSheetOpen(true)}
             >
-              <List size={20} weight="regular" className="text-foreground" />
+              <HugeiconsIcon icon={List} size={20} className="text-foreground" strokeWidth={1.5} color="currentColor" />
             </Button>
           </IconTooltip>
           <div className="flex items-center gap-2">

@@ -2,7 +2,13 @@
 
 import { HeatmapStock } from "@/app/api/heatmap/route"
 import { getStockColor, formatChangePercent } from "@/hooks/use-heatmap"
-import { ArrowUp, ArrowDown, Minus, BookmarkSimple } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  ArrowUp01Icon as ArrowUp,
+  ArrowDown01Icon as ArrowDown,
+  MinusSignIcon as Minus,
+  Bookmark01Icon as BookmarkSimple,
+} from "@hugeicons/core-free-icons"
 
 interface HeatmapGridProps {
   stocks: HeatmapStock[]
@@ -63,9 +69,9 @@ export function HeatmapGrid({ stocks, onStockClick, market, watchlistTickers, ad
               <span className={`font-mono text-xs font-medium ${colors.text}`}>
                 {formatChangePercent(stock.changePercent)}
               </span>
-              {isPositive && <ArrowUp size={12} weight="regular" className="text-green-400" />}
-              {isNegative && <ArrowDown size={12} weight="regular" className="text-red-400" />}
-              {!isPositive && !isNegative && <Minus size={12} weight="regular" className="text-foreground/30" />}
+              {isPositive && <HugeiconsIcon icon={ArrowUp} size={12} className="text-green-400" strokeWidth={1.5} color="currentColor" />}
+              {isNegative && <HugeiconsIcon icon={ArrowDown} size={12} className="text-red-400" strokeWidth={1.5} color="currentColor" />}
+              {!isPositive && !isNegative && <HugeiconsIcon icon={Minus} size={12} className="text-foreground/30" strokeWidth={1.5} color="currentColor" />}
             </div>
 
             {/* Price */}
@@ -91,11 +97,7 @@ export function HeatmapGrid({ stocks, onStockClick, market, watchlistTickers, ad
                 aria-label={isWatched ? 'Remove from Watchlist' : 'Add to Watchlist'}
               >
                 <div className="p-1 rounded hover:bg-white/10 transition-colors">
-                  <BookmarkSimple
-                    size={14}
-                    weight={isWatched ? 'fill' : 'regular'}
-                    className={isWatched ? 'text-[var(--accent-primary)]' : 'text-white/40 hover:text-white/60'}
-                  />
+                  <HugeiconsIcon icon={BookmarkSimple} size={14} className={isWatched ? 'text-[var(--accent-primary)]' : 'text-white/40 hover:text-white/60'} strokeWidth={1.5} color="currentColor" />
                 </div>
               </button>
             )}

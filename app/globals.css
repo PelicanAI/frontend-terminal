@@ -147,6 +147,7 @@
   /* Radius */
   --radius-card: 12px;
   --radius-button: 8px;
+
 }
 
 .dark {
@@ -278,8 +279,8 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), monospace;
 
   /* shadcn/ui standard color mappings */
   --color-background: var(--background);
@@ -823,7 +824,7 @@
 
   /* Utility: Apply to any element displaying financial numbers */
   .data-value {
-    font-family: var(--font-geist-mono), monospace;
+    font-family: var(--font-plex-mono), monospace;
     font-variant-numeric: tabular-nums;
   }
 

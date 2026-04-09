@@ -1,23 +1,22 @@
 'use client'
 
 import Link from 'next/link'
+import type { ReactNode } from 'react'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  CaretDown,
-  Lightning,
-  PencilSimple,
-  XCircle,
-  Warning,
-  ShieldWarning,
-  Info,
-} from '@phosphor-icons/react'
-import type { PortfolioPosition } from '@/types/portfolio'
-import type { PositionHealth, PositionAlert } from '@/lib/position-health'
-import type { TickerHistory } from '@/hooks/use-ticker-history'
+  Alert01Icon as Warning,
+  ArrowDown01Icon as CaretDown,
+  InformationCircleIcon as Info,
+  SecurityWarningIcon as ShieldWarning,
+} from '@hugeicons/core-free-icons'
+import { cn } from '@/lib/utils'
 import type { Quote } from '@/hooks/use-live-quotes'
+import type { TickerHistory } from '@/hooks/use-ticker-history'
+import type { PositionAlert, PositionHealth } from '@/lib/position-health'
+import type { PortfolioPosition } from '@/types/portfolio'
 
-// ============================================================================
-// Types
-// ============================================================================
+const DESKTOP_POSITION_GRID =
+  'grid-cols-[minmax(180px,1.45fr)_repeat(4,minmax(96px,0.8fr))_minmax(96px,0.8fr)_minmax(152px,1fr)_minmax(110px,0.95fr)]'
 
 interface PositionCardProps {
   position: PortfolioPosition
@@ -32,10 +31,6 @@ interface PositionCardProps {
   isExpanded: boolean
   onToggleExpand: () => void
 }
-
-// ============================================================================
-// Helpers
-// ============================================================================
 
 function formatCompactPrice(price: number): string {
   if (price >= 10000) return price.toLocaleString('en-US', { maximumFractionDigits: 0 })
@@ -66,6 +61,7 @@ function computeUnrealizedPnl(
   if (!quote || !position.entry_price || !position.quantity) {
     return { pnlAmount: 0, pnlPercent: 0, hasQuote: false }
   }
+
   const direction = position.direction === 'long' ? 1 : -1
   const pnlAmount = (quote.price - position.entry_price) * position.quantity * direction
   const pnlPercent = ((quote.price - position.entry_price) / position.entry_price) * 100 * direction
@@ -73,15 +69,9 @@ function computeUnrealizedPnl(
 }
 
 const healthDotColor: Record<PositionHealth['color'], string> = {
-  emerald: 'bg-[var(--data-positive)]',
-  amber: 'bg-[var(--data-warning)]',
-  red: 'bg-[var(--data-negative)]',
-}
-
-const alertStyles: Record<PositionAlert['severity'], string> = {
-  critical: 'bg-[var(--data-negative)]/8 text-[var(--data-negative)]/80 border-[var(--data-negative)]/15',
-  warning: 'bg-[var(--data-warning)]/8 text-[var(--data-warning)]/60 border-[var(--data-warning)]/10',
-  info: 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border-[var(--border-subtle)]/30',
+  emerald: 'bg-emerald-400',
+  amber: 'bg-amber-400',
+  red: 'bg-red-400',
 }
 
 const alertIcons: Record<PositionAlert['severity'], typeof Warning> = {
@@ -90,17 +80,12 @@ const alertIcons: Record<PositionAlert['severity'], typeof Warning> = {
   info: Info,
 }
 
-// ============================================================================
-// Risk/Reward Bar (desaturated)
-// ============================================================================
-
 function RiskRewardBar({ position }: { position: PortfolioPosition }) {
   if (!position.has_stop_loss || !position.has_take_profit) return null
 
   const stop = position.stop_loss!
   const entry = position.entry_price
   const target = position.take_profit!
-
   const min = Math.min(stop, entry, target)
   const max = Math.max(stop, entry, target)
   const range = max - min
@@ -111,46 +96,67 @@ function RiskRewardBar({ position }: { position: PortfolioPosition }) {
   const targetPct = ((target - min) / range) * 100
 
   return (
-    <div className="relative h-7 bg-[var(--bg-base)] rounded overflow-hidden mt-3 mb-7">
-      <div
-        className="absolute top-0 h-full bg-[var(--data-negative)]/10"
-        style={{ left: `${Math.min(stopPct, entryPct)}%`, width: `${Math.abs(entryPct - stopPct)}%` }}
-      />
-      <div
-        className="absolute top-0 h-full bg-[var(--data-positive)]/8"
-        style={{ left: `${Math.min(entryPct, targetPct)}%`, width: `${Math.abs(targetPct - entryPct)}%` }}
-      />
-      <div className="absolute top-0 h-full w-px bg-[var(--data-negative)]/60" style={{ left: `${stopPct}%` }} />
-      <div className="absolute top-0 h-full w-px bg-[var(--text-secondary)]" style={{ left: `${entryPct}%` }} />
-      <div className="absolute top-0 h-full w-px bg-[var(--data-positive)]/60" style={{ left: `${targetPct}%` }} />
-      <div className="absolute -bottom-5 text-[10px] font-[var(--font-geist-mono)] tabular-nums text-[var(--data-negative)]/60" style={{ left: `${stopPct}%`, transform: 'translateX(-50%)' }}>
-        ${formatCompactPrice(stop)}
+    <div className="pt-1">
+      <div className="relative h-1.5 overflow-hidden bg-[var(--bg-elevated)]">
+        <div
+          className="absolute top-0 h-full bg-red-400/12"
+          style={{ left: `${Math.min(stopPct, entryPct)}%`, width: `${Math.abs(entryPct - stopPct)}%` }}
+        />
+        <div
+          className="absolute top-0 h-full bg-emerald-400/10"
+          style={{ left: `${Math.min(entryPct, targetPct)}%`, width: `${Math.abs(targetPct - entryPct)}%` }}
+        />
+        <div className="absolute top-0 h-full w-px bg-red-500" style={{ left: `${stopPct}%` }} />
+        <div className="absolute top-0 h-full w-px bg-[var(--border-default)]" style={{ left: `${entryPct}%` }} />
+        <div className="absolute top-0 h-full w-px bg-emerald-500" style={{ left: `${targetPct}%` }} />
       </div>
-      <div className="absolute -bottom-5 text-[10px] font-[var(--font-geist-mono)] tabular-nums text-[var(--text-secondary)]" style={{ left: `${entryPct}%`, transform: 'translateX(-50%)' }}>
-        ${formatCompactPrice(entry)}
-      </div>
-      <div className="absolute -bottom-5 text-[10px] font-[var(--font-geist-mono)] tabular-nums text-[var(--data-positive)]/60" style={{ left: `${targetPct}%`, transform: 'translateX(-50%)' }}>
-        ${formatCompactPrice(target)}
+
+      <div className="mt-2 flex items-center justify-between gap-3 font-mono tabular-nums text-xs">
+        <span className="text-red-500">STOP ${formatCompactPrice(stop)}</span>
+        <span className="text-[var(--text-secondary)]">ENTRY ${formatCompactPrice(entry)}</span>
+        <span className="text-emerald-500">TARGET ${formatCompactPrice(target)}</span>
       </div>
     </div>
   )
 }
 
-// ============================================================================
-// Micro-label component
-// ============================================================================
-
-function MicroLabel({ children }: { children: React.ReactNode }) {
+function MetaCell({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string
+  value: ReactNode
+  valueClassName?: string
+}) {
   return (
-    <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">
-      {children}
-    </span>
+    <div className="min-w-0">
+      <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">{label}</p>
+      <div className={cn('mt-1 font-mono tabular-nums text-sm text-[var(--text-primary)]', valueClassName)}>
+        {value}
+      </div>
+    </div>
   )
 }
 
-// ============================================================================
-// PositionCard
-// ============================================================================
+function DesktopValueCell({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string
+  value: ReactNode
+  valueClassName?: string
+}) {
+  return (
+    <div className="flex min-w-0 flex-col gap-0.5">
+      <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">{label}</span>
+      <span className={cn('font-mono tabular-nums text-sm text-[var(--text-primary)]', valueClassName)}>
+        {value}
+      </span>
+    </div>
+  )
+}
 
 export function PositionCard({
   position,
@@ -167,284 +173,296 @@ export function PositionCard({
 }: PositionCardProps) {
   const { pnlAmount, pnlPercent, hasQuote } = computeUnrealizedPnl(position, quote)
   const pnlPositive = pnlAmount >= 0
-  const pnlColorClass = pnlPositive ? 'text-[var(--data-positive)]/80' : 'text-[var(--data-negative)]/80'
-  const pnlBgClass = pnlPositive ? 'bg-[var(--data-positive)]/[0.08]' : 'bg-[var(--data-negative)]/[0.08]'
+  const pnlColorClass = pnlPositive ? 'text-emerald-400' : 'text-red-400'
+  const convictionDisplay =
+    position.conviction !== null ? `${position.conviction}/10` : `${healthScore.score}`
+  const rAndScore = `${position.risk_reward_ratio !== null ? `${position.risk_reward_ratio.toFixed(1)}R` : '--'} · ${convictionDisplay}`
+
+  const symbolMeta = [
+    healthScore.label.toUpperCase(),
+    isWatching ? 'WATCH' : '',
+    `${position.days_held}D`,
+  ].filter(Boolean).join(' · ')
+
+  const borderAccent = hasQuote
+    ? pnlPositive ? 'border-l-emerald-500/30' : 'border-l-red-500/30'
+    : 'border-l-[var(--border-subtle)]'
 
   return (
-    <div
-      className={`
-        bg-[var(--bg-base)]/80 border border-[var(--border-subtle)]/40 rounded-lg
-        hover:bg-[var(--bg-elevated)] hover:border-[var(--border-subtle)]/60
-        transition-all duration-150 cursor-pointer
-        ${hasQuote && pnlAmount > 0 ? 'border-l-2 border-l-[var(--data-positive)]/40' : hasQuote && pnlAmount < 0 ? 'border-l-2 border-l-[var(--data-negative)]/40' : 'border-l-2 border-l-[var(--border-subtle)]/40'}
-      `}
-    >
-      {/* Collapsed — single dense row */}
+    <div className={`border-b border-[var(--border-subtle)] border-l-2 ${borderAccent} transition-colors duration-300`}>
       <button
+        type="button"
         onClick={onToggleExpand}
-        className="w-full text-left flex items-center px-4 py-3 gap-3"
+        className="group w-full cursor-pointer px-3 py-3 text-left transition-all duration-150 hover:bg-[var(--surface-hover)] hover:-translate-y-px hover:shadow-[0_1px_3px_rgba(0,0,0,0.3)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-inset motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
       >
-        {/* Left cluster: identity */}
-        <div
-          className={`w-1.5 h-1.5 rounded-full shrink-0 ${healthDotColor[healthScore.color]}`}
-          title={healthScore.tooltip}
-        />
-        <div className="w-8 h-8 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)]/30 flex items-center justify-center flex-shrink-0">
-          <span className="text-xs font-[var(--font-geist-mono)] font-bold text-[var(--accent-primary)]/60">
-            {position.ticker.slice(0, 2)}
-          </span>
-        </div>
-        <span className="text-sm font-semibold text-[var(--text-primary)] tracking-tight truncate max-w-[120px]">
-          {position.ticker}
-        </span>
-        <span className={`text-[9px] font-bold uppercase tracking-[0.08em] px-1.5 py-0.5 rounded ${
-          position.direction === 'long'
-            ? 'bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]/80'
-            : 'bg-[var(--data-negative)]/10 text-[var(--data-negative)]/80'
-        }`}>
-          {position.direction}
-        </span>
-        <span className="text-[11px] text-[var(--text-muted)]">{position.asset_type}</span>
+        <div className="flex flex-col gap-3 lg:hidden">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`h-2 w-2 flex-none rounded-full ${healthDotColor[healthScore.color]}`}
+                  title={healthScore.tooltip}
+                />
+                <span className="text-sm font-bold tracking-tight text-[var(--text-primary)]">{position.ticker}</span>
+                <span
+                  className={cn(
+                    'font-mono text-xs font-medium uppercase tracking-wider',
+                    position.direction === 'long' ? 'text-emerald-500' : 'text-red-500',
+                  )}
+                >
+                  {position.direction}
+                </span>
+                <span className="text-xs text-[var(--text-muted)]">{position.asset_type.toUpperCase()}</span>
+              </div>
+              <p className="mt-1 font-mono tabular-nums text-xs text-[var(--text-secondary)]">{symbolMeta}</p>
+            </div>
 
-        {/* Center: price levels (hidden on mobile) */}
-        <div className="hidden sm:flex items-center gap-4 text-[11px] flex-1 justify-center">
-          <span className="text-[var(--text-secondary)]">
-            Entry{' '}
-            <span className="font-[var(--font-geist-mono)] text-[var(--text-primary)]">
-              ${formatCompactPrice(position.entry_price)}
-            </span>
-          </span>
-          {hasQuote && (
-            <span className="text-[var(--text-secondary)]">
-              Now{' '}
-              <span className={`font-[var(--font-geist-mono)] ${pnlColorClass}`}>
-                ${formatCompactPrice(quote!.price)}
-              </span>
-            </span>
-          )}
-          {position.has_stop_loss ? (
-            <span className="text-[var(--data-negative)]/60">
-              Stop{' '}
-              <span className="font-[var(--font-geist-mono)]">
-                ${formatCompactPrice(position.stop_loss!)}
-              </span>
-            </span>
-          ) : (
-            <span className="text-[var(--data-warning)]/60">No stop</span>
-          )}
-          {position.has_take_profit ? (
-            <span className="text-[var(--data-positive)]/60">
-              Target{' '}
-              <span className="font-[var(--font-geist-mono)]">
-                ${formatCompactPrice(position.take_profit!)}
-              </span>
-            </span>
-          ) : (
-            <span className="text-[var(--text-muted)]">No target</span>
-          )}
+            <HugeiconsIcon
+              icon={CaretDown}
+              size={16}
+              className={cn('mt-0.5 flex-none text-[var(--text-secondary)] transition-transform duration-150 group-hover:text-[var(--text-primary)] motion-reduce:transition-none', isExpanded && 'rotate-180')}
+              strokeWidth={1.5}
+              color="currentColor"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            <DesktopValueCell label="Entry" value={`$${formatCompactPrice(position.entry_price)}`} />
+            <DesktopValueCell
+              label="Now"
+              value={hasQuote ? `$${formatCompactPrice(quote!.price)}` : '—'}
+              valueClassName={hasQuote ? pnlColorClass : 'text-[var(--text-secondary)]'}
+            />
+            <DesktopValueCell
+              label="Stop"
+              value={position.has_stop_loss ? `$${formatCompactPrice(position.stop_loss!)}` : '—'}
+              valueClassName={position.has_stop_loss ? 'text-red-500' : 'text-[var(--text-secondary)]'}
+            />
+            <DesktopValueCell
+              label="Target"
+              value={position.has_take_profit ? `$${formatCompactPrice(position.take_profit!)}` : '—'}
+              valueClassName={position.has_take_profit ? 'text-emerald-500' : 'text-[var(--text-secondary)]'}
+            />
+            <DesktopValueCell label="Value" value={formatExposure(position.position_size_usd)} valueClassName="text-[var(--text-secondary)]" />
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">P&amp;L</span>
+              {hasQuote ? (
+                <span className={cn('font-mono tabular-nums text-sm font-bold', pnlColorClass)}>
+                  {pnlPositive ? '+' : '-'}{formatPnlCurrency(pnlAmount)}
+                  <span className="ml-1 text-sm font-normal text-[var(--text-secondary)]">
+                    ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
+                  </span>
+                </span>
+              ) : (
+                <span className="font-mono tabular-nums text-sm text-[var(--text-secondary)]">—</span>
+              )}
+            </div>
+          </div>
+
+          <p className="font-mono tabular-nums text-xs text-[var(--text-secondary)]">{rAndScore}</p>
         </div>
 
-        {/* Right: P&L cluster */}
-        <div className="flex items-center gap-3 flex-shrink-0 ml-auto sm:ml-0">
-          <span className="text-xs font-[var(--font-geist-mono)] text-[var(--text-muted)]">
-            {formatExposure(position.position_size_usd)}
-          </span>
-          {hasQuote ? (
-            <span className={`px-2 py-0.5 rounded ${pnlBgClass}`}>
-              <span className={`text-sm font-[var(--font-geist-mono)] font-semibold ${pnlColorClass}`}>
+        <div className={`hidden lg:grid ${DESKTOP_POSITION_GRID} items-center gap-3`}>
+          <div className="flex min-w-0 items-start gap-2">
+            <span
+              className={`mt-1.5 h-2 w-2 flex-none rounded-full ${healthDotColor[healthScore.color]}`}
+              title={healthScore.tooltip}
+            />
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="truncate text-sm font-bold tracking-tight text-[var(--text-primary)]">{position.ticker}</span>
+                <span
+                  className={cn(
+                    'font-mono text-xs font-medium uppercase tracking-wider',
+                    position.direction === 'long' ? 'text-emerald-500' : 'text-red-500',
+                  )}
+                >
+                  {position.direction}
+                </span>
+                <span className="text-xs text-[var(--text-muted)]">{position.asset_type.toUpperCase()}</span>
+              </div>
+              <p className="mt-1 font-mono tabular-nums text-xs text-[var(--text-secondary)]">{symbolMeta}</p>
+            </div>
+          </div>
+
+          <DesktopValueCell label="Entry" value={`$${formatCompactPrice(position.entry_price)}`} />
+          <DesktopValueCell
+            label="Now"
+            value={hasQuote ? `$${formatCompactPrice(quote!.price)}` : '—'}
+            valueClassName={hasQuote ? pnlColorClass : 'text-[var(--text-secondary)]'}
+          />
+          <DesktopValueCell
+            label="Stop"
+            value={position.has_stop_loss ? `$${formatCompactPrice(position.stop_loss!)}` : '—'}
+            valueClassName={position.has_stop_loss ? 'text-red-500' : 'text-[var(--text-secondary)]'}
+          />
+          <DesktopValueCell
+            label="Target"
+            value={position.has_take_profit ? `$${formatCompactPrice(position.take_profit!)}` : '—'}
+            valueClassName={position.has_take_profit ? 'text-emerald-500' : 'text-[var(--text-secondary)]'}
+          />
+          <DesktopValueCell label="Value" value={formatExposure(position.position_size_usd)} valueClassName="text-[var(--text-secondary)]" />
+
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">P&amp;L</span>
+            {hasQuote ? (
+              <span className={cn('font-mono tabular-nums text-sm font-bold', pnlColorClass)}>
                 {pnlPositive ? '+' : '-'}{formatPnlCurrency(pnlAmount)}
-                <span className="ml-1 font-normal">
+                <span className="ml-1 text-sm font-normal text-[var(--text-secondary)]">
                   ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
                 </span>
               </span>
-            </span>
-          ) : (
-            <span className="text-xs font-[var(--font-geist-mono)] text-[var(--text-muted)]">P&L --</span>
-          )}
-          {position.risk_reward_ratio !== null && (
-            <span className="text-[11px] font-[var(--font-geist-mono)] text-[var(--text-muted)]">
-              {position.risk_reward_ratio > 10 ? '>10R' : `${position.risk_reward_ratio.toFixed(1)}R`}
-            </span>
-          )}
-          {position.conviction !== null && (
-            <span className="text-[11px] font-[var(--font-geist-mono)] text-[var(--accent-primary)]/70">
-              {position.conviction}/10
-            </span>
-          )}
-          <CaretDown
-            size={14}
-            weight="bold"
-            className={`text-sm text-[var(--text-muted)] shrink-0 transition-transform duration-150 ${
-              isExpanded ? 'rotate-180' : ''
-            }`}
-          />
+            ) : (
+              <span className="font-mono tabular-nums text-sm text-[var(--text-secondary)]">—</span>
+            )}
+          </div>
+
+          <div className="flex min-w-0 items-center justify-between gap-2">
+            <div className="min-w-0">
+              <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">R / Score</span>
+              <p className="font-mono tabular-nums text-xs text-[var(--text-secondary)]">{rAndScore}</p>
+            </div>
+            <HugeiconsIcon
+              icon={CaretDown}
+              size={16}
+              className={cn('flex-none text-[var(--text-secondary)] transition-transform duration-150 group-hover:text-[var(--text-primary)] motion-reduce:transition-none', isExpanded && 'rotate-180')}
+              strokeWidth={1.5}
+              color="currentColor"
+            />
+          </div>
         </div>
       </button>
 
-      {/* Expanded content — CSS grid transition */}
       <div
-        className="grid transition-all duration-200"
+        className="grid transition-all duration-200 motion-reduce:transition-none"
         style={{ gridTemplateRows: isExpanded ? '1fr' : '0fr' }}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="border-t border-[var(--border-subtle)]/30 px-4 pb-4">
-            {/* Risk/Reward Bar */}
-            <RiskRewardBar position={position} />
+          <div className="border-t border-[var(--border-subtle)] px-3 pb-3">
+            <div className="pt-3">
+              <RiskRewardBar position={position} />
+            </div>
 
-            {/* Metrics grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 py-3 border-b border-[var(--border-subtle)]/20">
-              <div className="bg-[var(--bg-elevated)]/30 rounded px-3 py-2">
-                <MicroLabel>Size</MicroLabel>
-                <div className="font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-primary)] mt-0.5">
-                  {position.quantity} shares
-                </div>
-              </div>
-              <div className="bg-[var(--bg-elevated)]/30 rounded px-3 py-2">
-                <MicroLabel>Conviction</MicroLabel>
-                <div className={`font-[var(--font-geist-mono)] text-xs tabular-nums mt-0.5 ${
-                  position.conviction !== null
-                    ? position.conviction >= 7 ? 'text-[var(--data-positive)]/80' : position.conviction >= 4 ? 'text-[var(--data-warning)]/60' : 'text-[var(--data-negative)]/80'
-                    : 'text-[var(--text-muted)]'
-                }`}>
-                  {position.conviction !== null ? `${position.conviction}/10` : '--'}
-                </div>
-              </div>
-              <div className="bg-[var(--bg-elevated)]/30 rounded px-3 py-2">
-                <MicroLabel>Days Held</MicroLabel>
-                <div className="font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-primary)] mt-0.5">
-                  {position.days_held}
-                </div>
-              </div>
-              <div className="bg-[var(--bg-elevated)]/30 rounded px-3 py-2">
-                <MicroLabel>Tags</MicroLabel>
-                {position.setup_tags.length > 0 ? (
-                  <div className="flex flex-wrap gap-1 mt-0.5">
-                    {position.setup_tags.map((tag) => (
-                      <span key={tag} className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-secondary)] text-[10px] break-all">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-[var(--text-muted)] mt-0.5">--</div>
-                )}
-              </div>
-              <div className="bg-[var(--bg-elevated)]/30 rounded px-3 py-2">
-                <MicroLabel>Paper</MicroLabel>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5">
-                  {position.is_paper ? (
-                    <span className="text-[var(--accent-primary)]/70">Yes</span>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3 border-b border-[var(--border-subtle)] py-2 lg:grid-cols-5">
+              <MetaCell label="Size" value={`${position.quantity} shares`} />
+              <MetaCell
+                label="Conviction"
+                value={position.conviction !== null ? `${position.conviction}/10` : '--'}
+                valueClassName={
+                  position.conviction === null
+                    ? 'text-[var(--text-secondary)]'
+                    : position.conviction >= 7
+                      ? 'text-emerald-500'
+                      : position.conviction >= 4
+                        ? 'text-amber-500'
+                        : 'text-red-500'
+                }
+              />
+              <MetaCell label="Days Held" value={`${position.days_held}`} />
+              <MetaCell
+                label="Tags"
+                value={
+                  position.setup_tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {position.setup_tags.map((tag) => (
+                        <span key={tag} className="bg-[var(--bg-elevated)] px-1.5 py-0.5 text-xs text-[var(--text-secondary)]">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   ) : (
-                    <span>No</span>
+                    '--'
+                  )
+                }
+              />
+              <MetaCell label="Paper" value={position.is_paper ? 'YES' : 'NO'} />
+            </div>
+
+            <div className="border-b border-[var(--border-subtle)] py-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">History</p>
+                  {tickerHistory && tickerHistory.times_traded > 0 ? (
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono tabular-nums text-sm text-[var(--text-secondary)]">
+                      <span>{tickerHistory.wins}W-{tickerHistory.losses}L</span>
+                      <span>{tickerHistory.win_rate.toFixed(0)}% WR</span>
+                      <span>{tickerHistory.total_pnl >= 0 ? '+' : ''}{formatExposure(tickerHistory.total_pnl)}</span>
+                      <span>{tickerHistory.avg_hold_days}D AVG HOLD</span>
+                    </div>
+                  ) : (
+                    <p className="mt-1 font-mono tabular-nums text-sm text-[var(--text-secondary)]">
+                      No closed trade history for {position.ticker} yet
+                    </p>
                   )}
                 </div>
+
+                <Link
+                  href={`/journal?highlight=${position.id}`}
+                  className="inline-flex min-h-11 items-center text-xs font-medium text-[var(--accent-primary)] transition-colors duration-150 hover:text-[var(--accent-hover)] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  Journal
+                </Link>
               </div>
             </div>
 
-            {/* Ticker history — terminal style */}
-            <div className="mt-3 px-3 py-2.5 bg-[var(--bg-base)] rounded border border-[var(--border-subtle)]/20 ring-1 ring-inset ring-white/[0.02]">
-              {tickerHistory && tickerHistory.times_traded > 0 ? (
-                <>
-                  <div className="flex items-center justify-between">
-                    <MicroLabel>History &middot; {position.ticker}</MicroLabel>
-                    <Link
-                      href={`/journal?highlight=${position.id}`}
-                      className="text-[10px] font-[var(--font-geist-mono)] text-[var(--accent-primary)]/60 hover:text-[var(--accent-primary)] transition-colors"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      journal &rarr;
-                    </Link>
-                  </div>
-                  <div className="flex items-baseline gap-3 mt-1.5">
-                    <span className="font-[var(--font-geist-mono)] text-[11px] tabular-nums text-[var(--text-primary)]">
-                      {tickerHistory.wins}W-{tickerHistory.losses}L
-                    </span>
-                    <span className="font-[var(--font-geist-mono)] text-[11px] tabular-nums text-[var(--text-muted)]">
-                      {tickerHistory.win_rate.toFixed(0)}% WR
-                    </span>
-                    <span className={`font-[var(--font-geist-mono)] text-[11px] tabular-nums ${
-                      tickerHistory.total_pnl >= 0 ? 'text-[var(--data-positive)]/80' : 'text-[var(--data-negative)]/80'
-                    }`}>
-                      {tickerHistory.total_pnl >= 0 ? '+' : ''}{formatExposure(tickerHistory.total_pnl)}
-                    </span>
-                    <span className="font-[var(--font-geist-mono)] text-[11px] tabular-nums text-[var(--text-muted)]">
-                      avg hold: {tickerHistory.avg_hold_days}d
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-[var(--text-muted)] italic">
-                    First time trading {position.ticker}
-                  </span>
-                  <Link
-                    href={`/journal?highlight=${position.id}`}
-                    className="text-[10px] font-[var(--font-geist-mono)] text-[var(--accent-primary)]/60 hover:text-[var(--accent-primary)] transition-colors"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    journal &rarr;
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Thesis / warning */}
-            {position.has_thesis ? (
-              <blockquote className="mt-3 border-l-2 border-[var(--accent-primary)]/20 pl-3 text-[11px] text-[var(--text-secondary)] italic break-words">
+            {position.has_thesis && (
+              <blockquote className="border-b border-[var(--border-subtle)] border-l-2 border-[var(--border-default)] py-4 pl-3 text-sm italic text-[var(--text-secondary)]">
                 {position.thesis}
               </blockquote>
-            ) : (
-              <div className="mt-2 flex items-center gap-2 py-1.5">
-                <span className="text-[var(--data-warning)]/50 text-[11px] shrink-0">!</span>
-                <span className="text-[11px] text-[var(--data-warning)]/50">No thesis recorded</span>
-                <button
-                  onClick={(e) => { e.stopPropagation(); onEdit(position) }}
-                  className="text-[10px] font-medium text-[var(--data-warning)]/60 uppercase tracking-[0.06em] cursor-pointer hover:text-[var(--data-warning)]/80 transition-colors ml-1"
-                >
-                  + Add
-                </button>
-              </div>
             )}
 
-            {/* Smart Alerts */}
             {smartAlerts.length > 0 && (
-              <div className="mt-3 space-y-1.5">
-                {smartAlerts.map((alert, i) => {
-                  const AlertIcon = alertIcons[alert.severity]
-                  return (
-                    <div
-                      key={i}
-                      className={`flex items-start gap-2 px-3 py-2 rounded border text-[11px] ${alertStyles[alert.severity]}`}
-                    >
-                      <AlertIcon size={12} weight="bold" className="shrink-0 mt-0.5" />
-                      <span>{alert.message}</span>
-                    </div>
-                  )
-                })}
+              <div className="border-b border-[var(--border-subtle)] py-3">
+                <div className="space-y-2">
+                  {smartAlerts.map((alert, index) => {
+                    const AlertIcon = alertIcons[alert.severity]
+                    return (
+                      <div key={`${alert.type}-${index}`} className="flex items-start gap-2">
+                        <HugeiconsIcon
+                          icon={AlertIcon}
+                          size={14}
+                          className="mt-0.5 flex-none text-[var(--text-muted)]"
+                          strokeWidth={1.5}
+                          color="currentColor"
+                        />
+                        <span className="text-sm text-[var(--text-secondary)]">{alert.message}</span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             )}
 
-            {/* Action buttons */}
-            <div className="flex gap-2 mt-3 pt-3 border-t border-[var(--border-subtle)]/20">
+            <div className="flex flex-wrap items-center gap-4 pt-3">
               <button
-                onClick={(e) => { e.stopPropagation(); onScanWithPelican(position) }}
-                className="text-[10px] font-semibold uppercase tracking-[0.06em] px-4 py-2 rounded-md bg-[var(--accent-primary)]/15 text-[var(--accent-primary)] border border-[var(--accent-primary)]/25 hover:bg-[var(--accent-primary)]/20 transition-colors flex items-center gap-1.5"
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onScanWithPelican(position)
+                }}
+                className="inline-flex min-h-11 items-center bg-transparent p-0 text-xs font-medium uppercase tracking-wider text-[var(--accent-primary)] transition-colors duration-150 cursor-pointer hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
               >
-                <Lightning size={12} weight="bold" />
                 Monitor
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); onEdit(position) }}
-                className="text-[10px] font-medium uppercase tracking-[0.06em] px-4 py-2 rounded-md bg-[var(--bg-elevated)]/60 text-[var(--text-secondary)] border border-[var(--border-subtle)]/40 hover:border-[var(--border-subtle)]/60 hover:text-[var(--text-primary)] transition-colors flex items-center gap-1.5"
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onEdit(position)
+                }}
+                className="inline-flex min-h-11 items-center bg-transparent p-0 text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)] transition-colors duration-150 cursor-pointer hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
               >
-                <PencilSimple size={12} weight="regular" />
                 Edit
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); onClose(position) }}
-                className="text-[10px] font-medium uppercase tracking-[0.06em] px-4 py-2 rounded-md bg-[var(--data-negative)]/8 text-[var(--data-negative)]/70 border border-[var(--data-negative)]/15 hover:bg-[var(--data-negative)]/12 hover:text-[var(--data-negative)]/90 transition-colors flex items-center gap-1.5"
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onClose(position)
+                }}
+                className="inline-flex min-h-11 items-center bg-transparent p-0 text-xs font-medium uppercase tracking-wider text-red-500 transition-colors duration-150 cursor-pointer hover:text-red-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-500"
               >
-                <XCircle size={12} weight="regular" />
                 Close
               </button>
             </div>

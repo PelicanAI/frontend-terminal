@@ -1,7 +1,14 @@
 'use client'
 
 import { m } from 'framer-motion'
-import { Wallet, ChartLineUp, Target, TrendUp, TrendDown } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Wallet01Icon as Wallet,
+  ChartLineData01Icon as ChartLineUp,
+  Target01Icon as Target,
+  AnalyticsUpIcon as TrendUp,
+  AnalyticsDownIcon as TrendDown,
+} from '@hugeicons/core-free-icons'
 import { PelicanCard, staggerContainer, staggerItem } from '@/components/ui/pelican'
 import {
   QuickStats,
@@ -71,7 +78,7 @@ export function StatsRow({ stats }: StatsRowProps) {
                 <span className="text-[var(--text-muted)] uppercase text-xs tracking-wider font-medium">
                   {card.label}
                 </span>
-                {Icon && <Icon size={18} className="text-[var(--text-muted)]" />}
+                {Icon && <HugeiconsIcon icon={Icon} size={18} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />}
               </div>
 
               {card.label === 'Best / Worst' ? (

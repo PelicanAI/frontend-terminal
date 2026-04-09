@@ -1,13 +1,14 @@
 "use client"
 
+import { HugeiconsIcon } from "@hugeicons/react"
 import {
-  Crosshair,
-  SignOut,
-  ShieldCheck,
-  CloudSun,
-  ListChecks,
-  NoteBlank,
-} from "@phosphor-icons/react"
+  Target01Icon as Crosshair,
+  Logout01Icon as SignOut,
+  SecurityCheckIcon as ShieldCheck,
+  SunCloud01Icon as CloudSun,
+  CheckListIcon as ListChecks,
+  Note01Icon as NoteBlank,
+} from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import type { Playbook } from "@/types/trading"
 
@@ -47,11 +48,7 @@ export function PlaybookOverviewTab({ playbook }: PlaybookOverviewTabProps) {
             >
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-[var(--accent-muted)] flex items-center justify-center">
-                  <Icon
-                    size={18}
-                    weight="regular"
-                    className="text-[var(--accent-primary)]"
-                  />
+                  <HugeiconsIcon icon={Icon} size={18} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
                 </div>
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">
                   {label}
@@ -75,11 +72,7 @@ export function PlaybookOverviewTab({ playbook }: PlaybookOverviewTabProps) {
         >
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-[var(--accent-muted)] flex items-center justify-center">
-              <ListChecks
-                size={18}
-                weight="regular"
-                className="text-[var(--accent-primary)]"
-              />
+              <HugeiconsIcon icon={ListChecks} size={18} className="text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
             </div>
             <h3 className="text-sm font-semibold text-[var(--text-primary)]">
               Pre-Trade Checklist
@@ -108,11 +101,7 @@ export function PlaybookOverviewTab({ playbook }: PlaybookOverviewTabProps) {
         !playbook.risk_rules &&
         !hasChecklist && (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <NoteBlank
-              size={32}
-              weight="thin"
-              className="text-[var(--text-muted)] mb-3"
-            />
+            <HugeiconsIcon icon={NoteBlank} size={32} className="text-[var(--text-muted)] mb-3" strokeWidth={1} color="currentColor" />
             <p className="text-sm text-[var(--text-muted)]">
               No rules defined yet. Edit this playbook to add your strategy rules.
             </p>

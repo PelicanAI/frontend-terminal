@@ -56,10 +56,10 @@ export function SessionIndicator({ assetType, className }: SessionIndicatorProps
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className={cn("w-2 h-2 rounded-full flex-shrink-0", dotColor, isOpen && "animate-pulse")} />
+      <div className={cn("w-2 h-2 rounded-full flex-shrink-0", dotColor, isOpen && "animate-pulse motion-reduce:animate-none")} />
       <span className="text-xs text-[var(--text-muted)]">{label}</span>
       {countdown && (
-        <span className="text-[10px] text-[var(--text-muted)]/60">{'\u00B7'} {countdown}</span>
+        <span className="text-xs text-[var(--text-secondary)]">{'\u00B7'} {countdown}</span>
       )}
     </div>
   )

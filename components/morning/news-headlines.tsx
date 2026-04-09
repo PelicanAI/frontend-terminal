@@ -1,6 +1,7 @@
 'use client'
 
-import { Newspaper } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { News01Icon as Newspaper } from '@hugeicons/core-free-icons'
 import { PelicanCard } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 
@@ -42,7 +43,7 @@ export function NewsHeadlines({ onAnalyze }: NewsHeadlinesProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Newspaper weight="regular" size={20} style={{ color: 'var(--text-muted)' }} />
+          <HugeiconsIcon icon={Newspaper} size={20} style={{ color: 'var(--text-muted)' }} strokeWidth={1.5} color="currentColor" />
           <h3 className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
             Market News
           </h3>

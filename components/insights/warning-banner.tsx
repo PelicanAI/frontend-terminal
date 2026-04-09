@@ -2,7 +2,14 @@
 
 import { useState } from 'react'
 import { m, AnimatePresence } from 'framer-motion'
-import { Warning, ShieldWarning, CaretDown, CaretUp, X } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Alert01Icon as Warning,
+  SecurityWarningIcon as ShieldWarning,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+  Cancel01Icon as X,
+} from '@hugeicons/core-free-icons'
 import { PelicanButton } from '@/components/ui/pelican'
 import { cn } from '@/lib/utils'
 import { IconTooltip } from '@/components/ui/icon-tooltip'
@@ -67,7 +74,7 @@ function WarningRow({
         style.border,
       )}
     >
-      <Icon size={18} weight="bold" className={cn('shrink-0', style.iconColor)} />
+      <HugeiconsIcon icon={Icon} size={18} className={cn('shrink-0', style.iconColor)} strokeWidth={2} color="currentColor" />
       <div className="flex-1 min-w-0">
         <span className="text-sm font-medium text-[var(--text-primary)]">
           {warning.title}
@@ -90,7 +97,7 @@ function WarningRow({
           className="shrink-0 p-1 rounded-md text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-white/5 transition-colors duration-150"
           aria-label="Dismiss warning"
         >
-          <X size={14} weight="regular" />
+          <HugeiconsIcon icon={X} size={14} strokeWidth={1.5} color="currentColor" />
         </button>
       </IconTooltip>
     </div>
@@ -136,9 +143,9 @@ export function WarningBanner({ warnings, onAction }: WarningBannerProps) {
             className="flex items-center gap-1.5 px-4 py-1 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors duration-150"
           >
             {expanded ? (
-              <CaretUp size={12} weight="regular" />
+              <HugeiconsIcon icon={CaretUp} size={12} strokeWidth={1.5} color="currentColor" />
             ) : (
-              <CaretDown size={12} weight="regular" />
+              <HugeiconsIcon icon={CaretDown} size={12} strokeWidth={1.5} color="currentColor" />
             )}
             <span className="font-mono tabular-nums">{rest.length}</span>
             {' '}more warning{rest.length > 1 ? 's' : ''}

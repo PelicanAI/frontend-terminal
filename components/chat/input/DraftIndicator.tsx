@@ -1,7 +1,8 @@
 "use client"
 
 import { m } from "framer-motion"
-import { X } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Cancel01Icon as X } from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 
 interface DraftIndicatorProps {
@@ -34,7 +35,7 @@ export function DraftIndicator({ pendingDraft, onCancel, onEdit }: DraftIndicato
               onClick={onCancel}
               className="p-0.5 rounded-full hover:bg-[var(--data-warning)]/20 transition-colors shrink-0"
             >
-              <X size={12} weight="bold" />
+              <HugeiconsIcon icon={X} size={12} strokeWidth={2} color="currentColor" />
             </button>
           </IconTooltip>
         )}

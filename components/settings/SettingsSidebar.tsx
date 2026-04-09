@@ -1,13 +1,19 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { User, TrendUp, Shield, Image as ImageIcon, Link } from "@phosphor-icons/react"
-import type { Icon } from "@phosphor-icons/react"
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
+import {
+  UserIcon as User,
+  AnalyticsUpIcon as TrendUp,
+  Shield01Icon as Shield,
+  Image01Icon as ImageIcon,
+  Link01Icon as Link,
+} from "@hugeicons/core-free-icons"
 
 interface Section {
   id: string
   label: string
-  icon: Icon
+  icon: IconSvgElement
 }
 
 const sections: Section[] = [
@@ -41,7 +47,7 @@ export function SettingsSidebar({ activeSection, onSectionChange }: SettingsSide
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <Icon size={16} weight="regular" />
+                  <HugeiconsIcon icon={Icon} size={16} strokeWidth={1.5} color="currentColor" />
                   {section.label}
                 </button>
               )

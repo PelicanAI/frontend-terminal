@@ -2,19 +2,19 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { m, AnimatePresence } from "framer-motion"
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
 import {
-  ChartLineUp,
-  Briefcase,
-  ShieldCheck,
-  Scales,
-  GraduationCap,
-
-  ChartBar,
-  CaretDown,
-  CaretRight,
-  ArrowRight,
-  Warning,
-} from "@phosphor-icons/react"
+  ChartLineData01Icon as ChartLineUp,
+  Briefcase01Icon as Briefcase,
+  SecurityCheckIcon as ShieldCheck,
+  BalanceScaleIcon as Scales,
+  Mortarboard01Icon as GraduationCap,
+  BarChartIcon as ChartBar,
+  ArrowDown01Icon as CaretDown,
+  ArrowRight01Icon as CaretRight,
+  ArrowRight01Icon as ArrowRight,
+  Alert01Icon as Warning,
+} from "@hugeicons/core-free-icons"
 import { PelicanButton } from "@/components/ui/pelican"
 import { useAntiTradeCheck, type AntiTradeWarning } from "@/hooks/use-anti-trade-check"
 import { cn } from "@/lib/utils"
@@ -28,7 +28,7 @@ type ActionKey = "analyze" | "scan" | "pretrade" | "compare" | "learn" | "review
 
 interface ActionDef {
   key: ActionKey
-  icon: React.ElementType
+  icon: IconSvgElement
   label: string
   description: string
   requiresTrades?: boolean
@@ -177,7 +177,7 @@ function ActionCard({
               : "bg-[var(--bg-elevated)] text-[var(--text-muted)]"
           )}
         >
-          <Icon size={16} weight={isExpanded ? "bold" : "regular"} />
+          <HugeiconsIcon icon={Icon} size={16} strokeWidth={isExpanded ? 2 : 1.5} color="currentColor" />
         </div>
         <div className="flex-1 min-w-0">
           <p
@@ -195,9 +195,9 @@ function ActionCard({
         {action.key !== "review" && (
           <div className="shrink-0 text-[var(--text-muted)]">
             {isExpanded ? (
-              <CaretDown size={14} weight="regular" />
+              <HugeiconsIcon icon={CaretDown} size={14} strokeWidth={1.5} color="currentColor" />
             ) : (
-              <CaretRight size={14} weight="regular" />
+              <HugeiconsIcon icon={CaretRight} size={14} strokeWidth={1.5} color="currentColor" />
             )}
           </div>
         )}
@@ -306,7 +306,7 @@ function AnalyzeForm({ onSend }: { onSend: (msg: string) => void }) {
       </select>
       <PelicanButton className="w-full" size="sm" onClick={handleSubmit} disabled={!ticker.trim()}>
         <span className="flex items-center justify-center gap-1.5">
-          Analyze <ArrowRight size={14} weight="bold" />
+          Analyze <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
         </span>
       </PelicanButton>
     </div>
@@ -429,7 +429,7 @@ function PreTradeForm({ onSend }: { onSend: (msg: string) => void }) {
       </div>
       <PelicanButton className="w-full" size="sm" onClick={handleCheck} disabled={!ticker.trim()}>
         <span className="flex items-center justify-center gap-1.5">
-          Check <ArrowRight size={14} weight="bold" />
+          Check <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
         </span>
       </PelicanButton>
       {warnings.length > 0 && (
@@ -444,15 +444,11 @@ function PreTradeForm({ onSend }: { onSend: (msg: string) => void }) {
                   : "bg-[var(--data-warning)]/[0.08]"
               )}
             >
-              <Warning
-                size={14}
-                weight="bold"
-                className={
+              <HugeiconsIcon icon={Warning} size={14} className={
                   w.severity === "critical"
                     ? "text-[var(--data-negative)] shrink-0 mt-0.5"
                     : "text-[var(--data-warning)] shrink-0 mt-0.5"
-                }
-              />
+                } strokeWidth={2} color="currentColor" />
               <div>
                 <p className="font-medium text-[var(--text-primary)]">{w.title}</p>
                 <p className="text-[var(--text-muted)] mt-0.5">{w.message}</p>
@@ -507,7 +503,7 @@ function CompareForm({ onSend }: { onSend: (msg: string) => void }) {
       />
       <PelicanButton className="w-full" size="sm" onClick={handleSubmit} disabled={!tickerA.trim() || !tickerB.trim()}>
         <span className="flex items-center justify-center gap-1.5">
-          Compare <ArrowRight size={14} weight="bold" />
+          Compare <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
         </span>
       </PelicanButton>
     </div>
@@ -543,7 +539,7 @@ function LearnForm({ onSend }: { onSend: (msg: string) => void }) {
       />
       <PelicanButton className="w-full" size="sm" onClick={handleSubmit} disabled={!topic.trim()}>
         <span className="flex items-center justify-center gap-1.5">
-          Learn <ArrowRight size={14} weight="bold" />
+          Learn <HugeiconsIcon icon={ArrowRight} size={14} strokeWidth={2} color="currentColor" />
         </span>
       </PelicanButton>
     </div>

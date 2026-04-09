@@ -6,15 +6,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { Section } from '@/components/landing/section'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ChatCircle,
-  Sun,
-  SquaresFour,
-  Notebook,
-  Strategy,
-  Crosshair,
-  Brain,
-} from '@phosphor-icons/react'
+  Chat01Icon as ChatCircle,
+  Sun01Icon as Sun,
+  DashboardSquare01Icon as SquaresFour,
+  Notebook01Icon as Notebook,
+  StrategyIcon as Strategy,
+  Target01Icon as Crosshair,
+  Brain01Icon as Brain,
+} from '@hugeicons/core-free-icons'
 
 const MockSkeleton = () => (
   <div className="animate-pulse bg-white/5 rounded-xl h-[400px] w-full" />
@@ -187,10 +188,7 @@ export function PlatformShowcase() {
                     : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                 )}
               >
-                <Icon
-                  weight={isActive ? 'fill' : 'regular'}
-                  className="w-4 h-4"
-                />
+                <HugeiconsIcon icon={Icon} className="w-4 h-4" strokeWidth={1.5} color="currentColor" />
                 {f.label}
               </button>
             )

@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { m } from "framer-motion"
-import { Sun, Moon } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Sun01Icon as Sun, MoonIcon as Moon } from "@hugeicons/core-free-icons"
 import { staggerContainer } from "@/components/ui/pelican"
 import { EarningsCard } from "@/components/earnings/earnings-card"
 import type { EnrichedEarningsEvent } from "@/types/earnings"
@@ -45,9 +46,9 @@ export function EarningsSection({
     <div className="px-2 pt-2">
       <div className="flex items-center gap-1.5 mb-1.5 px-1">
         {label === "bmo" ? (
-          <Sun weight="bold" className="w-3 h-3 text-[var(--data-warning)]" />
+          <HugeiconsIcon icon={Sun} className="w-3 h-3 text-[var(--data-warning)]" strokeWidth={2} color="currentColor" />
         ) : (
-          <Moon weight="bold" className="w-3 h-3 text-[var(--accent-primary)]" />
+          <HugeiconsIcon icon={Moon} className="w-3 h-3 text-[var(--accent-primary)]" strokeWidth={2} color="currentColor" />
         )}
         <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
           {label === "bmo" ? "Before Open" : "After Close"}

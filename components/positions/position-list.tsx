@@ -1,14 +1,19 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { PortfolioPosition, PortfolioStats } from '@/types/portfolio'
-import { BehavioralInsights } from '@/hooks/use-behavioral-insights'
-import { computePositionHealth, computeSmartAlerts, PositionHealth, PositionAlert } from '@/lib/position-health'
-import type { TickerHistory } from '@/hooks/use-ticker-history'
+import { useMemo, useState } from 'react'
+import { m } from 'framer-motion'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { FilterIcon as FunnelSimple } from '@hugeicons/core-free-icons'
+import { listStagger, listItem } from '@/components/ui/pelican'
+import type { BehavioralInsights } from '@/hooks/use-behavioral-insights'
 import type { Quote } from '@/hooks/use-live-quotes'
+import type { TickerHistory } from '@/hooks/use-ticker-history'
+import { computePositionHealth, computeSmartAlerts, type PositionAlert, type PositionHealth } from '@/lib/position-health'
+import { PortfolioPosition, PortfolioStats } from '@/types/portfolio'
 import { PositionCard } from './position-card'
-import { FunnelSimple } from '@phosphor-icons/react'
 
+const DESKTOP_POSITION_GRID =
+  'grid-cols-[minmax(180px,1.45fr)_repeat(4,minmax(96px,0.8fr))_minmax(96px,0.8fr)_minmax(152px,1fr)_minmax(110px,0.95fr)]'
 
 interface PositionListProps {
   positions: PortfolioPosition[]
@@ -45,28 +50,23 @@ export function PositionList({
   onScanWithPelican,
   onEdit,
   onClose,
-  onLogTrade,
 }: PositionListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  // 1. Filter and sort positions
   const filteredPositions = useMemo(() => {
     let result = [...positions]
 
-    // Direction filters
-    if (activeFilter === 'long') result = result.filter((p) => p.direction === 'long')
-    else if (activeFilter === 'short') result = result.filter((p) => p.direction === 'short')
-    // Asset type filters
-    else if (['stock', 'crypto', 'forex', 'option'].includes(activeFilter))
-      result = result.filter((p) => p.asset_type === activeFilter)
-
-    // Search
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      result = result.filter((p) => p.ticker.toLowerCase().includes(q))
+    if (activeFilter === 'long') result = result.filter((position) => position.direction === 'long')
+    else if (activeFilter === 'short') result = result.filter((position) => position.direction === 'short')
+    else if (['stock', 'crypto', 'forex', 'option'].includes(activeFilter)) {
+      result = result.filter((position) => position.asset_type === activeFilter)
     }
 
-    // Sort (non-health sorts applied here)
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter((position) => position.ticker.toLowerCase().includes(query))
+    }
+
     switch (sortBy) {
       case 'size_desc':
         result.sort((a, b) => b.position_size_usd - a.position_size_usd)
@@ -86,21 +86,20 @@ export function PositionList({
       case 'rr':
         result.sort((a, b) => (b.risk_reward_ratio || 0) - (a.risk_reward_ratio || 0))
         break
-      // 'health' sort applied after health computation
+      default:
+        break
     }
 
     return result
   }, [positions, activeFilter, sortBy, searchQuery])
 
-  // 2. Compute health scores and alerts for each position
   const positionData = useMemo<PositionData[]>(() => {
-    const data = filteredPositions.map((pos) => ({
-      position: pos,
-      health: computePositionHealth(pos, insights, portfolioStats),
-      alerts: computeSmartAlerts(pos, portfolioStats),
+    const data = filteredPositions.map((position) => ({
+      position,
+      health: computePositionHealth(position, insights, portfolioStats),
+      alerts: computeSmartAlerts(position, portfolioStats),
     }))
 
-    // Apply health sort after computation
     if (sortBy === 'health') {
       data.sort((a, b) => b.health.score - a.health.score)
     }
@@ -108,55 +107,52 @@ export function PositionList({
     return data
   }, [filteredPositions, insights, portfolioStats, sortBy])
 
-  // 3. Accordion toggle
-  const handleToggle = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id))
-  }
-
-  // Empty filtered state
   if (positionData.length === 0 && positions.length > 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <FunnelSimple size={32} weight="light" className="text-[var(--text-muted)] mb-3" />
-        <p className="text-sm text-[var(--text-secondary)] mb-1">
-          No positions match your filters
+      <div className="border-b border-[var(--border-default)] py-10 text-center">
+        <HugeiconsIcon icon={FunnelSimple} size={24} className="mx-auto text-[var(--text-muted)]" strokeWidth={1.25} color="currentColor" />
+        <p className="mt-3 text-sm font-medium text-[var(--text-primary)]">
+          No positions match the active filter set
         </p>
-        <p className="text-xs text-[var(--text-muted)] mb-4">
-          Try adjusting your search or filter criteria
+        <p className="mt-1 font-mono text-xs text-[var(--text-secondary)]">
+          Adjust the blotter tabs or search query to widen the feed.
         </p>
-        <button
-          className="text-[10px] font-medium uppercase tracking-[0.06em] px-3 py-1.5 rounded border border-[var(--border-subtle)]/40 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-          onClick={() => {
-            // Reset is handled by parent — this is a convenience signal
-            // Parent should listen for this pattern and reset filters
-          }}
-        >
-          Clear filters
-        </button>
       </div>
     )
   }
 
   return (
-    <div className="space-y-1.5">
-      {/* Position cards */}
-      {positionData.map((data) => (
-        <PositionCard
-          key={data.position.id}
-          position={data.position}
-          healthScore={data.health}
-          smartAlerts={data.alerts}
-          tickerHistory={tickerHistory[data.position.ticker] ?? null}
-          quote={quotes[data.position.ticker] ?? null}
-          isWatching={watchlistTickers?.has(data.position.ticker.toUpperCase()) ?? false}
-          isExpanded={expandedId === data.position.id}
-          onToggleExpand={() => handleToggle(data.position.id)}
-          onScanWithPelican={() => onScanWithPelican(data.position)}
-          onEdit={() => onEdit(data.position)}
-          onClose={() => onClose(data.position)}
-        />
-      ))}
+    <div>
+      <div className={`hidden border-b border-[var(--border-default)] px-3 py-2.5 lg:grid ${DESKTOP_POSITION_GRID} gap-3 text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]`}>
+        <span>Symbol</span>
+        <span>Entry</span>
+        <span>Now</span>
+        <span>Stop</span>
+        <span>Target</span>
+        <span>Value</span>
+        <span>P&amp;L</span>
+        <span>R / Score</span>
+      </div>
 
+      <m.div variants={listStagger} initial="hidden" animate="visible">
+        {positionData.map((data) => (
+          <m.div key={data.position.id} variants={listItem}>
+            <PositionCard
+              position={data.position}
+              healthScore={data.health}
+              smartAlerts={data.alerts}
+              tickerHistory={tickerHistory[data.position.ticker] ?? null}
+              quote={quotes[data.position.ticker] ?? null}
+              isWatching={watchlistTickers?.has(data.position.ticker.toUpperCase()) ?? false}
+              isExpanded={expandedId === data.position.id}
+              onToggleExpand={() => setExpandedId((current) => current === data.position.id ? null : data.position.id)}
+              onScanWithPelican={() => onScanWithPelican(data.position)}
+              onEdit={() => onEdit(data.position)}
+              onClose={() => onClose(data.position)}
+            />
+          </m.div>
+        ))}
+      </m.div>
     </div>
   )
 }

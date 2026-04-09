@@ -1,6 +1,13 @@
 "use client"
 
-import { TrendUp, TrendDown, Warning, Shuffle, Minus } from '@phosphor-icons/react'
+import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react'
+import {
+  AnalyticsUpIcon as TrendUp,
+  AnalyticsDownIcon as TrendDown,
+  Alert01Icon as Warning,
+  ShuffleIcon as Shuffle,
+  MinusSignIcon as Minus,
+} from '@hugeicons/core-free-icons'
 import type { MarketRegime, CorrelationPair } from '@/types/correlations'
 
 interface RegimeBannerProps {
@@ -12,7 +19,7 @@ interface RegimeBannerProps {
 
 const FALLBACK = { border: 'var(--border-default)', bg: 'transparent', icon: Minus } as const
 
-const bannerConfig: Record<string, { border: string; bg: string; icon: typeof TrendUp }> = {
+const bannerConfig: Record<string, { border: string; bg: string; icon: IconSvgElement }> = {
   risk_on: { border: 'var(--data-positive)', bg: 'rgba(34, 197, 94, 0.04)', icon: TrendUp },
   risk_off: { border: 'var(--data-negative)', bg: 'rgba(239, 68, 68, 0.04)', icon: TrendDown },
   correlation_breakdown: { border: 'var(--data-warning)', bg: 'rgba(245, 158, 11, 0.04)', icon: Warning },
@@ -84,7 +91,7 @@ export function RegimeBanner({ regime, correlations, beginnerMode, activeSignalC
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Icon weight="bold" className="w-4 h-4" style={{ color: config.border }} />
+          <HugeiconsIcon icon={Icon} className="w-4 h-4" style={{ color: config.border }} strokeWidth={2} color="currentColor" />
           <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
             Market Regime: {label}
           </span>

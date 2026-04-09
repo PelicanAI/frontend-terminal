@@ -2,19 +2,20 @@
 
 import { useEffect, useRef, useCallback } from "react"
 import { m, AnimatePresence } from "framer-motion"
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
 import {
-  MagnifyingGlass,
-  ChartLineUp,
-  Scales,
-  CalendarCheck,
-  ChartBar,
-} from "@phosphor-icons/react"
+  Search01Icon as MagnifyingGlass,
+  ChartLineData01Icon as ChartLineUp,
+  BalanceScaleIcon as Scales,
+  CalendarCheckIn01Icon as CalendarCheck,
+  BarChartIcon as ChartBar,
+} from "@hugeicons/core-free-icons"
 
 export interface SlashCommand {
   command: string
   args: string
   description: string
-  icon: React.ElementType
+  icon: IconSvgElement
   prompt: (arg: string) => string
 }
 
@@ -156,11 +157,7 @@ export function SlashCommandMenu({
                   }
                 `}
               >
-                <Icon
-                  size={18}
-                  weight="regular"
-                  className="flex-shrink-0 text-[var(--accent-primary)]"
-                />
+                <HugeiconsIcon icon={Icon} size={18} className="flex-shrink-0 text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-[var(--accent-primary)]">

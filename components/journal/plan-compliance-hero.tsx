@@ -2,7 +2,8 @@
 
 import { useMemo, useRef } from 'react'
 import { m } from 'framer-motion'
-import { Sparkle } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { SparklesIcon as Sparkle } from '@hugeicons/core-free-icons'
 import type { Trade } from '@/hooks/use-trades'
 import type { PlanCompliance, RuleScore } from '@/lib/plan-compliance'
 import { PelicanButton } from '@/components/ui/pelican'
@@ -272,11 +273,7 @@ export function PlanComplianceHero({
       {/* AI Insight */}
       <div className="bg-[var(--bg-base)] border-l-2 border-[var(--accent-primary)] p-3 rounded-r-lg">
         <div className="flex items-start gap-2">
-          <Sparkle
-            size={14}
-            weight="bold"
-            className="text-[var(--accent-primary)] shrink-0 mt-0.5"
-          />
+          <HugeiconsIcon icon={Sparkle} size={14} className="text-[var(--accent-primary)] shrink-0 mt-0.5" strokeWidth={2} color="currentColor" />
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {insight}
           </p>

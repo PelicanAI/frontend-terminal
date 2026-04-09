@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { User } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { UserIcon as User } from "@hugeicons/core-free-icons"
 import Link from "next/link"
 import { SubscriptionCard } from "./SubscriptionCard"
 import { SecuritySection } from "./SecuritySection"
@@ -27,7 +28,7 @@ export function AccountSection({ user, settings, supabase }: AccountSectionProps
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
-                  <User size={32} weight="regular" className="text-blue-600" />
+                  <HugeiconsIcon icon={User} size={32} className="text-blue-600" strokeWidth={1.5} color="currentColor" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-blue-900 mb-2">

@@ -101,7 +101,7 @@ export function PelicanInsightCard({ headline, tickers }: PelicanInsightProps) {
                   border: `1px solid ${CARD_COLORS.border}`,
                   borderRadius: 6,
                   padding: "4px 12px",
-                  fontFamily: "Geist Mono, monospace",
+                  fontFamily: "IBM Plex Mono, monospace",
                 }}
               >
                 {`$${ticker}`}

@@ -11,7 +11,13 @@ import {
   ReferenceLine,
   Cell,
 } from "recharts"
-import { PlayCircle, Pause, FastForward, Lightning } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  PlayCircleIcon as PlayCircle,
+  PauseIcon as Pause,
+  Forward01Icon as FastForward,
+  FlashIcon as Lightning,
+} from "@hugeicons/core-free-icons"
 import type { Trade } from "@/hooks/use-trades"
 import { useTradeReplay, type Candle, type PlaybackSpeed } from "@/hooks/use-trade-replay"
 import { PelicanCard } from "@/components/ui/pelican"
@@ -258,9 +264,9 @@ export function TradeReplay({ trade, onNarrate }: TradeReplayProps) {
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? (
-            <Pause size={20} weight="fill" />
+            <HugeiconsIcon icon={Pause} size={20} strokeWidth={1.5} color="currentColor" />
           ) : (
-            <PlayCircle size={20} weight="fill" />
+            <HugeiconsIcon icon={PlayCircle} size={20} strokeWidth={1.5} color="currentColor" />
           )}
         </button>
 
@@ -298,7 +304,7 @@ export function TradeReplay({ trade, onNarrate }: TradeReplayProps) {
 
         {/* Speed Controls */}
         <div className="flex items-center gap-0.5">
-          <FastForward size={14} className="text-[var(--text-muted)] mr-1" />
+          <HugeiconsIcon icon={FastForward} size={14} className="text-[var(--text-muted)] mr-1" strokeWidth={1.5} color="currentColor" />
           {speeds.map((s) => (
             <button
               key={s}
@@ -327,7 +333,7 @@ export function TradeReplay({ trade, onNarrate }: TradeReplayProps) {
             onClick={() => onNarrate(trade)}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[var(--accent-muted)] text-[var(--accent-primary)] text-sm font-medium hover:bg-[var(--accent-primary)]/20 transition-colors active:scale-[0.98]"
           >
-            <Lightning size={16} weight="fill" />
+            <HugeiconsIcon icon={Lightning} size={16} strokeWidth={1.5} color="currentColor" />
             Narrate with Pelican
           </button>
         </div>

@@ -2,23 +2,23 @@
 
 import Link from 'next/link'
 import { m } from 'framer-motion'
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  ShieldCheck,
-  Warning,
-  CheckCircle,
-  ArrowRight,
-  ChartPie,
-  ChatCircle,
-} from '@phosphor-icons/react'
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
-import { PelicanCard, staggerContainer, staggerItem } from '@/components/ui/pelican'
+  Alert01Icon as Warning,
+  Chat01Icon as ChatCircle,
+  CheckmarkCircle01Icon as CheckCircle,
+  PieChart01Icon as ChartPie,
+  SecurityCheckIcon as ShieldCheck,
+} from '@hugeicons/core-free-icons'
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
+import { staggerContainer, staggerItem } from '@/components/ui/pelican'
 import { formatCompactDollar } from '@/lib/positions/dashboard-utils'
 import type {
+  AssetBreakdown,
+  PlanCompliance,
+  PortfolioPosition,
   PortfolioStats,
   RiskSummary,
-  PlanCompliance,
-  AssetBreakdown,
-  PortfolioPosition,
 } from '@/types/portfolio'
 
 interface PortfolioOverviewProps {
@@ -30,7 +30,6 @@ interface PortfolioOverviewProps {
   onSendMessage?: (message: string) => void
 }
 
-// ── Color map for asset types ──────────────────────────────────────────
 const ASSET_COLORS: Record<string, string> = {
   stock: 'var(--accent-primary)',
   crypto: 'var(--data-warning)',
@@ -45,20 +44,6 @@ function getAssetColor(type: string): string {
   return ASSET_COLORS[type.toLowerCase()] ?? '#6b7280'
 }
 
-// ── Skeleton Loader ────────────────────────────────────────────────────
-function SkeletonBlock({ className = '' }: { className?: string }) {
-  return (
-    <PelicanCard className={`bg-[var(--bg-base)]/80 border border-[var(--border-subtle)]/40 rounded-lg ${className}`}>
-      <div className="p-4 space-y-3">
-        <div className="h-4 w-32 rounded bg-[var(--bg-elevated)] animate-pulse" />
-        <div className="h-32 w-full rounded bg-[var(--bg-elevated)] animate-pulse" />
-        <div className="h-3 w-48 rounded bg-[var(--bg-elevated)] animate-pulse" />
-      </div>
-    </PelicanCard>
-  )
-}
-
-// ── Custom Tooltip for Pie Chart ───────────────────────────────────────
 function DonutTooltip({
   active,
   payload,
@@ -67,25 +52,32 @@ function DonutTooltip({
   payload?: Array<{ payload: AssetBreakdown & { fill: string } }>
 }) {
   if (!active || !payload?.length) return null
-  const first = payload[0]
-  if (!first) return null
-  const d = first.payload
+  const datum = payload[0]?.payload
+  if (!datum) return null
+
   return (
-    <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 shadow-lg">
-      <p className="text-xs font-medium text-[var(--text-primary)] capitalize">
-        {d.asset_type}
+    <div className="border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2">
+      <p className="text-sm font-medium capitalize text-[var(--text-primary)]">{datum.asset_type}</p>
+      <p className="mt-1 font-mono tabular-nums text-sm text-[var(--text-secondary)]">
+        {formatCompactDollar(datum.total_exposure)} ({datum.pct_of_portfolio.toFixed(1)}%)
       </p>
-      <p className="text-xs text-[var(--text-secondary)] font-[var(--font-geist-mono)] tabular-nums">
-        {formatCompactDollar(d.total_exposure)} ({d.pct_of_portfolio.toFixed(1)}%)
-      </p>
-      <p className="text-xs text-[var(--text-muted)] font-[var(--font-geist-mono)] tabular-nums">
-        {d.count} position{d.count !== 1 ? 's' : ''}
+      <p className="font-mono tabular-nums text-xs text-[var(--text-muted)]">
+        {datum.count} position{datum.count !== 1 ? 's' : ''}
       </p>
     </div>
   )
 }
 
-// ── Main Component ─────────────────────────────────────────────────────
+function LoadingBlock({ title }: { title: string }) {
+  return (
+    <div className="border-b border-[var(--border-default)] pb-4">
+      <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">{title}</p>
+      <div className="mt-4 h-px w-full bg-[var(--border-subtle)]" />
+      <div className="mt-8 h-px w-full bg-[var(--border-subtle)]" />
+    </div>
+  )
+}
+
 export function PortfolioOverview({
   portfolio,
   risk,
@@ -94,32 +86,25 @@ export function PortfolioOverview({
   isLoading,
   onSendMessage,
 }: PortfolioOverviewProps) {
-  // ── Loading State ──────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="space-y-3">
-        <div className="grid grid-cols-1 gap-3">
-          <SkeletonBlock />
-          <SkeletonBlock />
-        </div>
-        <SkeletonBlock />
+      <div className="space-y-4">
+        <LoadingBlock title="Exposure Breakdown" />
+        <LoadingBlock title="Risk Budget" />
       </div>
     )
   }
 
-  // ── R:R display (used in Risk Budget card) ────────────────────────
   const rrDisplay =
     risk.portfolio_rr_ratio !== null
       ? `${risk.portfolio_rr_ratio.toFixed(2)}:1`
-      : '\u2014'
+      : '—'
 
-  // ── Donut Data ─────────────────────────────────────────────────────
-  const donutData = portfolio.asset_breakdown.map((ab) => ({
-    ...ab,
-    fill: getAssetColor(ab.asset_type),
+  const donutData = portfolio.asset_breakdown.map((breakdown) => ({
+    ...breakdown,
+    fill: getAssetColor(breakdown.asset_type),
   }))
 
-  // ── Risk Budget Calculations ───────────────────────────────────────
   const totalPositions = risk.positions_with_defined_risk + risk.positions_without_risk
   const riskDefinedPct =
     totalPositions > 0
@@ -127,27 +112,26 @@ export function PortfolioOverview({
       : 0
   const riskBarColor =
     riskDefinedPct > 80
-      ? 'rgb(52, 211, 153)' // emerald-400
+      ? 'rgb(52, 211, 153)'
       : riskDefinedPct >= 50
-        ? 'rgb(245, 158, 11, 0.6)' // amber-500/60
-        : 'rgb(248, 113, 113, 0.8)' // red-400/80
+        ? 'rgb(245, 158, 11)'
+        : 'rgb(248, 113, 113)'
 
-  // ── Plan Compliance ────────────────────────────────────────────────
   const violations: string[] = []
   if (planCompliance.has_active_plan) {
     if (planCompliance.over_position_limit) {
       violations.push(
-        `Over position limit: ${planCompliance.current_open_positions}/${planCompliance.max_open_positions}`
+        `Over position limit: ${planCompliance.current_open_positions}/${planCompliance.max_open_positions}`,
       )
     }
     if (planCompliance.require_stop_loss && planCompliance.positions_missing_stop > 0) {
       violations.push(
-        `${planCompliance.positions_missing_stop} position${planCompliance.positions_missing_stop !== 1 ? 's' : ''} missing stop loss`
+        `${planCompliance.positions_missing_stop} position${planCompliance.positions_missing_stop !== 1 ? 's' : ''} missing stop loss`,
       )
     }
     if (planCompliance.require_thesis && planCompliance.positions_missing_thesis > 0) {
       violations.push(
-        `${planCompliance.positions_missing_thesis} position${planCompliance.positions_missing_thesis !== 1 ? 's' : ''} missing thesis`
+        `${planCompliance.positions_missing_thesis} position${planCompliance.positions_missing_thesis !== 1 ? 's' : ''} missing thesis`,
       )
     }
   }
@@ -157,275 +141,174 @@ export function PortfolioOverview({
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
-      className="space-y-3"
+      className="space-y-4"
     >
-      {/* ── Visual Breakdowns ──────────────────────────────────────────── */}
-      <m.div
-        variants={staggerContainer}
-        className="grid grid-cols-1 gap-3"
-      >
-        {/* Card A: Exposure Breakdown Donut */}
-        <m.div variants={staggerItem}>
-          <PelicanCard className="bg-[var(--bg-base)]/80 p-4 border border-[var(--border-subtle)]/40 rounded-lg">
-            <div className="flex items-center gap-2 mb-3">
-              <ChartPie size={18} weight="regular" className="text-[var(--text-muted)]" />
-              <h3 className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                Exposure Breakdown
-              </h3>
+      <div>
+        <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Risk</p>
+      </div>
+
+      <m.div variants={staggerItem} className="border-b border-[var(--border-default)] pb-4">
+        <div className="flex items-center gap-2">
+          <HugeiconsIcon icon={ChartPie} size={16} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
+          <h3 className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Exposure Breakdown</h3>
+        </div>
+
+        {donutData.length === 0 ? (
+          <p className="mt-6 text-sm text-[var(--text-secondary)]">No positions to display.</p>
+        ) : (
+          <>
+            <div className="relative mt-4 h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={donutData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={56}
+                    outerRadius={82}
+                    paddingAngle={2}
+                    dataKey="total_exposure"
+                    stroke="none"
+                  >
+                    {donutData.map((entry) => (
+                      <Cell key={entry.asset_type} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<DonutTooltip />} cursor={false} />
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <span className="font-mono tabular-nums text-xl text-[var(--text-primary)]">{portfolio.total_positions}</span>
+                <span className="font-mono tabular-nums text-sm text-[var(--text-secondary)]">positions</span>
+              </div>
             </div>
 
-            {donutData.length === 0 ? (
-              <div className="flex items-center justify-center h-40">
-                <p className="text-sm text-[var(--text-muted)]">No positions to display</p>
-              </div>
-            ) : (
-              <>
-                <div className="relative h-48">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={donutData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={55}
-                        outerRadius={80}
-                        paddingAngle={2}
-                        dataKey="total_exposure"
-                        stroke="none"
-                      >
-                        {donutData.map((entry) => (
-                          <Cell
-                            key={entry.asset_type}
-                            fill={entry.fill}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        content={<DonutTooltip />}
-                        cursor={false}
+            <div className="mt-3 space-y-2">
+              {donutData.map((entry) => {
+                const tickersInClass = positions
+                  .filter((position) => position.asset_type.toLowerCase() === entry.asset_type.toLowerCase())
+                  .map((position) => position.ticker)
+                  .join(', ')
+
+                return (
+                  <button
+                    key={entry.asset_type}
+                    type="button"
+                    disabled={!onSendMessage}
+                    onClick={() => onSendMessage?.(
+                      `I have ${entry.pct_of_portfolio.toFixed(1)}% of my portfolio in ${entry.asset_type}s (${formatCompactDollar(entry.total_exposure)}, ${entry.count} positions: ${tickersInClass}). Is this too concentrated? What's the ideal allocation for this asset class?`,
+                    )}
+                    className="flex min-h-11 w-full items-center justify-between gap-3 bg-transparent p-0 text-left transition-colors duration-150 cursor-pointer hover:text-[var(--text-primary)] disabled:cursor-default disabled:hover:text-inherit focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
+                  >
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span
+                        className="h-2 w-2 flex-none"
+                        style={{ backgroundColor: entry.fill }}
                       />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  {/* Center label */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-2xl font-bold font-[var(--font-geist-mono)] tabular-nums text-[var(--text-primary)]">
-                      {portfolio.total_positions}
+                      <span className="text-sm capitalize text-[var(--text-secondary)]">{entry.asset_type}</span>
+                    </div>
+                    <span className="font-mono tabular-nums text-sm text-[var(--text-secondary)]">
+                      {entry.pct_of_portfolio.toFixed(0)}%
                     </span>
-                    <span className="text-xs text-[var(--text-muted)]">
-                      position{portfolio.total_positions !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Legend */}
-                <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
-                  {donutData.map((entry) => {
-                    const tickersInClass = positions
-                      .filter(p => p.asset_type.toLowerCase() === entry.asset_type.toLowerCase())
-                      .map(p => p.ticker)
-                      .join(', ')
-                    const isClickable = !!onSendMessage
-                    return (
-                      <button
-                        key={entry.asset_type}
-                        disabled={!isClickable}
-                        onClick={() => onSendMessage?.(
-                          `I have ${entry.pct_of_portfolio.toFixed(1)}% of my portfolio in ${entry.asset_type}s (${formatCompactDollar(entry.total_exposure)}, ${entry.count} positions: ${tickersInClass}). ` +
-                          `Is this too concentrated? What's the ideal allocation for this asset class?`
-                        )}
-                        className={`flex items-center gap-1.5 ${isClickable ? 'hover:bg-[var(--bg-elevated)] rounded-md px-1.5 py-0.5 -mx-1.5 -my-0.5 transition-colors duration-150 cursor-pointer' : ''}`}
-                      >
-                        <span
-                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: entry.fill }}
-                        />
-                        <span className="text-xs text-[var(--text-secondary)] capitalize">
-                          {entry.asset_type}
-                        </span>
-                        <span className="text-xs text-[var(--text-muted)] font-[var(--font-geist-mono)] tabular-nums">
-                          {entry.pct_of_portfolio.toFixed(0)}%
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              </>
-            )}
-          </PelicanCard>
-        </m.div>
-
-        {/* Card B: Risk Budget */}
-        <m.div variants={staggerItem}>
-          <PelicanCard className="bg-[var(--bg-base)]/80 p-4 border border-[var(--border-subtle)]/40 rounded-lg">
-            <div className="flex items-center gap-2 mb-3">
-              <ShieldCheck size={18} weight="regular" className="text-[var(--text-muted)]" />
-              <h3 className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">
-                Risk Budget
-              </h3>
+                  </button>
+                )
+              })}
             </div>
-
-            {/* Total at risk / Potential reward */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div>
-                <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)] mb-1">
-                  Total at Risk
-                </p>
-                <p className="text-lg font-semibold font-[var(--font-geist-mono)] tabular-nums text-red-400/80">
-                  {formatCompactDollar(risk.total_risk_usd)}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)] mb-1">
-                  Potential Reward
-                </p>
-                <p className="text-lg font-semibold font-[var(--font-geist-mono)] tabular-nums text-emerald-400/80">
-                  {formatCompactDollar(risk.total_reward_usd)}
-                </p>
-              </div>
-            </div>
-
-            {/* Portfolio R:R Badge */}
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Portfolio R:R</span>
-              <span
-                className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold font-[var(--font-geist-mono)] tabular-nums"
-                style={{
-                  backgroundColor: 'var(--accent-muted)',
-                  color: 'var(--accent-primary)',
-                }}
-              >
-                {rrDisplay}
-              </span>
-            </div>
-
-            {/* Risk Defined Progress Bar */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-[var(--text-secondary)]">
-                  Risk-Defined Positions
-                </span>
-                <span
-                  className="text-xs font-semibold font-[var(--font-geist-mono)] tabular-nums"
-                  style={{ color: riskBarColor }}
-                >
-                  {riskDefinedPct}%
-                </span>
-              </div>
-
-              <div className="h-1.5 w-full rounded-full bg-[var(--bg-base)] overflow-hidden">
-                <m.div
-                  className="h-full rounded-full"
-                  style={{ backgroundColor: riskBarColor }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${riskDefinedPct}%` }}
-                  transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1], delay: 0.3 }}
-                />
-              </div>
-
-              <p className="text-xs text-[var(--text-muted)]">
-                <span className="font-[var(--font-geist-mono)] tabular-nums">
-                  {risk.positions_with_defined_risk}/{totalPositions}
-                </span>
-                {' '}positions ({riskDefinedPct}%) have defined risk
-              </p>
-            </div>
-
-            {/* Risk budget action button */}
-            {onSendMessage && totalPositions > 0 && (
-              <button
-                onClick={() => {
-                  const rr = risk.portfolio_rr_ratio
-                  if (rr === null || rr < 1) {
-                    onSendMessage(
-                      `My portfolio risk management needs help. R:R: ${rr !== null ? rr.toFixed(2) + ':1' : 'undefined'}. ` +
-                      `${risk.positions_without_risk} of ${totalPositions} positions have no stop loss. ` +
-                      `Total at risk: ${formatCompactDollar(risk.total_risk_usd)}. ` +
-                      `Help me fix this — suggest stop losses for my unprotected positions and improve my R:R.`
-                    )
-                  } else {
-                    onSendMessage(
-                      `Validate my risk budget: R:R ${rr.toFixed(2)}:1, ${risk.positions_with_defined_risk}/${totalPositions} have stops, ` +
-                      `total risk ${formatCompactDollar(risk.total_risk_usd)} vs reward ${formatCompactDollar(risk.total_reward_usd)}. ` +
-                      `Is this well-structured? Any improvements?`
-                    )
-                  }
-                }}
-                className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-medium uppercase tracking-[0.06em] transition-all duration-150 hover:translate-y-[-1px]"
-                style={{
-                  backgroundColor: riskDefinedPct > 80
-                    ? 'rgba(52, 211, 153, 0.06)'
-                    : riskDefinedPct >= 50
-                      ? 'rgba(245, 158, 11, 0.05)'
-                      : 'rgba(248, 113, 113, 0.06)',
-                  color: riskBarColor,
-                }}
-              >
-                <ChatCircle size={14} weight="fill" />
-                {riskDefinedPct > 80 ? 'Validate with Pelican' : 'Fix This with Pelican'}
-              </button>
-            )}
-          </PelicanCard>
-        </m.div>
+          </>
+        )}
       </m.div>
 
-      {/* ── Row 3: Plan Compliance ────────────────────────────────────── */}
-      <m.div variants={staggerItem}>
+      <m.div variants={staggerItem} className="border-b border-[var(--border-default)] pb-4">
+        <div className="flex items-center gap-2">
+          <HugeiconsIcon icon={ShieldCheck} size={16} className="text-[var(--text-muted)]" strokeWidth={1.5} color="currentColor" />
+          <h3 className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Risk Budget</h3>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Total at Risk</p>
+            <p className="mt-1 font-mono tabular-nums text-base text-red-500">{formatCompactDollar(risk.total_risk_usd)}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Potential Reward</p>
+            <p className="mt-1 font-mono tabular-nums text-base text-emerald-500">{formatCompactDollar(risk.total_reward_usd)}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Portfolio R:R</p>
+            <p className="mt-1 font-mono tabular-nums text-base text-[var(--text-primary)]">{rrDisplay}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Risk Defined</p>
+            <p className="mt-1 font-mono tabular-nums text-base" style={{ color: riskBarColor }}>
+              {riskDefinedPct}%
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="h-1.5 bg-[var(--bg-elevated)]">
+            <m.div
+              className="h-full"
+              style={{ backgroundColor: riskBarColor }}
+              initial={{ width: 0 }}
+              animate={{ width: `${riskDefinedPct}%` }}
+              transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
+            />
+          </div>
+          <p className="mt-2 font-mono tabular-nums text-sm text-[var(--text-secondary)]">
+            {risk.positions_with_defined_risk}/{totalPositions || 0} positions have defined risk
+          </p>
+        </div>
+
+        {onSendMessage && totalPositions > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              const rr = risk.portfolio_rr_ratio
+              if (rr === null || rr < 1) {
+                onSendMessage(
+                  `My portfolio risk management needs help. R:R: ${rr !== null ? `${rr.toFixed(2)}:1` : 'undefined'}. ${risk.positions_without_risk} of ${totalPositions} positions have no stop loss. Total at risk: ${formatCompactDollar(risk.total_risk_usd)}. Help me fix this — suggest stop losses for my unprotected positions and improve my R:R.`,
+                )
+              } else {
+                onSendMessage(
+                  `Validate my risk budget: R:R ${rr.toFixed(2)}:1, ${risk.positions_with_defined_risk}/${totalPositions} have stops, total risk ${formatCompactDollar(risk.total_risk_usd)} vs reward ${formatCompactDollar(risk.total_reward_usd)}. Is this well-structured? Any improvements?`,
+                )
+              }
+            }}
+            className="mt-4 inline-flex min-h-11 items-center gap-1 bg-transparent p-0 text-xs font-medium uppercase tracking-wider text-[var(--accent-primary)] transition-colors duration-150 cursor-pointer hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
+          >
+            <HugeiconsIcon icon={ChatCircle} size={13} strokeWidth={1.5} color="currentColor" />
+            Validate with Pelican
+          </button>
+        )}
+      </m.div>
+
+      <m.div variants={staggerItem} className="border-b border-[var(--border-default)] pb-3">
         {!planCompliance.has_active_plan ? (
           <Link
             href="/journal?tab=plan"
-            className="flex items-center justify-between rounded-xl px-4 py-3 border border-[var(--border-subtle)] hover:border-[var(--accent-primary)]/30 transition-colors duration-150"
-            style={{ backgroundColor: 'var(--accent-glow)' }}
+            className="flex min-h-11 items-start gap-2 text-sm text-[var(--text-secondary)] transition-colors duration-150 hover:text-[var(--text-primary)] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
           >
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={18} weight="regular" className="text-[var(--accent-primary)]" />
-              <span className="text-sm text-[var(--text-secondary)]">
-                Set up a Trading Plan to track position compliance
-              </span>
-            </div>
-            <ArrowRight size={16} weight="bold" className="text-[var(--accent-primary)]" />
+            <HugeiconsIcon icon={ShieldCheck} size={15} className="mt-0.5 flex-none text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />
+            <span>Set up a trading plan to track position compliance.</span>
           </Link>
         ) : violations.length > 0 ? (
-          <div
-            className="rounded-xl px-4 py-3 border"
-            style={{
-              backgroundColor: 'rgba(245, 158, 11, 0.04)',
-              borderColor: 'rgba(245, 158, 11, 0.12)',
-            }}
-          >
-            <div className="flex items-start gap-2">
-              <Warning
-                size={18}
-                weight="fill"
-                className="flex-shrink-0 mt-0.5 text-amber-500/60"
-              />
-              <div className="space-y-1">
-                <p className="text-[10px] font-medium uppercase tracking-[0.08em] text-amber-500/60">
-                  Plan Violations
-                </p>
-                {violations.map((v) => (
-                  <p key={v} className="text-xs text-[var(--text-secondary)]">
-                    {v}
-                  </p>
-                ))}
-              </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <HugeiconsIcon icon={Warning} size={15} className="text-amber-500" strokeWidth={1.5} color="currentColor" />
+              <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Plan Violations</p>
             </div>
+            {violations.map((violation) => (
+              <p key={violation} className="text-sm text-[var(--text-secondary)]">
+                {violation}
+              </p>
+            ))}
           </div>
         ) : (
-          <div
-            className="flex items-center gap-2 rounded-xl px-4 py-3 border"
-            style={{
-              backgroundColor: 'rgba(34, 197, 94, 0.04)',
-              borderColor: 'rgba(34, 197, 94, 0.12)',
-            }}
-          >
-            <CheckCircle
-              size={18}
-              weight="fill"
-              className="text-emerald-400/80"
-            />
-            <span className="text-sm text-[var(--text-secondary)]">
-              All positions comply with your trading plan
-            </span>
+          <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+            <HugeiconsIcon icon={CheckCircle} size={15} className="text-emerald-500" strokeWidth={1.5} color="currentColor" />
+            <span>All positions comply with your trading plan.</span>
           </div>
         )}
       </m.div>

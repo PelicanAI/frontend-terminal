@@ -15,7 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Trash, Image as ImageIcon } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Delete01Icon as Trash, Image01Icon as ImageIcon } from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "@/hooks/use-toast"
@@ -176,7 +177,7 @@ export function UploadedImagesSection({ userId }: UploadedImagesSectionProps) {
             </div>
           ) : totalCount === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-              <ImageIcon size={40} weight="regular" className="mb-3 opacity-40" />
+              <HugeiconsIcon icon={ImageIcon} size={40} className="mb-3 opacity-40" strokeWidth={1.5} color="currentColor" />
               <p className="text-sm">No images uploaded yet</p>
             </div>
           ) : (
@@ -203,7 +204,7 @@ export function UploadedImagesSection({ userId }: UploadedImagesSectionProps) {
                         disabled={deleting}
                         aria-label="Delete image"
                       >
-                        <Trash size={14} weight="regular" />
+                        <HugeiconsIcon icon={Trash} size={14} strokeWidth={1.5} color="currentColor" />
                       </Button>
                     </IconTooltip>
                   </div>

@@ -2,7 +2,12 @@
 
 import type * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { Check, CaretDown, CaretUp } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  Tick01Icon as Check,
+  ArrowDown01Icon as CaretDown,
+  ArrowUp01Icon as CaretUp,
+} from "@hugeicons/core-free-icons"
 
 import { cn } from "@/lib/utils"
 
@@ -38,7 +43,7 @@ function SelectTrigger({
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <CaretDown size={16} className="opacity-50" />
+        <HugeiconsIcon icon={CaretDown} size={16} className="opacity-50" strokeWidth={1.5} color="currentColor" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   )
@@ -101,7 +106,7 @@ function SelectItem({ className, children, ...props }: React.ComponentProps<type
     >
       <span className="absolute right-2 flex size-3.5 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <Check size={16} />
+          <HugeiconsIcon icon={Check} size={16} strokeWidth={1.5} color="currentColor" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -126,7 +131,7 @@ function SelectScrollUpButton({ className, ...props }: React.ComponentProps<type
       className={cn("flex cursor-default items-center justify-center py-1", className)}
       {...props}
     >
-      <CaretUp size={16} />
+      <HugeiconsIcon icon={CaretUp} size={16} strokeWidth={1.5} color="currentColor" />
     </SelectPrimitive.ScrollUpButton>
   )
 }
@@ -141,7 +146,7 @@ function SelectScrollDownButton({
       className={cn("flex cursor-default items-center justify-center py-1", className)}
       {...props}
     >
-      <CaretDown size={16} />
+      <HugeiconsIcon icon={CaretDown} size={16} strokeWidth={1.5} color="currentColor" />
     </SelectPrimitive.ScrollDownButton>
   )
 }

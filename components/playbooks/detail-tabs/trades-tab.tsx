@@ -1,7 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { List } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ListViewIcon as List } from "@hugeicons/core-free-icons"
 import type { PlaybookStats } from "@/hooks/use-playbooks"
 
 interface PlaybookTradesTabProps {
@@ -28,11 +29,7 @@ export function PlaybookTradesTab({ stats, isLoading }: PlaybookTradesTabProps) 
   if (!stats || trades.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <List
-          size={32}
-          weight="thin"
-          className="text-[var(--text-muted)] mb-3"
-        />
+        <HugeiconsIcon icon={List} size={32} className="text-[var(--text-muted)] mb-3" strokeWidth={1} color="currentColor" />
         <p className="text-sm text-[var(--text-muted)]">
           No trades tagged with this playbook yet.
         </p>

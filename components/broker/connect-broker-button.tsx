@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { PlugsConnected } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ConnectIcon as PlugsConnected } from '@hugeicons/core-free-icons'
 import { SnapTradeReact } from 'snaptrade-react'
 import { PelicanButton } from '@/components/ui/pelican'
 import { toast } from '@/hooks/use-toast'
@@ -65,7 +66,7 @@ export function ConnectBrokerButton({
         disabled={isLoading}
         className={className}
       >
-        <PlugsConnected size={14} weight="bold" />
+        <HugeiconsIcon icon={PlugsConnected} size={14} strokeWidth={2} color="currentColor" />
         {isLoading ? 'Connecting...' : 'Connect Broker'}
       </PelicanButton>
 

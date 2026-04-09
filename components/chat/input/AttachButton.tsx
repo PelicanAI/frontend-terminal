@@ -2,7 +2,8 @@
 
 import type React from "react"
 import { useRef } from "react"
-import { Paperclip } from "@phosphor-icons/react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Attachment01Icon as Paperclip } from "@hugeicons/core-free-icons"
 import { cn } from "@/lib/utils"
 import { m } from "framer-motion"
 import { useT } from "@/lib/providers/translation-provider"
@@ -40,7 +41,7 @@ export function AttachButton({ disabled, onFileSelect }: AttachButtonProps) {
             disabled && "opacity-50 cursor-not-allowed",
           )}
         >
-          <Paperclip size={20} weight="regular" className="text-muted-foreground" />
+          <HugeiconsIcon icon={Paperclip} size={20} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
         </m.button>
       </IconTooltip>
 

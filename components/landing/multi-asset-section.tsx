@@ -1,10 +1,11 @@
 'use client'
 
+import { HugeiconsIcon } from '@hugeicons/react'
 import {
-  TrendUp,
-  CurrencyCircleDollar,
-  CurrencyBtc,
-} from '@phosphor-icons/react'
+  AnalyticsUpIcon as TrendUp,
+  DollarCircleIcon as CurrencyCircleDollar,
+  Bitcoin01Icon as CurrencyBtc,
+} from '@hugeicons/core-free-icons'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 import { Section } from '@/components/landing/section'
 
@@ -49,10 +50,7 @@ export function MultiAssetSection() {
           return (
             <ScrollReveal key={i} delay={i * 0.1}>
               <div className="p-5 rounded-xl bg-white border border-slate-200 hover:border-violet-500/20 transition-colors">
-                <Icon
-                  className="h-7 w-7 text-violet-600 mb-3"
-                  weight="duotone"
-                />
+                <HugeiconsIcon icon={Icon} className="h-7 w-7 text-violet-600 mb-3" strokeWidth={1.5} color="currentColor" />
                 <h3 className="text-base font-semibold text-slate-900 mb-1">
                   {asset.title}
                 </h3>

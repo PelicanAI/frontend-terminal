@@ -75,7 +75,7 @@ export default withSentryConfig(nextConfig, {
 
   // Exclude large base64 asset files from source map processing (prevents WasmHash buffer errors)
   sourcemaps: {
-    ignore: ['lib/share-cards/*-base64*', 'lib/share-cards/font-geist-*'],
+    ignore: ['lib/share-cards/*-base64*'],
   },
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.

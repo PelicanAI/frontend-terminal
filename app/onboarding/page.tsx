@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, m } from 'framer-motion'
-import { ArrowLeft, SpinnerGap } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ArrowLeft01Icon as ArrowLeft, Loading03Icon as SpinnerGap } from '@hugeicons/core-free-icons'
 import { toast } from '@/hooks/use-toast'
 
 import { useAuth } from '@/lib/providers/auth-provider'
@@ -224,7 +225,7 @@ export default function OnboardingPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <SpinnerGap weight="bold" className="w-8 h-8 text-primary animate-spin" />
+        <HugeiconsIcon icon={SpinnerGap} className="w-8 h-8 text-primary animate-spin" strokeWidth={2} color="currentColor" />
       </div>
     )
   }
@@ -233,7 +234,7 @@ export default function OnboardingPage() {
     router.push('/auth/login')
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <SpinnerGap weight="bold" className="w-8 h-8 text-primary animate-spin" />
+        <HugeiconsIcon icon={SpinnerGap} className="w-8 h-8 text-primary animate-spin" strokeWidth={2} color="currentColor" />
       </div>
     )
   }
@@ -419,7 +420,7 @@ export default function OnboardingPage() {
                 'disabled:opacity-50 disabled:cursor-not-allowed'
               )}
             >
-              <ArrowLeft weight="bold" className="w-4 h-4" />
+              <HugeiconsIcon icon={ArrowLeft} className="w-4 h-4" strokeWidth={2} color="currentColor" />
               Back
             </m.button>
           )}
@@ -455,7 +456,7 @@ export default function OnboardingPage() {
             )}
           >
             {isSubmitting ? (
-              <SpinnerGap weight="bold" className="w-5 h-5 animate-spin" />
+              <HugeiconsIcon icon={SpinnerGap} className="w-5 h-5 animate-spin" strokeWidth={2} color="currentColor" />
             ) : isFinalStep ? (
               'Start Trading →'
             ) : (

@@ -2,7 +2,12 @@
 
 import { cn } from '@/lib/utils'
 import type { BudgetStatus } from '@/lib/risk-budget/budget-tracker'
-import { Warning, Lock, Shield } from '@phosphor-icons/react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Alert01Icon as Warning,
+  LockIcon as Lock,
+  Shield01Icon as Shield,
+} from '@hugeicons/core-free-icons'
 
 interface BudgetWarningBannerProps {
   budget: BudgetStatus
@@ -22,7 +27,7 @@ export function BudgetWarningBanner({ budget }: BudgetWarningBannerProps) {
   return (
     <div className={cn("p-3 border rounded-xl text-sm", colors[budget.overallStatus])}>
       <div className="flex items-start gap-2">
-        <Icon size={16} weight="bold" className="flex-shrink-0 mt-0.5" />
+        <HugeiconsIcon icon={Icon} size={16} className="flex-shrink-0 mt-0.5" strokeWidth={2} color="currentColor" />
         <div>
           <p className="font-medium text-xs">
             {budget.overallStatus === 'locked' ? 'Trading Budget Exceeded' : 'Risk Budget Warning'}
