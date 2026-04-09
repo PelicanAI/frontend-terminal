@@ -683,7 +683,7 @@ export default function MorningPage() {
       localStorage.setItem(`pelican-brief-${today}`, fullContent)
     } catch (err) {
       if (signal.aborted) return // Intentional abort, no error
-      console.error('Brief generation error:', err)
+      // Brief generation error — user sees briefError state
       setBriefError('Failed to generate brief. Please try again.')
     } finally {
       setBriefLoading(false)
@@ -746,8 +746,8 @@ export default function MorningPage() {
                   setMoversRefreshing(true)
                   try {
                     await refetchMovers()
-                  } catch (e) {
-                    console.error('Refresh movers failed:', e)
+                  } catch {
+                    // Refresh movers failed — UI resets via finally
                   } finally {
                     setTimeout(() => setMoversRefreshing(false), 800)
                   }

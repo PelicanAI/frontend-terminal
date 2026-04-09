@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { User } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,18 +15,18 @@ export async function GET(request: NextRequest) {
 
     if (code) {
       const supabase = await createClient()
-      
+
       // Exchange code for session
       const { data: sessionData, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
-      
+
       if (exchangeError) {
-        console.error('[AUTH CALLBACK] Exchange error:', exchangeError)
+        logger.error('[AUTH CALLBACK] Exchange error', exchangeError instanceof Error ? exchangeError : undefined, { message: exchangeError.message })
         return NextResponse.redirect(`${origin}/auth/error`)
       }
 
       // Verify session was actually created
       if (!sessionData?.session) {
-        console.error('[AUTH CALLBACK] No session returned from exchangeCodeForSession')
+        logger.error('[AUTH CALLBACK] No session returned from exchangeCodeForSession')
         return NextResponse.redirect(`${origin}/auth/error`)
       }
 
@@ -36,14 +37,14 @@ export async function GET(request: NextRequest) {
         const { data: { user: fetchedUser }, error: getUserError } = await supabase.auth.getUser()
 
         if (getUserError) {
-          console.error('[AUTH CALLBACK] getUser() error:', getUserError)
+          logger.error('[AUTH CALLBACK] getUser() error', getUserError instanceof Error ? getUserError : undefined, { message: getUserError.message })
           return NextResponse.redirect(`${origin}/auth/error`)
         }
         user = fetchedUser || null
       }
-      
+
       if (!user) {
-        console.error('[AUTH CALLBACK] No user found after exchangeCodeForSession')
+        logger.error('[AUTH CALLBACK] No user found after exchangeCodeForSession')
         return NextResponse.redirect(`${origin}/auth/error`)
       }
 
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
             })
           }
         } catch (error) {
-          console.error('[AUTH CALLBACK] Failed to record referral:', error)
+          logger.error('[AUTH CALLBACK] Failed to record referral', error instanceof Error ? error : undefined)
           // Continue without failing the auth flow
         }
       }
@@ -105,8 +106,7 @@ export async function GET(request: NextRequest) {
     // No code provided - this shouldn't happen for OAuth, but handle gracefully
     return NextResponse.redirect(new URL('/chat', request.url))
   } catch (error) {
-    console.error('[AUTH CALLBACK] Unhandled error:', error)
+    logger.error('[AUTH CALLBACK] Unhandled error', error instanceof Error ? error : undefined)
     return NextResponse.redirect(new URL('/auth/error', request.url))
   }
 }
-

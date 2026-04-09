@@ -652,8 +652,8 @@ export default function PortfolioPage() {
                         setIsRefreshing(true)
                         try {
                           await refreshPortfolio()
-                        } catch (error) {
-                          console.error("Refresh failed:", error)
+                        } catch {
+                          // Refresh failed — UI resets via finally
                         } finally {
                           setTimeout(() => setIsRefreshing(false), 800)
                         }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
     })
 
     if (!response.ok) {
-      console.error("Finnhub economic error:", response.status, response.statusText)
+      logger.error("Finnhub economic error", undefined, { status: response.status, statusText: response.statusText })
       if (cachedData?.data) return NextResponse.json(cachedData.data)
       return NextResponse.json({ events: [], lastUpdated: new Date().toISOString() })
     }
@@ -173,7 +174,7 @@ export async function GET(request: NextRequest) {
       headers: { "Cache-Control": "public, s-maxage=3600" },
     })
   } catch (error) {
-    console.error("Economic calendar error:", error)
+    logger.error("Economic calendar error", error instanceof Error ? error : undefined)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

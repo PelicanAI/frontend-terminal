@@ -242,7 +242,7 @@ export default function PositionsPage() {
             onRefresh={async () => {
               if (isRefreshing) return
               setIsRefreshing(true)
-              try { await refreshPortfolio() } catch (e) { console.error('Refresh failed:', e) }
+              try { await refreshPortfolio() } catch { /* refresh failed — UI resets via finally */ }
               finally { setTimeout(() => setIsRefreshing(false), 800) }
             }}
             onGradeClick={handleSendMessage}

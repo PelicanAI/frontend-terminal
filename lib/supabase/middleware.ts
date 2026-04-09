@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 const PUBLIC_PATHS = [
   "/auth/login",
@@ -77,7 +78,7 @@ export const updateSession = async (request: NextRequest) => {
 
     return response;
   } catch (e) {
-    console.error('Middleware auth error:', e)
+    logger.error('Middleware auth error', e instanceof Error ? e : undefined)
     // Fail closed — redirect to login for protected routes
     if (!isPublicPath(pathname)) {
       const loginUrl = request.nextUrl.clone()

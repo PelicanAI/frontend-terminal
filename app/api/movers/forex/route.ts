@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,7 +36,7 @@ export async function GET() {
     )
 
     if (!res.ok) {
-      console.error('Polygon forex API error:', res.status)
+      logger.error('Polygon forex API error', undefined, { status: res.status })
       return NextResponse.json({ tickers: [] }, { status: 502 })
     }
 
@@ -80,7 +81,7 @@ export async function GET() {
       headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120' },
     })
   } catch (error) {
-    console.error('Forex movers error:', error)
+    logger.error('Forex movers error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Internal server error', tickers: [] }, { status: 500 })
   }
 }

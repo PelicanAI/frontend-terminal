@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -181,7 +182,7 @@ export async function POST(request: NextRequest) {
       { headers: { 'Cache-Control': 'private, s-maxage=300, stale-while-revalidate=600' } }
     )
   } catch (error) {
-    console.error('[portfolio-pnl-history] error:', error)
+    logger.error('[portfolio-pnl-history] error', error instanceof Error ? error : undefined)
     const message = process.env.NODE_ENV === 'production'
       ? 'Failed to compute P&L history'
       : `Error: ${error instanceof Error ? error.message : String(error)}`

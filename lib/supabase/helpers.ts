@@ -12,6 +12,7 @@
  */
 
 import { SupabaseClient, PostgrestError } from '@supabase/supabase-js'
+import { logger } from '@/lib/logger'
 
 // ============================================================================
 // Types
@@ -341,8 +342,7 @@ export function logRLSError(
   const errorMessage = error instanceof Error ? error.message : String(error)
   const isRLSRejection = errorMessage.includes('RLS rejection')
   
-  console.error(`[Supabase ${operation.toUpperCase()}] ${table}:`, {
-    error: errorMessage,
+  logger.error(`Supabase ${operation.toUpperCase()} ${table}`, error instanceof Error ? error : undefined, {
     isRLSRejection,
     ...context
   })

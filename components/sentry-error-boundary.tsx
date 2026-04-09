@@ -13,8 +13,8 @@ export default function SentryErrorBoundary({
     <Sentry.ErrorBoundary
       fallback={({ error, resetError }) => <ErrorFallback error={error as Error} reset={resetError} />}
       showDialog={false}
-      onError={(error) => {
-        console.error('ErrorBoundary caught:', error);
+      onError={() => {
+        // Error already captured by Sentry.ErrorBoundary
       }}
     >
       {children}

@@ -3,6 +3,7 @@ import { Snaptrade } from 'snaptrade-typescript-sdk'
 import { createClient } from '@/lib/supabase/server'
 import { getServiceClient } from '@/lib/admin'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,7 +56,7 @@ export async function POST() {
       snaptradeUserId = response.data.userId
       userSecret = response.data.userSecret
     } catch (registerError: unknown) {
-      console.error('SnapTrade registerUser error:', registerError)
+      logger.error('SnapTrade registerUser error', registerError instanceof Error ? registerError : undefined)
 
       // User likely already registered at SnapTrade but our DB lost the record.
       // Confirm they exist, then reset their secret to get fresh credentials.
@@ -73,13 +74,13 @@ export async function POST() {
         snaptradeUserId = resetResponse.data.userId ?? user.id
         userSecret = resetResponse.data.userSecret
       } catch (recoveryError) {
-        console.error('SnapTrade recovery (list/reset) failed:', recoveryError)
+        logger.error('SnapTrade recovery (list/reset) failed', recoveryError instanceof Error ? recoveryError : undefined)
         return NextResponse.json({ error: 'Broker registration failed' }, { status: 502 })
       }
     }
 
     if (!snaptradeUserId || !userSecret) {
-      console.error('SnapTrade registration returned incomplete data')
+      logger.error('SnapTrade registration returned incomplete data')
       return NextResponse.json({ error: 'Broker registration failed' }, { status: 502 })
     }
 
@@ -97,7 +98,7 @@ export async function POST() {
       .single()
 
     if (insertError) {
-      console.error('Failed to store SnapTrade credentials:', insertError)
+      logger.error('Failed to store SnapTrade credentials', undefined, { error: insertError.message })
       return NextResponse.json({ error: 'Failed to save broker connection' }, { status: 500 })
     }
 
@@ -105,7 +106,7 @@ export async function POST() {
       headers: { 'Cache-Control': 'no-store' },
     })
   } catch (error) {
-    console.error('SnapTrade register error:', error)
+    logger.error('SnapTrade register error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Failed to register with broker service' }, { status: 500 })
   }
 }

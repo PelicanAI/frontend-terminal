@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
 import { PLAN_PRICES } from '@/lib/plans'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -181,7 +182,7 @@ export async function GET() {
       { headers: { 'Cache-Control': 'private, no-cache' } }
     )
   } catch (error) {
-    console.error('Admin stats error:', error)
+    logger.error('Admin stats error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

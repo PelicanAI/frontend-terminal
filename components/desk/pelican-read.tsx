@@ -222,7 +222,7 @@ export default function PelicanRead({ onAnalyze }: PelicanReadProps) {
     } catch (error) {
       if (controller.signal.aborted) return
       setBriefError("Failed to generate Pelican Read. Please try again.")
-      console.error("Pelican Read generation error:", error)
+      // Pelican Read generation error — user sees briefError state
     } finally {
       setBriefLoading(false)
     }

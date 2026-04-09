@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 const messagesLimiter = createUserRateLimiter('conversation-messages', 30, '1 m')
 
@@ -50,7 +51,7 @@ export async function GET(
       .limit(100)
 
     if (error) {
-      console.error('[MESSAGES] Error fetching messages:', error)
+      logger.error('[MESSAGES] Error fetching messages', undefined, { error: error.message })
       return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 })
     }
 
@@ -92,7 +93,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('[API] Unexpected error:', error)
+    logger.error('[API] Unexpected error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

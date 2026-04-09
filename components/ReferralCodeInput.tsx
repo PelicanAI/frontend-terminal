@@ -40,7 +40,7 @@ export function ReferralCodeInput({ onReferralReady }: ReferralCodeInputProps) {
       });
 
       if (error) {
-        console.error("Failed to record referral:", error);
+        // Referral recording failed silently — non-blocking
       }
     });
   }, [validatedInfo, code, onReferralReady]);

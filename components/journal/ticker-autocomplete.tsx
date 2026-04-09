@@ -49,8 +49,7 @@ export function TickerAutocomplete({
           setIsOpen(data.results?.length > 0)
           setSelectedIndex(0)
         }
-      } catch (error) {
-        console.error('Ticker search error:', error)
+      } catch {
         setResults([])
       } finally {
         setIsLoading(false)

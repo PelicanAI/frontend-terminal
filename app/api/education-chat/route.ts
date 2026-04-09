@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 const MAX_CONTENT_LENGTH = 2000
 
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     if (!openaiResponse.ok) {
       const errorData = await openaiResponse.text();
-      console.error('Education chat OpenAI API error:', errorData);
+      logger.error('Education chat OpenAI API error', undefined, { response: errorData });
       return NextResponse.json({ error: 'Failed to get response' }, { status: 500 });
     }
 
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Education chat API error:', error);
+    logger.error('Education chat API error', error instanceof Error ? error : undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

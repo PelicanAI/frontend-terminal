@@ -45,12 +45,11 @@ import { cn } from "@/lib/utils"
 import { useConversations, type Conversation } from "@/hooks/use-conversations"
 import { useSavedInsights } from "@/hooks/use-saved-insights"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useT } from "@/lib/providers/translation-provider"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { useAuth } from "@/lib/providers/auth-provider"
 import { createClient } from "@/lib/supabase/client"
-import { getConversationClass, type ConversationClass } from "@/lib/chat/message-source"
+import { getConversationClass } from "@/lib/chat/message-source"
 
 interface ConversationSidebarProps {
   currentConversationId?: string
@@ -233,7 +232,6 @@ export function ConversationSidebar({
   onWidthChange,
 }: ConversationSidebarProps) {
   const t = useT()
-  const router = useRouter()
   const { signOut } = useAuth()
   const [searchQuery, setSearchQuery] = useState("")
   const [searchExpanded, setSearchExpanded] = useState(false)

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
 import { getAllTickers, SP500_CONSTITUENTS } from "@/lib/data/sp500-constituents"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -84,7 +85,7 @@ export async function GET() {
     ])
 
     if (!gainersRes.ok || !losersRes.ok || !activeRes.ok) {
-      console.error("Polygon movers API error:", gainersRes.status, losersRes.status, activeRes.status)
+      logger.error("Polygon movers API error", undefined, { gainersStatus: gainersRes.status, losersStatus: losersRes.status, activeStatus: activeRes.status })
       // Return stale cache if available
       if (cachedData?.data) {
         return NextResponse.json(cachedData.data)
@@ -204,10 +205,10 @@ export async function GET() {
               })
           }
         } else {
-          console.error('[movers] S&P 500 snapshot failed:', sp500Res.status)
+          logger.error('[movers] S&P 500 snapshot failed', undefined, { status: sp500Res.status })
         }
       } catch (err) {
-        console.error('[movers] S&P 500 snapshot error:', err)
+        logger.error('[movers] S&P 500 snapshot error', err instanceof Error ? err : undefined)
         // Non-fatal — movers will still work with Polygon gainers/losers data
       }
     }
@@ -247,7 +248,7 @@ export async function GET() {
       headers: { "Cache-Control": "public, s-maxage=300" },
     })
   } catch (error) {
-    console.error("Movers API error:", error)
+    logger.error("Movers API error", error instanceof Error ? error : undefined)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

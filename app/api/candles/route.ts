@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
 const candleLimiter = createUserRateLimiter('candles', 30, '1 m')
 const POLYGON_API_KEY = process.env.POLYGON_API_KEY
 
-type Timespan = 'minute' | 'hour' | 'day'
+type Timespan = 'minute' | 'hour' | 'day' | 'week'
 
 interface PolygonBar {
   t: number
@@ -24,8 +25,8 @@ interface PolygonAggsResponse {
   resultsCount?: number
 }
 
-const VALID_TIMESPANS = new Set<Timespan>(['minute', 'hour', 'day'])
-const VALID_MULTIPLIERS = new Set(['1', '5', '15'])
+const VALID_TIMESPANS = new Set<Timespan>(['minute', 'hour', 'day', 'week'])
+const VALID_MULTIPLIERS = new Set(['1', '4', '5', '15', '30'])
 
 function isValidDate(dateStr: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(dateStr)
@@ -111,7 +112,7 @@ export async function GET(request: NextRequest) {
       }
     )
   } catch (error) {
-    console.error("Candles API error:", error)
+    logger.error("Candles API error", error instanceof Error ? error : undefined)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

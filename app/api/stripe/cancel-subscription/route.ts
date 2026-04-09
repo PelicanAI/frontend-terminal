@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { getServiceClient } from '@/lib/admin'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +23,7 @@ export async function POST() {
     try {
       stripe = getStripeClient()
     } catch (error) {
-      console.error('Stripe config error:', error)
+      logger.error('Stripe config error', error instanceof Error ? error : undefined)
       return NextResponse.json(
         { error: 'Stripe is not configured' },
         { status: 500 }
@@ -68,7 +69,7 @@ export async function POST() {
     })
 
     if (rpcError) {
-      console.error('Failed to update database after Stripe cancellation:', rpcError)
+      logger.error('Failed to update database after Stripe cancellation', undefined, { rpcError: rpcError.message })
       // Don't return error - Stripe cancelled successfully, webhook will retry DB update
     }
 
@@ -81,7 +82,7 @@ export async function POST() {
     })
 
   } catch (error) {
-    console.error('Cancel subscription error:', error)
+    logger.error('Cancel subscription error', error instanceof Error ? error : undefined)
 
     if (error instanceof Stripe.errors.StripeError) {
       return NextResponse.json(

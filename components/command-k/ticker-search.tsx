@@ -53,8 +53,7 @@ export function TickerSearch({ open, onClose }: TickerSearchProps) {
           setResults(data.results || [])
           setSelectedIndex(0)
         }
-      } catch (error) {
-        console.error('Search error:', error)
+      } catch {
         setResults([])
       } finally {
         setIsLoading(false)

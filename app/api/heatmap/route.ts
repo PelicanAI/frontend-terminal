@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
 import { getAllTickers } from "@/lib/data/sp500-constituents"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -140,7 +141,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("Heatmap API error:", error)
+    logger.error("Heatmap API error", error instanceof Error ? error : undefined)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -174,7 +175,7 @@ async function fetch1DSnapshot(tickers: string[], constituents: Constituent[]): 
   const response = await fetch(url)
 
   if (!response.ok) {
-    console.error("Polygon snapshot error:", response.status)
+    logger.error("Polygon snapshot error", undefined, { status: response.status })
     return []
   }
 
@@ -218,7 +219,7 @@ async function fetchGroupedDaily(date: string): Promise<Map<string, { close: num
   const response = await fetch(url)
 
   if (!response.ok) {
-    console.error(`Polygon grouped daily error for ${date}:`, response.status)
+    logger.error("Polygon grouped daily error", undefined, { date, status: response.status })
     return new Map()
   }
 

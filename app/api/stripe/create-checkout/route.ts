@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
     try {
       stripe = getStripeClient()
     } catch (error) {
-      console.error('Stripe checkout config error:', error)
+      logger.error('Stripe checkout config error', error instanceof Error ? error : undefined)
       return NextResponse.json(
         { error: 'Stripe is not configured' },
         { status: 500 }
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
       headers: { "Cache-Control": "no-store" },
     })
   } catch (error) {
-    console.error('Stripe checkout error:', error)
+    logger.error('Stripe checkout error', error instanceof Error ? error : undefined)
     
     if (error instanceof Stripe.errors.StripeError) {
       return NextResponse.json(

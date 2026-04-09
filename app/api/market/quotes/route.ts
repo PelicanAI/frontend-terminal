@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -189,11 +190,11 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({ quotes })
     } catch (error) {
-      console.error('Market quotes error:', error)
+      logger.error('Market quotes error', error instanceof Error ? error : undefined)
       return NextResponse.json({ error: 'Failed to fetch quotes' }, { status: 500 })
     }
   } catch (error) {
-    console.error('Market quotes API error:', error)
+    logger.error('Market quotes API error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

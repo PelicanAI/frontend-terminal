@@ -5,6 +5,9 @@ import { TradeRecapCard } from "@/lib/share-cards/trade-recap"
 import { PelicanInsightCard } from "@/lib/share-cards/pelican-insight"
 import { StatsTableCard } from "@/lib/share-cards/stats-table"
 import { createClient } from "@/lib/supabase/server"
+import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+
+const limiter = createUserRateLimiter("share-card", 20, "1 m")
 
 function getFonts(plexSans: ArrayBuffer, plexMono: ArrayBuffer) {
   return [
@@ -41,6 +44,9 @@ export async function GET(req: NextRequest) {
         if (authError || !user) {
           return new Response("Unauthorized", { status: 401 })
         }
+
+        const { success: rlOk } = await limiter.limit(user.id)
+        if (!rlOk) return rateLimitResponse()
 
         const { data: trade, error: tradeError } = await supabase
           .from("trades")

@@ -59,7 +59,7 @@ export function SubscriptionCard() {
       router.refresh()
       setShowCancelDialog(false)
     } catch (error) {
-      console.error('Cancel subscription error:', error)
+      // Cancel subscription error — user sees toast below
       toast({
         title: "Cancellation failed",
         description: error instanceof Error ? error.message : "Failed to cancel subscription. Please contact support.",

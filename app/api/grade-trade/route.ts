@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { computeTradeGrade } from "@/lib/grading/trade-grader"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+import { logger } from "@/lib/logger"
 
 const gradeLimiter = createUserRateLimiter('grade-trade', 10, '1 m')
 
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ grade })
   } catch (err) {
-    console.error('Grade trade error:', err)
+    logger.error('Grade trade error', err instanceof Error ? err : undefined)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

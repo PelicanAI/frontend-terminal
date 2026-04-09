@@ -240,7 +240,7 @@ export default function AdminConversationsPage() {
         }
         setHasMore(data.hasMore === true)
       } catch (err) {
-        console.error('[Conversations] fetch error:', err)
+        // Fetch error — loading state resets via finally
       } finally {
         setLoading(false)
         setLoadingMore(false)

@@ -3,6 +3,7 @@ import { Snaptrade } from 'snaptrade-typescript-sdk'
 import { createClient } from '@/lib/supabase/server'
 import { getServiceClient } from '@/lib/admin'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,7 +37,7 @@ export async function GET() {
       .order('connected_at', { ascending: false })
 
     if (error) {
-      console.error('Failed to fetch broker connections:', error)
+      logger.error('Failed to fetch broker connections', undefined, { error: error.message })
       return NextResponse.json({ error: 'Failed to fetch connections' }, { status: 500 })
     }
 
@@ -44,7 +45,7 @@ export async function GET() {
       headers: { 'Cache-Control': 'no-store' },
     })
   } catch (error) {
-    console.error('SnapTrade connections GET error:', error)
+    logger.error('SnapTrade connections GET error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
@@ -79,7 +80,7 @@ export async function PATCH(request: NextRequest) {
       .is('brokerage_authorization_id', null)
 
     if (updateError) {
-      console.error('Failed to activate broker connection:', updateError)
+      logger.error('Failed to activate broker connection', undefined, { error: updateError.message })
       return NextResponse.json({ error: 'Failed to activate connection' }, { status: 500 })
     }
 
@@ -87,7 +88,7 @@ export async function PATCH(request: NextRequest) {
       headers: { 'Cache-Control': 'no-store' },
     })
   } catch (error) {
-    console.error('SnapTrade connections PATCH error:', error)
+    logger.error('SnapTrade connections PATCH error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
@@ -131,7 +132,7 @@ export async function DELETE(request: NextRequest) {
           authorizationId: connection.brokerage_authorization_id,
         })
       } catch (snapError) {
-        console.error('SnapTrade disconnect error (continuing):', snapError)
+        logger.warn('SnapTrade disconnect error (continuing)', { error: snapError instanceof Error ? snapError.message : String(snapError) })
         // Continue — mark as disabled even if SnapTrade call fails
       }
     }
@@ -144,7 +145,7 @@ export async function DELETE(request: NextRequest) {
       .eq('user_id', user.id)
 
     if (updateError) {
-      console.error('Failed to update connection status:', updateError)
+      logger.error('Failed to update connection status', undefined, { error: updateError.message })
       return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 })
     }
 
@@ -152,7 +153,7 @@ export async function DELETE(request: NextRequest) {
       headers: { 'Cache-Control': 'no-store' },
     })
   } catch (error) {
-    console.error('SnapTrade connections DELETE error:', error)
+    logger.error('SnapTrade connections DELETE error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

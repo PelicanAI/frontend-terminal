@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 const adoptLimiter = createUserRateLimiter('playbooks-adopt', 10, '1 m')
 
@@ -43,13 +44,13 @@ export async function POST(req: NextRequest) {
       if (msg.includes('not found')) {
         return NextResponse.json({ error: 'Strategy not found' }, { status: 404 })
       }
-      console.error('adopt_template RPC error:', rpcError)
+      logger.error('adopt_template RPC error', undefined, { rpcError: rpcError.message })
       return NextResponse.json({ error: 'Failed to adopt strategy' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, playbook: data })
   } catch (err) {
-    console.error('Adopt strategy error:', err)
+    logger.error('Adopt strategy error', err instanceof Error ? err : undefined)
     return NextResponse.json({ error: 'Failed to adopt strategy' }, { status: 500 })
   }
 }

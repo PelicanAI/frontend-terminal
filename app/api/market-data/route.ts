@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -109,7 +110,7 @@ export async function GET() {
     ])
 
     if (!indicesResponse.ok || !stocksResponse.ok) {
-      console.error("Polygon.io API error:", { indices: indicesResponse.status, stocks: stocksResponse.status })
+      logger.error("Polygon.io API error", undefined, { indicesStatus: indicesResponse.status, stocksStatus: stocksResponse.status })
       return NextResponse.json(
         { error: "Failed to fetch market data from upstream provider" },
         { status: 502 }
@@ -217,7 +218,7 @@ export async function GET() {
       },
     })
   } catch (error) {
-    console.error("Market data API error:", error)
+    logger.error("Market data API error", error instanceof Error ? error : undefined)
 
     // Return null values with 502 to indicate upstream failure
     return NextResponse.json(

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/logger'
 
 /**
  * Upload an image to the chat-images Supabase Storage bucket.
@@ -17,7 +18,7 @@ export async function uploadChatImage(
     .upload(path, file, { contentType: file.type, upsert: false })
 
   if (uploadError) {
-    console.error('[upload-image] Storage upload failed:', uploadError)
+    logger.error('Storage upload failed', uploadError instanceof Error ? uploadError : undefined, { component: 'upload-image' })
     return null
   }
 
@@ -35,7 +36,7 @@ export async function uploadChatImage(
     .single()
 
   if (dbError) {
-    console.error('[upload-image] Files table insert failed:', dbError)
+    logger.error('Files table insert failed', dbError instanceof Error ? dbError : undefined, { component: 'upload-image' })
     // Still return the storage path even if DB insert fails
     return { storagePath: path, fileId: '' }
   }
@@ -56,7 +57,7 @@ export async function getSignedImageUrl(
     .createSignedUrl(storagePath, 3600) // 1 hour
 
   if (error) {
-    console.error('[upload-image] Signed URL failed:', error)
+    logger.error('Signed URL failed', error instanceof Error ? error : undefined, { component: 'upload-image' })
     return null
   }
   return data.signedUrl

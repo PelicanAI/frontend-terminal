@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createIpRateLimiter, getClientIp, rateLimitResponse } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 const MAX_CONTENT_LENGTH = 2000
 
@@ -178,7 +179,7 @@ export async function POST(request: NextRequest) {
 
     if (!openaiResponse.ok) {
       const errorData = await openaiResponse.text();
-      console.error('OpenAI API error:', errorData);
+      logger.error('OpenAI API error', undefined, { responseBody: errorData });
       return NextResponse.json({ error: 'Failed to get response' }, { status: 500 });
     }
 
@@ -190,7 +191,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Chat API error:', error);
+    logger.error('Chat API error', error instanceof Error ? error : undefined);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

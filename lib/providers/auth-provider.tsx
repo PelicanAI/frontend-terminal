@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const migrateGuestConversations = useCallback(async (userId: string) => {
     // Validate user ID
     if (!isValidUUID(userId)) {
-      console.error("[Auth] Invalid user ID for migration:", userId)
+      // Invalid user ID for migration — skip silently
       return
     }
 
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .single()
 
           if (convError || !newConv) {
-            console.error("[Auth] Failed to migrate conversation:", convError)
+            // Failed to migrate conversation — skip to next
             continue
           }
 
@@ -111,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               )
 
               if (!success || msgError) {
-                console.error("[Auth] Failed to migrate messages:", msgError)
+                // Failed to migrate messages — continue cleanup
               }
             }
           }
@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.removeItem(`pelican_guest_messages_${guestConv.id}`)
 
         } catch (error) {
-          console.error("[Auth] Migration error for conversation:", error)
+          // Migration error for individual conversation — skip to next
         }
       }
 
@@ -130,7 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem(GUEST_USER_ID_KEY)
 
     } catch (error) {
-      console.error("[Auth] Guest migration failed:", error)
+      // Guest migration failed — non-blocking, user still logs in
     }
   }, [supabase])
 

@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { logger } from "@/lib/logger";
 
 export interface ErrorContext {
   userId?: string;
@@ -24,7 +25,7 @@ export function captureError(
   
   // Log to console in development
   if (process.env.NODE_ENV === 'development') {
-    console.error(`[${context.action || 'ERROR'}]`, errorMessage, context);
+    logger.error(`[${context.action || 'ERROR'}] ${errorMessage}`, error instanceof Error ? error : undefined, context);
   }
   
   // Send to Sentry

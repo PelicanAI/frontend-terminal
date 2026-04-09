@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
 import { FOREX_PAIRS } from "@/lib/data/forex-pairs"
 import type { HeatmapStock, HeatmapResponse } from "@/app/api/heatmap/route"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -65,7 +66,7 @@ export async function GET() {
     )
 
     if (!res.ok) {
-      console.error("Polygon forex snapshot error:", res.status)
+      logger.error("Polygon forex snapshot error", undefined, { status: res.status })
       // Return stale cache if available
       if (cachedData?.data) {
         return NextResponse.json(cachedData.data, {
@@ -125,7 +126,7 @@ export async function GET() {
       },
     })
   } catch (error) {
-    console.error("Forex heatmap API error:", error)
+    logger.error("Forex heatmap API error", error instanceof Error ? error : undefined)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

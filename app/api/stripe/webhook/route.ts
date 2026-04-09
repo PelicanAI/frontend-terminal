@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServiceClient } from '@/lib/admin'
-import { getPlanByPriceId, getPlanCredits, PLAN_CREDITS } from '@/lib/plans'
+import { getPlanCredits } from '@/lib/plans'
+import { logger } from '@/lib/logger'
 
 const getStripeClient = () => {
   const secretKey = process.env.STRIPE_SECRET_KEY
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
   try {
     stripe = getStripeClient()
   } catch (error) {
-    console.error('Stripe webhook config error:', error)
+    logger.error('Stripe webhook config error', error instanceof Error ? error : undefined)
     return NextResponse.json(
       { error: 'Stripe is not configured' },
       { status: 500 }
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
       webhookSecret
     )
   } catch (err) {
-    console.error('Webhook signature verification failed:', err)
+    logger.error('Webhook signature verification failed', err instanceof Error ? err : undefined)
     return NextResponse.json(
       { error: 'Invalid signature' },
       { status: 400 }
@@ -69,12 +70,12 @@ export async function POST(request: NextRequest) {
             : getPlanCredits(planName || 'starter')
 
           if (!userId) {
-            console.error('No user_id in checkout session')
+            logger.error('No user_id in checkout session')
             break
           }
 
           if (!planName) {
-            console.error('No plan name in checkout session metadata')
+            logger.error('No plan name in checkout session metadata')
             break
           }
 
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
           })
 
           if (error) {
-            console.error('Failed to setup subscriber:', error)
+            logger.error('Failed to setup subscriber', error instanceof Error ? error : undefined)
             throw error
           }
 
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
           });
           if (referralError) {
             // Log but don't throw - referral bonus failure shouldn't block subscription setup
-            console.error('Referral bonus activation failed:', referralError);
+            logger.error('Referral bonus activation failed', referralError instanceof Error ? referralError : undefined);
           }
         }
         break
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
           const userId = subscription.metadata?.user_id
           
           if (!userId) {
-            console.error('No user_id in subscription metadata')
+            logger.error('No user_id in subscription metadata')
             break
           }
 
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
           })
 
           if (error) {
-            console.error('Failed to reset monthly credits:', error)
+            logger.error('Failed to reset monthly credits', error instanceof Error ? error : undefined)
             throw error
           }
 
@@ -174,7 +175,7 @@ export async function POST(request: NextRequest) {
           })
 
           if (error) {
-            console.error('Failed to cancel subscription:', error)
+            logger.error('Failed to cancel subscription', error instanceof Error ? error : undefined)
             throw error
           }
 
@@ -214,7 +215,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Webhook processing error:', error)
+    logger.error('Webhook processing error', error instanceof Error ? error : undefined)
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }

@@ -9,12 +9,15 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import * as Sentry from "@sentry/nextjs"
-import { 
-  updateConversation, 
-  softDeleteConversation, 
+import {
+  updateConversation,
+  softDeleteConversation,
   logRLSError,
-  isValidUUID 
+  isValidUUID
 } from "@/lib/supabase/helpers"
+import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+
+const limiter = createUserRateLimiter("conversations-id", 60, "1 m")
 
 // ============================================================================
 // GET - Fetch single conversation with messages
@@ -53,6 +56,9 @@ export async function GET(
         { status: 401 }
       )
     }
+
+    const { success: rlOk } = await limiter.limit(user.id)
+    if (!rlOk) return rateLimitResponse()
 
     // Get specific conversation with messages
     const { data: conversation, error } = await supabase
@@ -146,6 +152,9 @@ export async function PATCH(
         { status: 401 }
       )
     }
+
+    const { success: rlOk } = await limiter.limit(user.id)
+    if (!rlOk) return rateLimitResponse()
 
     // Build update data
     const updateData: Record<string, unknown> = {}
@@ -253,6 +262,9 @@ export async function DELETE(
         { status: 401 }
       )
     }
+
+    const { success: rlOk } = await limiter.limit(user.id)
+    if (!rlOk) return rateLimitResponse()
 
     // Soft delete using RLS-safe helper
     const { data, error, success } = await softDeleteConversation(

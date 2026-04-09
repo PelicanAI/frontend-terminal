@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
-import { classifyConversation, type ConvoTag } from '@/lib/admin/classify-conversation'
+import { classifyConversation } from '@/lib/admin/classify-conversation'
 
 export const dynamic = 'force-dynamic'
 

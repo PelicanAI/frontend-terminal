@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,7 +45,7 @@ export async function GET() {
     )
 
     if (!res.ok) {
-      console.error('Polygon IPO API error:', res.status)
+      logger.error('Polygon IPO API error', undefined, { status: res.status })
       return NextResponse.json({ ipos: [] })
     }
 
@@ -87,7 +88,7 @@ export async function GET() {
       }
     )
   } catch (err) {
-    console.error('IPO fetch error:', err)
+    logger.error('IPO fetch error', err instanceof Error ? err : undefined)
     return NextResponse.json({ ipos: [] })
   }
 }

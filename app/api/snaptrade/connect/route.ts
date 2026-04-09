@@ -3,6 +3,7 @@ import { Snaptrade } from 'snaptrade-typescript-sdk'
 import { createClient } from '@/lib/supabase/server'
 import { getServiceClient } from '@/lib/admin'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,7 +63,7 @@ export async function POST() {
       headers: { 'Cache-Control': 'no-store' },
     })
   } catch (error) {
-    console.error('SnapTrade connect error:', error)
+    logger.error('SnapTrade connect error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Failed to generate broker login link' }, { status: 500 })
   }
 }

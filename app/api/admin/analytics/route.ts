@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin, getServiceClient } from '@/lib/admin'
 import { PLAN_PRICES } from '@/lib/plans'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,11 +61,11 @@ export async function GET() {
   ])
 
   // Log errors
-  if (convosResult.error) console.error('[Analytics] conversations:', convosResult.error.message)
-  if (authResult.error) console.error('[Analytics] auth:', authResult.error.message)
-  if (messagesResult.error) console.error('[Analytics] messages:', messagesResult.error.message)
-  if (creditsResult.error) console.error('[Analytics] credits:', creditsResult.error.message)
-  if (allMessagesWithConvoResult.error) console.error('[Analytics] messages with convo:', allMessagesWithConvoResult.error.message)
+  if (convosResult.error) logger.error('[Analytics] conversations', undefined, { error: convosResult.error.message })
+  if (authResult.error) logger.error('[Analytics] auth', undefined, { error: authResult.error.message })
+  if (messagesResult.error) logger.error('[Analytics] messages', undefined, { error: messagesResult.error.message })
+  if (creditsResult.error) logger.error('[Analytics] credits', undefined, { error: creditsResult.error.message })
+  if (allMessagesWithConvoResult.error) logger.error('[Analytics] messages with convo', undefined, { error: allMessagesWithConvoResult.error.message })
 
   const authUsers = authResult.data?.users ?? []
   const creditsData = creditsResult.data ?? []
@@ -111,7 +112,7 @@ export async function GET() {
       p_limit: 15,
     })
     if (rpcError) {
-      console.error('[Analytics] get_popular_tickers RPC:', rpcError.message)
+      logger.error('[Analytics] get_popular_tickers RPC', undefined, { error: rpcError.message })
     }
     if (rpcTickers && Array.isArray(rpcTickers) && rpcTickers.length > 0) {
       top_tickers_30d = rpcTickers.map((t: { ticker: string; mention_count: number }) => ({
@@ -120,7 +121,7 @@ export async function GET() {
       }))
     }
   } catch (e) {
-    console.error('[Analytics] get_popular_tickers RPC failed:', e)
+    logger.error('[Analytics] get_popular_tickers RPC failed', e instanceof Error ? e : undefined)
   }
 
   // Fallback: if RPC returned nothing, try the tickers column approach
@@ -282,7 +283,7 @@ export async function GET() {
     headers: { 'Cache-Control': 'private, no-cache' },
   })
   } catch (error) {
-    console.error('Admin analytics error:', error)
+    logger.error('Admin analytics error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

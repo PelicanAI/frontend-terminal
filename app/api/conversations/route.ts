@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import * as Sentry from "@sentry/nextjs"
+import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
 
+const limiter = createUserRateLimiter("conversations", 60, "1 m")
 const PRIVATE_CACHE = { "Cache-Control": "private, no-cache" } as const
 
 interface ConversationRow {
@@ -42,6 +44,9 @@ export async function GET(req: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
+
+    const { success: rlOk } = await limiter.limit(user.id)
+    if (!rlOk) return rateLimitResponse()
 
     let query = supabase
       .from("conversations")
@@ -130,6 +135,9 @@ export async function POST(req: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
+
+    const { success: rlOk } = await limiter.limit(user.id)
+    if (!rlOk) return rateLimitResponse()
 
     // Create new conversation
     const { data: conversation, error } = await supabase

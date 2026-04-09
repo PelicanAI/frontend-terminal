@@ -164,7 +164,7 @@ export default function FeaturesLayout({ children }: { children: React.ReactNode
   }, [])
 
   const handleError = useCallback((error: Error) => {
-    console.error('[FEATURES-LAYOUT] Panel error', error)
+    // Panel error — user sees toast below
     toast({
       title: 'Something went wrong',
       description: 'Could not check your credits. Please try again.',

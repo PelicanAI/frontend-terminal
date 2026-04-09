@@ -1,8 +1,8 @@
 /**
  * Message Regeneration API Route
- * 
+ *
  * Regenerates an assistant message using the Pelican API.
- * 
+ *
  * @version 2.0.0 - UUID Migration Compatible with RLS-safe operations
  */
 
@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server"
 import * as Sentry from "@sentry/nextjs"
 import { updateMessage, logRLSError } from "@/lib/supabase/helpers"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+import { logger } from "@/lib/logger"
 
 const regenerateLimiter = createUserRateLimiter('message-regenerate', 30, '1 h')
 
@@ -84,7 +85,7 @@ export async function POST(
       .limit(10)
 
     if (contextError) {
-      console.error("[regenerate] Error fetching context:", contextError)
+      logger.error("[regenerate] Error fetching context", undefined, { error: contextError.message, conversationId: message.conversation_id })
       Sentry.captureException(contextError, {
         tags: { action: "regenerate_fetch_context" },
         extra: { conversationId: message.conversation_id }
@@ -98,7 +99,7 @@ export async function POST(
     // Call Pelican API for regeneration
     const pelApiKey = process.env.PEL_API_KEY
     if (!pelApiKey) {
-      console.error("[regenerate] Pelican API key not configured")
+      logger.error("[regenerate] Pelican API key not configured")
       return NextResponse.json(
         { error: process.env.NODE_ENV === 'production' ? 'An internal error occurred' : 'Pelican API key not configured' },
         { status: 500 }
@@ -120,7 +121,7 @@ export async function POST(
 
     if (!pelResponse.ok) {
       const errorText = await pelResponse.text()
-      console.error("[regenerate] Pelican API error:", errorText)
+      logger.error("[regenerate] Pelican API error", undefined, { status: pelResponse.status, responseBody: errorText })
       Sentry.captureMessage("Pelican API error during regeneration", {
         level: "error",
         tags: { action: "regenerate_api_call" },
@@ -136,7 +137,7 @@ export async function POST(
     const newContent = pelData.choices[0]?.message?.content
 
     if (!newContent) {
-      console.error("[regenerate] No content in API response")
+      logger.error("[regenerate] No content in API response")
       return NextResponse.json(
         { error: "No response generated" },
         { status: 500 }
@@ -167,7 +168,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error("[regenerate] Unexpected error:", error)
+    logger.error("[regenerate] Unexpected error", error instanceof Error ? error : undefined)
     Sentry.captureException(error, {
       tags: { endpoint: "/api/messages/[id]/regenerate", method: "POST" },
       level: "error"

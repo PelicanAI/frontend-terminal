@@ -138,9 +138,8 @@ export const MessageContent = memo(function MessageContent({
         setShareCopied(true)
         setTimeout(() => setShareCopied(false), 2000)
       }
-    } catch (err) {
-      console.error('[Share Table] error:', err)
-      // Fallback: copy as text
+    } catch {
+      // Share card generation failed — fallback: copy as text
       const header = table.columns.map(c => c.label).join('\t')
       const textRows = table.data.map((row) =>
         table.columns.map(c => String(row[c.key] ?? '')).join('\t')

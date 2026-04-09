@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -61,7 +62,7 @@ export async function GET() {
     const response = await fetch(url)
 
     if (!response.ok) {
-      console.error("Polygon pulse API error:", response.status)
+      logger.error("Polygon pulse API error", undefined, { status: response.status })
       return NextResponse.json(
         { error: "Failed to fetch market data" },
         { status: 502 }
@@ -97,7 +98,7 @@ export async function GET() {
       }
     )
   } catch (error) {
-    console.error("Market pulse API error:", error)
+    logger.error("Market pulse API error", error instanceof Error ? error : undefined)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

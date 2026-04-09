@@ -214,8 +214,8 @@ export function MessageActionBar({
           break
         }
       }
-    } catch (err) {
-      console.error(`Action ${action.type} failed:`, err)
+    } catch {
+      // Action failed silently — UI state resets via finally
     } finally {
       setLoadingId(null)
     }

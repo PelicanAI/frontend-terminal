@@ -3,6 +3,7 @@ import { Snaptrade } from 'snaptrade-typescript-sdk'
 import { createClient } from '@/lib/supabase/server'
 import { getServiceClient } from '@/lib/admin'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -176,7 +177,7 @@ export async function POST() {
           .eq('id', connection.id)
 
       } catch (connError) {
-        console.error(`Sync error for connection ${connection.id}:`, connError)
+        logger.error('Sync error for connection', connError instanceof Error ? connError : undefined, { connectionId: connection.id })
         // Mark connection as errored but continue with others
         await serviceClient
           .from('broker_connections')
@@ -192,7 +193,7 @@ export async function POST() {
       headers: { 'Cache-Control': 'no-store' },
     })
   } catch (error) {
-    console.error('SnapTrade sync error:', error)
+    logger.error('SnapTrade sync error', error instanceof Error ? error : undefined)
     return NextResponse.json({ error: 'Failed to sync positions' }, { status: 500 })
   }
 }

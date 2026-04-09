@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { createIpRateLimiter, getClientIp, rateLimitResponse } from "@/lib/rate-limit"
+
+const limiter = createIpRateLimiter("health", 10, "1 m")
 
 export const dynamic = "force-dynamic"
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { success: rlOk } = await limiter.limit(getClientIp(request))
+  if (!rlOk) return rateLimitResponse()
+
   let status: "ok" | "degraded" = "ok"
 
   try {

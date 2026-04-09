@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { getServiceClient } from '@/lib/admin'
 import { UsersTable } from '@/components/admin/UsersTable'
+import { logger } from '@/lib/logger'
 
 export default async function AdminUsersPage() {
   const admin = getServiceClient()
@@ -14,11 +15,11 @@ export default async function AdminUsersPage() {
       page: 1,
       perPage: 1000,
     })
-    if (authError) console.error('[Admin Users] listUsers failed:', authError.message)
+    if (authError) logger.error('Admin listUsers failed', undefined, { message: authError.message })
     allUsers = (authData?.users ?? [])
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   } catch (e) {
-    console.error('[Admin Users] Failed to fetch auth users:', e)
+    logger.error('Failed to fetch auth users', e instanceof Error ? e : undefined)
   }
 
   const total = allUsers.length
@@ -40,7 +41,7 @@ export default async function AdminUsersPage() {
     admin.from('messages').select('user_id, created_at').order('created_at', { ascending: false }),
   ])
 
-  if (creditsResult.error) console.error('[Admin Users] credits query failed:', creditsResult.error.message)
+  if (creditsResult.error) logger.error('Admin credits query failed', undefined, { message: creditsResult.error.message })
 
   const credits = creditsResult.data ?? []
   const creditMap = new Map(

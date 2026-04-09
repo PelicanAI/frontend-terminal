@@ -3,6 +3,8 @@
  * Removes potentially dangerous HTML/script content while preserving formatting
  */
 
+import { logger } from '@/lib/logger'
+
 const DANGEROUS_PATTERNS = [
   /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
   /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
@@ -75,7 +77,7 @@ export function sanitizeMessage(message: string, maxLength: number = 10000): str
 
   // Log prompt injection attempts (detection only — backend handles neutralization)
   if (detectPromptInjection(sanitized)) {
-    console.warn('[Security] Prompt injection pattern detected in user input')
+    logger.warn('Prompt injection pattern detected in user input')
   }
 
   // DO NOT escape HTML here - store raw text

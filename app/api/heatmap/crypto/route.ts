@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
 import { CRYPTO_TOKENS } from "@/lib/data/crypto-tokens"
 import type { HeatmapStock, HeatmapResponse } from "@/app/api/heatmap/route"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -64,7 +65,7 @@ export async function GET() {
     )
 
     if (!res.ok) {
-      console.error("Polygon crypto snapshot error:", res.status)
+      logger.error("Polygon crypto snapshot error", undefined, { status: res.status })
       if (cachedData?.data) {
         return NextResponse.json(cachedData.data, {
           headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600", "X-Cache-Status": "stale" },
@@ -123,7 +124,7 @@ export async function GET() {
       },
     })
   } catch (error) {
-    console.error("Crypto heatmap API error:", error)
+    logger.error("Crypto heatmap API error", error instanceof Error ? error : undefined)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

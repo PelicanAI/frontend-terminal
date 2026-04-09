@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -112,7 +113,7 @@ export async function GET(request: NextRequest) {
       }
     )
   } catch (error) {
-    console.error('Sparklines API error:', error)
+    logger.error('Sparklines API error', error instanceof Error ? error : undefined)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

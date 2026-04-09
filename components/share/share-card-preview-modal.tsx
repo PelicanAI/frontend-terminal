@@ -125,7 +125,7 @@ export function ShareCardPreviewModal({
         })
         if (!res.ok) {
           const errText = await res.text()
-          console.error("Stats card POST failed:", res.status, errText)
+          // Stats card POST failed — error handled by setImageError below
           throw new Error(errText)
         }
         const blob = await res.blob()

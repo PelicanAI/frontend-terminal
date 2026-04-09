@@ -5,6 +5,7 @@ import { createHash } from "crypto"
 import { sanitizeFilename } from "@/lib/sanitize"
 import { captureException, addBreadcrumb } from "@/lib/sentry"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
+import { logger } from "@/lib/logger"
 
 const uploadLimiter = createUserRateLimiter('upload', 20, '1 h')
 
@@ -248,7 +249,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (uploadError) {
-      console.error(`[${requestId}] Storage error:`, uploadError)
+      logger.error(`[${requestId}] Storage error`, uploadError instanceof Error ? uploadError : undefined)
       captureException(new Error(`Upload failed: ${uploadError.message}`), { reqId: requestId, userId, fileMeta })
       return NextResponse.json({ error: "Failed to upload file", code: "storage_error" }, { status: 500 })
     }
@@ -266,7 +267,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (dbError || !fileRecord) {
-      console.error(`[${requestId}] DB error:`, dbError)
+      logger.error(`[${requestId}] DB error`, dbError instanceof Error ? dbError : undefined)
       await supabase.storage.from("pelican").remove([storageKey])
       captureException(new Error(`DB insert failed: ${dbError?.message}`), { reqId: requestId, userId, fileMeta })
       return NextResponse.json({ error: "Failed to save file metadata", code: "database_error" }, { status: 500 })
@@ -277,7 +278,7 @@ export async function POST(request: NextRequest) {
       .createSignedUrl(storageKey, 7 * 24 * 60 * 60)
 
     if (signedUrlError) {
-      console.error(`[${requestId}] Signed URL error:`, signedUrlError)
+      logger.error(`[${requestId}] Signed URL error`, signedUrlError instanceof Error ? signedUrlError : undefined)
       return NextResponse.json({ error: "Failed to generate access URL", code: "signed_url_error" }, { status: 500 })
     }
 
@@ -295,7 +296,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error(`[${requestId}] Upload error:`, error)
+    logger.error(`[${requestId}] Upload error`, error instanceof Error ? error : undefined)
     captureException(error instanceof Error ? error : new Error(String(error)), { reqId: requestId, fileMeta })
     return NextResponse.json({ error: "Internal server error", code: "internal_error" }, { status: 500 })
   }
