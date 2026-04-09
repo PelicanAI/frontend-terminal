@@ -100,7 +100,7 @@ export default function RadarCard({ onTickerClick, onAnalyze }: RadarCardProps) 
               key={item.ticker}
               type="button"
               onClick={() => handleAnalyze(item.ticker, item.prompt)}
-              className="flex min-w-0 w-full items-center gap-2 rounded px-0 py-1 text-left transition-colors hover:bg-[var(--bg-elevated)]"
+              className="flex min-w-0 w-full items-center gap-2 rounded px-3 py-1 text-left transition-colors hover:bg-[var(--bg-elevated)]"
             >
               <span className="w-12 flex-shrink-0 text-xs font-semibold text-[var(--text-primary)]">{item.ticker}</span>
               {item.badge.label && (

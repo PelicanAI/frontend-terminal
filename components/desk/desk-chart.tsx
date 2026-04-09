@@ -1,6 +1,7 @@
 "use client"
 
 import { memo, useEffect, useRef, useState } from "react"
+import { NASDAQ_100 } from "@/lib/trading/ticker-lists"
 
 interface DeskChartProps {
   symbol: string
@@ -8,9 +9,29 @@ interface DeskChartProps {
 }
 
 const CRYPTO_BASES = new Set(["BTC", "ETH", "SOL", "XRP", "DOGE", "ADA", "DOT", "AVAX", "MATIC", "LINK"])
+const INDEX_SYMBOL_MAP: Record<string, string> = {
+  SPX: "SP:SPX",
+  SPY: "AMEX:SPY",
+  QQQ: "NASDAQ:QQQ",
+  IWM: "AMEX:IWM",
+  DIA: "AMEX:DIA",
+  VIX: "CBOE:VIX",
+  DJI: "DJ:DJI",
+  COMP: "NASDAQ:IXIC",
+}
+const COMMON_STOCK_EXCHANGE_MAP: Record<string, string> = {
+  PLTR: "NASDAQ:PLTR",
+  SMCI: "NASDAQ:SMCI",
+  COIN: "NASDAQ:COIN",
+  HOOD: "NASDAQ:HOOD",
+  SOFI: "NASDAQ:SOFI",
+}
 
 function toTradingViewSymbol(symbol: string): string {
   const normalized = symbol.trim().toUpperCase()
+
+  if (INDEX_SYMBOL_MAP[normalized]) return INDEX_SYMBOL_MAP[normalized]
+  if (COMMON_STOCK_EXCHANGE_MAP[normalized]) return COMMON_STOCK_EXCHANGE_MAP[normalized]
 
   if (normalized.startsWith("X:")) return normalized.slice(2)
   if (normalized.startsWith("C:")) return `FX:${normalized.slice(2)}`
@@ -21,6 +42,13 @@ function toTradingViewSymbol(symbol: string): string {
     if (base && CRYPTO_BASES.has(base)) return cleaned
     return `FX:${cleaned}`
   }
+
+  if (normalized.endsWith("USD")) {
+    const base = normalized.slice(0, -3)
+    if (CRYPTO_BASES.has(base)) return normalized
+  }
+
+  if (NASDAQ_100.has(normalized)) return `NASDAQ:${normalized}`
 
   return normalized
 }
@@ -80,13 +108,15 @@ function DeskChartInner({ symbol }: DeskChartProps) {
   }, [symbol])
 
   return (
-    <div className="relative h-full w-full">
-      {isLoading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--bg-base)]">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-primary)] border-t-transparent" />
-        </div>
-      )}
-      <div ref={containerRef} className="h-full w-full" />
+    <div className="flex h-full min-h-0 w-full flex-col">
+      <div className="relative min-h-0 flex-1">
+        {isLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--bg-base)]">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-primary)] border-t-transparent" />
+          </div>
+        )}
+        <div ref={containerRef} className="h-full w-full" />
+      </div>
     </div>
   )
 }

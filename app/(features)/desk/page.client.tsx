@@ -78,7 +78,7 @@ export default function DeskPage() {
           </section>
 
           <aside
-            className="order-3 min-h-[320px] overflow-hidden border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] lg:order-2 lg:row-span-2 lg:min-h-0 lg:border-l lg:border-t-0"
+            className="order-3 min-h-[320px] overflow-y-auto border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] lg:order-2 lg:row-span-2 lg:min-h-0 lg:border-l lg:border-t-0"
             style={{ minHeight: 0 }}
           >
             <DeskRightPanel onTickerClick={handleTickerClick} onAnalyze={handleAnalyze} />
