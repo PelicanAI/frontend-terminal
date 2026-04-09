@@ -59,6 +59,9 @@ const nextConfig = {
       { source: '/positions', destination: '/portfolio', permanent: true },
       { source: '/journal', destination: '/portfolio', permanent: true },
       { source: '/playbooks', destination: '/portfolio', permanent: true },
+      { source: '/heatmap', destination: '/markets', permanent: true },
+      { source: '/correlations', destination: '/markets?tab=correlations', permanent: true },
+      { source: '/earnings', destination: '/markets?tab=earnings', permanent: true },
     ]
   },
 }

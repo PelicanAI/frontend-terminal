@@ -33,7 +33,7 @@ const NAV_TABS: NavTab[] = [
   { key: 'chat', label: 'Chat', href: '/chat', alwaysShow: true },
   { key: 'portfolio', label: 'Portfolio', href: '/portfolio', alwaysShow: true },
   { key: 'lab', label: 'Lab', href: '/strategies', alwaysShow: true },
-  { key: 'markets', label: 'Markets', href: '/heatmap', alwaysShow: true },
+  { key: 'markets', label: 'Markets', href: '/markets', alwaysShow: true },
 ]
 
 // =============================================================================
@@ -56,6 +56,7 @@ export function TopNav({ className }: TopNavProps) {
     if (pathname.startsWith('/lab')) return 'lab'
     if (pathname.startsWith('/strategies')) return 'lab'
     if (pathname.startsWith('/playbooks')) return 'lab'
+    if (pathname.startsWith('/markets')) return 'markets'
     if (pathname.startsWith('/heatmap')) return 'markets'
     if (pathname.startsWith('/correlations')) return 'markets'
     if (pathname.startsWith('/earnings')) return 'markets'

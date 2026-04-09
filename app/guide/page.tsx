@@ -243,7 +243,7 @@ export default function GuidePage() {
             hook="Pelican gives you institutional-grade market awareness without the Bloomberg terminal."
             cta={{
               label: "Explore the market → Go to Heatmap",
-              href: "/heatmap",
+              href: "/markets",
             }}
           >
             <p>
@@ -278,7 +278,7 @@ export default function GuidePage() {
             hook="Earnings season is where careers are made and accounts are blown. Here's how to prepare."
             cta={{
               label: "Check this week's earnings → Go to Earnings",
-              href: "/earnings",
+              href: "/markets?tab=earnings",
             }}
           >
             <p>

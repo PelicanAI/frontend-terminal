@@ -39,12 +39,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // V3 route redirects — positions + journal + playbooks → portfolio
+  // V3 route redirects — legacy feature routes mapped to consolidated pages
   const pathname = request.nextUrl.pathname
   const routeRedirects: Record<string, string> = {
     '/positions': '/portfolio',
     '/journal': '/portfolio?tab=history',
     '/playbooks': '/portfolio',
+    '/heatmap': '/markets',
+    '/correlations': '/markets?tab=correlations',
+    '/earnings': '/markets?tab=earnings',
   }
 
   const redirectTarget = routeRedirects[pathname]

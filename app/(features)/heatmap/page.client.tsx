@@ -1,3 +1,6 @@
+// DEPRECATED: Merged into /markets — see app/(features)/markets/page.client.tsx
+// Content extracted to components/markets/heatmap-tab.tsx
+// Redirects in middleware.ts handle inbound traffic. Kept for reference.
 "use client"
 
 import { useState, useRef, useEffect, useMemo, useCallback, Suspense } from "react"

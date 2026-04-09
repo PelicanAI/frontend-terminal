@@ -59,7 +59,7 @@ export function SectorMiniHeatmap({ sectors, onSectorClick }: SectorMiniHeatmapP
           </h3>
         </div>
         <Link
-          href="/heatmap"
+          href="/markets"
           className="flex items-center gap-1 text-xs transition-colors hover:text-[var(--accent-hover)]"
           style={{ color: 'var(--text-muted)' }}
         >

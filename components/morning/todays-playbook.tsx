@@ -184,7 +184,7 @@ export function TodaysPlaybook({ economicEvents, economicLoading, onAnalyze }: T
           <h2 className="text-sm font-semibold text-[var(--text-primary)]">Today&apos;s Playbook</h2>
         </div>
         <Link
-          href="/earnings"
+          href="/markets?tab=earnings"
           className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors"
         >
           View All

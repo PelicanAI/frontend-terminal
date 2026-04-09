@@ -178,12 +178,12 @@ export function MessageActionBar({
         }
 
         case 'show_heatmap': {
-          router.push('/heatmap')
+          router.push('/markets')
           break
         }
 
         case 'show_correlations': {
-          router.push('/correlations')
+          router.push('/markets?tab=correlations')
           break
         }
 
