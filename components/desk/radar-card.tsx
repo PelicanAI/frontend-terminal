@@ -83,11 +83,11 @@ export default function RadarCard({ onTickerClick, onAnalyze }: RadarCardProps) 
   return (
     <section className="flex h-full min-h-0 flex-col">
       <div className="flex items-center justify-between px-3 py-2">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Watchlist radar</span>
-        <span className="font-[var(--font-geist-mono)] text-[10px] tabular-nums text-[var(--text-muted)]">{items.length} tracking</span>
+        <span className="min-w-0 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Watchlist radar</span>
+        <span className="flex-shrink-0 font-[var(--font-geist-mono)] text-[10px] tabular-nums text-[var(--text-muted)]">{items.length} tracking</span>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-2">
         {loading ? (
           <div className="space-y-1">
             {Array.from({ length: 6 }).map((_, index) => (
@@ -100,13 +100,13 @@ export default function RadarCard({ onTickerClick, onAnalyze }: RadarCardProps) 
               key={item.ticker}
               type="button"
               onClick={() => handleAnalyze(item.ticker, item.prompt)}
-              className="flex w-full items-center gap-2 rounded px-1.5 py-1 text-left transition-colors hover:bg-[var(--bg-elevated)]"
+              className="flex min-w-0 w-full items-center gap-2 rounded px-0 py-1 text-left transition-colors hover:bg-[var(--bg-elevated)]"
             >
-              <span className="w-12 text-xs font-semibold text-[var(--text-primary)]">{item.ticker}</span>
+              <span className="w-12 flex-shrink-0 text-xs font-semibold text-[var(--text-primary)]">{item.ticker}</span>
               {item.badge.label && (
                 <span
                   className={cn(
-                    "rounded px-1 py-px text-[8px] font-medium",
+                    "flex-shrink-0 rounded px-1 py-px text-[8px] font-medium",
                     item.badge.tone === "positive" && "bg-[var(--data-positive)]/10 text-[var(--data-positive)]",
                     item.badge.tone === "negative" && "bg-[var(--data-negative)]/10 text-[var(--data-negative)]",
                     item.badge.tone === "warning" && "bg-[var(--data-warning)]/10 text-[var(--data-warning)]"
@@ -115,12 +115,12 @@ export default function RadarCard({ onTickerClick, onAnalyze }: RadarCardProps) 
                   {item.badge.label}
                 </span>
               )}
-              <span className="ml-auto font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-secondary)]">
+              <span className="ml-auto whitespace-nowrap font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-secondary)]">
                 {item.price != null ? `$${item.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : "—"}
               </span>
               <span
                 className={cn(
-                  "w-14 text-right font-[var(--font-geist-mono)] text-[10px] tabular-nums",
+                  "w-14 flex-shrink-0 text-right font-[var(--font-geist-mono)] text-[10px] tabular-nums",
                   (item.changePercent ?? 0) >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"
                 )}
               >

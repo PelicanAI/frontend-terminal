@@ -69,16 +69,25 @@ export default function DeskPage() {
           </div>
         </div>
 
-        <div className="grid flex-1 min-h-0 grid-cols-1 grid-rows-[300px_minmax(360px,1fr)_auto] overflow-y-auto lg:grid-cols-[minmax(0,1fr)_400px] lg:grid-rows-[minmax(280px,55vh)_minmax(0,1fr)] lg:overflow-hidden">
-          <section className="order-1 min-h-0 overflow-hidden border-b border-[var(--border-subtle)] bg-[var(--bg-base)]">
-            <DeskChart symbol={chartSymbol} />
+        <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[300px_minmax(360px,1fr)_auto] overflow-y-auto lg:grid-cols-[minmax(0,1fr)_400px] lg:grid-rows-[minmax(280px,55vh)_minmax(0,1fr)] lg:overflow-hidden">
+          <section
+            className="order-1 h-full min-h-0 overflow-hidden border-b border-[var(--border-subtle)] bg-[var(--bg-base)]"
+            style={{ minHeight: 0 }}
+          >
+            <DeskChart symbol={chartSymbol} onSymbolChange={setChartSymbol} />
           </section>
 
-          <aside className="order-3 min-h-[320px] overflow-hidden border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] lg:order-2 lg:row-span-2 lg:min-h-0 lg:border-l lg:border-t-0">
+          <aside
+            className="order-3 min-h-[320px] overflow-hidden border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] lg:order-2 lg:row-span-2 lg:min-h-0 lg:border-l lg:border-t-0"
+            style={{ minHeight: 0 }}
+          >
             <DeskRightPanel onTickerClick={handleTickerClick} onAnalyze={handleAnalyze} />
           </aside>
 
-          <section className="order-2 min-h-[360px] overflow-hidden bg-[var(--bg-base)] lg:order-3 lg:min-h-0">
+          <section
+            className="order-2 min-h-[360px] overflow-hidden bg-[var(--bg-base)] lg:order-3 lg:min-h-0"
+            style={{ minHeight: 0 }}
+          >
             <DeskDataZone onTickerClick={handleTickerClick} onAnalyze={handleAnalyze} />
           </section>
         </div>

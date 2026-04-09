@@ -96,7 +96,7 @@ export default function CatalystsCard({ onAnalyze }: CatalystsCardProps) {
       <div className="space-y-0.5 px-3 pb-2">
         {economicLoading || earningsLoading ? (
           Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="flex items-center gap-2 rounded px-1.5 py-1">
+            <div key={index} className="flex items-center gap-2 rounded px-3 py-1">
               <div className="h-1.5 w-1.5 rounded-full bg-[var(--bg-elevated)] animate-pulse" />
               <div className="h-2.5 w-6 rounded bg-[var(--bg-elevated)] animate-pulse" />
               <div className="h-2.5 w-full rounded bg-[var(--bg-elevated)] animate-pulse" />
@@ -108,7 +108,7 @@ export default function CatalystsCard({ onAnalyze }: CatalystsCardProps) {
               key={event.id}
               type="button"
               onClick={() => onAnalyze(event.ticker, event.prompt)}
-              className="flex w-full items-center gap-2 rounded px-1.5 py-0.5 text-left transition-colors hover:bg-[var(--bg-elevated)]"
+              className="flex w-full items-center gap-2 rounded px-3 py-1 text-left transition-colors hover:bg-[var(--bg-elevated)]"
             >
               <span
                 className={cn(
@@ -127,7 +127,7 @@ export default function CatalystsCard({ onAnalyze }: CatalystsCardProps) {
             </button>
           ))
         ) : (
-          <p className="px-1.5 py-1 text-xs text-[var(--text-muted)]">Quiet tape so far — no major catalysts on deck.</p>
+          <p className="px-3 py-1 text-xs text-[var(--text-muted)]">Quiet tape so far — no major catalysts on deck.</p>
         )}
       </div>
     </section>

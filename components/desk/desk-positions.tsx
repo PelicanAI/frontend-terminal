@@ -47,9 +47,7 @@ export default function DeskPositions({ onAnalyze }: DeskPositionsProps) {
         const totalPnl = quote?.price != null
           ? (quote.price - trade.entry_price) * trade.quantity * direction
           : trade.pnl_amount
-        const changePercent = quote?.price != null
-          ? ((quote.price - trade.entry_price) / trade.entry_price) * 100 * direction
-          : trade.pnl_percent
+        const todayChangePercent = quote?.changePercent ?? null
         const todayPnl = quote?.change != null
           ? quote.change * trade.quantity * direction
           : null
@@ -72,7 +70,7 @@ export default function DeskPositions({ onAnalyze }: DeskPositionsProps) {
           last,
           marketValue,
           totalPnl,
-          changePercent,
+          todayChangePercent,
           todayPnl,
           prompt: promptParts.filter(Boolean).join(" "),
         }
@@ -134,8 +132,8 @@ export default function DeskPositions({ onAnalyze }: DeskPositionsProps) {
               <th className="px-2 py-1 text-left text-[9px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Symbol</th>
               <th className="px-2 py-1 text-right text-[9px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Price</th>
               <th className="px-2 py-1 text-right text-[9px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Mkt val</th>
-              <th className="px-2 py-1 text-right text-[9px] font-medium uppercase tracking-wider text-[var(--text-muted)]">%Chg</th>
-              <th className="px-2 py-1 text-right text-[9px] font-medium uppercase tracking-wider text-[var(--text-muted)]">P&amp;L</th>
+              <th className="px-2 py-1 text-right text-[9px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Today %</th>
+              <th className="px-2 py-1 text-right text-[9px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Today P&amp;L</th>
             </tr>
           </thead>
           <tbody>
@@ -157,10 +155,10 @@ export default function DeskPositions({ onAnalyze }: DeskPositionsProps) {
                 <td
                   className={cn(
                     "px-2 py-1.5 text-right font-[var(--font-geist-mono)] text-xs tabular-nums",
-                    (row.changePercent ?? 0) >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"
+                    (row.todayChangePercent ?? 0) >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"
                   )}
                 >
-                  {formatSignedPercent(row.changePercent)}
+                  {formatSignedPercent(row.todayChangePercent)}
                 </td>
                 <td
                   className={cn(

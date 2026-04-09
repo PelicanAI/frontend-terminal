@@ -270,14 +270,14 @@ export default function PelicanRead({ onAnalyze }: PelicanReadProps) {
 
       <div className="px-3 pb-2">
         {briefError ? (
-          <div className="flex items-center justify-between gap-3 rounded-md bg-[var(--data-negative)]/8 px-2 py-1.5">
-            <p className="text-xs text-[var(--text-secondary)]">{briefError}</p>
+          <div className="flex items-center justify-between gap-2 rounded bg-[var(--data-negative)]/5 px-2 py-1.5">
+            <p className="min-w-0 truncate text-[11px] text-[var(--data-negative)]">Failed to generate. Please try again.</p>
             <button
               type="button"
               onClick={() => void generateBrief()}
-              className="whitespace-nowrap rounded px-2 py-1 text-[10px] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-elevated)]"
+              className="flex-shrink-0 text-[10px] font-medium text-[var(--text-primary)] transition-colors hover:underline"
             >
-              Try Again
+              Retry
             </button>
           </div>
         ) : !briefContent && briefLoading ? (
