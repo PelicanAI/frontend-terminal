@@ -39,6 +39,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // V3 route redirects — positions + journal + playbooks → portfolio
+  const pathname = request.nextUrl.pathname
+  const routeRedirects: Record<string, string> = {
+    '/positions': '/portfolio',
+    '/journal': '/portfolio?tab=history',
+    '/playbooks': '/portfolio',
+  }
+
+  const redirectTarget = routeRedirects[pathname]
+  if (redirectTarget) {
+    const url = request.nextUrl.clone()
+    const newUrl = new URL(redirectTarget, url.origin)
+    request.nextUrl.searchParams.forEach((value, key) => {
+      if (!newUrl.searchParams.has(key)) {
+        newUrl.searchParams.set(key, value)
+      }
+    })
+    return NextResponse.redirect(newUrl, 308)
+  }
+
   const isApiRoute = request.nextUrl.pathname.startsWith('/api');
 
   // For non-API routes, update session and add locale detection

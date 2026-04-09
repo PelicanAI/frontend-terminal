@@ -287,7 +287,7 @@ export function PortfolioOverview({
       <m.div variants={staggerItem} className="border-b border-[var(--border-default)] pb-3">
         {!planCompliance.has_active_plan ? (
           <Link
-            href="/journal?tab=plan"
+            href="/portfolio?tab=plan"
             className="flex min-h-11 items-start gap-2 text-sm text-[var(--text-secondary)] transition-colors duration-150 hover:text-[var(--text-primary)] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
           >
             <HugeiconsIcon icon={ShieldCheck} size={15} className="mt-0.5 flex-none text-[var(--accent-primary)]" strokeWidth={1.5} color="currentColor" />

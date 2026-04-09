@@ -21,7 +21,7 @@ export function GuideCTA() {
           Start a Chat
         </Link>
         <Link
-          href="/journal"
+          href="/portfolio?tab=history"
           className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] px-6 py-3 rounded-lg font-medium hover:bg-[var(--bg-elevated)] transition-colors"
         >
           Log a Trade

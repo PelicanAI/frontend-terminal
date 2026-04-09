@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import { render, screen } from "@testing-library/react"
-import { forwardRef } from "react"
+import { forwardRef, type ReactNode } from "react"
 import { MessageContent } from "./message-content"
 
 // Mock framer-motion to avoid animation issues in tests
@@ -25,7 +25,7 @@ vi.mock("framer-motion", () => ({
         }
         return (
           <div ref={ref} {...(safeProps as React.HTMLAttributes<HTMLDivElement>)}>
-            {children}
+            {children as ReactNode}
           </div>
         )
       }

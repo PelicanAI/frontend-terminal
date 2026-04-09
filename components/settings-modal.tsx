@@ -89,14 +89,14 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
               Account
             </button>
             <button
-              onClick={() => { onOpenChange(false); router.push('/journal?tab=profile') }}
+              onClick={() => { onOpenChange(false); router.push('/portfolio?tab=profile') }}
               className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
             >
               <HugeiconsIcon icon={UserCircle} className="w-4 h-4" strokeWidth={1.5} color="currentColor" />
               Trader Profile
             </button>
             <button
-              onClick={() => { onOpenChange(false); router.push('/journal?tab=plan') }}
+              onClick={() => { onOpenChange(false); router.push('/portfolio?tab=plan') }}
               className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
             >
               <HugeiconsIcon icon={ClipboardText} className="w-4 h-4" strokeWidth={1.5} color="currentColor" />

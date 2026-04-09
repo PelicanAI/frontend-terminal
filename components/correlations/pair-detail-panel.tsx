@@ -350,7 +350,7 @@ export function PairDetailPanel({
             </button>
             {userHoldsAsset && (
               <a
-                href="/positions"
+                href="/portfolio"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors w-full"
                 style={{
                   background: 'var(--bg-elevated)',
@@ -359,7 +359,7 @@ export function PairDetailPanel({
                 }}
               >
                 <HugeiconsIcon icon={Briefcase} className="w-3.5 h-3.5" style={{ color: 'var(--data-positive)' }} strokeWidth={2} color="currentColor" />
-                View on Positions
+                View in Portfolio
               </a>
             )}
           </div>

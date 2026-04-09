@@ -54,6 +54,13 @@ const nextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      { source: '/positions', destination: '/portfolio', permanent: true },
+      { source: '/journal', destination: '/portfolio', permanent: true },
+      { source: '/playbooks', destination: '/portfolio', permanent: true },
+    ]
+  },
 }
 
 export default withSentryConfig(nextConfig, {

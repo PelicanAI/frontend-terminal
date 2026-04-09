@@ -1,3 +1,5 @@
+// DEPRECATED: Merged into /portfolio — see app/(features)/portfolio/page.client.tsx
+// Redirects in middleware.ts handle inbound traffic. This file is kept for reference.
 "use client"
 
 import { useState, useCallback, useMemo, type ReactNode } from "react"

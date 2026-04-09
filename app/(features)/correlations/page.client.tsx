@@ -115,7 +115,7 @@ export default function CorrelationsPageClient() {
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <Link
-            href="/journal"
+            href="/portfolio?tab=history"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-all duration-150 active:scale-[0.98]"
             style={{ background: 'var(--accent-primary)' }}
           >

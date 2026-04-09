@@ -29,11 +29,11 @@ describe("SuggestedPrompts", () => {
     const onSelect = vi.fn()
     render(<SuggestedPrompts onSelect={onSelect} />)
 
-    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[0]))
-    expect(onSelect).toHaveBeenCalledWith(SUGGESTED_PROMPTS[0])
+    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[0]!))
+    expect(onSelect).toHaveBeenCalledWith(SUGGESTED_PROMPTS[0]!)
 
-    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[2]))
-    expect(onSelect).toHaveBeenCalledWith(SUGGESTED_PROMPTS[2])
+    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[2]!))
+    expect(onSelect).toHaveBeenCalledWith(SUGGESTED_PROMPTS[2]!)
 
     expect(onSelect).toHaveBeenCalledTimes(2)
   })
@@ -50,7 +50,7 @@ describe("SuggestedPrompts", () => {
     const onSelect = vi.fn()
     render(<SuggestedPrompts onSelect={onSelect} disabled />)
 
-    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[0]))
+    fireEvent.click(screen.getByText(SUGGESTED_PROMPTS[0]!))
     expect(onSelect).not.toHaveBeenCalled()
   })
 })

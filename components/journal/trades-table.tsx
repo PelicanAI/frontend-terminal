@@ -209,13 +209,13 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
         ))}
       </div>
 
-      {/* Cross-link banner: Open filter → Positions */}
+      {/* Cross-link banner: Open filter → Portfolio */}
       {statusFilter === 'open' && !dismissedPositionsBanner && (
         <div className="flex items-center justify-between gap-3 mb-4 px-3 py-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
           <p className="text-xs text-[var(--text-secondary)]">
-            Managing live positions? Positions dashboard has real-time health scores and alerts{' '}
-            <Link href="/positions" className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors font-medium inline-flex items-center gap-0.5">
-              Go to Positions <HugeiconsIcon icon={ArrowRight} size={12} strokeWidth={2} color="currentColor" />
+            Managing live positions? Portfolio has real-time health scores and alerts{' '}
+            <Link href="/portfolio" className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors font-medium inline-flex items-center gap-0.5">
+              Go to Portfolio <HugeiconsIcon icon={ArrowRight} size={12} strokeWidth={2} color="currentColor" />
             </Link>
           </p>
           <button
@@ -474,7 +474,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                     )}
                     {trade.status === 'open' ? (
                       <a
-                        href="/positions"
+                        href="/portfolio"
                         onClick={(e) => e.stopPropagation()}
                         className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors whitespace-nowrap"
                       >
@@ -655,7 +655,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                       )}
                       {trade.status === 'open' ? (
                         <a
-                          href="/positions"
+                          href="/portfolio"
                           onClick={(e) => e.stopPropagation()}
                           className="text-xs text-[var(--accent-primary)] hover:text-[var(--accent-hover)] font-medium transition-colors"
                         >

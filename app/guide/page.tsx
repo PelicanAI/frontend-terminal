@@ -187,8 +187,8 @@ export default function GuidePage() {
             title="Track & Improve"
             hook="The traders who improve fastest are the ones who track every trade. Pelican makes it painless."
             cta={{
-              label: "Log your first trade → Go to Positions",
-              href: "/journal",
+              label: "Log your first trade → Go to Portfolio",
+              href: "/portfolio?tab=history",
             }}
           >
             <p>

@@ -83,7 +83,7 @@ export function MessageActionBar({
       switch (action.type) {
         case 'view_position':
         case 'review_trade': {
-          router.push(`/journal?highlight=${action.tradeId}`)
+          router.push(`/portfolio?tab=history&highlight=${action.tradeId}`)
           break
         }
 

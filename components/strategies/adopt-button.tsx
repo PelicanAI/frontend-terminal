@@ -54,11 +54,11 @@ export function AdoptButton({ strategy, adoption }: AdoptButtonProps) {
           Added to Playbooks
         </div>
         <button
-          onClick={() => router.push('/playbooks')}
+          onClick={() => router.push('/portfolio')}
           className="flex items-center gap-1 text-xs text-[var(--accent-primary)] hover:underline"
         >
           <HugeiconsIcon icon={ArrowSquareOut} size={12} strokeWidth={1.5} color="currentColor" />
-          View in Playbooks
+          View in Portfolio
         </button>
       </div>
     )

@@ -31,9 +31,9 @@ export function StrategyBrowse() {
             <span className="text-[var(--text-muted)]">/</span>
             <span className="text-sm font-medium text-[var(--text-primary)]">Strategies</span>
           </div>
-          <Link href="/playbooks" className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+          <Link href="/portfolio" className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
             <HugeiconsIcon icon={ArrowLeft} size={14} strokeWidth={2} color="currentColor" />
-            My Playbooks
+            Portfolio
           </Link>
         </div>
       </nav>

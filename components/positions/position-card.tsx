@@ -397,11 +397,11 @@ export function PositionCard({
                 </div>
 
                 <Link
-                  href={`/journal?highlight=${position.id}`}
+                  href={`/portfolio?tab=history&highlight=${position.id}`}
                   className="inline-flex min-h-11 items-center text-xs font-medium text-[var(--accent-primary)] transition-colors duration-150 hover:text-[var(--accent-hover)] cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--accent-primary)]"
                   onClick={(event) => event.stopPropagation()}
                 >
-                  Journal
+                  History
                 </Link>
               </div>
             </div>

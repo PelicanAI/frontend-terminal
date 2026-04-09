@@ -194,12 +194,12 @@ export function PortfolioCorrelations({
           No Open Positions
         </h3>
         <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-          Log your first trade in the Journal to see how your positions correlate with each other and the broader market.
+          Log your first trade in Portfolio to see how your positions correlate with each other and the broader market.
         </p>
-        <a href="/journal"
+        <a href="/portfolio?tab=history"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all hover:brightness-110 active:scale-[0.98]"
           style={{ background: 'var(--accent-indigo)', color: 'white' }}>
-          Go to Journal <HugeiconsIcon icon={ArrowRight} className="w-4 h-4" strokeWidth={2} color="currentColor" />
+          Go to Portfolio <HugeiconsIcon icon={ArrowRight} className="w-4 h-4" strokeWidth={2} color="currentColor" />
         </a>
       </m.div>
     )
