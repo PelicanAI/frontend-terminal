@@ -7,6 +7,7 @@ import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react"
 import {
   Add01Icon as Plus,
   Alert01Icon as Warning,
+  Alert02Icon,
   Analytics01Icon as Graph,
   AnalyticsDownIcon as TrendDown,
   AnalyticsUpIcon as TrendUp,
@@ -27,8 +28,79 @@ import { PortfolioCorrelations } from "@/components/correlations/portfolio-corre
 import { RegimeBanner } from "@/components/correlations/regime-banner"
 import { SignalCards } from "@/components/correlations/signal-cards"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
+import { getStaleness, type StalenessLevel } from "@/lib/markets/staleness"
 
 type ViewTab = "market" | "portfolio"
+
+interface StaleDataBannerProps {
+  calculatedAt: string
+  isRefreshing: boolean
+  onRefresh: () => void
+}
+
+function StaleDataBanner({ calculatedAt, isRefreshing, onRefresh }: StaleDataBannerProps) {
+  const staleness = getStaleness(calculatedAt)
+
+  if (staleness.level === "fresh" || staleness.level === "aging") return null
+
+  const formattedTimestamp = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(calculatedAt))
+
+  return (
+    <div
+      className="mb-4 flex flex-col gap-3 rounded-lg px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+      style={{
+        background: "color-mix(in srgb, var(--data-warning) 10%, transparent)",
+        borderLeft: "2px solid var(--data-warning)",
+      }}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="flex items-start gap-3">
+        <HugeiconsIcon icon={Alert02Icon} className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "var(--data-warning)" }} strokeWidth={2} color="currentColor" />
+        <div>
+          <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+            Data is {staleness.ageLabel} stale
+          </p>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--text-secondary)" }}>
+            Correlation values may not reflect current market conditions.
+          </p>
+          <p className="mt-1 font-[var(--font-geist-mono)] text-[10px] tabular-nums" style={{ color: "var(--text-muted)" }}>
+            Last refreshed: {formattedTimestamp}
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onRefresh}
+        disabled={isRefreshing}
+        className="inline-flex min-h-[36px] items-center justify-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.98]"
+        style={{
+          borderColor: "color-mix(in srgb, var(--data-warning) 55%, transparent)",
+          color: "var(--text-primary)",
+          background: "transparent",
+        }}
+      >
+        <HugeiconsIcon
+          icon={ArrowsClockwise}
+          className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`}
+          strokeWidth={2}
+          color="currentColor"
+        />
+        Refresh now
+      </button>
+    </div>
+  )
+}
+
+function isMutedByStaleness(level: StalenessLevel): boolean {
+  return level === "stale" || level === "critical"
+}
 
 const NEUTRAL_REGIME = { color: "var(--text-muted)", Icon: Minus, label: "Neutral" } as const
 
@@ -93,6 +165,8 @@ export default function CorrelationsTab() {
   const regime = data?.regime
   const regimeStyle = regime ? regimeConfig[regime.overall_regime] ?? NEUTRAL_REGIME : NEUTRAL_REGIME
   const RegimeIcon = regimeStyle.Icon
+  const staleness = regime?.calculated_at ? getStaleness(regime.calculated_at) : null
+  const shouldMuteMatrix = staleness ? isMutedByStaleness(staleness.level) : false
 
   const activeSignalCount = data?.correlations.filter(
     (pair) => Math.abs(pair.z_score) > 1.0 || pair.regime === "breakdown" || pair.regime === "inversion"
@@ -253,6 +327,14 @@ export default function CorrelationsTab() {
         />
       )}
 
+      {activeTab === "market" && regime?.calculated_at && (
+        <StaleDataBanner
+          calculatedAt={regime.calculated_at}
+          isRefreshing={calculating}
+          onRefresh={handleCalculate}
+        />
+      )}
+
       {isLoading && (
         <div className="flex items-center justify-center py-20">
           <HugeiconsIcon
@@ -288,7 +370,7 @@ export default function CorrelationsTab() {
             >
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-4">
                 <div className="xl:col-span-3">
-                  <div className="pelican-card hidden overflow-auto md:block">
+                  <div className={`pelican-card hidden overflow-auto md:block transition-opacity duration-200 ${shouldMuteMatrix ? "opacity-70" : ""}`}>
                     <CorrelationMatrix
                       assets={data.assets}
                       correlations={data.correlations}
@@ -298,7 +380,7 @@ export default function CorrelationsTab() {
                       beginnerMode={beginnerMode}
                     />
                   </div>
-                  <div className="md:hidden">
+                  <div className={`md:hidden transition-opacity duration-200 ${shouldMuteMatrix ? "opacity-70" : ""}`}>
                     <CorrelationListView
                       correlations={data.correlations}
                       assets={data.assets}
