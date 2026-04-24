@@ -296,14 +296,8 @@ function HeatmapPageInner() {
     }
   }, [])
 
-  // Onboarding milestone — ref guard prevents re-firing when completeMilestone identity changes
   const { completeMilestone } = useOnboardingProgress()
   const heatmapMilestoneRef = useRef(false)
-  useEffect(() => {
-    if (heatmapMilestoneRef.current) return
-    heatmapMilestoneRef.current = true
-    completeMilestone("visited_heatmap")
-  }, [completeMilestone])
 
   // Filter to a single sector if passed via query param (stocks only)
   useEffect(() => {
@@ -415,6 +409,11 @@ function HeatmapPageInner() {
   }, [autoRefresh, refetch])
 
   const handleStockClick = useCallback((ticker: string, name: string) => {
+    if (!heatmapMilestoneRef.current) {
+      heatmapMilestoneRef.current = true
+      completeMilestone("visited_heatmap")
+    }
+
     const stock = stocks.find(s => s.ticker === ticker)
     trackEvent({ eventType: 'heatmap_ticker_clicked', feature: 'heatmap', ticker, data: { market: activeMarket, changePercent: stock?.changePercent ?? null } })
     if (stock) {
@@ -422,7 +421,7 @@ function HeatmapPageInner() {
     } else {
       openWithPrompt(ticker, `Analyze ${ticker} (${name}) — is there a trade here for me? Consider my current portfolio exposure, my best-performing setups, and my risk rules.`, 'heatmap', 'heatmap_click')
     }
-  }, [stocks, heatmapContext, activeMarket, openWithPrompt])
+  }, [completeMilestone, stocks, heatmapContext, activeMarket, openWithPrompt])
 
   const handleToggleSector = useCallback((sector: string) => {
     setSelectedSectors((prev) => {

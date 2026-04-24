@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
+import { useCallback, useMemo, useState, type ReactNode } from "react"
 import { m } from "framer-motion"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Refresh01Icon as ArrowsClockwise } from "@hugeicons/core-free-icons"
@@ -512,21 +512,18 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
   const { plan } = useTradingPlan()
   const { stats: tradeStats, equityCurve } = useTradeStats()
 
+  const handleInsightAskPelican = useCallback((prompt: string) => {
+    completeMilestone("first_insight")
+    onAskPelican(prompt)
+  }, [completeMilestone, onAskPelican])
+
   const handleComplianceAskPelican = useCallback(() => {
     if (plan) {
-      onAskPelican(buildPlanReviewPrompt(plan, complianceStats, tradeStats))
+      handleInsightAskPelican(buildPlanReviewPrompt(plan, complianceStats, tradeStats))
       return
     }
-    onAskPelican("Review my current trading plan compliance and tell me the highest-leverage rule to tighten next.")
-  }, [plan, complianceStats, tradeStats, onAskPelican])
-
-  const insightMilestoneRef = useRef(false)
-  useEffect(() => {
-    if (insights?.has_enough_data && !insightMilestoneRef.current) {
-      insightMilestoneRef.current = true
-      completeMilestone("first_insight")
-    }
-  }, [insights?.has_enough_data, completeMilestone])
+    handleInsightAskPelican("Review my current trading plan compliance and tell me the highest-leverage rule to tighten next.")
+  }, [plan, complianceStats, tradeStats, handleInsightAskPelican])
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true)
@@ -612,8 +609,8 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
       <m.div variants={staggerItem} className="mt-6">
         <SectionHeader title="Pattern ledger · counterfactual" meta={`${patterns.length} live patterns · rule prompts`} />
         <div className="grid gap-8 xl:grid-cols-2">
-          <PatternLedger patterns={patterns} onDismiss={dismissPattern} onAskPelican={onAskPelican} />
-          <RuleBacktest stats={tradeStats} onAskPelican={onAskPelican} />
+          <PatternLedger patterns={patterns} onDismiss={dismissPattern} onAskPelican={handleInsightAskPelican} />
+          <RuleBacktest stats={tradeStats} onAskPelican={handleInsightAskPelican} />
         </div>
       </m.div>
 
@@ -642,7 +639,7 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
         <span>·</span>
         <span>Pattern engine live</span>
         <span className="ml-auto">
-          <button type="button" onClick={() => onAskPelican("Summarize my current insights tab. Give me the top 3 edge improvements and the one rule I should follow tomorrow.")} className="uppercase tracking-[0.08em] text-[var(--accent-primary)] hover:text-[var(--accent-hover)]">
+          <button type="button" onClick={() => handleInsightAskPelican("Summarize my current insights tab. Give me the top 3 edge improvements and the one rule I should follow tomorrow.")} className="uppercase tracking-[0.08em] text-[var(--accent-primary)] hover:text-[var(--accent-hover)]">
             Ask Pelican
           </button>
         </span>

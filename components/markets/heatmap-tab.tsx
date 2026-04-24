@@ -282,12 +282,6 @@ function HeatmapTabInner() {
   const heatmapMilestoneRef = useRef(false)
 
   useEffect(() => {
-    if (heatmapMilestoneRef.current) return
-    heatmapMilestoneRef.current = true
-    completeMilestone("visited_heatmap")
-  }, [completeMilestone])
-
-  useEffect(() => {
     const sectorParam = searchParams.get("sector")
     if (sectorParam && activeMarket === "stocks") {
       const allSectors = getSectors()
@@ -396,6 +390,11 @@ function HeatmapTabInner() {
   }, [autoRefresh, refetch])
 
   const handleStockClick = useCallback((ticker: string, name: string) => {
+    if (!heatmapMilestoneRef.current) {
+      heatmapMilestoneRef.current = true
+      completeMilestone("visited_heatmap")
+    }
+
     const stock = stocks.find((item) => item.ticker === ticker)
     trackEvent({
       eventType: "heatmap_ticker_clicked",
@@ -414,7 +413,7 @@ function HeatmapTabInner() {
         "heatmap_click"
       )
     }
-  }, [stocks, heatmapContext, activeMarket, openWithPrompt])
+  }, [completeMilestone, stocks, heatmapContext, activeMarket, openWithPrompt])
 
   const handleToggleSector = useCallback((sector: string) => {
     setSelectedSectors((prev) => {
