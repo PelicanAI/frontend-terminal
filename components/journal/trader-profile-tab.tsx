@@ -40,6 +40,21 @@ const severityBorder: Record<string, string> = {
   neutral: 'var(--text-muted)',
 }
 
+function formatMilestoneValue(value: number, unit: string): string {
+  if (unit === 'dollars') {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value)
+  }
+
+  return new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
 function SkeletonCard({ className = '' }: { className?: string }) {
   return (
     <div
@@ -199,7 +214,7 @@ export default function TraderProfileTab({ trades, stats, isLoading, onAskPelica
                       />
                     </div>
                     <span className="text-xs font-mono tabular-nums text-[var(--text-muted)]">
-                      {current}/{milestone.threshold}
+                      {formatMilestoneValue(current, milestone.unit)}/{formatMilestoneValue(milestone.threshold, milestone.unit)}
                     </span>
                   </div>
                 )}
