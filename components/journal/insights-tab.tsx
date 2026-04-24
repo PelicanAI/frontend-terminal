@@ -410,7 +410,7 @@ function PlanAdherence({ onReviewPlan }: { onReviewPlan: () => void }) {
         <div className="font-mono text-[9px] text-[var(--text-muted)]">
           {days.map((day) => <div key={day} className="h-5 pr-1 text-right leading-5">{day}</div>)}
         </div>
-        <div className="grid grid-cols-14">
+        <div className="grid grid-cols-[repeat(14,minmax(0,1fr))]">
           {days.flatMap((_, dayIndex) => Array.from({ length: 14 }, (_week, weekIndex) => {
             const value = cells[weekIndex * 5 + dayIndex] ?? "o"
             return (

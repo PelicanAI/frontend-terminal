@@ -364,8 +364,14 @@ export function PositionList({
               tickerHistory={tickerHistory[selected.position.ticker] ?? null}
               onCloseSheet={() => setSelectedId(null)}
               onScan={() => onScanWithPelican(selected.position)}
-              onEdit={() => onEdit(selected.position)}
-              onClosePosition={() => onClose(selected.position)}
+              onEdit={() => {
+                setSelectedId(null)
+                onEdit(selected.position)
+              }}
+              onClosePosition={() => {
+                setSelectedId(null)
+                onClose(selected.position)
+              }}
             />
           </>
         )}
