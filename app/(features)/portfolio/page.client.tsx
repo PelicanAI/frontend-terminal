@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import dynamicImport from "next/dynamic"
+import Image from "next/image"
 import { m, AnimatePresence } from "framer-motion"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
@@ -10,34 +11,26 @@ import {
   Brain01Icon as Brain,
   Cancel01Icon as XIcon,
   Upload01Icon as UploadSimple,
-  UserCircleIcon as UserCircle,
 } from "@hugeicons/core-free-icons"
 import { usePortfolioSummary } from "@/hooks/use-portfolio-summary"
 import { useBehavioralInsights } from "@/hooks/use-behavioral-insights"
 import { useTodaysWarnings } from "@/hooks/use-todays-warnings"
-import { usePositionEarnings } from "@/hooks/use-position-earnings"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { useTrades, type Trade } from "@/hooks/use-trades"
 import { useTradeStats } from "@/hooks/use-trade-stats"
 import { useTickerHistory } from "@/hooks/use-ticker-history"
-import { useLiveQuotes } from "@/hooks/use-live-quotes"
-import { usePortfolioPnl } from "@/hooks/use-portfolio-pnl"
+import { useLiveQuotes, type Quote } from "@/hooks/use-live-quotes"
 import { useWatchlist } from "@/hooks/use-watchlist"
-import { useTraderProfile } from "@/hooks/use-trader-profile"
 import { usePlanCompliance } from "@/hooks/use-plan-compliance"
 import { useBrokerConnections } from "@/hooks/use-broker-connections"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
-import { WarningBanner } from "@/components/insights/warning-banner"
 import { EdgeSummary } from "@/components/insights/edge-summary"
-import { TodaysActions } from "@/components/positions/todays-actions"
 import { PositionFilters } from "@/components/positions/position-filters"
 import { PositionList } from "@/components/positions/position-list"
-import { PortfolioIntelligence } from "@/components/positions/portfolio-intelligence"
 import { PositionsEmptyState } from "@/components/positions/positions-empty-state"
 import { CloseTradeModal } from "@/components/journal/close-trade-modal"
 import { LogTradeModal } from "@/components/journal/log-trade-modal"
 import { CSVImportModal } from "@/components/journal/csv-import-modal"
-import { PortfolioHeroStrip } from "@/components/positions/portfolio-hero-strip"
 import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
 import { ConnectBrokerButton } from "@/components/broker/connect-broker-button"
@@ -48,9 +41,8 @@ import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
 import { buildReplayNarrationPrompt } from "@/lib/journal/build-replay-prompt"
 import { trackEvent } from "@/lib/tracking"
 import { toast } from "@/hooks/use-toast"
-import { computePortfolioGrade } from "@/lib/portfolio-grade"
 import { cn } from "@/lib/utils"
-import type { PortfolioPosition } from "@/types/portfolio"
+import type { PortfolioPosition, PortfolioStats } from "@/types/portfolio"
 
 const InsightsTab = dynamicImport(
   () => import("@/components/journal/insights-tab").then((module) => ({ default: module.InsightsTab })),
@@ -59,14 +51,6 @@ const InsightsTab = dynamicImport(
 const TradeReplay = dynamicImport(
   () => import("@/components/journal/trade-replay").then((module) => ({ default: module.TradeReplay })),
   { ssr: false }
-)
-const PortfolioPnlChart = dynamicImport(
-  () => import("@/components/positions/portfolio-pnl-chart").then((module) => ({ default: module.PortfolioPnlChart })),
-  { ssr: false, loading: () => <TerminalSectionFallback label="Loading P&L history" height="h-36" /> }
-)
-const PortfolioOverview = dynamicImport(
-  () => import("@/components/positions/portfolio-overview").then((module) => ({ default: module.PortfolioOverview })),
-  { ssr: false, loading: () => <TerminalSectionFallback label="Loading risk" height="h-40" /> }
 )
 const TradingPlanTab = dynamicImport(
   () => import("@/components/journal/trading-plan-tab").then((module) => ({ default: module.TradingPlanTab })),
@@ -103,6 +87,258 @@ function formatNum(n: number | null | undefined): string {
   if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`
   if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(1)}K`
   return `$${n.toLocaleString()}`
+}
+
+function formatTerminalMoney(value: number | null | undefined, signed = false): string {
+  if (value == null || Number.isNaN(value)) return "—"
+  const sign = signed && value > 0 ? "+" : value < 0 ? "-" : ""
+  const abs = Math.abs(value)
+  return `${sign}${abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
+function getPositionQuote(position: PortfolioPosition, quotes: Record<string, Quote>): Quote | null {
+  return quotes[position.ticker] ?? quotes[position.ticker.toUpperCase()] ?? null
+}
+
+function computeTerminalUnrealized(positions: PortfolioPosition[], quotes: Record<string, Quote>) {
+  let total = 0
+  let quotedExposure = 0
+  let hasQuotes = false
+
+  for (const position of positions) {
+    const quote = getPositionQuote(position, quotes)
+    if (!quote) continue
+    hasQuotes = true
+    const direction = position.direction === "long" ? 1 : -1
+    const move = (quote.price - position.entry_price) * direction
+    total += move * position.quantity
+    quotedExposure += quote.price * position.quantity
+  }
+
+  return {
+    total,
+    hasQuotes,
+    pct: quotedExposure > 0 ? (total / quotedExposure) * 100 : null,
+  }
+}
+
+function AccountStrip({
+  positions,
+  portfolio,
+  quotes,
+  brokerName,
+  isRefreshing,
+  onRefresh,
+  onLogTrade,
+  onProfile,
+}: {
+  positions: PortfolioPosition[]
+  portfolio: PortfolioStats | null | undefined
+  quotes: Record<string, Quote>
+  brokerName: string
+  isRefreshing: boolean
+  onRefresh: () => void
+  onLogTrade: () => void
+  onProfile: () => void
+}) {
+  const unrealized = useMemo(() => computeTerminalUnrealized(positions, quotes), [positions, quotes])
+  const statTone =
+    !unrealized.hasQuotes
+      ? "text-[var(--text-muted)]"
+      : unrealized.total >= 0
+        ? "text-[var(--data-positive)]"
+        : "text-[var(--data-negative)]"
+  const totalRisk = portfolio?.positions_without_stop === 0 ? "Defined" : `${portfolio?.positions_without_stop ?? 0} missing`
+
+  return (
+    <div className="border-b border-[var(--border-default)] py-3">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+            <Image src="/pelican-logo-transparent.webp" alt="Pelican" width={28} height={28} className="h-7 w-7 object-contain" />
+          </div>
+          <div className="min-w-0">
+            <div className="font-semibold text-[var(--text-primary)]">Pelican</div>
+            <button
+              type="button"
+              onClick={onProfile}
+              className="mt-0.5 flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
+            >
+              <span>ACCT</span>
+              <span>{brokerName} · USD</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="grid flex-1 grid-cols-2 gap-3 md:grid-cols-4 xl:ml-auto xl:max-w-4xl">
+          <div>
+            <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Open exposure</div>
+            <div className="mt-1 font-mono text-sm tabular-nums text-[var(--text-primary)]">{formatTerminalMoney(portfolio?.total_exposure)}</div>
+            <div className="font-mono text-[10px] text-[var(--text-ghost)]">USD</div>
+          </div>
+          <div>
+            <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Unrealized P/L</div>
+            <div className={`mt-1 font-mono text-sm tabular-nums ${statTone}`}>{unrealized.hasQuotes ? formatTerminalMoney(unrealized.total, true) : "—"}</div>
+            <div className="font-mono text-[10px] text-[var(--text-ghost)]">{unrealized.pct == null ? "Waiting for quotes" : `${unrealized.pct > 0 ? "+" : ""}${unrealized.pct.toFixed(2)}% on exposure`}</div>
+          </div>
+          <div>
+            <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Risk coverage</div>
+            <div className="mt-1 font-mono text-sm tabular-nums text-[var(--text-primary)]">{totalRisk}</div>
+            <div className="font-mono text-[10px] text-[var(--text-ghost)]">{portfolio?.total_positions ?? positions.length} positions</div>
+          </div>
+          <div>
+            <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Buying power</div>
+            <div className="mt-1 font-mono text-sm tabular-nums text-[var(--text-muted)]">—</div>
+            <div className="font-mono text-[10px] text-[var(--text-ghost)]">Not in current data</div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 xl:ml-3">
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="h-9 border border-[var(--border-default)] px-3 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] disabled:cursor-wait disabled:opacity-50"
+          >
+            {isRefreshing ? "Syncing" : "Sync"}
+          </button>
+          <button
+            type="button"
+            onClick={onLogTrade}
+            className="h-9 border border-[var(--border-active)] bg-[var(--accent-glow)] px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
+          >
+            Log
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function TerminalTabs({
+  activeTab,
+  positionsCount,
+  tradesCount,
+  warningsCount,
+  insightsCount,
+  onNavigate,
+  onProfile,
+}: {
+  activeTab: SubTab
+  positionsCount: number
+  tradesCount: number
+  warningsCount: number
+  insightsCount: number
+  onNavigate: (tab: SubTab) => void
+  onProfile: () => void
+}) {
+  const tabs = [
+    { label: "Positions", count: positionsCount, active: activeTab === "active", onClick: () => onNavigate("active") },
+    { label: "Orders", count: 0, active: false, onClick: undefined },
+    { label: "History", count: tradesCount, active: activeTab === "history", onClick: () => onNavigate("history") },
+    { label: "Account", active: false, onClick: onProfile },
+    { label: "Notifications", count: warningsCount, active: false, onClick: undefined },
+  ]
+
+  return (
+    <div className="flex flex-col gap-3 border-b border-[var(--border-default)] py-2 lg:flex-row lg:items-center">
+      <div className="flex flex-nowrap items-center gap-0 overflow-x-auto scrollbar-hide">
+        {tabs.map((tab) => (
+          <button
+            key={tab.label}
+            type="button"
+            onClick={tab.onClick}
+            disabled={!tab.onClick}
+            className={cn(
+              "min-h-10 shrink-0 border-b px-3 py-2 text-xs font-medium uppercase tracking-[0.08em] transition-colors",
+              tab.active
+                ? "border-[var(--accent-primary)] text-[var(--text-primary)]"
+                : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]",
+              !tab.onClick && "cursor-not-allowed opacity-40 hover:text-[var(--text-muted)]",
+            )}
+          >
+            {tab.label}
+            {tab.count != null && <span className="ml-1 font-mono text-[10px] text-[var(--text-ghost)]">{tab.count}</span>}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex w-fit border border-[var(--border-default)] lg:ml-auto">
+        <button
+          type="button"
+          onClick={() => onNavigate("active")}
+          className={cn(
+            "border-r border-[var(--border-default)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors",
+            activeTab === "active" ? "bg-[var(--accent-glow)] text-[var(--accent-primary)]" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]",
+          )}
+        >
+          Positions
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate("insights")}
+          className={cn(
+            "px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors",
+            activeTab === "insights" ? "bg-[var(--accent-glow)] text-[var(--accent-primary)]" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]",
+          )}
+        >
+          Insights
+          {insightsCount > 0 && <span className="ml-1 text-[var(--text-ghost)]">{insightsCount}</span>}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function DataSourceBar({
+  activeConnectionName,
+  positionsCount,
+  onSync,
+  onImport,
+}: {
+  activeConnectionName: string
+  positionsCount: number
+  onSync: () => void
+  onImport: () => void
+}) {
+  return (
+    <div className="grid gap-2 border-b border-[var(--border-default)] py-3 lg:grid-cols-3">
+      <div className="border border-[var(--border-active)] bg-[var(--accent-glow)] px-3 py-2">
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--data-positive)]" />
+          <div className="min-w-0">
+            <div className="text-xs font-medium text-[var(--text-primary)]">Live · {activeConnectionName}</div>
+            <div className="font-mono text-[10px] text-[var(--text-muted)]">Current session · {positionsCount} pos · SnapTrade/manual</div>
+          </div>
+          <button type="button" onClick={onSync} className="ml-auto border border-[var(--border-default)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]">
+            Sync
+          </button>
+        </div>
+      </div>
+      <div className="border border-[var(--border-subtle)] px-3 py-2 opacity-45">
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--text-ghost)]" />
+          <div>
+            <div className="text-xs font-medium text-[var(--text-primary)]">Paper · Polygon</div>
+            <div className="font-mono text-[10px] text-[var(--text-muted)]">Deferred · simulator not wired</div>
+          </div>
+          <span className="ml-auto border border-[var(--border-default)] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-[var(--text-muted)]">SIM</span>
+        </div>
+      </div>
+      <div className="border border-[var(--border-subtle)] px-3 py-2">
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--text-ghost)]" />
+          <div>
+            <div className="text-xs font-medium text-[var(--text-primary)]">CSV · Import</div>
+            <div className="font-mono text-[10px] text-[var(--text-muted)]">Journal backfill path</div>
+          </div>
+          <button type="button" onClick={onImport} className="ml-auto border border-[var(--border-default)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]">
+            Import
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function SectionDivider({ label, right }: { label: string; right?: ReactNode }) {
@@ -191,18 +427,15 @@ export default function PortfolioPage() {
   const { data: portfolio, isLoading: portfolioLoading, refresh: refreshPortfolio } = usePortfolioSummary()
   const { data: insights } = useBehavioralInsights()
   const { warnings } = useTodaysWarnings()
-  const { warnings: earningsWarnings } = usePositionEarnings()
   const { openWithPrompt } = usePelicanPanelContext()
   const { trades, openTrades, isLoading: tradesLoading, logTrade, closeTrade, refetch, updateTrade } = useTrades()
   const { stats, isLoading: statsLoading } = useTradeStats()
   const { stats: complianceStats } = usePlanCompliance()
-  const { survey } = useTraderProfile()
   const { items: watchlistItems } = useWatchlist()
   const { activeConnections } = useBrokerConnections()
   const { completeMilestone } = useOnboardingProgress()
+  const activeConnectionName = activeConnections[0]?.brokerage_name || "Manual"
 
-  const marketsTraded = survey?.markets_traded || ["stocks"]
-  const primaryMarket = marketsTraded[0] || "stocks"
   const watchlistTickers = useMemo(
     () => new Set(watchlistItems.map((item) => item.ticker.toUpperCase())),
     [watchlistItems]
@@ -220,18 +453,6 @@ export default function PortfolioPage() {
 
   const { data: tickerHistory } = useTickerHistory(openTickers)
   const { quotes } = useLiveQuotes(quoteTickers)
-  const { data: pnlHistory, isLoading: pnlHistoryLoading } = usePortfolioPnl(portfolio?.positions ?? [])
-
-  const portfolioGrade = useMemo(() => {
-    if (!portfolio) return null
-    return computePortfolioGrade(
-      portfolio.portfolio,
-      portfolio.risk,
-      portfolio.plan_compliance,
-      portfolio.positions,
-    )
-  }, [portfolio])
-
   const insightsBadgeCount = useMemo(() => {
     if (!insights?.has_enough_data) return 0
     const sections = [
@@ -525,76 +746,37 @@ export default function PortfolioPage() {
   const showDetailPanel = activeTab === "history" && activePanel === "detail" && selectedTrade !== null
   const filterButtons = ["all", "real", "paper"] as const
   const filterLabels = { all: "All", real: "Real", paper: "Simulated" }
-  const tabs: { key: SubTab; label: string; badge?: number }[] = [
-    { key: "active", label: "Active" },
-    { key: "history", label: "History" },
-    { key: "insights", label: "Insights", badge: insightsBadgeCount },
-  ]
-
   return (
     <div className="min-h-full bg-[var(--bg-base)] text-[var(--text-primary)]">
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="border-b border-[var(--border-default)] pb-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">Portfolio</p>
-              <h1 className="mt-3 text-2xl font-semibold text-[var(--text-primary)]">Positions, history, and edge</h1>
-              <p className="mt-2 text-xs text-[var(--text-secondary)]">
-                <span className="font-[var(--font-geist-mono)] tabular-nums">{portfolio?.positions.length ?? 0}</span> open positions
-                <span className="mx-1.5">·</span>
-                <span className="font-[var(--font-geist-mono)] tabular-nums">{trades.length}</span> total trades
-                {stats?.win_rate != null && (
-                  <>
-                    <span className="mx-1.5">·</span>
-                    <span className="font-[var(--font-geist-mono)] tabular-nums">{stats.win_rate.toFixed(1)}%</span> win rate
-                  </>
-                )}
-              </p>
-            </div>
+        <AccountStrip
+          positions={portfolio?.positions ?? []}
+          portfolio={portfolio?.portfolio}
+          quotes={quotes}
+          brokerName={activeConnectionName}
+          isRefreshing={isRefreshing}
+          onRefresh={async () => {
+            if (isRefreshing) return
+            setIsRefreshing(true)
+            try {
+              await refreshPortfolio()
+            } finally {
+              setTimeout(() => setIsRefreshing(false), 800)
+            }
+          }}
+          onLogTrade={() => setShowLogTradeModal(true)}
+          onProfile={() => setShowProfileModal(true)}
+        />
 
-            <div className="flex items-center gap-2 self-start">
-              <button
-                onClick={() => setShowProfileModal(true)}
-                className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                aria-label="Trader Profile"
-              >
-                <HugeiconsIcon icon={UserCircle} size={18} strokeWidth={1.5} color="currentColor" />
-              </button>
-              <PelicanButton variant="primary" size="sm" onClick={() => setShowLogTradeModal(true)}>
-                <HugeiconsIcon icon={Plus} size={16} strokeWidth={2} color="currentColor" />
-                Log Trade
-              </PelicanButton>
-            </div>
-          </div>
-          <div className="mt-2 h-px w-full bg-[var(--border-subtle)] opacity-70" />
-        </div>
-
-        <div className="border-b border-[var(--border-default)] py-3">
-          <div className="flex items-center gap-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => navigateToTab(tab.key)}
-                className={cn(
-                  "relative px-4 py-2 text-sm font-medium transition-colors duration-150 rounded-lg",
-                  activeTab === tab.key
-                    ? "text-[var(--text-primary)] bg-[var(--surface-hover)]"
-                    : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
-                )}
-              >
-                {tab.label}
-                {tab.badge != null && tab.badge > 0 && (
-                  <span className="ml-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--accent-muted)] text-[var(--accent-primary)] font-[var(--font-geist-mono)] tabular-nums">
-                    {tab.badge}
-                  </span>
-                )}
-                {activeTab === tab.key && (
-                  <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-[var(--accent-primary)] rounded-full" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        <TerminalTabs
+          activeTab={activeTab}
+          positionsCount={portfolio?.positions.length ?? 0}
+          tradesCount={trades.length}
+          warningsCount={warnings.length}
+          insightsCount={insightsBadgeCount}
+          onNavigate={navigateToTab}
+          onProfile={() => setShowProfileModal(true)}
+        />
 
         <AnimatePresence mode="wait">
           {activeTab === "active" && (
@@ -639,43 +821,20 @@ export default function PortfolioPage() {
                   className="pt-3"
                 >
                   <m.div variants={sectionReveal} className="space-y-2">
-                    <PortfolioHeroStrip
-                      portfolio={portfolio.portfolio}
-                      positions={portfolio.positions}
-                      quotes={quotes}
-                      grade={portfolioGrade}
-                      primaryMarket={primaryMarket}
-                      marketsTraded={marketsTraded}
-                      isRefreshing={isRefreshing}
-                      onRefresh={async () => {
+                    <DataSourceBar
+                      activeConnectionName={activeConnectionName}
+                      positionsCount={portfolio.positions.length}
+                      onSync={async () => {
                         if (isRefreshing) return
                         setIsRefreshing(true)
                         try {
                           await refreshPortfolio()
-                        } catch {
-                          // Refresh failed — UI resets via finally
                         } finally {
                           setTimeout(() => setIsRefreshing(false), 800)
                         }
                       }}
-                      onGradeClick={handleSendMessage}
+                      onImport={() => setShowImportModal(true)}
                     />
-
-                    {insights?.has_enough_data && (
-                      <div className="mt-2">
-                        <EdgeSummary insights={insights} compact onAskPelican={handleSendMessage} />
-                      </div>
-                    )}
-
-                    {warnings.length > 0 && (
-                      <WarningBanner
-                        warnings={warnings}
-                        onAction={(warning) => {
-                          trackEvent({ eventType: "alert_acted", feature: "positions", data: { alertType: warning.title } })
-                          handleSendMessage(`I have a trading warning: ${warning.title}. ${warning.message} What should I do?`)
-                        }}
-                      />
-                    )}
 
                     <PositionFilters
                       positions={portfolio.positions}
@@ -719,51 +878,40 @@ export default function PortfolioPage() {
                     />
                   </m.div>
 
-                  {portfolio.positions.length > 0 && (
-                    <m.div variants={sectionReveal} className="mt-4">
-                      <PortfolioPnlChart data={pnlHistory} isLoading={pnlHistoryLoading} />
+                  {(warnings.length > 0 || insights?.has_enough_data) && (
+                    <m.div variants={sectionReveal} className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-2">
+                      {warnings.length > 0 && (
+                        <div className="border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
+                          <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Notifications</div>
+                          <div className="mt-3 space-y-3">
+                            {warnings.slice(0, 3).map((warning) => (
+                              <button
+                                key={warning.title}
+                                type="button"
+                                onClick={() => {
+                                  trackEvent({ eventType: "alert_acted", feature: "positions", data: { alertType: warning.title } })
+                                  handleSendMessage(`I have a trading warning: ${warning.title}. ${warning.message} What should I do?`)
+                                }}
+                                className="block w-full text-left text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                              >
+                                <span className="font-medium text-[var(--text-primary)]">{warning.title}</span>
+                                <span className="ml-2">{warning.message}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {insights?.has_enough_data && (
+                        <div className="border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
+                          <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Edge summary</div>
+                          <div className="mt-3">
+                            <EdgeSummary insights={insights} compact onAskPelican={handleSendMessage} />
+                          </div>
+                        </div>
+                      )}
                     </m.div>
                   )}
-
-                  <m.div variants={sectionReveal} className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-12">
-                    <div className="xl:col-span-8">
-                      <TodaysActions
-                        positions={portfolio.positions}
-                        insights={insights}
-                        warnings={warnings}
-                        earningsWarnings={earningsWarnings}
-                        portfolioStats={portfolio.portfolio}
-                        riskSummary={portfolio.risk}
-                        onAction={handleSendMessage}
-                        onEditPosition={handleEditPosition}
-                      />
-                    </div>
-                    <div className="xl:col-span-4 space-y-3">
-                      <PortfolioOverview
-                        portfolio={portfolio.portfolio}
-                        risk={portfolio.risk}
-                        planCompliance={portfolio.plan_compliance}
-                        positions={portfolio.positions}
-                        isLoading={portfolioLoading}
-                        onSendMessage={handleSendMessage}
-                      />
-                      <PelicanButton variant="ghost" size="sm" onClick={() => setShowPlanModal(true)}>
-                        Manage plan
-                      </PelicanButton>
-                    </div>
-                  </m.div>
-
-                  <m.div variants={sectionReveal} className="mt-4">
-                    <SectionDivider label="Intelligence" />
-                    <div className="mt-1">
-                      <PortfolioIntelligence
-                        positions={portfolio.positions}
-                        portfolio={portfolio.portfolio}
-                        risk={portfolio.risk}
-                        onSendMessage={handleSendMessage}
-                      />
-                    </div>
-                  </m.div>
                 </m.div>
               )}
             </m.div>
