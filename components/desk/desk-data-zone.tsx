@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import dynamicImport from "next/dynamic"
-import { AnimatePresence, m } from "framer-motion"
 import { MarketPulseStrip } from "@/components/morning/market-pulse-strip"
-import { tabContent } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
+import DeskPositions from "./desk-positions"
+import DeskWatchlist from "./desk-watchlist"
+import DeskMovers from "./desk-movers"
+import DeskSectors from "./desk-sectors"
 
 interface DeskDataZoneProps {
   onTickerClick: (ticker: string) => void
@@ -20,26 +21,6 @@ const tabs: Array<{ key: DeskTab; label: string }> = [
   { key: "movers", label: "Movers" },
   { key: "sectors", label: "Sectors" },
 ]
-
-const DeskPositions = dynamicImport(() => import("./desk-positions"), {
-  ssr: false,
-  loading: () => <div className="h-48 rounded-xl bg-[var(--bg-surface)] animate-pulse" />,
-})
-
-const DeskWatchlist = dynamicImport(() => import("./desk-watchlist"), {
-  ssr: false,
-  loading: () => <div className="h-48 rounded-xl bg-[var(--bg-surface)] animate-pulse" />,
-})
-
-const DeskMovers = dynamicImport(() => import("./desk-movers"), {
-  ssr: false,
-  loading: () => <div className="h-48 rounded-xl bg-[var(--bg-surface)] animate-pulse" />,
-})
-
-const DeskSectors = dynamicImport(() => import("./desk-sectors"), {
-  ssr: false,
-  loading: () => <div className="h-48 rounded-xl bg-[var(--bg-surface)] animate-pulse" />,
-})
 
 export default function DeskDataZone({ onTickerClick, onAnalyze }: DeskDataZoneProps) {
   const [activeTab, setActiveTab] = useState<DeskTab>("positions")
@@ -71,31 +52,10 @@ export default function DeskDataZone({ onTickerClick, onAnalyze }: DeskDataZoneP
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden">
-        <AnimatePresence mode="wait">
-          {activeTab === "positions" ? (
-            <m.div key="positions" variants={tabContent} initial="hidden" animate="visible" exit="exit" className="h-full min-h-0">
-              <DeskPositions onAnalyze={onAnalyze} />
-            </m.div>
-          ) : null}
-
-          {activeTab === "watchlist" ? (
-            <m.div key="watchlist" variants={tabContent} initial="hidden" animate="visible" exit="exit" className="h-full min-h-0">
-              <DeskWatchlist onAnalyze={onAnalyze} />
-            </m.div>
-          ) : null}
-
-          {activeTab === "movers" ? (
-            <m.div key="movers" variants={tabContent} initial="hidden" animate="visible" exit="exit" className="h-full min-h-0">
-              <DeskMovers onAnalyze={onAnalyze} />
-            </m.div>
-          ) : null}
-
-          {activeTab === "sectors" ? (
-            <m.div key="sectors" variants={tabContent} initial="hidden" animate="visible" exit="exit" className="h-full min-h-0">
-              <DeskSectors onAnalyze={onAnalyze} />
-            </m.div>
-          ) : null}
-        </AnimatePresence>
+        {activeTab === "positions" && <DeskPositions onTickerClick={onTickerClick} onAnalyze={onAnalyze} />}
+        {activeTab === "watchlist" && <DeskWatchlist onTickerClick={onTickerClick} onAnalyze={onAnalyze} />}
+        {activeTab === "movers" && <DeskMovers onAnalyze={onAnalyze} />}
+        {activeTab === "sectors" && <DeskSectors onAnalyze={onAnalyze} />}
       </div>
     </div>
   )

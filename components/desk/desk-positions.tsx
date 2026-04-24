@@ -7,6 +7,7 @@ import { usePortfolioSummary } from "@/hooks/use-portfolio-summary"
 import { cn } from "@/lib/utils"
 
 interface DeskPositionsProps {
+  onTickerClick: (ticker: string) => void
   onAnalyze: (ticker: string, prompt: string) => void
 }
 
@@ -31,7 +32,7 @@ function formatSignedPercent(value: number | null | undefined): string {
   return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`
 }
 
-export default function DeskPositions({ onAnalyze }: DeskPositionsProps) {
+export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPositionsProps) {
   const { openTrades, isLoading } = useTrades()
   const { data: portfolio } = usePortfolioSummary()
   const tickers = useMemo(() => [...new Set(openTrades.map((trade) => trade.ticker))], [openTrades])
@@ -91,7 +92,11 @@ export default function DeskPositions({ onAnalyze }: DeskPositionsProps) {
   }, [rows])
 
   if (isLoading) {
-    return <div className="h-full bg-[var(--bg-surface)]/40 animate-pulse" />
+    return (
+      <div className="flex h-full min-h-[180px] items-center justify-center bg-[var(--bg-surface)]/40 text-xs text-[var(--text-muted)]">
+        Loading positions...
+      </div>
+    )
   }
 
   if (rows.length === 0) {
@@ -140,7 +145,20 @@ export default function DeskPositions({ onAnalyze }: DeskPositionsProps) {
             {rows.map((row) => (
               <tr
                 key={row.trade.id}
-                onClick={() => onAnalyze(row.trade.ticker, row.prompt)}
+                onClick={() => {
+                  onTickerClick(row.trade.ticker)
+                  onAnalyze(row.trade.ticker, row.prompt)
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault()
+                    onTickerClick(row.trade.ticker)
+                    onAnalyze(row.trade.ticker, row.prompt)
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Analyze ${row.trade.ticker} position`}
                 className="cursor-pointer transition-colors hover:bg-[var(--bg-elevated)]"
               >
                 <td className="px-2 py-1.5 font-[var(--font-geist-mono)] text-xs font-semibold text-[var(--text-primary)]">

@@ -1,24 +1,11 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import dynamicImport from "next/dynamic"
 import { usePelicanPanelContext } from "@/providers/pelican-panel-provider"
 import { trackEvent } from "@/lib/tracking"
-
-const DeskChart = dynamicImport(() => import("@/components/desk/desk-chart"), {
-  ssr: false,
-  loading: () => <div className="h-full bg-[var(--bg-surface)] animate-pulse" />,
-})
-
-const DeskDataZone = dynamicImport(() => import("@/components/desk/desk-data-zone"), {
-  ssr: false,
-  loading: () => <div className="h-full bg-[var(--bg-surface)] animate-pulse" />,
-})
-
-const DeskRightPanel = dynamicImport(() => import("@/components/desk/desk-right-panel"), {
-  ssr: false,
-  loading: () => <div className="h-full bg-[var(--bg-surface)] animate-pulse" />,
-})
+import DeskChart from "@/components/desk/desk-chart"
+import DeskDataZone from "@/components/desk/desk-data-zone"
+import DeskRightPanel from "@/components/desk/desk-right-panel"
 
 export default function DeskPage() {
   const [chartSymbol, setChartSymbol] = useState("SPY")

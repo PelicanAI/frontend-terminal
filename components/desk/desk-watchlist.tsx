@@ -6,6 +6,7 @@ import { useLiveQuotes } from "@/hooks/use-live-quotes"
 import { cn } from "@/lib/utils"
 
 interface DeskWatchlistProps {
+  onTickerClick: (ticker: string) => void
   onAnalyze: (ticker: string, prompt: string) => void
 }
 
@@ -52,7 +53,7 @@ function getAlertState(
   return { label: "", tone: null, rank: 3 }
 }
 
-export default function DeskWatchlist({ onAnalyze }: DeskWatchlistProps) {
+export default function DeskWatchlist({ onTickerClick, onAnalyze }: DeskWatchlistProps) {
   const { items, loading } = useWatchlist()
   const tickers = useMemo(() => items.map((item) => item.ticker), [items])
   const { quotes } = useLiveQuotes(tickers)
@@ -91,7 +92,11 @@ export default function DeskWatchlist({ onAnalyze }: DeskWatchlistProps) {
   }, [items, quotes])
 
   if (loading) {
-    return <div className="h-full bg-[var(--bg-surface)]/40 animate-pulse" />
+    return (
+      <div className="flex h-full min-h-[180px] items-center justify-center bg-[var(--bg-surface)]/40 text-xs text-[var(--text-muted)]">
+        Loading watchlist...
+      </div>
+    )
   }
 
   if (rows.length === 0) {
@@ -118,7 +123,10 @@ export default function DeskWatchlist({ onAnalyze }: DeskWatchlistProps) {
               <button
                 key={row.item.id}
                 type="button"
-                onClick={() => onAnalyze(row.item.ticker, row.prompt)}
+                onClick={() => {
+                  onTickerClick(row.item.ticker)
+                  onAnalyze(row.item.ticker, row.prompt)
+                }}
                 className="grid w-full grid-cols-[1fr_repeat(3,minmax(88px,1fr))] items-center rounded px-2 py-1.5 text-left transition-colors duration-150 hover:bg-[var(--bg-elevated)]"
               >
                 <span className="font-[var(--font-geist-mono)] text-xs font-semibold tabular-nums text-[var(--text-primary)]">

@@ -1,31 +1,14 @@
 "use client"
 
-import dynamicImport from "next/dynamic"
+import PelicanRead from "./pelican-read"
+import CatalystsCard from "./catalysts-card"
+import NewsCard from "./news-card"
+import RadarCard from "./radar-card"
 
 interface DeskRightPanelProps {
   onTickerClick: (ticker: string) => void
   onAnalyze: (ticker: string | null, prompt: string) => void
 }
-
-const PelicanRead = dynamicImport(() => import("./pelican-read"), {
-  ssr: false,
-  loading: () => <div className="h-32 animate-pulse border-b border-[var(--border-subtle)] bg-[var(--bg-base)]/40" />,
-})
-
-const CatalystsCard = dynamicImport(() => import("./catalysts-card"), {
-  ssr: false,
-  loading: () => <div className="h-28 animate-pulse border-b border-[var(--border-subtle)] bg-[var(--bg-base)]/40" />,
-})
-
-const NewsCard = dynamicImport(() => import("./news-card"), {
-  ssr: false,
-  loading: () => <div className="h-20 animate-pulse border-b border-[var(--border-subtle)] bg-[var(--bg-base)]/40" />,
-})
-
-const RadarCard = dynamicImport(() => import("./radar-card"), {
-  ssr: false,
-  loading: () => <div className="flex-1 animate-pulse bg-[var(--bg-base)]/40" />,
-})
 
 export default function DeskRightPanel({ onTickerClick, onAnalyze }: DeskRightPanelProps) {
   return (

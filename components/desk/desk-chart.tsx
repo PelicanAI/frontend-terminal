@@ -1,15 +1,9 @@
 "use client"
 
 import { memo, useCallback, useRef, useState } from "react"
-import dynamicImport from "next/dynamic"
 import { PelicanChartProvider, usePelicanChart } from "@/providers/pelican-chart-provider"
-import type { KlineChartRef } from "./kline-chart"
+import KlineChart, { type KlineChartRef } from "./kline-chart"
 import type { ChartIndicator, OverlayTool, TimeframeKey } from "@/types/chart"
-
-const KlineChart = dynamicImport(() => import("./kline-chart"), {
-  ssr: false,
-  loading: () => <div className="h-full w-full bg-[#0a0a0f] animate-pulse" />,
-})
 
 interface DeskChartProps {
   symbol: string

@@ -29,7 +29,7 @@ interface NavTab {
 // =============================================================================
 
 const NAV_TABS: NavTab[] = [
-  { key: 'desk', label: 'The Desk', href: '/morning', alwaysShow: true },
+  { key: 'desk', label: 'The Desk', href: '/desk', alwaysShow: true },
   { key: 'chat', label: 'Chat', href: '/chat', alwaysShow: true },
   { key: 'portfolio', label: 'Portfolio', href: '/portfolio', alwaysShow: true },
   { key: 'lab', label: 'Lab', href: '/strategies', alwaysShow: true },

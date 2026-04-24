@@ -1,11 +1,5 @@
 import type { Metadata } from "next"
-import dynamicImport from "next/dynamic"
-import Loading from "./loading"
-
-const DeskPage = dynamicImport(() => import("./page.client"), {
-  ssr: false,
-  loading: () => <Loading />,
-})
+import DeskPage from "./page.client"
 
 export const metadata: Metadata = {
   title: "The Desk — Pelican Trading AI",
