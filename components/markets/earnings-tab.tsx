@@ -279,7 +279,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
       {isLoading ? (
         <EarningsGridSkeleton />
       ) : events.length === 0 ? (
-        <EarningsEmptyState variant="no-data" />
+        <EarningsEmptyState variant="no-data" onPreviousWeek={prevWeek} onNextWeek={nextWeek} />
       ) : filteredEvents.length === 0 && hasActiveFilters ? (
         <EarningsEmptyState variant="filtered" onClearFilters={clearFilters} />
       ) : (
