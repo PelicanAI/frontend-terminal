@@ -8,6 +8,7 @@ import { m, AnimatePresence } from "framer-motion"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Add01Icon as Plus,
+  ArrowUpRight01Icon,
   Brain01Icon as Brain,
   Cancel01Icon as XIcon,
   Upload01Icon as UploadSimple,
@@ -236,7 +237,7 @@ function TerminalTabs({
     { label: "Positions", count: positionsCount, active: activeTab === "active", onClick: () => onNavigate("active") },
     { label: "Orders", count: 0, active: false, onClick: undefined },
     { label: "History", count: tradesCount, active: activeTab === "history", onClick: () => onNavigate("history") },
-    { label: "Account", active: false, onClick: onProfile },
+    { label: "Profile", active: false, onClick: onProfile, opensDialog: true },
     { label: "Notifications", count: warningsCount, active: false, onClick: undefined },
   ]
 
@@ -249,8 +250,11 @@ function TerminalTabs({
             type="button"
             onClick={tab.onClick}
             disabled={!tab.onClick}
+            aria-haspopup={tab.opensDialog ? "dialog" : undefined}
+            aria-label={tab.opensDialog ? "Trader profile, opens in modal" : undefined}
+            title={tab.opensDialog ? "Opens trader profile" : undefined}
             className={cn(
-              "min-h-10 shrink-0 border-b px-3 py-2 text-xs font-medium uppercase tracking-[0.08em] transition-colors",
+              "inline-flex min-h-10 shrink-0 items-center border-b px-3 py-2 text-xs font-medium uppercase tracking-[0.08em] transition-colors",
               tab.active
                 ? "border-[var(--accent-primary)] text-[var(--text-primary)]"
                 : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]",
@@ -258,6 +262,15 @@ function TerminalTabs({
             )}
           >
             {tab.label}
+            {tab.opensDialog && (
+              <HugeiconsIcon
+                icon={ArrowUpRight01Icon}
+                className="ml-1 h-3 w-3 opacity-60"
+                strokeWidth={1.5}
+                color="currentColor"
+                aria-hidden
+              />
+            )}
             {tab.count != null && <span className="ml-1 font-mono text-[10px] text-[var(--text-ghost)]">{tab.count}</span>}
           </button>
         ))}
