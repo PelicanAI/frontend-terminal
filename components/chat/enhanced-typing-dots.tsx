@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { m, AnimatePresence } from "framer-motion"
+import Image from "next/image"
+import { m, AnimatePresence, useReducedMotion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { messageVariants } from "@/lib/animation-config"
 
@@ -16,42 +17,56 @@ interface TimedMessage {
 
 const THINKING_MESSAGES: Record<Category, TimedMessage[]> = {
   backtest: [
-    { after: 0, text: "Loading historical data" },
-    { after: 2, text: "Running backtest simulation" },
-    { after: 5, text: "Calculating returns & drawdowns" },
-    { after: 8, text: "Compiling performance report" },
+    { after: 0, text: "Reading the setup" },
+    { after: 2, text: "Finding historical matches" },
+    { after: 6, text: "Running the backtest" },
+    { after: 12, text: "Computing the stats" },
+    { after: 20, text: "Drafting the call" },
+    { after: 35, text: "Almost there" },
   ],
   technical: [
-    { after: 0, text: "Pulling price data" },
-    { after: 2, text: "Running technical indicators" },
-    { after: 5, text: "Analyzing chart patterns" },
-    { after: 8, text: "Forming technical outlook" },
+    { after: 0, text: "Reading your chart question" },
+    { after: 2, text: "Pulling price snapshots" },
+    { after: 6, text: "Scanning the tape" },
+    { after: 12, text: "Cross-checking levels" },
+    { after: 20, text: "Drafting the call" },
+    { after: 35, text: "Almost there" },
   ],
   tick: [
-    { after: 0, text: "Fetching latest quotes" },
-    { after: 2, text: "Checking price action" },
-    { after: 5, text: "Comparing to recent range" },
-    { after: 8, text: "Summarizing price data" },
+    { after: 0, text: "Reading your ticker" },
+    { after: 2, text: "Fetching the quote" },
+    { after: 6, text: "Checking session data" },
+    { after: 12, text: "Comparing recent range" },
+    { after: 20, text: "Drafting the snapshot" },
+    { after: 35, text: "Almost there" },
   ],
   scan: [
-    { after: 0, text: "Scanning the market" },
-    { after: 2, text: "Filtering by criteria" },
-    { after: 5, text: "Ranking top matches" },
-    { after: 8, text: "Preparing results" },
+    { after: 0, text: "Reading your scan" },
+    { after: 2, text: "Pulling market snapshots" },
+    { after: 6, text: "Filtering the tape" },
+    { after: 12, text: "Ranking the matches" },
+    { after: 20, text: "Drafting the shortlist" },
+    { after: 35, text: "Almost there" },
   ],
   macro: [
-    { after: 0, text: "Checking macro landscape" },
-    { after: 2, text: "Reading recent headlines" },
-    { after: 5, text: "Analyzing economic data" },
-    { after: 8, text: "Synthesizing macro view" },
+    { after: 0, text: "Reading the macro question" },
+    { after: 2, text: "Checking market pulse" },
+    { after: 6, text: "Reading recent headlines" },
+    { after: 12, text: "Cross-checking the thesis" },
+    { after: 20, text: "Drafting the view" },
+    { after: 35, text: "Almost there" },
   ],
   default: [
-    { after: 0, text: "Pelican is thinking" },
-    { after: 10, text: "Almost there" },
-    { after: 30, text: "Impressive question — this might take a minute" },
-    { after: 60, text: "Deep analysis in progress — hang tight" },
+    { after: 0, text: "Reading your question" },
+    { after: 2, text: "Pulling market snapshots" },
+    { after: 6, text: "Scanning the tape" },
+    { after: 12, text: "Cross-checking the thesis" },
+    { after: 20, text: "Drafting the call" },
+    { after: 35, text: "Almost there" },
   ],
 }
+
+const EXPECTED_DURATION_SECONDS = 25
 
 // ─── Keyword → category mapping (priority: backtest > technical > tick > scan > macro > default) ──
 const CATEGORY_KEYWORDS: { category: Category; patterns: RegExp }[] = [
@@ -105,6 +120,10 @@ interface EnhancedTypingDotsProps {
   userMessage?: string
   /** Elapsed seconds from the response timer */
   elapsedSeconds?: number
+  /** Hide the Pelican sigil if the surrounding row already renders it. */
+  hideSigil?: boolean
+  /** Hide the timer in compact inline contexts. */
+  hideTimer?: boolean
 }
 
 export function EnhancedTypingDots({
@@ -113,7 +132,10 @@ export function EnhancedTypingDots({
   variant = "default",
   userMessage = "",
   elapsedSeconds = 0,
+  hideSigil = false,
+  hideTimer = false,
 }: EnhancedTypingDotsProps) {
+  const shouldReduceMotion = useReducedMotion()
   const sizeClasses = {
     sm: "w-1.5 h-1.5",
     md: "w-2 h-2",
@@ -139,7 +161,7 @@ export function EnhancedTypingDots({
   }, [elapsedSeconds])
 
   // Fallback for non-context-aware usage
-  const fallbackMessages: Record<string, string> = {
+  const fallbackMessages: Record<NonNullable<EnhancedTypingDotsProps["variant"]>, string> = {
     default: "Pelican is typing",
     thinking: "Pelican is thinking",
     processing: "Processing your request",
@@ -147,6 +169,11 @@ export function EnhancedTypingDots({
 
   const showContextAware = variant === "thinking" && userMessage
   const text = showContextAware ? displayText : fallbackMessages[variant]
+  const progressPct = Math.min(elapsedSeconds / EXPECTED_DURATION_SECONDS, 1)
+  const displaySeconds = elapsedSeconds.toFixed(1)
+  const statusLabel = text.toLowerCase().startsWith("pelican")
+    ? text
+    : `Pelican is ${text.toLowerCase()}`
 
   return (
     <m.div
@@ -155,40 +182,84 @@ export function EnhancedTypingDots({
       exit={messageVariants.thinkingIndicator.exit}
       transition={messageVariants.thinkingIndicator.transition}
       className={cn("flex items-center gap-3", className)}
-      aria-label={text}
+      aria-label={statusLabel}
+      aria-live="polite"
       role="status"
     >
-      <div className="flex items-center gap-1">
-        {[0, 1, 2].map((index) => (
+      {!hideSigil && (
+        <div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
           <m.div
-            key={index}
-            className={cn("bg-current rounded-full", sizeClasses[size])}
-            animate={{
-              y: [0, -8, 0],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 0.6,
-              repeat: Infinity,
-              delay: index * 0.15,
-              ease: [0.4, 0, 0.2, 1],
-            }}
+            aria-hidden
+            className="absolute inset-0 rounded-full bg-[var(--accent-primary)]/25 blur-md"
+            animate={shouldReduceMotion ? undefined : { scale: [0.95, 1.18, 0.95], opacity: [0.25, 0.65, 0.25] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
           />
-        ))}
-      </div>
+          <Image
+            src="/pelican-logo-transparent.webp"
+            alt=""
+            aria-hidden
+            width={32}
+            height={32}
+            className="relative h-7 w-7 object-contain opacity-90"
+          />
+        </div>
+      )}
 
-      <AnimatePresence mode="wait">
-        <m.span
-          key={text}
-          className="text-sm font-medium thinking-shimmer-text"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {text}...
-        </m.span>
-      </AnimatePresence>
+      <div className="relative flex min-h-10 min-w-[min(280px,calc(100vw-6rem))] items-center gap-2.5 overflow-hidden rounded-full border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.18)] backdrop-blur-sm">
+        <m.div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-transparent via-[var(--accent-primary)]/12 to-transparent"
+          animate={shouldReduceMotion ? undefined : { x: ["-130%", "380%"] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <div className="relative flex items-center gap-1">
+          {[0, 1, 2].map((index) => (
+            <m.div
+              key={index}
+              className={cn("rounded-full bg-current text-[var(--accent-primary)]", sizeClasses[size])}
+              animate={shouldReduceMotion ? { opacity: 0.75 } : {
+                opacity: [0.35, 1, 0.35],
+                y: [0, -3, 0],
+              }}
+              transition={{
+                duration: 1.2,
+                repeat: Infinity,
+                delay: index * 0.16,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative flex min-h-5 min-w-0 flex-1 items-center">
+          <AnimatePresence mode="wait">
+            <m.span
+              key={text}
+              className="block truncate text-sm font-medium text-[var(--text-primary)]"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              {text}...
+            </m.span>
+          </AnimatePresence>
+        </div>
+
+        {!hideTimer && (
+          <span className="relative shrink-0 font-mono text-xs tabular-nums text-[var(--text-secondary)]/70">
+            {displaySeconds}s
+          </span>
+        )}
+
+        <m.div
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 left-0 h-px w-full origin-left bg-gradient-to-r from-transparent via-[var(--accent-primary)] to-transparent"
+          animate={{ scaleX: progressPct }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+        />
+      </div>
     </m.div>
   )
 }

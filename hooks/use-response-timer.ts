@@ -23,7 +23,7 @@ export function useResponseTimer(isLoading: boolean): number {
       
       intervalRef.current = setInterval(() => {
         if (startTimeRef.current) {
-          const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
+          const elapsed = Number(((Date.now() - startTimeRef.current) / 1000).toFixed(1))
           setElapsedSeconds(elapsed)
         }
       }, 100) // Update frequently for smooth display

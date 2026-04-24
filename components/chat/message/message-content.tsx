@@ -172,7 +172,7 @@ export const MessageContent = memo(function MessageContent({
   }
 
   if (!safeContent && isStreaming) {
-    return <EnhancedTypingDots variant="thinking" />
+    return <EnhancedTypingDots variant="thinking" hideSigil hideTimer />
   }
 
   if (!safeContent) {
