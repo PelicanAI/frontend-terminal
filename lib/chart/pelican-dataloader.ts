@@ -37,24 +37,25 @@ export function createPelicanDataLoader(callbacks?: DataLoaderCallbacks): DataLo
       const apiParams = periodToApiParams(period)
       const ticker = toPolygonTicker(symbol.ticker)
 
-      let from: string
-      let to: string
+      // For init we let the server pick a sensible, timespan-aware window.
+      // For backward pagination we send an explicit { from, to } anchored at
+      // the timestamp of the oldest bar already loaded.
+      const searchParams = new URLSearchParams({
+        ticker,
+        timespan: apiParams.timespan,
+        multiplier: apiParams.multiplier,
+      })
 
       if (type === 'backward' && timestamp) {
-        // Guard against infinite backward loading
         if (emptyBackwardCount >= MAX_EMPTY_BACKWARD) {
           callback([], false)
           return
         }
         const range = getDateRange(apiParams.daysBack, timestamp)
-        from = range.from
-        to = range.to
+        searchParams.set('from', range.from)
+        searchParams.set('to', range.to)
       } else {
-        // init or forward: load from present
         emptyBackwardCount = 0
-        const range = getDateRange(apiParams.daysBack)
-        from = range.from
-        to = range.to
       }
 
       // Only signal "loading" for the user-visible init load, not silent
@@ -62,14 +63,6 @@ export function createPelicanDataLoader(callbacks?: DataLoaderCallbacks): DataLo
       if (type === 'init') callbacks?.onFetchStart?.()
 
       try {
-        const searchParams = new URLSearchParams({
-          ticker,
-          from,
-          to,
-          timespan: apiParams.timespan,
-          multiplier: apiParams.multiplier,
-        })
-
         const res = await fetch(`/api/candles?${searchParams}`)
         if (!res.ok) {
           let errBody: { error?: string; hint?: string } | null = null

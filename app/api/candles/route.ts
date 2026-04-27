@@ -43,6 +43,40 @@ function isValidTicker(ticker: string): boolean {
   return /^[A-Z0-9.:]{1,20}$/.test(ticker)
 }
 
+function formatUtcDate(d: Date): string {
+  return d.toISOString().slice(0, 10)
+}
+
+/**
+ * Compute a sensible default { from, to } window for a Polygon aggregate
+ * request based on the requested timespan + multiplier. Used when the caller
+ * (dataloader) omits explicit from/to. Windows are tuned wide enough to
+ * survive weekends/holidays without going so far back that Polygon truncates
+ * minute bars at the 50,000-row limit.
+ */
+function computeDateRange(timespan: Timespan, multiplier: string): { from: string; to: string } {
+  const to = new Date()
+  const from = new Date(to)
+  const m = Number.parseInt(multiplier, 10) || 1
+
+  if (timespan === 'minute') {
+    if (m <= 1) from.setUTCDate(from.getUTCDate() - 5)
+    else if (m <= 5) from.setUTCDate(from.getUTCDate() - 30)
+    else if (m <= 15) from.setUTCDate(from.getUTCDate() - 90)
+    else from.setUTCDate(from.getUTCDate() - 180)
+  } else if (timespan === 'hour') {
+    if (m <= 1) from.setUTCFullYear(from.getUTCFullYear() - 1)
+    else from.setUTCFullYear(from.getUTCFullYear() - 2)
+  } else if (timespan === 'day') {
+    from.setUTCFullYear(from.getUTCFullYear() - 5)
+  } else {
+    // week
+    from.setUTCFullYear(from.getUTCFullYear() - 20)
+  }
+
+  return { from: formatUtcDate(from), to: formatUtcDate(to) }
+}
+
 export async function GET(request: NextRequest) {
   try {
     // 1. Auth check
@@ -59,23 +93,37 @@ export async function GET(request: NextRequest) {
     // 3. Parse and validate params
     const { searchParams } = request.nextUrl
     const ticker = searchParams.get('ticker')?.toUpperCase()
-    const from = searchParams.get('from')
-    const to = searchParams.get('to')
+    const fromParam = searchParams.get('from')
+    const toParam = searchParams.get('to')
     const timespan = searchParams.get('timespan') as Timespan | null
     const multiplier = searchParams.get('multiplier') ?? '1'
 
     if (!ticker || !isValidTicker(ticker)) {
       return NextResponse.json({ error: "Invalid ticker" }, { status: 400 })
     }
-    if (!from || !to || !isValidDate(from) || !isValidDate(to)) {
-      return NextResponse.json({ error: "Invalid date range. Use YYYY-MM-DD format." }, { status: 400 })
-    }
     if (!timespan || !VALID_TIMESPANS.has(timespan)) {
-      return NextResponse.json({ error: "Invalid timespan. Use minute, hour, or day." }, { status: 400 })
+      return NextResponse.json({ error: "Invalid timespan. Use minute, hour, day, or week." }, { status: 400 })
     }
     if (!VALID_MULTIPLIERS.has(multiplier)) {
-      return NextResponse.json({ error: "Invalid multiplier. Use 1, 5, or 15." }, { status: 400 })
+      return NextResponse.json(
+        { error: "Invalid multiplier. Use 1, 4, 5, 15, or 30." },
+        { status: 400 }
+      )
     }
+    // from/to are optional. When provided, both must be valid YYYY-MM-DD.
+    // When omitted, the server computes a timespan-aware window.
+    const explicitRange = fromParam !== null || toParam !== null
+    if (explicitRange) {
+      if (!fromParam || !toParam || !isValidDate(fromParam) || !isValidDate(toParam)) {
+        return NextResponse.json(
+          { error: "Invalid date range. Use YYYY-MM-DD format for both from and to, or omit both for defaults." },
+          { status: 400 }
+        )
+      }
+    }
+    const { from, to } = explicitRange
+      ? { from: fromParam as string, to: toParam as string }
+      : computeDateRange(timespan, multiplier)
 
     if (!POLYGON_API_KEY) {
       return NextResponse.json(
