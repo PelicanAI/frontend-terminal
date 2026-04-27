@@ -1,3 +1,9 @@
+/**
+ * /api/candles — Polygon aggregates proxy for the /desk K-line chart.
+ *
+ * Required env: POLYGON_API_KEY (see .env.example for setup instructions).
+ * Returns 503 with a hint when the key is missing.
+ */
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
@@ -72,7 +78,13 @@ export async function GET(request: NextRequest) {
     }
 
     if (!POLYGON_API_KEY) {
-      return NextResponse.json({ error: "Market data unavailable" }, { status: 503 })
+      return NextResponse.json(
+        {
+          error: "POLYGON_API_KEY not configured",
+          hint: "Set POLYGON_API_KEY in .env.local (local) or Vercel env (prod). Restart dev server after setting.",
+        },
+        { status: 503 }
+      )
     }
 
     // 4. Fetch from Polygon

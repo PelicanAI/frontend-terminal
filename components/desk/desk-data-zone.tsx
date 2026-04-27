@@ -54,8 +54,8 @@ export default function DeskDataZone({ onTickerClick, onAnalyze }: DeskDataZoneP
       <div className="min-h-0 flex-1 overflow-hidden">
         {activeTab === "positions" && <DeskPositions onTickerClick={onTickerClick} onAnalyze={onAnalyze} />}
         {activeTab === "watchlist" && <DeskWatchlist onTickerClick={onTickerClick} onAnalyze={onAnalyze} />}
-        {activeTab === "movers" && <DeskMovers onAnalyze={onAnalyze} />}
-        {activeTab === "sectors" && <DeskSectors onAnalyze={onAnalyze} />}
+        {activeTab === "movers" && <DeskMovers onTickerClick={onTickerClick} onAnalyze={onAnalyze} />}
+        {activeTab === "sectors" && <DeskSectors onTickerClick={onTickerClick} onAnalyze={onAnalyze} />}
       </div>
     </div>
   )

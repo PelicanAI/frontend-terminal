@@ -9,7 +9,19 @@ import { logger } from '@/lib/logger'
 /** Maximum consecutive empty responses before stopping backward loading */
 const MAX_EMPTY_BACKWARD = 2
 
-export function createPelicanDataLoader(): DataLoader {
+export interface DataLoaderFetchError {
+  status?: number
+  message: string
+  hint?: string
+}
+
+export interface DataLoaderCallbacks {
+  onFetchStart?: () => void
+  onFetchSuccess?: (barCount: number) => void
+  onFetchError?: (error: DataLoaderFetchError) => void
+}
+
+export function createPelicanDataLoader(callbacks?: DataLoaderCallbacks): DataLoader {
   let emptyBackwardCount = 0
 
   return {
@@ -45,6 +57,10 @@ export function createPelicanDataLoader(): DataLoader {
         to = range.to
       }
 
+      // Only signal "loading" for the user-visible init load, not silent
+      // backward pagination — that would flicker the spinner on every scroll.
+      if (type === 'init') callbacks?.onFetchStart?.()
+
       try {
         const searchParams = new URLSearchParams({
           ticker,
@@ -56,7 +72,20 @@ export function createPelicanDataLoader(): DataLoader {
 
         const res = await fetch(`/api/candles?${searchParams}`)
         if (!res.ok) {
+          let errBody: { error?: string; hint?: string } | null = null
+          try {
+            errBody = (await res.json()) as { error?: string; hint?: string }
+          } catch {
+            errBody = null
+          }
           logger.error('DataLoader fetch failed', undefined, { status: res.status, ticker })
+          if (type === 'init') {
+            callbacks?.onFetchError?.({
+              status: res.status,
+              message: errBody?.error ?? `Request failed (${res.status})`,
+              hint: errBody?.hint,
+            })
+          }
           callback([], false)
           return
         }
@@ -67,12 +96,15 @@ export function createPelicanDataLoader(): DataLoader {
 
         if (bars.length === 0) {
           if (type === 'backward') emptyBackwardCount++
+          if (type === 'init') callbacks?.onFetchSuccess?.(0)
           callback([], false)
           return
         }
 
         // Reset counter on successful backward load
         if (type === 'backward') emptyBackwardCount = 0
+
+        if (type === 'init') callbacks?.onFetchSuccess?.(bars.length)
 
         // Signal whether more data is available
         const more = type === 'init'
@@ -84,6 +116,11 @@ export function createPelicanDataLoader(): DataLoader {
         callback(bars, more)
       } catch (err) {
         logger.error('DataLoader error', err instanceof Error ? err : undefined, { ticker })
+        if (type === 'init') {
+          callbacks?.onFetchError?.({
+            message: err instanceof Error ? err.message : 'Network error',
+          })
+        }
         callback([], false)
       }
     },

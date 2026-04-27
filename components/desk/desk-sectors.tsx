@@ -2,13 +2,15 @@
 
 import { useMemo } from "react"
 import { useMarketData } from "@/hooks/use-market-data"
+import { sectorNameToEtf } from "@/lib/desk/sector-etfs"
 import { cn } from "@/lib/utils"
 
 interface DeskSectorsProps {
   onAnalyze: (ticker: string | null, prompt: string) => void
+  onTickerClick?: (ticker: string) => void
 }
 
-export default function DeskSectors({ onAnalyze }: DeskSectorsProps) {
+export default function DeskSectors({ onAnalyze, onTickerClick }: DeskSectorsProps) {
   const { sectors, isLoading } = useMarketData({ refreshInterval: 60000, autoRefresh: true })
   const sortedSectors = useMemo(
     () => [...sectors].sort((a, b) => Math.abs(b.changePercent ?? 0) - Math.abs(a.changePercent ?? 0)),
@@ -27,7 +29,9 @@ export default function DeskSectors({ onAnalyze }: DeskSectorsProps) {
             key={sector.name}
             type="button"
             onClick={() => {
-              onAnalyze(null, `How is the ${sector.name} sector performing today? What is driving the move, which tickers are leading it, and how should I frame it versus the broader tape?`)
+              const etf = sectorNameToEtf(sector.name)
+              if (etf) onTickerClick?.(etf)
+              onAnalyze(etf, `How is the ${sector.name} sector performing today? What is driving the move, which tickers are leading it, and how should I frame it versus the broader tape?`)
             }}
             className="flex items-center justify-between rounded border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-2 py-2 text-left transition-colors hover:bg-[var(--bg-elevated)]"
           >

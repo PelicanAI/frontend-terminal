@@ -144,8 +144,8 @@ const KlineChart = forwardRef<KlineChartRef, KlineChartProps>(
     const containerRef = useRef<HTMLDivElement>(null)
     const chartRef = useRef<Chart | null>(null)
     const { activeTool, indicators, chartRef: ctxChartRef } = usePelicanChart()
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+    const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle")
+    const [errorInfo, setErrorInfo] = useState<{ message: string; hint?: string } | null>(null)
     const prevIndicatorsRef = useRef<ChartIndicator[]>([])
     const indicatorPaneIdsRef = useRef<Map<string, string>>(new Map())
 
@@ -172,8 +172,32 @@ const KlineChart = forwardRef<KlineChartRef, KlineChartProps>(
       chartRef.current = chart
       ctxChartRef.current = chart
 
-      // Set up DataLoader
-      chart.setDataLoader(createPelicanDataLoader())
+      // Set up DataLoader with status callbacks. The loader fires onFetchStart
+      // before the network request, onFetchSuccess on a 200 (with bar count —
+      // 0 means the symbol returned no data), onFetchError on any non-2xx or
+      // network failure. Only the user-visible init fetch reports — silent
+      // backward pagination does not toggle this state.
+      chart.setDataLoader(
+        createPelicanDataLoader({
+          onFetchStart: () => {
+            setStatus("loading")
+            setErrorInfo(null)
+          },
+          onFetchSuccess: (count) => {
+            if (count === 0) {
+              setStatus("error")
+              setErrorInfo({ message: "No data for this symbol or range" })
+            } else {
+              setStatus("ready")
+              setErrorInfo(null)
+            }
+          },
+          onFetchError: (err) => {
+            setStatus("error")
+            setErrorInfo({ message: err.message, hint: err.hint })
+          },
+        })
+      )
 
       // Volume pane
       chart.createIndicator("VOL", false, { id: "volume_pane", height: 80 })
@@ -194,8 +218,6 @@ const KlineChart = forwardRef<KlineChartRef, KlineChartProps>(
       })
       chart.setPeriod(PERIOD_MAP[timeframe] as { type: "day"; span: number })
 
-      setLoading(false)
-
       return () => {
         ro.disconnect()
         dispose(container)
@@ -205,13 +227,22 @@ const KlineChart = forwardRef<KlineChartRef, KlineChartProps>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    /* ── ticker changes ── */
+    /* ── ticker changes ──
+     * klinecharts v10 contract: chart.setSymbol() automatically re-invokes the
+     * registered DataLoader.getBars with type "init", so no explicit
+     * applyNewData([]) reset is required.
+     *
+     * Source: https://klinecharts.com/en-US/api/instance/setDataLoader —
+     * "Get data, which will be triggered when setting the trading pair
+     * information, setting the period and dragging the chart to the left or
+     * right boundary."
+     *
+     * Loading/error UI is driven by the DataLoader's onFetchStart /
+     * onFetchSuccess / onFetchError callbacks, not by toggling state here.
+     */
     useEffect(() => {
       const chart = chartRef.current
       if (!chart) return
-
-      setLoading(true)
-      setError(null)
 
       const normalized = normalizeTicker(ticker)
       const pricePrecision = normalized?.assetType === "forex" ? 5 : 2
@@ -221,8 +252,6 @@ const KlineChart = forwardRef<KlineChartRef, KlineChartProps>(
         pricePrecision,
         volumePrecision: 0,
       })
-
-      setLoading(false)
     }, [ticker])
 
     /* ── timeframe changes ── */
@@ -282,9 +311,8 @@ const KlineChart = forwardRef<KlineChartRef, KlineChartProps>(
     const handleRetry = useCallback(() => {
       const chart = chartRef.current
       if (!chart) return
-      setError(null)
-      setLoading(true)
-      // Re-set symbol to trigger a fresh data load
+      // Re-set symbol to trigger a fresh data load. Loading/error state will
+      // be updated by the DataLoader callbacks.
       const normalized = normalizeTicker(ticker)
       const pricePrecision = normalized?.assetType === "forex" ? 5 : 2
       chart.setSymbol({
@@ -292,26 +320,28 @@ const KlineChart = forwardRef<KlineChartRef, KlineChartProps>(
         pricePrecision,
         volumePrecision: 0,
       })
-      setLoading(false)
     }, [ticker])
 
     return (
-      <div className="relative h-full w-full bg-[#0a0a0f]">
+      <div className="relative h-full w-full bg-background">
         <div ref={containerRef} className="h-full w-full" />
 
-        {loading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f]/80">
+        {status === "loading" && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-sm">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-primary)] border-t-transparent" />
           </div>
         )}
 
-        {error && !loading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#0a0a0f]/90">
-            <div className="flex flex-col items-center gap-2 text-center">
-              <span className="text-sm text-[var(--text-muted)]">{error}</span>
+        {status === "error" && errorInfo && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/80 backdrop-blur-sm">
+            <div className="flex max-w-sm flex-col items-center gap-2 px-6 text-center">
+              <span className="text-sm font-medium text-foreground">{errorInfo.message}</span>
+              {errorInfo.hint && (
+                <span className="text-xs text-muted-foreground">{errorInfo.hint}</span>
+              )}
               <button
                 onClick={handleRetry}
-                className="rounded-md bg-[var(--accent-primary)] px-3 py-1 text-xs text-white transition-colors hover:bg-[var(--accent-hover)]"
+                className="mt-1 rounded-md bg-[var(--accent-primary)] px-3 py-1 text-xs font-medium text-foreground transition-colors hover:bg-[var(--accent-hover)]"
               >
                 Retry
               </button>
