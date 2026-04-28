@@ -149,6 +149,8 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
   }
 
   const subtitle = useMemo(() => {
+    if (isLoading) return "Loading earnings reports..."
+
     const parts: string[] = [`${stats.total} reports`]
     if (stats.reported > 0) {
       parts.push(`${stats.reported} reported (${Math.round(stats.beatRate * 100)}% beat)`)
@@ -157,7 +159,7 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
       parts.push(`${stats.portfolioOverlap} in your portfolio`)
     }
     return parts.join(" · ")
-  }, [stats])
+  }, [isLoading, stats])
 
   const renderDayColumn = (day: typeof weekDays[0], i: number) => {
     const dayEvents = getEventsForDate(day.dateStr)
