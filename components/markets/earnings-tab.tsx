@@ -17,6 +17,7 @@ import { EarningsFilters } from "@/components/earnings/earnings-filters"
 import { EarningsGridSkeleton } from "@/components/earnings/earnings-grid-skeleton"
 import { EarningsSection } from "@/components/earnings/earnings-section"
 import { EarningsSpotlight } from "@/components/earnings/earnings-spotlight"
+import { PressScale } from "@/components/motion/press-scale"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { PelicanButton, staggerContainer, staggerItem } from "@/components/ui/pelican"
 import { cn } from "@/lib/utils"
@@ -233,33 +234,41 @@ What are the key things to watch? Any whisper numbers or sentiment shifts? How h
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
           <div className="flex items-center gap-2">
             <IconTooltip label="Previous week" side="bottom">
-              <PelicanButton variant="ghost" size="sm" onClick={prevWeek} className="min-h-[44px] min-w-[44px]">
-                <HugeiconsIcon icon={CaretLeft} className="h-4 w-4" strokeWidth={2} color="currentColor" />
-              </PelicanButton>
+              <PressScale>
+                <PelicanButton variant="ghost" size="sm" onClick={prevWeek} className="min-h-[44px] min-w-[44px]">
+                  <HugeiconsIcon icon={CaretLeft} className="h-4 w-4" strokeWidth={2} color="currentColor" />
+                </PelicanButton>
+              </PressScale>
             </IconTooltip>
             <span className="min-w-[220px] text-center text-sm font-medium text-[var(--text-primary)]">{formatWeekRange()}</span>
             <IconTooltip label="Next week" side="bottom">
-              <PelicanButton variant="ghost" size="sm" onClick={nextWeek} className="min-h-[44px] min-w-[44px]">
-                <HugeiconsIcon icon={CaretRight} className="h-4 w-4" strokeWidth={2} color="currentColor" />
-              </PelicanButton>
+              <PressScale>
+                <PelicanButton variant="ghost" size="sm" onClick={nextWeek} className="min-h-[44px] min-w-[44px]">
+                  <HugeiconsIcon icon={CaretRight} className="h-4 w-4" strokeWidth={2} color="currentColor" />
+                </PelicanButton>
+              </PressScale>
             </IconTooltip>
             {weekOffset !== 0 && (
-              <PelicanButton variant="secondary" size="sm" onClick={goToThisWeek} className="min-h-[44px]">
-                This Week
-              </PelicanButton>
+              <PressScale>
+                <PelicanButton variant="secondary" size="sm" onClick={goToThisWeek} className="min-h-[44px]">
+                  This Week
+                </PelicanButton>
+              </PressScale>
             )}
           </div>
 
           <IconTooltip label="Refresh" side="bottom">
-            <PelicanButton
-              variant="ghost"
-              size="sm"
-              onClick={() => refetch()}
-              disabled={isLoading}
-              className="min-h-[44px] min-w-[44px]"
-            >
-              <HugeiconsIcon icon={ArrowsClockwise} className={cn("h-4 w-4", isLoading && "animate-spin")} strokeWidth={1.5} color="currentColor" />
-            </PelicanButton>
+            <PressScale disabled={isLoading}>
+              <PelicanButton
+                variant="ghost"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isLoading}
+                className="min-h-[44px] min-w-[44px]"
+              >
+                <HugeiconsIcon icon={ArrowsClockwise} className={cn("h-4 w-4", isLoading && "animate-spin")} strokeWidth={1.5} color="currentColor" />
+              </PelicanButton>
+            </PressScale>
           </IconTooltip>
         </div>
       </div>

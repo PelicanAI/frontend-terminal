@@ -9,6 +9,8 @@ import {
   MinusSignIcon as Minus,
   Bookmark01Icon as BookmarkSimple,
 } from "@hugeicons/core-free-icons"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PriceFlash } from "@/components/motion/price-flash"
 
 interface HeatmapGridProps {
   stocks: HeatmapStock[]
@@ -67,7 +69,11 @@ export function HeatmapGrid({ stocks, onStockClick, market, watchlistTickers, ad
             {/* Change Percent */}
             <div className="flex items-center justify-between gap-1">
               <span className={`font-mono text-xs font-medium ${colors.text}`}>
-                {formatChangePercent(stock.changePercent)}
+                {stock.changePercent == null ? formatChangePercent(stock.changePercent) : (
+                  <PriceFlash value={stock.changePercent} direction={stock.changePercent >= 0 ? "up" : "down"}>
+                    <NumberTicker value={stock.changePercent} format={(value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`} />
+                  </PriceFlash>
+                )}
               </span>
               {isPositive && <HugeiconsIcon icon={ArrowUp} size={12} className="text-green-400" strokeWidth={1.5} color="currentColor" />}
               {isNegative && <HugeiconsIcon icon={ArrowDown} size={12} className="text-red-400" strokeWidth={1.5} color="currentColor" />}
@@ -77,7 +83,9 @@ export function HeatmapGrid({ stocks, onStockClick, market, watchlistTickers, ad
             {/* Price */}
             {stock.price !== null && (
               <div className="mt-1 text-[10px] text-foreground/50 font-mono tabular-nums">
-                {formatGridPrice(stock.price, market)}
+                <PriceFlash value={stock.price}>
+                  <NumberTicker value={stock.price} format={(value) => formatGridPrice(value, market)} />
+                </PriceFlash>
               </div>
             )}
 

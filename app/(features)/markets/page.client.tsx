@@ -4,14 +4,8 @@ import { Suspense, useCallback, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import dynamicImport from "next/dynamic"
 import { AnimatePresence, m } from "framer-motion"
-import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  Calendar03Icon as Calendar,
-  ChartLineData01Icon as ChartLine,
-  GridViewIcon as GridFour,
-} from "@hugeicons/core-free-icons"
+import { TabIndicator } from "@/components/motion/tab-indicator"
 import { tabContent } from "@/components/ui/pelican"
-import { cn } from "@/lib/utils"
 
 const HeatmapTab = dynamicImport(() => import("@/components/markets/heatmap-tab"), {
   ssr: false,
@@ -60,10 +54,10 @@ const TAB_ALIASES: Record<string, MarketsTab> = {
   calendar: "earnings",
 }
 
-const tabs: { key: MarketsTab; label: string; icon: typeof GridFour }[] = [
-  { key: "heatmap", label: "Heatmap", icon: GridFour },
-  { key: "correlations", label: "Correlations", icon: ChartLine },
-  { key: "earnings", label: "Earnings", icon: Calendar },
+const tabs: { key: MarketsTab; label: string }[] = [
+  { key: "heatmap", label: "Heatmap" },
+  { key: "correlations", label: "Correlations" },
+  { key: "earnings", label: "Earnings" },
 ]
 
 function resolveMarketsTab(tabParam: string | null): MarketsTab {
@@ -115,27 +109,12 @@ function MarketsPageInner() {
           </p>
         </div>
 
-        <div className="mb-5 flex items-center gap-1 overflow-x-auto scrollbar-hide">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => navigateToTab(tab.key)}
-              className={cn(
-                "relative flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150",
-                activeTab === tab.key
-                  ? "bg-[var(--surface-hover)] text-[var(--text-primary)]"
-                  : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
-              )}
-            >
-              <HugeiconsIcon icon={tab.icon} size={14} strokeWidth={1.5} color="currentColor" />
-              {tab.label}
-              {activeTab === tab.key && (
-                <span className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-[var(--accent-primary)]" />
-              )}
-            </button>
-          ))}
-        </div>
+        <TabIndicator
+          tabs={tabs.map((tab) => ({ id: tab.key, label: tab.label }))}
+          activeId={activeTab}
+          onChange={(id) => navigateToTab(id as MarketsTab)}
+          className="mb-5 overflow-x-auto scrollbar-hide border-[var(--border-default)]"
+        />
 
         <AnimatePresence mode="wait">
           {activeTab === "heatmap" && (

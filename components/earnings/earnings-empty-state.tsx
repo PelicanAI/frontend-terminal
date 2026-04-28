@@ -7,6 +7,7 @@ import {
   Calendar03Icon as CalendarBlank,
   FilterIcon as Funnel,
 } from "@hugeicons/core-free-icons"
+import { PressScale } from "@/components/motion/press-scale"
 import { PelicanButton } from "@/components/ui/pelican"
 
 interface EarningsEmptyStateProps {
@@ -35,16 +36,20 @@ export function EarningsEmptyState({
         {(onPreviousWeek || onNextWeek) && (
           <div className="flex flex-col items-center gap-2 sm:flex-row">
             {onPreviousWeek && (
-              <PelicanButton variant="secondary" size="sm" onClick={onPreviousWeek}>
-                <HugeiconsIcon icon={CaretLeft} className="h-4 w-4" strokeWidth={2} color="currentColor" />
-                Previous week
-              </PelicanButton>
+              <PressScale>
+                <PelicanButton variant="secondary" size="sm" onClick={onPreviousWeek}>
+                  <HugeiconsIcon icon={CaretLeft} className="h-4 w-4" strokeWidth={2} color="currentColor" />
+                  Previous week
+                </PelicanButton>
+              </PressScale>
             )}
             {onNextWeek && (
-              <PelicanButton variant="secondary" size="sm" onClick={onNextWeek}>
-                Next week
-                <HugeiconsIcon icon={CaretRight} className="h-4 w-4" strokeWidth={2} color="currentColor" />
-              </PelicanButton>
+              <PressScale>
+                <PelicanButton variant="secondary" size="sm" onClick={onNextWeek}>
+                  Next week
+                  <HugeiconsIcon icon={CaretRight} className="h-4 w-4" strokeWidth={2} color="currentColor" />
+                </PelicanButton>
+              </PressScale>
             )}
           </div>
         )}
@@ -62,9 +67,11 @@ export function EarningsEmptyState({
         Try adjusting your filters or search term to see more results.
       </p>
       {onClearFilters && (
-        <PelicanButton variant="secondary" size="sm" onClick={onClearFilters}>
-          Clear filters
-        </PelicanButton>
+        <PressScale>
+          <PelicanButton variant="secondary" size="sm" onClick={onClearFilters}>
+            Clear filters
+          </PelicanButton>
+        </PressScale>
       )}
     </div>
   )

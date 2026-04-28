@@ -10,6 +10,7 @@ import {
   FlashIcon as Lightning,
 } from '@hugeicons/core-free-icons'
 import { findSignalForPair } from '@/lib/correlation-signals'
+import { PressScale } from '@/components/motion/press-scale'
 import { detectDynamicSignals, type DynamicSignal } from '@/lib/correlations/dynamic-signals'
 import { usePelicanPanelContext } from '@/providers/pelican-panel-provider'
 import { trackEvent } from '@/lib/tracking'
@@ -122,20 +123,24 @@ export function SignalCards({ correlations, correlations90d, beginnerMode, onSel
               </p>
 
               <div className="flex items-center gap-3">
-                <button
-                  className="text-xs flex items-center gap-1 transition-colors hover:opacity-80"
-                  style={{ color: 'var(--accent-indigo)' }}
-                  onClick={() => onSelectPair(sig.pair[0], sig.pair[1])}
-                >
-                  View Details <HugeiconsIcon icon={ArrowRight} className="w-3 h-3" strokeWidth={2} color="currentColor" />
-                </button>
-                <button
-                  className="text-xs flex items-center gap-1 transition-colors hover:opacity-80"
-                  style={{ color: 'var(--accent-indigo)' }}
-                  onClick={() => handleAskPelican(sig)}
-                >
-                  <HugeiconsIcon icon={Lightning} className="w-3 h-3" strokeWidth={2} color="currentColor" /> Ask Pelican
-                </button>
+                <PressScale>
+                  <button
+                    className="text-xs flex items-center gap-1 transition-colors hover:opacity-80"
+                    style={{ color: 'var(--accent-indigo)' }}
+                    onClick={() => onSelectPair(sig.pair[0], sig.pair[1])}
+                  >
+                    View Details <HugeiconsIcon icon={ArrowRight} className="w-3 h-3" strokeWidth={2} color="currentColor" />
+                  </button>
+                </PressScale>
+                <PressScale>
+                  <button
+                    className="text-xs flex items-center gap-1 transition-colors hover:opacity-80"
+                    style={{ color: 'var(--accent-indigo)' }}
+                    onClick={() => handleAskPelican(sig)}
+                  >
+                    <HugeiconsIcon icon={Lightning} className="w-3 h-3" strokeWidth={2} color="currentColor" /> Ask Pelican
+                  </button>
+                </PressScale>
               </div>
             </div>
           )

@@ -27,6 +27,7 @@ import { PairDetailPanel } from "@/components/correlations/pair-detail-panel"
 import { PortfolioCorrelations } from "@/components/correlations/portfolio-correlations"
 import { RegimeBanner } from "@/components/correlations/regime-banner"
 import { SignalCards } from "@/components/correlations/signal-cards"
+import { PressScale } from "@/components/motion/press-scale"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { getStaleness, type StalenessLevel } from "@/lib/markets/staleness"
 
@@ -75,25 +76,27 @@ function StaleDataBanner({ calculatedAt, isRefreshing, onRefresh }: StaleDataBan
           </p>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onRefresh}
-        disabled={isRefreshing}
-        className="inline-flex min-h-[36px] items-center justify-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.98]"
-        style={{
-          borderColor: "color-mix(in srgb, var(--data-warning) 55%, transparent)",
-          color: "var(--text-primary)",
-          background: "transparent",
-        }}
-      >
-        <HugeiconsIcon
-          icon={ArrowsClockwise}
-          className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`}
-          strokeWidth={2}
-          color="currentColor"
-        />
-        Refresh now
-      </button>
+      <PressScale disabled={isRefreshing}>
+        <button
+          type="button"
+          onClick={onRefresh}
+          disabled={isRefreshing}
+          className="inline-flex min-h-[36px] items-center justify-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60"
+          style={{
+            borderColor: "color-mix(in srgb, var(--data-warning) 55%, transparent)",
+            color: "var(--text-primary)",
+            background: "transparent",
+          }}
+        >
+          <HugeiconsIcon
+            icon={ArrowsClockwise}
+            className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`}
+            strokeWidth={2}
+            color="currentColor"
+          />
+          Refresh now
+        </button>
+      </PressScale>
     </div>
   )
 }
@@ -244,36 +247,40 @@ export default function CorrelationsTab() {
 
       <div className="mb-4 flex items-center gap-4">
         <div className="flex gap-1 rounded-lg p-0.5" style={{ background: "var(--bg-base)" }}>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("market")
-              setSelectedPair(null)
-            }}
-            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
-            style={{
-              background: activeTab === "market" ? "var(--accent-indigo)" : "transparent",
-              color: activeTab === "market" ? "white" : "var(--text-secondary)",
-            }}
-          >
-            <HugeiconsIcon icon={ChartLineUp} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />
-            Market Matrix
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("portfolio")
-              setSelectedPair(null)
-            }}
-            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
-            style={{
-              background: activeTab === "portfolio" ? "var(--accent-indigo)" : "transparent",
-              color: activeTab === "portfolio" ? "white" : "var(--text-secondary)",
-            }}
-          >
-            <HugeiconsIcon icon={Briefcase} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />
-            My Portfolio
-          </button>
+          <PressScale>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("market")
+                setSelectedPair(null)
+              }}
+              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+              style={{
+                background: activeTab === "market" ? "var(--accent-indigo)" : "transparent",
+                color: activeTab === "market" ? "white" : "var(--text-secondary)",
+              }}
+            >
+              <HugeiconsIcon icon={ChartLineUp} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />
+              Market Matrix
+            </button>
+          </PressScale>
+          <PressScale>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("portfolio")
+                setSelectedPair(null)
+              }}
+              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+              style={{
+                background: activeTab === "portfolio" ? "var(--accent-indigo)" : "transparent",
+                color: activeTab === "portfolio" ? "white" : "var(--text-secondary)",
+              }}
+            >
+              <HugeiconsIcon icon={Briefcase} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />
+              My Portfolio
+            </button>
+          </PressScale>
         </div>
       </div>
 
@@ -281,38 +288,41 @@ export default function CorrelationsTab() {
         <div className="mb-4 flex items-center justify-between">
           <div className="flex gap-1 rounded-lg p-0.5" style={{ background: "var(--bg-base)" }}>
             {(["30d", "90d", "1y"] as const).map((value) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setPeriod(value)}
-                className="rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
-                style={{
-                  background: period === value ? "var(--accent-indigo)" : "transparent",
-                  color: period === value ? "white" : "var(--text-secondary)",
-                }}
-              >
-                {value === "1y" ? "1 Year" : value === "90d" ? "90 Day" : "30 Day"}
-              </button>
+              <PressScale key={value}>
+                <button
+                  type="button"
+                  onClick={() => setPeriod(value)}
+                  className="rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+                  style={{
+                    background: period === value ? "var(--accent-indigo)" : "transparent",
+                    color: period === value ? "white" : "var(--text-secondary)",
+                  }}
+                >
+                  {value === "1y" ? "1 Year" : value === "90d" ? "90 Day" : "30 Day"}
+                </button>
+              </PressScale>
             ))}
           </div>
 
           <div className="flex items-center gap-2">
             <BeginnerToggle value={beginnerMode} onChange={setBeginnerMode} />
             <IconTooltip label="Recalculate correlations" side="bottom">
-              <button
-                type="button"
-                onClick={handleCalculate}
-                disabled={calculating}
-                className="rounded-lg p-1.5 transition-colors"
-                style={{ color: "var(--text-muted)", background: "var(--bg-base)" }}
-              >
-                <HugeiconsIcon
-                  icon={ArrowsClockwise}
-                  className={`h-4 w-4 ${calculating ? "animate-spin" : ""}`}
-                  strokeWidth={2}
-                  color="currentColor"
-                />
-              </button>
+              <PressScale disabled={calculating}>
+                <button
+                  type="button"
+                  onClick={handleCalculate}
+                  disabled={calculating}
+                  className="rounded-lg p-1.5 transition-colors"
+                  style={{ color: "var(--text-muted)", background: "var(--bg-base)" }}
+                >
+                  <HugeiconsIcon
+                    icon={ArrowsClockwise}
+                    className={`h-4 w-4 ${calculating ? "animate-spin" : ""}`}
+                    strokeWidth={2}
+                    color="currentColor"
+                  />
+                </button>
+              </PressScale>
             </IconTooltip>
           </div>
         </div>

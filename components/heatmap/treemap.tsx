@@ -4,6 +4,8 @@ import { useMemo, useState, useCallback, useEffect, useRef } from "react"
 import { treemap, hierarchy } from "d3-hierarchy"
 import type { HeatmapStock } from "@/app/api/heatmap/route"
 import { formatChangePercent } from "@/hooks/use-heatmap"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PriceFlash } from "@/components/motion/price-flash"
 import { HeatmapTooltip, type TooltipData } from "./heatmap-tooltip"
 import { cn } from "@/lib/utils"
 
@@ -354,7 +356,11 @@ export function Treemap({
                       className="font-mono leading-tight tabular-nums"
                       style={{ fontSize: `${changeSize}px`, opacity: 0.85 }}
                     >
-                      {formatChangePercent(stock.changePercent)}
+                      {stock.changePercent == null ? formatChangePercent(stock.changePercent) : (
+                        <PriceFlash value={stock.changePercent} direction={stock.changePercent >= 0 ? "up" : "down"}>
+                          <NumberTicker value={stock.changePercent} format={(value) => `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`} />
+                        </PriceFlash>
+                      )}
                     </span>
                   )}
                 </>

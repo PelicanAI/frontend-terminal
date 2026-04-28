@@ -25,9 +25,13 @@ import {
   Target01Icon as Crosshair,
 } from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PressScale } from "@/components/motion/press-scale"
+import { PriceFlash } from "@/components/motion/price-flash"
 import { useOnboardingProgress } from "@/hooks/use-onboarding-progress"
 import { getMarketStatus } from "@/hooks/use-market-data"
 import { DataCell } from "@/components/ui/pelican"
+import { fmt } from "@/lib/motion"
 import type { HeatmapStock } from "@/app/api/heatmap/route"
 import { cn } from "@/lib/utils"
 import { trackEvent } from "@/lib/tracking"
@@ -456,19 +460,20 @@ function HeatmapTabInner() {
       <div className="flex-shrink-0 border-b border-[var(--border-subtle)] bg-gradient-to-b from-white/[0.03] to-transparent px-6 py-4">
         <div className="mb-3 flex w-fit items-center gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] p-0.5">
           {marketTabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => handleMarketChange(tab.id)}
-              className={cn(
-                "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
-                activeMarket === tab.id
-                  ? "bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm"
-                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-              )}
-            >
-              {tab.label}
-            </button>
+            <PressScale key={tab.id}>
+              <button
+                type="button"
+                onClick={() => handleMarketChange(tab.id)}
+                className={cn(
+                  "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+                  activeMarket === tab.id
+                    ? "bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                )}
+              >
+                {tab.label}
+              </button>
+            </PressScale>
           ))}
         </div>
 
@@ -481,65 +486,72 @@ function HeatmapTabInner() {
             {activeMarket === "stocks" && (
               <div className="flex items-center gap-0.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] p-0.5">
                 {TIMEFRAMES.map((tf) => (
-                  <button
-                    key={tf.value}
-                    type="button"
-                    onClick={() => setTimeframe(tf.value)}
-                    className={cn(
-                      "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                      timeframe === tf.value
-                        ? "bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm"
-                        : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                    )}
-                  >
-                    {tf.label}
-                  </button>
+                  <PressScale key={tf.value}>
+                    <button
+                      type="button"
+                      onClick={() => setTimeframe(tf.value)}
+                      className={cn(
+                        "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                        timeframe === tf.value
+                          ? "bg-[var(--accent-muted)] text-[var(--accent-primary)] shadow-sm"
+                          : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                      )}
+                    >
+                      {tf.label}
+                    </button>
+                  </PressScale>
                 ))}
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={() => setShowMyStocks(!showMyStocks)}
-              className={cn(
-                "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150",
-                showMyStocks
-                  ? "border-[var(--accent-primary)]/30 bg-[var(--accent-muted)] text-[var(--accent-primary)]"
-                  : "border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]"
-              )}
-            >
-              <HugeiconsIcon icon={Crosshair} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />
-              My {activeMarket === "forex" ? "Pairs" : activeMarket === "crypto" ? "Tokens" : "Stocks"}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className={cn(
-                "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150",
-                autoRefresh
-                  ? "border-[var(--accent-primary)]/30 bg-[var(--accent-muted)] text-[var(--accent-primary)]"
-                  : "border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]"
-              )}
-            >
-              <HugeiconsIcon icon={Lightning} className="h-3 w-3" strokeWidth={1.5} color="currentColor" />
-              Auto
-            </button>
-
-            <IconTooltip label="Refresh data" side="bottom">
+            <PressScale>
               <button
                 type="button"
-                onClick={() => refetch()}
-                disabled={isLoading}
-                className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-1.5 transition-all duration-150 hover:border-[var(--border-hover)] disabled:opacity-50"
+                onClick={() => setShowMyStocks(!showMyStocks)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150",
+                  showMyStocks
+                    ? "border-[var(--accent-primary)]/30 bg-[var(--accent-muted)] text-[var(--accent-primary)]"
+                    : "border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]"
+                )}
               >
-                <HugeiconsIcon
-                  icon={ArrowsClockwise}
-                  className={cn("h-4 w-4 text-[var(--text-secondary)]", isLoading && "animate-spin")}
-                  strokeWidth={1.5}
-                  color="currentColor"
-                />
+                <HugeiconsIcon icon={Crosshair} className="h-3.5 w-3.5" strokeWidth={1.5} color="currentColor" />
+                My {activeMarket === "forex" ? "Pairs" : activeMarket === "crypto" ? "Tokens" : "Stocks"}
               </button>
+            </PressScale>
+
+            <PressScale>
+              <button
+                type="button"
+                onClick={() => setAutoRefresh(!autoRefresh)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150",
+                  autoRefresh
+                    ? "border-[var(--accent-primary)]/30 bg-[var(--accent-muted)] text-[var(--accent-primary)]"
+                    : "border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]"
+                )}
+              >
+                <HugeiconsIcon icon={Lightning} className="h-3 w-3" strokeWidth={1.5} color="currentColor" />
+                Auto
+              </button>
+            </PressScale>
+
+            <IconTooltip label="Refresh data" side="bottom">
+              <PressScale disabled={isLoading}>
+                <button
+                  type="button"
+                  onClick={() => refetch()}
+                  disabled={isLoading}
+                  className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-1.5 transition-all duration-150 hover:border-[var(--border-hover)] disabled:opacity-50"
+                >
+                  <HugeiconsIcon
+                    icon={ArrowsClockwise}
+                    className={cn("h-4 w-4 text-[var(--text-secondary)]", isLoading && "animate-spin")}
+                    strokeWidth={1.5}
+                    color="currentColor"
+                  />
+                </button>
+              </PressScale>
             </IconTooltip>
 
             <div className="hidden items-center gap-1 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] p-1 sm:flex">
@@ -750,16 +762,19 @@ function HeatmapTabInner() {
                       </div>
                       <div className="flex flex-shrink-0 items-center gap-3">
                         <span className="font-[var(--font-geist-mono)] text-[10px] tabular-nums text-[var(--text-secondary)]">
-                          {activeMarket === "forex" ? stock.price?.toFixed(5) ?? "\u2014" : `$${stock.price?.toFixed(2) ?? "\u2014"}`}
+                          {stock.price == null ? "\u2014" : (
+                            <PriceFlash value={stock.price}>
+                              <NumberTicker value={stock.price} format={(value) => activeMarket === "forex" ? value.toFixed(5) : `$${value.toFixed(2)}`} />
+                            </PriceFlash>
+                          )}
                         </span>
-                        <DataCell
-                          value={stock.changePercent?.toFixed(2) ?? "0.00"}
-                          sentiment={(stock.changePercent ?? 0) >= 0 ? "positive" : "negative"}
-                          prefix={(stock.changePercent ?? 0) >= 0 ? "+" : ""}
-                          suffix="%"
-                          size="sm"
-                          className="w-16 text-right font-semibold"
-                        />
+                        <span className={cn("w-16 text-right font-[var(--font-geist-mono)] text-[10px] font-semibold tabular-nums", (stock.changePercent ?? 0) >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]")}>
+                          {stock.changePercent == null ? "—" : (
+                            <PriceFlash value={stock.changePercent} direction={stock.changePercent >= 0 ? "up" : "down"}>
+                              <NumberTicker value={stock.changePercent} format={(value) => fmt.percent(value)} />
+                            </PriceFlash>
+                          )}
+                        </span>
                         <button
                           type="button"
                           onClick={(event) => {
