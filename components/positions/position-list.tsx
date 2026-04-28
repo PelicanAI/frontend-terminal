@@ -9,7 +9,11 @@ import {
   Cancel01Icon as XIcon,
   FilterIcon as FunnelSimple,
 } from '@hugeicons/core-free-icons'
-import { listStagger, listItem, backdrop } from '@/components/ui/pelican'
+import { NumberTicker } from '@/components/motion/number-ticker'
+import { PressScale } from '@/components/motion/press-scale'
+import { PriceFlash } from '@/components/motion/price-flash'
+import { fmt } from '@/lib/motion'
+import { backdrop } from '@/components/ui/pelican'
 import type { BehavioralInsights } from '@/hooks/use-behavioral-insights'
 import type { Quote } from '@/hooks/use-live-quotes'
 import type { TickerHistory } from '@/hooks/use-ticker-history'
@@ -66,11 +70,6 @@ function formatMoney(value: number | null | undefined, options?: { signed?: bool
     if (abs >= 1_000) return `${prefix}${(abs / 1_000).toFixed(1)}K`
   }
   return `${prefix}${abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-
-function formatPercent(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) return '—'
-  return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`
 }
 
 function formatOpened(position: PortfolioPosition): string {
@@ -269,7 +268,7 @@ export function PositionList({
               <th className="px-3 py-2.5 text-right">Action</th>
             </tr>
           </thead>
-          <m.tbody variants={listStagger} initial="hidden" animate="visible">
+          <tbody>
             {positionData.map((data) => {
               const { position, quote } = data
               const pnl = computePnl(position, quote)
@@ -283,9 +282,8 @@ export function PositionList({
               ].filter(Boolean).join(' · ')
 
               return (
-                <m.tr
+                <tr
                   key={position.id}
-                  variants={listItem}
                   onClick={() => setSelectedId(position.id)}
                   aria-selected={selectedId === position.id}
                   className={cn(
@@ -306,28 +304,70 @@ export function PositionList({
                   </td>
                   <td className="px-3 py-0 text-right"><DataValue>{formatQuantity(position.quantity)}</DataValue></td>
                   <td className="px-3 py-0 text-right"><DataValue>{formatPrice(position.entry_price)}</DataValue></td>
-                  <td className="px-3 py-0 text-right"><DataValue tone={pnl.hasQuote ? rowTone : 'muted'}>{formatPrice(pnl.currentPrice)}</DataValue></td>
-                  <td className="px-3 py-0 text-right"><DataValue tone={rowTone}>{pnl.priceChange == null ? '—' : `${pnl.priceChange > 0 ? '+' : ''}${formatPrice(pnl.priceChange)}`}</DataValue></td>
-                  <td className="px-3 py-0 text-right"><DataValue tone={rowTone}>{formatPercent(pnl.pnlPercent)}</DataValue></td>
-                  <td className="px-3 py-0 text-right"><DataValue>{formatMoney(pnl.marketValue)}</DataValue></td>
-                  <td className="px-3 py-0 text-right"><DataValue tone={rowTone}>{formatMoney(pnl.pnlAmount, { signed: true })}</DataValue></td>
-                  <td className="px-3 py-0 text-right"><DataValue tone={pnl.rMultiple == null ? 'muted' : pnl.rMultiple >= 0 ? 'positive' : 'negative'}>{pnl.rMultiple == null ? '—' : `${pnl.rMultiple >= 0 ? '+' : ''}${pnl.rMultiple.toFixed(1)}R`}</DataValue></td>
+                  <td className="px-3 py-0 text-right">
+                    <DataValue tone={pnl.hasQuote ? rowTone : 'muted'}>
+                      {pnl.currentPrice == null ? '—' : (
+                        <PriceFlash value={pnl.currentPrice}>
+                          <NumberTicker value={pnl.currentPrice} format={(value) => formatPrice(value)} />
+                        </PriceFlash>
+                      )}
+                    </DataValue>
+                  </td>
+                  <td className="px-3 py-0 text-right">
+                    <DataValue tone={rowTone}>
+                      {pnl.priceChange == null ? '—' : (
+                        <PriceFlash value={pnl.priceChange} direction={pnl.priceChange >= 0 ? 'up' : 'down'}>
+                          <NumberTicker value={pnl.priceChange} format={(value) => `${value > 0 ? '+' : ''}${formatPrice(value)}`} />
+                        </PriceFlash>
+                      )}
+                    </DataValue>
+                  </td>
+                  <td className="px-3 py-0 text-right">
+                    <DataValue tone={rowTone}>
+                      {pnl.pnlPercent == null ? '—' : (
+                        <PriceFlash value={pnl.pnlPercent} direction={pnl.pnlPercent >= 0 ? 'up' : 'down'}>
+                          <NumberTicker value={pnl.pnlPercent} format={(value) => fmt.percent(value)} />
+                        </PriceFlash>
+                      )}
+                    </DataValue>
+                  </td>
+                  <td className="px-3 py-0 text-right">
+                    <DataValue>
+                      {pnl.marketValue == null ? '—' : <NumberTicker value={pnl.marketValue} format={(value) => fmt.currency(value)} />}
+                    </DataValue>
+                  </td>
+                  <td className="px-3 py-0 text-right">
+                    <DataValue tone={rowTone}>
+                      {pnl.pnlAmount == null ? '—' : (
+                        <PriceFlash value={pnl.pnlAmount} direction={pnl.pnlAmount >= 0 ? 'up' : 'down'}>
+                          <NumberTicker value={pnl.pnlAmount} format={fmt.pnl} />
+                        </PriceFlash>
+                      )}
+                    </DataValue>
+                  </td>
+                  <td className="px-3 py-0 text-right">
+                    <DataValue tone={pnl.rMultiple == null ? 'muted' : pnl.rMultiple >= 0 ? 'positive' : 'negative'}>
+                      {pnl.rMultiple == null ? '—' : <NumberTicker value={pnl.rMultiple} format={(value) => `${value >= 0 ? '+' : ''}${value.toFixed(1)}R`} />}
+                    </DataValue>
+                  </td>
                   <td className="px-3 py-0 text-right"><DataValue tone={position.stop_loss == null ? 'muted' : 'negative'}>{formatPrice(position.stop_loss)}</DataValue></td>
                   <td className="px-3 py-0 text-right"><DataValue tone={position.take_profit == null ? 'muted' : 'positive'}>{formatPrice(position.take_profit)}</DataValue></td>
                   <td className="px-3 py-0 text-left"><DataValue tone="muted">{formatOpened(position)}</DataValue></td>
                   <td className="px-3 py-0 text-left"><DataValue tone="muted">{position.id.slice(0, 8)}</DataValue></td>
                   <td className="px-3 py-0 text-right">
                     <div className="flex justify-end gap-2 opacity-60 transition-opacity group-hover:opacity-100">
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          onEdit(position)
-                        }}
-                        className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
-                      >
-                        Edit
-                      </button>
+                      <PressScale>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onEdit(position)
+                          }}
+                          className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
+                        >
+                          Edit
+                        </button>
+                      </PressScale>
                       <button
                         type="button"
                         onClick={(event) => {
@@ -340,10 +380,10 @@ export function PositionList({
                       </button>
                     </div>
                   </td>
-                </m.tr>
+                </tr>
               )
             })}
-          </m.tbody>
+          </tbody>
         </table>
       </div>
 
@@ -406,7 +446,7 @@ function PositionSheet({
     : null
 
   return (
-    <m.aside
+    <m.div
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
@@ -425,21 +465,25 @@ function PositionSheet({
           <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)]">Scan</div>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onScan}
-            className="h-8 border border-[var(--border-default)] px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)] hover:bg-[var(--accent-glow)]"
-          >
-            Run scan
-          </button>
-          <button
-            type="button"
-            onClick={onCloseSheet}
-            className="flex h-8 w-8 items-center justify-center text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]"
-            aria-label="Close position sheet"
-          >
-            <HugeiconsIcon icon={XIcon} size={16} strokeWidth={1.8} color="currentColor" />
-          </button>
+          <PressScale>
+            <button
+              type="button"
+              onClick={onScan}
+              className="h-8 border border-[var(--border-default)] px-2.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)] hover:bg-[var(--accent-glow)]"
+            >
+              Run scan
+            </button>
+          </PressScale>
+          <PressScale>
+            <button
+              type="button"
+              onClick={onCloseSheet}
+              className="flex h-8 w-8 items-center justify-center text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)]"
+              aria-label="Close position sheet"
+            >
+              <HugeiconsIcon icon={XIcon} size={16} strokeWidth={1.8} color="currentColor" />
+            </button>
+          </PressScale>
         </div>
       </div>
 
@@ -452,9 +496,25 @@ function PositionSheet({
           </span>
         </div>
         <div className="mt-2 flex items-baseline gap-3">
-          <DataValue className="text-xl font-semibold">{formatPrice(pnl.currentPrice ?? position.entry_price)}</DataValue>
-          <DataValue tone={tone}>{formatMoney(pnl.pnlAmount, { signed: true })}</DataValue>
-          <DataValue tone={tone}>{formatPercent(pnl.pnlPercent)}</DataValue>
+          <DataValue className="text-xl font-semibold">
+            <PriceFlash value={pnl.currentPrice ?? position.entry_price}>
+              <NumberTicker value={pnl.currentPrice ?? position.entry_price} format={(value) => formatPrice(value)} />
+            </PriceFlash>
+          </DataValue>
+          <DataValue tone={tone}>
+            {pnl.pnlAmount == null ? '—' : (
+              <PriceFlash value={pnl.pnlAmount} direction={pnl.pnlAmount >= 0 ? 'up' : 'down'}>
+                <NumberTicker value={pnl.pnlAmount} format={fmt.pnl} />
+              </PriceFlash>
+            )}
+          </DataValue>
+          <DataValue tone={tone}>
+            {pnl.pnlPercent == null ? '—' : (
+              <PriceFlash value={pnl.pnlPercent} direction={pnl.pnlPercent >= 0 ? 'up' : 'down'}>
+                <NumberTicker value={pnl.pnlPercent} format={(value) => fmt.percent(value)} />
+              </PriceFlash>
+            )}
+          </DataValue>
         </div>
       </div>
 
@@ -472,9 +532,25 @@ function PositionSheet({
             <SheetCell label="Qty" value={formatQuantity(position.quantity)} />
             <SheetCell label="Side" value={position.direction} tone={position.direction === 'long' ? 'positive' : 'negative'} />
             <SheetCell label="Avg price" value={formatPrice(position.entry_price)} />
-            <SheetCell label="Market value" value={formatMoney(pnl.marketValue)} />
-            <SheetCell label="Unrealized" value={formatMoney(pnl.pnlAmount, { signed: true })} tone={tone} />
-            <SheetCell label="Return" value={formatPercent(pnl.pnlPercent)} tone={tone} />
+            <SheetCell label="Market value" value={pnl.marketValue == null ? '—' : <NumberTicker value={pnl.marketValue} format={(value) => fmt.currency(value)} />} />
+            <SheetCell
+              label="Unrealized"
+              value={pnl.pnlAmount == null ? '—' : (
+                <PriceFlash value={pnl.pnlAmount} direction={pnl.pnlAmount >= 0 ? 'up' : 'down'}>
+                  <NumberTicker value={pnl.pnlAmount} format={fmt.pnl} />
+                </PriceFlash>
+              )}
+              tone={tone}
+            />
+            <SheetCell
+              label="Return"
+              value={pnl.pnlPercent == null ? '—' : (
+                <PriceFlash value={pnl.pnlPercent} direction={pnl.pnlPercent >= 0 ? 'up' : 'down'}>
+                  <NumberTicker value={pnl.pnlPercent} format={(value) => fmt.percent(value)} />
+                </PriceFlash>
+              )}
+              tone={tone}
+            />
             <SheetCell label="Stop" value={formatPrice(position.stop_loss)} tone={position.stop_loss == null ? 'muted' : 'negative'} />
             <SheetCell label="Target" value={formatPrice(position.take_profit)} tone={position.take_profit == null ? 'muted' : 'positive'} />
             <SheetCell label="Opened" value={formatOpened(position)} tone="muted" />
@@ -500,14 +576,16 @@ function PositionSheet({
               <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Recommendation</span>
               <span className="ml-auto font-mono text-xs text-[var(--text-muted)]">—</span>
             </div>
-            <button
-              type="button"
-              onClick={onScan}
-              className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--accent-primary)] transition-colors hover:text-[var(--accent-hover)]"
-            >
-              <HugeiconsIcon icon={Brain} size={14} strokeWidth={1.8} color="currentColor" />
-              Send position to Pelican
-            </button>
+            <PressScale className="mt-4 inline-flex">
+              <button
+                type="button"
+                onClick={onScan}
+                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--accent-primary)] transition-colors hover:text-[var(--accent-hover)]"
+              >
+                <HugeiconsIcon icon={Brain} size={14} strokeWidth={1.8} color="currentColor" />
+                Send position to Pelican
+              </button>
+            </PressScale>
             {alerts.length > 0 && (
               <ul className="mt-4 space-y-2 text-sm text-[var(--text-secondary)]">
                 {alerts.slice(0, 3).map((alert, index) => (
@@ -548,21 +626,25 @@ function PositionSheet({
         >
           Close
         </button>
-        <button
-          type="button"
-          onClick={onEdit}
-          className="h-10 border border-[var(--border-default)] font-semibold uppercase tracking-[0.08em] text-[10px] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
-        >
-          Edit SL/TP
-        </button>
-        <button
-          type="button"
-          onClick={onScan}
-          className="h-10 border border-[var(--border-active)] bg-[var(--accent-glow)] font-semibold uppercase tracking-[0.08em] text-[10px] text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
-        >
-          Monitor
-        </button>
+        <PressScale>
+          <button
+            type="button"
+            onClick={onEdit}
+            className="h-10 w-full border border-[var(--border-default)] font-semibold uppercase tracking-[0.08em] text-[10px] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+          >
+            Edit SL/TP
+          </button>
+        </PressScale>
+        <PressScale>
+          <button
+            type="button"
+            onClick={onScan}
+            className="h-10 w-full border border-[var(--border-active)] bg-[var(--accent-glow)] font-semibold uppercase tracking-[0.08em] text-[10px] text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
+          >
+            Monitor
+          </button>
+        </PressScale>
       </div>
-    </m.aside>
+    </m.div>
   )
 }

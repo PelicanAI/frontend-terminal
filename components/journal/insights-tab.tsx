@@ -9,7 +9,10 @@ import { useTradePatterns, type TradePattern } from "@/hooks/use-trade-patterns"
 import { useDetectPatterns } from "@/hooks/use-detect-patterns"
 import { useToast } from "@/hooks/use-toast"
 import { NotEnoughData } from "@/components/insights/not-enough-data"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PressScale } from "@/components/motion/press-scale"
 import { staggerContainer, staggerItem } from "@/components/ui/pelican"
+import { fmt } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 import { usePlanCompliance } from "@/hooks/use-plan-compliance"
 import { useTradingPlan } from "@/hooks/use-trading-plan"
@@ -107,15 +110,15 @@ function InsightsKpis({ stats, insights, patterns }: { stats: TradeStats | null;
 
   return (
     <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-9">
-      <Kpi label="Net P&L · all" value={fmtMoney(stats?.total_pnl, { signed: true })} detail="closed trades · USD" tone={(stats?.total_pnl ?? 0) >= 0 ? "positive" : "negative"} />
-      <Kpi label="Trades" value={stats?.total_trades ?? insights.total_closed_trades} detail={`${insights.total_closed_trades} closed · ${stats?.open_trades ?? 0} open`} />
-      <Kpi label="Win rate" value={fmtPct(stats?.win_rate ?? null)} detail={`${Math.round(((stats?.closed_trades ?? insights.total_closed_trades) * (stats?.win_rate ?? 0)) / 100)}W / ${Math.max(0, (stats?.closed_trades ?? insights.total_closed_trades) - Math.round(((stats?.closed_trades ?? insights.total_closed_trades) * (stats?.win_rate ?? 0)) / 100))}L`} />
-      <Kpi label="Avg R" value={fmtR(stats?.avg_r_multiple)} detail={`win ${fmtMoney(stats?.avg_win, { signed: true, compact: true })} · loss ${fmtMoney(stats?.avg_loss, { signed: true, compact: true })}`} tone={(stats?.avg_r_multiple ?? 0) >= 0 ? "positive" : "negative"} />
-      <Kpi label="Expectancy" value={fmtMoney(stats?.expectancy, { signed: true })} detail="per trade · USD" tone={(stats?.expectancy ?? 0) >= 0 ? "positive" : "negative"} />
-      <Kpi label="Profit factor" value={stats?.profit_factor ? stats.profit_factor.toFixed(2) : "—"} detail="gross W / gross L" />
-      <Kpi label="Sharpe · trade" value={stats?.sharpe_ratio ? stats.sharpe_ratio.toFixed(2) : "—"} detail="pnl mean / std" />
-      <Kpi label="Largest loss" value={fmtMoney(stats?.largest_loss, { signed: true, compact: true })} detail="closed trades" tone="negative" />
-      <Kpi label="Leak cost" value={leakCost ? fmtMoney(leakCost, { signed: true, compact: true }) : "—"} detail={`${leakCount} patterns · live`} tone={leakCost < 0 ? "negative" : "muted"} />
+      <Kpi label="Net P&L · all" value={stats?.total_pnl == null ? "—" : <NumberTicker value={stats.total_pnl} format={fmt.pnl} />} detail="closed trades · USD" tone={(stats?.total_pnl ?? 0) >= 0 ? "positive" : "negative"} />
+      <Kpi label="Trades" value={<NumberTicker value={stats?.total_trades ?? insights.total_closed_trades} format={fmt.integer} />} detail={`${insights.total_closed_trades} closed · ${stats?.open_trades ?? 0} open`} />
+      <Kpi label="Win rate" value={stats?.win_rate == null ? "—" : <NumberTicker value={stats.win_rate} format={(value) => fmt.percent(value, 1)} />} detail={`${Math.round(((stats?.closed_trades ?? insights.total_closed_trades) * (stats?.win_rate ?? 0)) / 100)}W / ${Math.max(0, (stats?.closed_trades ?? insights.total_closed_trades) - Math.round(((stats?.closed_trades ?? insights.total_closed_trades) * (stats?.win_rate ?? 0)) / 100))}L`} />
+      <Kpi label="Avg R" value={stats?.avg_r_multiple == null ? "—" : <NumberTicker value={stats.avg_r_multiple} format={(value) => `${value > 0 ? "+" : ""}${value.toFixed(1)}R`} />} detail={`win ${fmtMoney(stats?.avg_win, { signed: true, compact: true })} · loss ${fmtMoney(stats?.avg_loss, { signed: true, compact: true })}`} tone={(stats?.avg_r_multiple ?? 0) >= 0 ? "positive" : "negative"} />
+      <Kpi label="Expectancy" value={stats?.expectancy == null ? "—" : <NumberTicker value={stats.expectancy} format={fmt.pnl} />} detail="per trade · USD" tone={(stats?.expectancy ?? 0) >= 0 ? "positive" : "negative"} />
+      <Kpi label="Profit factor" value={stats?.profit_factor == null ? "—" : <NumberTicker value={stats.profit_factor} format={(value) => value.toFixed(2)} />} detail="gross W / gross L" />
+      <Kpi label="Sharpe · trade" value={stats?.sharpe_ratio == null ? "—" : <NumberTicker value={stats.sharpe_ratio} format={(value) => value.toFixed(2)} />} detail="pnl mean / std" />
+      <Kpi label="Largest loss" value={stats?.largest_loss == null ? "—" : <NumberTicker value={stats.largest_loss} format={(value) => fmt.pnl(value)} />} detail="closed trades" tone="negative" />
+      <Kpi label="Leak cost" value={leakCost ? <NumberTicker value={leakCost} format={fmt.pnl} /> : "—"} detail={`${leakCount} patterns · live`} tone={leakCost < 0 ? "negative" : "muted"} />
     </div>
   )
 }
@@ -145,8 +148,7 @@ function HeatmapTable({ insights }: { insights: BehavioralInsights }) {
               </th>
               {setups.map((setup) => (
                 <td key={`${session.session}-${setup.setup}`} className="border-l border-[var(--border-subtle)] px-3 py-2 text-right text-[var(--text-muted)]">
-                  <div>—</div>
-                  <div className="mt-0.5 text-[9px] text-[var(--text-ghost)]">cross-tab unavailable</div>
+                  <span className="inline-flex justify-center text-[var(--muted-foreground)]/40" title="Insufficient data">—</span>
                 </td>
               ))}
               <td className="border-l border-[var(--border-subtle)] px-3 py-2 text-right">
@@ -273,17 +275,18 @@ function RuleBacktest({ stats, onAskPelican }: { stats: TradeStats | null; onAsk
       <div className="mb-2 text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--text-muted)]">Rule backtest</div>
       <div className="divide-y divide-[var(--border-subtle)]">
         {rows.map((row) => (
-          <button
-            key={row.label}
-            type="button"
-            onClick={() => onAskPelican(`Review this trading rule against my journal: ${row.label}. Use my current trade stats and patterns. Be specific about whether it is worth adopting.`)}
-            className="flex w-full items-center gap-3 py-2 text-left hover:bg-[var(--surface-hover)]"
-          >
-            <span className="ml-2 h-3 w-3 border border-[var(--text-muted)]" />
-            <span className="min-w-0 flex-1 text-xs font-medium text-[var(--text-primary)]">{row.label}</span>
-            <span className="w-24 text-right font-mono text-[10px] text-[var(--text-muted)]">{row.status}</span>
-            <span className="w-16 text-right font-mono text-[11px] text-[var(--data-positive)]">{row.pnl}</span>
-          </button>
+          <PressScale key={row.label} hoverScale={1}>
+            <button
+              type="button"
+              onClick={() => onAskPelican(`Review this trading rule against my journal: ${row.label}. Use my current trade stats and patterns. Be specific about whether it is worth adopting.`)}
+              className="flex w-full items-center gap-3 py-2 text-left hover:bg-[var(--surface-hover)]"
+            >
+              <span className="ml-2 h-3 w-3 border border-[var(--text-muted)]" />
+              <span className="min-w-0 flex-1 text-xs font-medium text-[var(--text-primary)]">{row.label}</span>
+              <span className="w-24 text-right font-mono text-[10px] text-[var(--text-muted)]">{row.status}</span>
+              <span className="w-16 text-right font-mono text-[11px] text-[var(--data-positive)]">{row.pnl}</span>
+            </button>
+          </PressScale>
         ))}
       </div>
       <div className="mt-4 grid grid-cols-[auto_1fr_auto] items-baseline gap-x-5 gap-y-2 border-t border-[var(--border-default)] pt-3 font-mono tabular-nums">
@@ -586,15 +589,17 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
             {insights.generated_at && <> · computed {new Date(insights.generated_at).toLocaleDateString("en-US", { month: "short", day: "2-digit" })}</>}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="flex h-9 items-center gap-2 border border-[var(--border-default)] px-3 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] disabled:cursor-wait disabled:opacity-50"
-        >
-          <HugeiconsIcon icon={ArrowsClockwise} size={14} className={cn(refreshing && "animate-spin")} strokeWidth={2} color="currentColor" />
-          {refreshing ? "Analyzing" : "Refresh"}
-        </button>
+        <PressScale disabled={refreshing}>
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex h-9 items-center gap-2 border border-[var(--border-default)] px-3 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] disabled:cursor-wait disabled:opacity-50"
+          >
+            <HugeiconsIcon icon={ArrowsClockwise} size={14} className={cn(refreshing && "animate-spin")} strokeWidth={2} color="currentColor" />
+            {refreshing ? "Analyzing" : "Refresh"}
+          </button>
+        </PressScale>
       </m.div>
 
       <m.div variants={staggerItem}>
@@ -639,9 +644,11 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
         <span>·</span>
         <span>Pattern engine live</span>
         <span className="ml-auto">
-          <button type="button" onClick={() => handleInsightAskPelican("Summarize my current insights tab. Give me the top 3 edge improvements and the one rule I should follow tomorrow.")} className="uppercase tracking-[0.08em] text-[var(--accent-primary)] hover:text-[var(--accent-hover)]">
-            Ask Pelican
-          </button>
+          <PressScale>
+            <button type="button" onClick={() => handleInsightAskPelican("Summarize my current insights tab. Give me the top 3 edge improvements and the one rule I should follow tomorrow.")} className="uppercase tracking-[0.08em] text-[var(--accent-primary)] hover:text-[var(--accent-hover)]">
+              Ask Pelican
+            </button>
+          </PressScale>
         </span>
       </m.div>
     </m.div>

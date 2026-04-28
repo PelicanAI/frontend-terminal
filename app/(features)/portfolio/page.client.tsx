@@ -8,7 +8,6 @@ import { m, AnimatePresence } from "framer-motion"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Add01Icon as Plus,
-  ArrowUpRight01Icon,
   Brain01Icon as Brain,
   Cancel01Icon as XIcon,
   Upload01Icon as UploadSimple,
@@ -34,6 +33,10 @@ import { LogTradeModal } from "@/components/journal/log-trade-modal"
 import { CSVImportModal } from "@/components/journal/csv-import-modal"
 import { TradesTable } from "@/components/journal/trades-table"
 import { TradeDetailPanel } from "@/components/journal/trade-detail-panel"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PressScale } from "@/components/motion/press-scale"
+import { PriceFlash } from "@/components/motion/price-flash"
+import { TabIndicator } from "@/components/motion/tab-indicator"
 import { ConnectBrokerButton } from "@/components/broker/connect-broker-button"
 import { JournalEmptyState } from "@/components/journal/journal-empty-state"
 import { FirstTradeCelebration, hasSeenFirstTradeCelebration } from "@/components/onboarding/first-trade-celebration"
@@ -42,6 +45,7 @@ import { buildScanPrompt } from "@/lib/journal/build-scan-prompt"
 import { buildReplayNarrationPrompt } from "@/lib/journal/build-replay-prompt"
 import { trackEvent } from "@/lib/tracking"
 import { toast } from "@/hooks/use-toast"
+import { fmt } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 import type { PortfolioPosition, PortfolioStats } from "@/types/portfolio"
 
@@ -88,13 +92,6 @@ function formatNum(n: number | null | undefined): string {
   if (Math.abs(n) >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`
   if (Math.abs(n) >= 1_000) return `$${(n / 1_000).toFixed(1)}K`
   return `$${n.toLocaleString()}`
-}
-
-function formatTerminalMoney(value: number | null | undefined, signed = false): string {
-  if (value == null || Number.isNaN(value)) return "—"
-  const sign = signed && value > 0 ? "+" : value < 0 ? "-" : ""
-  const abs = Math.abs(value)
-  return `${sign}${abs.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 function getPositionQuote(position: PortfolioPosition, quotes: Record<string, Quote>): Quote | null {
@@ -174,18 +171,34 @@ function AccountStrip({
         <div className="grid flex-1 grid-cols-2 gap-3 md:grid-cols-4 xl:ml-auto xl:max-w-4xl">
           <div>
             <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Open exposure</div>
-            <div className="mt-1 font-mono text-sm tabular-nums text-[var(--text-primary)]">{formatTerminalMoney(portfolio?.total_exposure)}</div>
+            <div className="mt-1 font-mono text-sm tabular-nums text-[var(--text-primary)]">
+              {portfolio?.total_exposure == null ? "—" : <NumberTicker value={portfolio.total_exposure} format={(value) => fmt.currency(value)} />}
+            </div>
             <div className="font-mono text-[10px] text-[var(--text-ghost)]">USD</div>
           </div>
           <div>
             <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Unrealized P/L</div>
-            <div className={`mt-1 font-mono text-sm tabular-nums ${statTone}`}>{unrealized.hasQuotes ? formatTerminalMoney(unrealized.total, true) : "—"}</div>
-            <div className="font-mono text-[10px] text-[var(--text-ghost)]">{unrealized.pct == null ? "Waiting for quotes" : `${unrealized.pct > 0 ? "+" : ""}${unrealized.pct.toFixed(2)}% on exposure`}</div>
+            <div className={`mt-1 font-mono text-sm tabular-nums ${statTone}`}>
+              {unrealized.hasQuotes ? (
+                <PriceFlash value={unrealized.total} direction={unrealized.total >= 0 ? "up" : "down"}>
+                  <NumberTicker value={unrealized.total} format={fmt.pnl} />
+                </PriceFlash>
+              ) : "—"}
+            </div>
+            <div className="font-mono text-[10px] text-[var(--text-ghost)]">
+              {unrealized.pct == null ? "Waiting for quotes" : (
+                <PriceFlash value={unrealized.pct} direction={unrealized.pct >= 0 ? "up" : "down"}>
+                  <NumberTicker value={unrealized.pct} format={(value) => `${fmt.percent(value)} on exposure`} />
+                </PriceFlash>
+              )}
+            </div>
           </div>
           <div>
             <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Risk coverage</div>
             <div className="mt-1 font-mono text-sm tabular-nums text-[var(--text-primary)]">{totalRisk}</div>
-            <div className="font-mono text-[10px] text-[var(--text-ghost)]">{portfolio?.total_positions ?? positions.length} positions</div>
+            <div className="font-mono text-[10px] text-[var(--text-ghost)]">
+              <NumberTicker value={portfolio?.total_positions ?? positions.length} format={fmt.integer} /> positions
+            </div>
           </div>
           <div>
             <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">Buying power</div>
@@ -195,21 +208,25 @@ function AccountStrip({
         </div>
 
         <div className="flex items-center gap-2 xl:ml-3">
-          <button
-            type="button"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            className="h-9 border border-[var(--border-default)] px-3 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] disabled:cursor-wait disabled:opacity-50"
-          >
-            {isRefreshing ? "Syncing" : "Sync"}
-          </button>
-          <button
-            type="button"
-            onClick={onLogTrade}
-            className="h-9 border border-[var(--border-active)] bg-[var(--accent-glow)] px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
-          >
-            Log
-          </button>
+          <PressScale disabled={isRefreshing}>
+            <button
+              type="button"
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="h-9 border border-[var(--border-default)] px-3 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] disabled:cursor-wait disabled:opacity-50"
+            >
+              {isRefreshing ? "Syncing" : "Sync"}
+            </button>
+          </PressScale>
+          <PressScale>
+            <button
+              type="button"
+              onClick={onLogTrade}
+              className="h-9 border border-[var(--border-active)] bg-[var(--accent-glow)] px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--accent-primary)] transition-colors hover:border-[var(--accent-primary)]"
+            >
+              Log
+            </button>
+          </PressScale>
         </div>
       </div>
     </div>
@@ -220,7 +237,6 @@ function TerminalTabs({
   activeTab,
   positionsCount,
   tradesCount,
-  warningsCount,
   insightsCount,
   onNavigate,
   onProfile,
@@ -228,53 +244,30 @@ function TerminalTabs({
   activeTab: SubTab
   positionsCount: number
   tradesCount: number
-  warningsCount: number
   insightsCount: number
   onNavigate: (tab: SubTab) => void
   onProfile: () => void
 }) {
   const tabs = [
-    { label: "Positions", count: positionsCount, active: activeTab === "active", onClick: () => onNavigate("active") },
-    { label: "Orders", count: 0, active: false, onClick: undefined },
-    { label: "History", count: tradesCount, active: activeTab === "history", onClick: () => onNavigate("history") },
-    { label: "Profile", active: false, onClick: onProfile, opensDialog: true },
-    { label: "Notifications", count: warningsCount, active: false, onClick: undefined },
+    { id: "active", label: `Positions (${positionsCount})` },
+    { id: "history", label: `History (${tradesCount})` },
+    { id: "profile", label: "Profile ↗" },
   ]
 
   return (
     <div className="flex flex-col gap-3 border-b border-[var(--border-default)] py-2 lg:flex-row lg:items-center">
-      <div className="flex flex-nowrap items-center gap-0 overflow-x-auto scrollbar-hide">
-        {tabs.map((tab) => (
-          <button
-            key={tab.label}
-            type="button"
-            onClick={tab.onClick}
-            disabled={!tab.onClick}
-            aria-haspopup={tab.opensDialog ? "dialog" : undefined}
-            aria-label={tab.opensDialog ? "Trader profile, opens in modal" : undefined}
-            title={tab.opensDialog ? "Opens trader profile" : undefined}
-            className={cn(
-              "inline-flex min-h-10 shrink-0 items-center border-b px-3 py-2 text-xs font-medium uppercase tracking-[0.08em] transition-colors",
-              tab.active
-                ? "border-[var(--accent-primary)] text-[var(--text-primary)]"
-                : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]",
-              !tab.onClick && "cursor-not-allowed opacity-40 hover:text-[var(--text-muted)]",
-            )}
-          >
-            {tab.label}
-            {tab.opensDialog && (
-              <HugeiconsIcon
-                icon={ArrowUpRight01Icon}
-                className="ml-1 h-3 w-3 opacity-60"
-                strokeWidth={1.5}
-                color="currentColor"
-                aria-hidden
-              />
-            )}
-            {tab.count != null && <span className="ml-1 font-mono text-[10px] text-[var(--text-ghost)]">{tab.count}</span>}
-          </button>
-        ))}
-      </div>
+      <TabIndicator
+        tabs={tabs}
+        activeId={activeTab === "history" ? "history" : "active"}
+        onChange={(id) => {
+          if (id === "profile") {
+            onProfile()
+            return
+          }
+          onNavigate(id as SubTab)
+        }}
+        className="overflow-x-auto scrollbar-hide border-[var(--border-default)]"
+      />
 
       <div className="flex w-fit border border-[var(--border-default)] lg:ml-auto">
         <button
@@ -296,7 +289,11 @@ function TerminalTabs({
           )}
         >
           Insights
-          {insightsCount > 0 && <span className="ml-1 text-[var(--text-ghost)]">{insightsCount}</span>}
+          {insightsCount > 0 && (
+            <span className="ml-1 text-[var(--text-ghost)]">
+              <NumberTicker value={insightsCount} format={fmt.integer} />
+            </span>
+          )}
         </button>
       </div>
     </div>
@@ -321,11 +318,15 @@ function DataSourceBar({
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--data-positive)]" />
           <div className="min-w-0">
             <div className="text-xs font-medium text-[var(--text-primary)]">Live · {activeConnectionName}</div>
-            <div className="font-mono text-[10px] text-[var(--text-muted)]">Current session · {positionsCount} pos · SnapTrade/manual</div>
+            <div className="font-mono text-[10px] text-[var(--text-muted)]">
+              Current session · <NumberTicker value={positionsCount} format={fmt.integer} /> pos · SnapTrade/manual
+            </div>
           </div>
-          <button type="button" onClick={onSync} className="ml-auto border border-[var(--border-default)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]">
-            Sync
-          </button>
+          <PressScale className="ml-auto">
+            <button type="button" onClick={onSync} className="border border-[var(--border-default)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]">
+              Sync
+            </button>
+          </PressScale>
         </div>
       </div>
       <div className="border border-[var(--border-subtle)] px-3 py-2 opacity-45">
@@ -345,9 +346,11 @@ function DataSourceBar({
             <div className="text-xs font-medium text-[var(--text-primary)]">CSV · Import</div>
             <div className="font-mono text-[10px] text-[var(--text-muted)]">Journal backfill path</div>
           </div>
-          <button type="button" onClick={onImport} className="ml-auto border border-[var(--border-default)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]">
-            Import
-          </button>
+          <PressScale className="ml-auto">
+            <button type="button" onClick={onImport} className="border border-[var(--border-default)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]">
+              Import
+            </button>
+          </PressScale>
         </div>
       </div>
     </div>
@@ -785,7 +788,6 @@ export default function PortfolioPage() {
           activeTab={activeTab}
           positionsCount={portfolio?.positions.length ?? 0}
           tradesCount={trades.length}
-          warningsCount={warnings.length}
           insightsCount={insightsBadgeCount}
           onNavigate={navigateToTab}
           onProfile={() => setShowProfileModal(true)}

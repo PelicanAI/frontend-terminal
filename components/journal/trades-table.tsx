@@ -16,12 +16,15 @@ import Link from "next/link"
 import { m } from "framer-motion"
 import { useLiveQuotes, type Quote } from "@/hooks/use-live-quotes"
 import { LogoImg } from "@/components/ui/logo-img"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PressScale } from "@/components/motion/press-scale"
+import { PriceFlash } from "@/components/motion/price-flash"
 import { PelicanCard, PelicanButton, staggerContainer, staggerItem } from "@/components/ui/pelican"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { GradeBadge } from "@/components/grading/trade-grade-card"
+import { fmt } from "@/lib/motion"
 
 const fmtPrice = (v: number) => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const fmtPnl = (v: number) => `${v >= 0 ? '+' : ''}${v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 interface TradesTableProps {
   trades: Trade[]
@@ -185,27 +188,28 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
       {/* Status Filter Pills */}
       <div className="flex items-center gap-1 mb-4 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg p-0.5 w-fit">
         {statusFilters.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => handleStatusFilter(key)}
-            className={`
-              px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 flex items-center gap-1.5
-              ${
+          <PressScale key={key}>
+            <button
+              onClick={() => handleStatusFilter(key)}
+              className={`
+                px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 flex items-center gap-1.5
+                ${
+                  statusFilter === key
+                    ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] border border-[var(--accent-primary)]/30'
+                    : 'bg-transparent text-[var(--text-muted)] border border-transparent hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
+                }
+              `}
+            >
+              {label}
+              <span className={`font-mono tabular-nums text-[10px] px-1.5 py-0.5 rounded-full ${
                 statusFilter === key
-                  ? 'bg-[var(--accent-muted)] text-[var(--accent-primary)] border border-[var(--accent-primary)]/30'
-                  : 'bg-transparent text-[var(--text-muted)] border border-transparent hover:text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)]'
-              }
-            `}
-          >
-            {label}
-            <span className={`font-mono tabular-nums text-[10px] px-1.5 py-0.5 rounded-full ${
-              statusFilter === key
-                ? 'bg-[var(--accent-primary)]/20 text-[var(--accent-primary)]'
-                : 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'
-            }`}>
-              {statusCounts[key]}
-            </span>
-          </button>
+                  ? 'bg-[var(--accent-primary)]/20 text-[var(--accent-primary)]'
+                  : 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'
+              }`}>
+                <NumberTicker value={statusCounts[key]} format={fmt.integer} />
+              </span>
+            </button>
+          </PressScale>
         ))}
       </div>
 
@@ -374,7 +378,9 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                 <td className="py-3 px-4 text-right font-mono tabular-nums text-sm">
                   {trade.status === 'open' && unrealized ? (
                     <span className={unrealized.currentPrice > trade.entry_price ? 'text-[var(--data-positive)]' : unrealized.currentPrice < trade.entry_price ? 'text-[var(--data-negative)]' : 'text-[var(--text-primary)]'}>
-                      ${fmtPrice(unrealized.currentPrice)}
+                      <PriceFlash value={unrealized.currentPrice}>
+                        <NumberTicker value={unrealized.currentPrice} format={(value) => `$${fmtPrice(value)}`} />
+                      </PriceFlash>
                     </span>
                   ) : trade.status === 'open' ? (
                     <span className="text-[var(--text-disabled)]" title="Price unavailable">—</span>
@@ -393,7 +399,13 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                 <td className="py-3 px-4 text-right font-mono tabular-nums text-sm font-medium">
                   {displayPnL.amount !== null ? (
                     <span className={isWinner ? 'text-[var(--data-positive)]' : isLoser ? 'text-[var(--data-negative)]' : 'text-[var(--text-muted)]'}>
-                      ${fmtPnl(displayPnL.amount)}
+                      {trade.status === 'open' ? (
+                        <PriceFlash value={displayPnL.amount} direction={displayPnL.amount >= 0 ? "up" : "down"}>
+                          <NumberTicker value={displayPnL.amount} format={fmt.pnl} />
+                        </PriceFlash>
+                      ) : (
+                        <NumberTicker value={displayPnL.amount} format={fmt.pnl} />
+                      )}
                     </span>
                   ) : (
                     <span className="text-[var(--text-disabled)]">—</span>
@@ -402,7 +414,13 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                 <td className="py-3 px-4 text-right font-mono tabular-nums text-sm font-medium">
                   {displayPnL.percent !== null ? (
                     <span className={isWinner ? 'text-[var(--data-positive)]' : isLoser ? 'text-[var(--data-negative)]' : 'text-[var(--text-muted)]'}>
-                      {displayPnL.percent >= 0 ? '+' : ''}{displayPnL.percent.toFixed(2)}%
+                      {trade.status === 'open' ? (
+                        <PriceFlash value={displayPnL.percent} direction={displayPnL.percent >= 0 ? "up" : "down"}>
+                          <NumberTicker value={displayPnL.percent} format={(value) => fmt.percent(value)} />
+                        </PriceFlash>
+                      ) : (
+                        <NumberTicker value={displayPnL.percent} format={(value) => fmt.percent(value)} />
+                      )}
                     </span>
                   ) : (
                     <span className="text-[var(--text-disabled)]">—</span>
@@ -412,7 +430,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                   <td className="py-3 px-4 text-right font-mono tabular-nums text-sm">
                     {trade.r_multiple != null ? (
                       <span className={trade.r_multiple > 0 ? 'text-[var(--data-positive)]' : trade.r_multiple < 0 ? 'text-[var(--data-negative)]' : 'text-[var(--text-muted)]'}>
-                        {trade.r_multiple >= 0 ? '+' : ''}{trade.r_multiple.toFixed(2)}R
+                        <NumberTicker value={trade.r_multiple} format={(value) => `${value >= 0 ? '+' : ''}${value.toFixed(2)}R`} />
                       </span>
                     ) : (
                       <span className="text-[var(--text-disabled)]">—</span>
@@ -461,15 +479,17 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                   <div className="flex items-center justify-end gap-1.5">
                     {onEditTrade && (
                       <IconTooltip label="Edit trade" side="top">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            onEditTrade(trade)
-                          }}
-                          className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors active:scale-95"
-                        >
-                          <HugeiconsIcon icon={PencilSimple} size={14} strokeWidth={1.5} color="currentColor" />
-                        </button>
+                        <PressScale>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onEditTrade(trade)
+                            }}
+                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+                          >
+                            <HugeiconsIcon icon={PencilSimple} size={14} strokeWidth={1.5} color="currentColor" />
+                          </button>
+                        </PressScale>
                       </IconTooltip>
                     )}
                     {trade.status === 'open' ? (
@@ -484,15 +504,17 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                       <>
                         {onReplayTrade && (
                           <IconTooltip label="Replay trade" side="top">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                onReplayTrade(trade)
-                              }}
-                              className="p-1.5 rounded-lg text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors active:scale-95"
-                            >
-                              <HugeiconsIcon icon={PlayCircle} size={16} strokeWidth={1.5} color="currentColor" />
-                            </button>
+                            <PressScale>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  onReplayTrade(trade)
+                                }}
+                                className="p-1.5 rounded-lg text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors"
+                              >
+                                <HugeiconsIcon icon={PlayCircle} size={16} strokeWidth={1.5} color="currentColor" />
+                              </button>
+                            </PressScale>
                           </IconTooltip>
                         )}
                         {onScanTrade && (
@@ -589,7 +611,9 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                     <span className="text-[var(--text-muted)] block mb-0.5">Current</span>
                     {trade.status === 'open' && unrealized ? (
                       <span className={`font-mono tabular-nums ${unrealized.currentPrice > trade.entry_price ? 'text-[var(--data-positive)]' : unrealized.currentPrice < trade.entry_price ? 'text-[var(--data-negative)]' : 'text-[var(--text-primary)]'}`}>
-                        ${fmtPrice(unrealized.currentPrice)}
+                        <PriceFlash value={unrealized.currentPrice}>
+                          <NumberTicker value={unrealized.currentPrice} format={(value) => `$${fmtPrice(value)}`} />
+                        </PriceFlash>
                       </span>
                     ) : (
                       <span className="text-[var(--text-disabled)]">—</span>
@@ -599,7 +623,13 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                     <span className="text-[var(--text-muted)] block mb-0.5">P&L</span>
                     {displayPnL.amount !== null ? (
                       <span className={`font-mono tabular-nums ${isWinner ? 'text-[var(--data-positive)]' : isLoser ? 'text-[var(--data-negative)]' : 'text-[var(--text-muted)]'}`}>
-                        ${fmtPnl(displayPnL.amount)}
+                        {trade.status === 'open' ? (
+                          <PriceFlash value={displayPnL.amount} direction={displayPnL.amount >= 0 ? "up" : "down"}>
+                            <NumberTicker value={displayPnL.amount} format={fmt.pnl} />
+                          </PriceFlash>
+                        ) : (
+                          <NumberTicker value={displayPnL.amount} format={fmt.pnl} />
+                        )}
                       </span>
                     ) : (
                       <span className="text-[var(--text-disabled)]">—</span>
@@ -643,15 +673,17 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                     </span>
                     <div className="flex items-center gap-1.5">
                       {onEditTrade && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            onEditTrade(trade)
-                          }}
-                          className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                        >
-                          <HugeiconsIcon icon={PencilSimple} size={14} strokeWidth={1.5} color="currentColor" />
-                        </button>
+                        <PressScale>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onEditTrade(trade)
+                            }}
+                            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                          >
+                            <HugeiconsIcon icon={PencilSimple} size={14} strokeWidth={1.5} color="currentColor" />
+                          </button>
+                        </PressScale>
                       )}
                       {trade.status === 'open' ? (
                         <a
@@ -665,15 +697,17 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                         <>
                           {onReplayTrade && (
                             <IconTooltip label="Replay trade" side="top">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  onReplayTrade(trade)
-                                }}
-                                className="p-1.5 rounded-lg text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                              >
-                                <HugeiconsIcon icon={PlayCircle} size={16} strokeWidth={1.5} color="currentColor" />
-                              </button>
+                              <PressScale>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    onReplayTrade(trade)
+                                  }}
+                                  className="p-1.5 rounded-lg text-[var(--accent-primary)] hover:bg-[var(--accent-muted)] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                                >
+                                  <HugeiconsIcon icon={PlayCircle} size={16} strokeWidth={1.5} color="currentColor" />
+                                </button>
+                              </PressScale>
                             </IconTooltip>
                           )}
                           {onScanTrade && (
