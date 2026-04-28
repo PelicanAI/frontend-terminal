@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
 import { logger } from "@/lib/logger"
+import { isValidTicker, normalizeTicker } from "@/lib/validation/ticker"
 
 export const dynamic = "force-dynamic"
 
@@ -36,11 +37,6 @@ const VALID_MULTIPLIERS = new Set(['1', '4', '5', '15', '30'])
 
 function isValidDate(dateStr: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(dateStr)
-}
-
-function isValidTicker(ticker: string): boolean {
-  // Allow stocks (AAPL), forex (C:EURUSD), crypto (X:BTCUSD)
-  return /^[A-Z0-9.:]{1,20}$/.test(ticker)
 }
 
 function formatUtcDate(d: Date): string {
@@ -92,7 +88,8 @@ export async function GET(request: NextRequest) {
 
     // 3. Parse and validate params
     const { searchParams } = request.nextUrl
-    const ticker = searchParams.get('ticker')?.toUpperCase()
+    const tickerParam = searchParams.get('ticker')
+    const ticker = tickerParam ? normalizeTicker(tickerParam) : null
     const fromParam = searchParams.get('from')
     const toParam = searchParams.get('to')
     const timespan = searchParams.get('timespan') as Timespan | null

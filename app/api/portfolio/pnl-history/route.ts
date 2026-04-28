@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
+import { isValidTicker, normalizeTicker, TICKER_REGEX } from '@/lib/validation/ticker'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +12,6 @@ const POLYGON_API_KEY = process.env.POLYGON_API_KEY
 
 const VALID_ASSET_TYPES = ['stock', 'etf', 'option', 'crypto', 'forex', 'future', 'other'] as const
 const VALID_DIRECTIONS = ['long', 'short'] as const
-const TICKER_REGEX = /^[A-Z.:]{1,20}$/
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}/
 
 interface PositionInput {
@@ -36,8 +36,12 @@ function validatePosition(pos: unknown, index: number): string | null {
   if (!pos || typeof pos !== 'object') return `Position ${index}: must be an object`
   const p = pos as Record<string, unknown>
 
-  if (typeof p.ticker !== 'string' || !TICKER_REGEX.test(p.ticker))
+  if (typeof p.ticker !== 'string')
     return `Position ${index}: ticker must match ${TICKER_REGEX}`
+  const normalizedTicker = normalizeTicker(p.ticker)
+  if (!isValidTicker(normalizedTicker))
+    return `Position ${index}: ticker must match ${TICKER_REGEX}`
+  p.ticker = normalizedTicker
 
   // Coerce numeric strings (Supabase numeric columns may return strings)
   const qty = typeof p.quantity === 'string' ? Number(p.quantity) : p.quantity
