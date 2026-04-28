@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
+import { PressScale } from "@/components/motion/press-scale"
 import type { UserSettings } from "./types"
 import { POPULAR_TICKERS } from "./types"
 
@@ -149,9 +150,11 @@ export function TradingSection({ settings, updateSetting }: TradingSectionProps)
               placeholder="Enter ticker symbol (e.g., AAPL)"
               maxLength={10}
             />
-            <Button onClick={addTicker} variant="outline">
-              Add
-            </Button>
+            <PressScale>
+              <Button onClick={addTicker} variant="outline">
+                Add
+              </Button>
+            </PressScale>
           </div>
           <div className="flex flex-wrap gap-2">
             {settings.favorite_tickers.map((ticker) => (
@@ -175,15 +178,16 @@ export function TradingSection({ settings, updateSetting }: TradingSectionProps)
               {POPULAR_TICKERS.filter((t) => !settings.favorite_tickers.includes(t))
                 .slice(0, 8)
                 .map((ticker) => (
-                  <button
-                    key={ticker}
-                    onClick={() => {
-                      updateSetting("favorite_tickers", [...settings.favorite_tickers, ticker])
-                    }}
-                    className="px-2 py-1 text-sm border border-border rounded hover:bg-muted"
-                  >
-                    + {ticker}
-                  </button>
+                  <PressScale key={ticker}>
+                    <button
+                      onClick={() => {
+                        updateSetting("favorite_tickers", [...settings.favorite_tickers, ticker])
+                      }}
+                      className="px-2 py-1 text-sm border border-border rounded hover:bg-muted"
+                    >
+                      + {ticker}
+                    </button>
+                  </PressScale>
                 ))}
             </div>
           </div>

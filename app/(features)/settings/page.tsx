@@ -142,7 +142,7 @@ export default function SettingsPage() {
             onSectionChange={setActiveSection}
           />
 
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-4 space-y-6">
             {activeSection === "account" && (
               <AccountSection
                 user={user}
