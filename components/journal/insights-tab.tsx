@@ -176,6 +176,21 @@ function HeatmapTable({ insights }: { insights: BehavioralInsights }) {
   )
 }
 
+function CrossTabComingSoon({ closedTrades }: { closedTrades: number }) {
+  return (
+    <div className="border border-[var(--border-default)] bg-[var(--surface-subtle)] px-4 py-3">
+      <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--text-muted)]">
+        Coming soon
+      </div>
+      <p className="mt-1 text-sm text-[var(--text-secondary)]">
+        Session × setup analysis coming soon. Pelican is computing the cross-tab matrix from your{" "}
+        <span className="font-mono tabular-nums text-[var(--text-primary)]">{closedTrades}</span>{" "}
+        closed trades.
+      </p>
+    </div>
+  )
+}
+
 function PatternLedger({
   patterns,
   onDismiss,
@@ -608,7 +623,11 @@ export function InsightsTab({ onAskPelican, onLogTrade }: InsightsTabProps) {
 
       <m.div variants={staggerItem} className="mt-5">
         <SectionHeader title="Win rate · session × setup" meta={setupMeta} />
-        <HeatmapTable insights={insights} />
+        {process.env.NEXT_PUBLIC_ENABLE_CROSS_TAB === "true" ? (
+          <HeatmapTable insights={insights} />
+        ) : (
+          <CrossTabComingSoon closedTrades={insights.total_closed_trades} />
+        )}
       </m.div>
 
       <m.div variants={staggerItem} className="mt-6">
