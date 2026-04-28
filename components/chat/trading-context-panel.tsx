@@ -23,6 +23,11 @@ import {
   Notification01Icon as BellSimple,
 } from "@hugeicons/core-free-icons"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PressScale } from "@/components/motion/press-scale"
+import { PriceFlash } from "@/components/motion/price-flash"
+import { ShimmerSkeleton } from "@/components/motion/shimmer-skeleton"
+import { fmt } from "@/lib/motion"
 import { cn, normalizeTicker } from "@/lib/utils"
 import { useState, useRef } from "react"
 import type { Trade } from "@/hooks/use-trades"
@@ -564,19 +569,21 @@ export function TradingContextPanel({
                     <HugeiconsIcon icon={Star} size={12} strokeWidth={1.5} color="currentColor" />
                     Watchlist
                   </h4>
-                  <button
-                    onClick={() => setEditingWatchlist(!editingWatchlist)}
-                    className="text-[10px] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors duration-150 font-medium"
-                  >
-                    {editingWatchlist ? "Done" : "Edit"}
-                  </button>
+                  <PressScale>
+                    <button
+                      onClick={() => setEditingWatchlist(!editingWatchlist)}
+                      className="text-[10px] text-[var(--accent-primary)] hover:text-[var(--accent-hover)] transition-colors duration-150 font-medium"
+                    >
+                      {editingWatchlist ? "Done" : "Edit"}
+                    </button>
+                  </PressScale>
                 </div>
 
                 {/* Loading state */}
                 {watchlistLoading && watchlistTickers.length === 0 && (
                   <div className="space-y-1.5">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-10 rounded-lg bg-[var(--bg-surface)] animate-pulse" />
+                      <ShimmerSkeleton key={i} height={40} rounded="lg" className="block" />
                     ))}
                   </div>
                 )}
@@ -600,7 +607,13 @@ export function TradingContextPanel({
                           <div className="flex-1 flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
                             <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
                             <div className="flex flex-col items-end">
-                              <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price, ticker.symbol)}</span>
+                              <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">
+                                {ticker.price == null ? formatPrice(ticker.price, ticker.symbol) : (
+                                  <PriceFlash value={ticker.price}>
+                                    <NumberTicker value={ticker.price} format={(value) => formatPrice(value, ticker.symbol)} />
+                                  </PriceFlash>
+                                )}
+                              </span>
                             </div>
                           </div>
                           <button
@@ -614,17 +627,18 @@ export function TradingContextPanel({
                         <div className="w-full">
                           <div className="flex items-center gap-1">
                             {/* Clickable ticker row — opens chat */}
-                            <button
-                              className="flex-1 flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-white/5 cursor-pointer transition-all duration-150 text-left"
-                              onClick={() => {
-                                const prompt = `Analyze ${ticker.symbol} — it's on my watchlist. ${ticker.notes ? `Notes: ${ticker.notes}` : ''} ${ticker.customPrompt || 'Give me a technical and fundamental update.'}`
-                                openWithPrompt(
-                                  ticker.symbol,
-                                  prompt,
-                                  null
-                                )
-                              }}
-                            >
+                            <PressScale hoverScale={1} className="flex-1">
+                              <button
+                                className="flex w-full items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-white/5 cursor-pointer transition-all duration-150 text-left"
+                                onClick={() => {
+                                  const prompt = `Analyze ${ticker.symbol} — it's on my watchlist. ${ticker.notes ? `Notes: ${ticker.notes}` : ''} ${ticker.customPrompt || 'Give me a technical and fundamental update.'}`
+                                  openWithPrompt(
+                                    ticker.symbol,
+                                    prompt,
+                                    null
+                                  )
+                                }}
+                              >
                               <div className="flex items-center gap-1.5">
                                 <span className="text-xs font-semibold text-[var(--text-primary)]">{ticker.symbol}</span>
                                 {ticker.customPrompt && (
@@ -635,7 +649,13 @@ export function TradingContextPanel({
                                 )}
                               </div>
                               <div className="flex flex-col items-end">
-                                <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(ticker.price, ticker.symbol)}</span>
+                                <span className="text-xs font-medium font-mono tabular-nums text-[var(--text-primary)]">
+                                  {ticker.price == null ? formatPrice(ticker.price, ticker.symbol) : (
+                                    <PriceFlash value={ticker.price}>
+                                      <NumberTicker value={ticker.price} format={(value) => formatPrice(value, ticker.symbol)} />
+                                    </PriceFlash>
+                                  )}
+                                </span>
                                 <div
                                   className={cn(
                                     "text-[10px] font-medium font-mono tabular-nums px-1.5 py-0.5 rounded",
@@ -643,10 +663,15 @@ export function TradingContextPanel({
                                     getChangeColor(ticker.changePercent),
                                   )}
                                 >
-                                  {formatPercent(ticker.changePercent)}
+                                  {ticker.changePercent == null ? formatPercent(ticker.changePercent) : (
+                                    <PriceFlash value={ticker.changePercent} direction={ticker.changePercent >= 0 ? "up" : "down"}>
+                                      <NumberTicker value={ticker.changePercent} format={(value) => fmt.percent(value)} />
+                                    </PriceFlash>
+                                  )}
                                 </div>
                               </div>
-                            </button>
+                              </button>
+                            </PressScale>
                             {/* Action menu button — stops propagation */}
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -872,30 +897,34 @@ export function TradingContextPanel({
                       <HugeiconsIcon icon={Briefcase} size={12} strokeWidth={1.5} color="currentColor" />
                       Active Positions
                     </h4>
-                    <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">{openTrades.length}</span>
+                    <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">
+                      <NumberTicker value={openTrades.length} format={fmt.integer} />
+                    </span>
                   </div>
                   <div className="space-y-1.5">
                     {openTrades.map((trade) => (
-                      <div
-                        key={trade.id}
-                        onClick={() => onPrefillChat?.(buildPositionReviewPrompt(trade))}
-                        className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className={cn(
-                            "text-[9px] font-semibold px-1.5 py-0.5 rounded uppercase",
-                            trade.direction === 'long'
-                              ? "bg-[var(--data-positive)]/10 text-[var(--data-positive)]"
-                              : "bg-[var(--data-negative)]/10 text-[var(--data-negative)]"
-                          )}>
-                            {trade.direction}
+                      <PressScale key={trade.id} hoverScale={1}>
+                        <button
+                          type="button"
+                          onClick={() => onPrefillChat?.(buildPositionReviewPrompt(trade))}
+                          className="flex w-full items-center justify-between p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)] cursor-pointer transition-all duration-150"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className={cn(
+                              "text-[9px] font-semibold px-1.5 py-0.5 rounded uppercase",
+                              trade.direction === 'long'
+                                ? "bg-[var(--data-positive)]/10 text-[var(--data-positive)]"
+                                : "bg-[var(--data-negative)]/10 text-[var(--data-negative)]"
+                            )}>
+                              {trade.direction}
+                            </span>
+                            <span className="text-xs font-semibold text-[var(--text-primary)]">{trade.ticker}</span>
+                          </div>
+                          <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">
+                            <NumberTicker value={trade.entry_price} format={(value) => `$${value.toFixed(2)}`} />
                           </span>
-                          <span className="text-xs font-semibold text-[var(--text-primary)]">{trade.ticker}</span>
-                        </div>
-                        <span className="text-[10px] text-[var(--text-muted)] font-mono tabular-nums">
-                          ${trade.entry_price.toFixed(2)}
-                        </span>
-                      </div>
+                        </button>
+                      </PressScale>
                     ))}
                   </div>
                 </div>
@@ -908,24 +937,23 @@ export function TradingContextPanel({
                 </h4>
                 <div className="space-y-1.5">
                   {defaultSectors.map((sector) => (
-                    <button
-                      key={sector.name}
-                      onClick={() => {
-                        const heatmapName = sectorToSP500[sector.name]
-                        if (heatmapName) {
-                          router.push(`/heatmap?sector=${encodeURIComponent(heatmapName)}`)
-                        } else {
-                          // Non-stock categories: ask Pelican about the category
-                          onPrefillChat?.(`What's happening in ${sector.name} today?`)
-                        }
-                      }}
-                      className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors duration-150 cursor-pointer group"
-                    >
-                      <span className="text-xs text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors duration-150">{sector.name}</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className={cn("text-xs font-medium font-mono tabular-nums", getChangeColor(sector.changePercent))}>
-                          {formatPercent(sector.changePercent)}
-                        </span>
+                    <PressScale key={sector.name} hoverScale={1}>
+                      <button
+                        onClick={() => {
+                          const heatmapName = sectorToSP500[sector.name]
+                          if (heatmapName) {
+                            router.push(`/heatmap?sector=${encodeURIComponent(heatmapName)}`)
+                          } else {
+                            onPrefillChat?.(`What's happening in ${sector.name} today?`)
+                          }
+                        }}
+                        className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-[var(--bg-elevated)] transition-colors duration-150 cursor-pointer group"
+                      >
+                        <span className="text-xs text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors duration-150">{sector.name}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={cn("text-xs font-medium font-mono tabular-nums", getChangeColor(sector.changePercent))}>
+                            {sector.changePercent == null ? formatPercent(sector.changePercent) : <NumberTicker value={sector.changePercent} format={(value) => fmt.percent(value)} />}
+                          </span>
                         {sector.changePercent !== null && (
                           <div
                             className={cn(
@@ -941,8 +969,9 @@ export function TradingContextPanel({
                           </div>
                         )}
                         <HugeiconsIcon icon={CaretRight} size={12} className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity duration-150" strokeWidth={1.5} color="currentColor" />
-                      </div>
-                    </button>
+                        </div>
+                      </button>
+                    </PressScale>
                   ))}
                 </div>
               </div>
@@ -960,9 +989,11 @@ export function TradingContextPanel({
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-sm font-bold font-mono tabular-nums text-[var(--text-primary)]">{formatPrice(defaultVix)}</span>
+                    <span className="text-sm font-bold font-mono tabular-nums text-[var(--text-primary)]">
+                      {defaultVix == null ? formatPrice(defaultVix) : <NumberTicker value={defaultVix} format={(value) => formatPrice(value)} />}
+                    </span>
                     <span className={cn("text-[10px] font-medium font-mono tabular-nums", getChangeColor(defaultVixChange))}>
-                      {formatPercent(defaultVixChange)}
+                      {defaultVixChange == null ? formatPercent(defaultVixChange) : <NumberTicker value={defaultVixChange} format={(value) => fmt.percent(value)} />}
                     </span>
                   </div>
                 </div>
@@ -992,10 +1023,18 @@ export function TradingContextPanel({
                       </div>
                       <div className="flex flex-col items-end">
                         <span className="text-xs font-semibold font-mono tabular-nums text-[var(--text-primary)]">
-                          {formatPrice(index.price)}
+                          {index.price == null ? formatPrice(index.price) : (
+                            <PriceFlash value={index.price}>
+                              <NumberTicker value={index.price} format={(value) => formatPrice(value)} />
+                            </PriceFlash>
+                          )}
                         </span>
                         <span className={cn("text-[10px] font-medium font-mono tabular-nums", getChangeColor(index.changePercent))}>
-                          {formatPercent(index.changePercent)}
+                          {index.changePercent == null ? formatPercent(index.changePercent) : (
+                            <PriceFlash value={index.changePercent} direction={index.changePercent >= 0 ? "up" : "down"}>
+                              <NumberTicker value={index.changePercent} format={(value) => fmt.percent(value)} />
+                            </PriceFlash>
+                          )}
                         </span>
                       </div>
                     </div>

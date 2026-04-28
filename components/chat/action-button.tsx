@@ -17,6 +17,7 @@ import {
   Shield01Icon as Shield,
   ChartLineData01Icon as ChartLineUp,
 } from '@hugeicons/core-free-icons'
+import { PressScale } from '@/components/motion/press-scale'
 import type { MessageAction, ActionType } from '@/types/action-buttons'
 
 const ACTION_ICONS: Record<ActionType, { icon: IconSvgElement }> = {
@@ -46,12 +47,12 @@ interface ActionButtonProps {
 export function ActionButton({ action, onClick, loading }: ActionButtonProps) {
   const config = ACTION_ICONS[action.type]
   const Icon = config?.icon
-
-  return (
+  const destructive = action.type === 'close_trade' || action.type === 'remove_watchlist'
+  const button = (
     <button
       onClick={() => onClick(action)}
       disabled={loading}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:pointer-events-none bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-indigo-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--accent-indigo-subtle)]"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-indigo-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--accent-indigo-subtle)]"
     >
       {loading ? (
         <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -60,5 +61,13 @@ export function ActionButton({ action, onClick, loading }: ActionButtonProps) {
       )}
       <span>{action.label}</span>
     </button>
+  )
+
+  if (destructive) return button
+
+  return (
+    <PressScale disabled={loading}>
+      {button}
+    </PressScale>
   )
 }

@@ -4,8 +4,8 @@ import type React from "react"
 import { useRef } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Attachment01Icon as Paperclip } from "@hugeicons/core-free-icons"
+import { PressScale } from "@/components/motion/press-scale"
 import { cn } from "@/lib/utils"
-import { m } from "framer-motion"
 import { useT } from "@/lib/providers/translation-provider"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 
@@ -29,20 +29,20 @@ export function AttachButton({ disabled, onFileSelect }: AttachButtonProps) {
   return (
     <>
       <IconTooltip label={t.chat.attachFile} side="top">
-        <m.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled}
-          className={cn(
-            "flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
-            "transition-all duration-200",
-            "hover:bg-[var(--bg-elevated)]",
-            disabled && "opacity-50 cursor-not-allowed",
-          )}
-        >
-          <HugeiconsIcon icon={Paperclip} size={20} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
-        </m.button>
+        <PressScale disabled={disabled}>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={disabled}
+            className={cn(
+              "flex-shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center",
+              "transition-all duration-200",
+              "hover:bg-[var(--bg-elevated)]",
+              disabled && "opacity-50 cursor-not-allowed",
+            )}
+          >
+            <HugeiconsIcon icon={Paperclip} size={20} className="text-muted-foreground" strokeWidth={1.5} color="currentColor" />
+          </button>
+        </PressScale>
       </IconTooltip>
 
       <input

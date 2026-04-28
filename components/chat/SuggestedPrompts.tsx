@@ -2,6 +2,7 @@
 
 import { useMemo } from "react"
 import { m } from "framer-motion"
+import { PressScale } from "@/components/motion/press-scale"
 import { cn } from "@/lib/utils"
 import { useTodaysWarnings } from "@/hooks/use-todays-warnings"
 import { useBehavioralInsights } from "@/hooks/use-behavioral-insights"
@@ -227,57 +228,65 @@ export function SuggestedPrompts({ onSelect, disabled }: SuggestedPromptsProps) 
         chips.map((chip, index) => {
           const Icon = chip.icon
           return (
-            <m.button
+            <m.div
               key={`${chip.label}-${index}`}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25, delay: 0.05 + index * 0.04 }}
-              onClick={() => {
-                if (disabled) return
-                trackEvent({ eventType: 'suggested_prompt_clicked', feature: 'chat', data: { prompt: chip.label } })
-                onSelect(chip.prompt)
-              }}
-              whileHover={disabled ? undefined : { scale: 1.02 }}
-              disabled={disabled}
-              className={cn(
-                "px-4 py-3 rounded-xl text-sm border bg-[var(--bg-surface)] transition-all duration-150 flex items-center gap-2",
-                disabled
-                  ? "border-[var(--border-subtle)] text-[var(--text-disabled)] cursor-not-allowed"
-                  : chip.severity === 'critical'
-                    ? "border-[var(--data-negative)]/30 text-[var(--data-negative)] hover:bg-[var(--data-negative)]/5 cursor-pointer"
-                    : chip.severity === 'warning'
-                      ? "border-[var(--data-warning)]/30 text-[var(--data-warning)] hover:bg-[var(--data-warning)]/5 cursor-pointer"
-                      : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/20 hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] cursor-pointer"
-              )}
             >
-              <HugeiconsIcon icon={Icon} size={16} strokeWidth={1.5} color="currentColor" />
-              {chip.label}
-            </m.button>
+              <PressScale disabled={disabled}>
+                <button
+                  onClick={() => {
+                    if (disabled) return
+                    trackEvent({ eventType: 'suggested_prompt_clicked', feature: 'chat', data: { prompt: chip.label } })
+                    onSelect(chip.prompt)
+                  }}
+                  disabled={disabled}
+                  className={cn(
+                    "px-4 py-3 rounded-xl text-sm border bg-[var(--bg-surface)] transition-all duration-150 flex items-center gap-2",
+                    disabled
+                      ? "border-[var(--border-subtle)] text-[var(--text-disabled)] cursor-not-allowed"
+                      : chip.severity === 'critical'
+                        ? "border-[var(--data-negative)]/30 text-[var(--data-negative)] hover:bg-[var(--data-negative)]/5 cursor-pointer"
+                        : chip.severity === 'warning'
+                          ? "border-[var(--data-warning)]/30 text-[var(--data-warning)] hover:bg-[var(--data-warning)]/5 cursor-pointer"
+                          : "border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--accent-primary)]/20 hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] cursor-pointer"
+                  )}
+                >
+                  <HugeiconsIcon icon={Icon} size={16} strokeWidth={1.5} color="currentColor" />
+                  {chip.label}
+                </button>
+              </PressScale>
+            </m.div>
           )
         })
       ) : (
         (MARKET_DEFAULT_PROMPTS[primaryMarket] || MARKET_DEFAULT_PROMPTS.stocks!).map((prompt, index) => (
-          <m.button
+          <m.div
             key={index}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: 0.05 + index * 0.04 }}
-            onClick={() => {
-              if (disabled) return
-              trackEvent({ eventType: 'suggested_prompt_clicked', feature: 'chat', data: { prompt } })
-              onSelect(prompt)
-            }}
-            whileHover={disabled ? undefined : { scale: 1.02 }}
-            disabled={disabled}
-            className={cn(
-              "px-5 py-3 rounded-full text-[15px] border bg-card transition-all duration-150",
-              disabled
-                ? "border-border/30 text-muted-foreground/50 cursor-not-allowed"
-                : "border-border text-foreground/70 hover:border-primary/20 hover:text-foreground hover:bg-accent cursor-pointer"
-            )}
           >
-            {prompt}
-          </m.button>
+            <PressScale disabled={disabled}>
+              <button
+                onClick={() => {
+                  if (disabled) return
+                  trackEvent({ eventType: 'suggested_prompt_clicked', feature: 'chat', data: { prompt } })
+                  onSelect(prompt)
+                }}
+                disabled={disabled}
+                className={cn(
+                  "px-5 py-3 rounded-full text-[15px] border bg-card transition-all duration-150",
+                  disabled
+                    ? "border-border/30 text-muted-foreground/50 cursor-not-allowed"
+                    : "border-border text-foreground/70 hover:border-primary/20 hover:text-foreground hover:bg-accent cursor-pointer"
+                )}
+              >
+                {prompt}
+              </button>
+            </PressScale>
+          </m.div>
         ))
       )}
     </div>
