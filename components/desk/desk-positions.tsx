@@ -4,19 +4,15 @@ import { useMemo } from "react"
 import { useTrades } from "@/hooks/use-trades"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
 import { usePortfolioSummary } from "@/hooks/use-portfolio-summary"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PriceFlash } from "@/components/motion/price-flash"
+import { SkeletonRow } from "@/components/motion/shimmer-skeleton"
+import { fmt } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 interface DeskPositionsProps {
   onTickerClick: (ticker: string) => void
   onAnalyze: (ticker: string, prompt: string) => void
-}
-
-function formatCurrency(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) return "—"
-  return `$${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`
 }
 
 function formatSignedCurrency(value: number | null | undefined): string {
@@ -25,11 +21,6 @@ function formatSignedCurrency(value: number | null | undefined): string {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`
-}
-
-function formatSignedPercent(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) return "—"
-  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`
 }
 
 export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPositionsProps) {
@@ -93,8 +84,10 @@ export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPosition
 
   if (isLoading) {
     return (
-      <div className="flex h-full min-h-[180px] items-center justify-center bg-[var(--bg-surface)]/40 text-xs text-[var(--text-muted)]">
-        Loading positions...
+      <div className="flex h-full min-h-[180px] flex-col justify-center gap-3 bg-[var(--bg-surface)]/40 px-4">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <SkeletonRow key={index} cells={[{ width: "7ch" }, { width: "7ch" }, { width: "8ch" }, { width: "6ch" }, { width: "8ch" }]} />
+        ))}
       </div>
     )
   }
@@ -113,7 +106,7 @@ export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPosition
         <span>
           Exposure:{" "}
           <span className="font-[var(--font-geist-mono)] tabular-nums text-[var(--text-secondary)]">
-            {formatCurrency(totalExposure)}
+            <NumberTicker value={totalExposure} format={(value) => fmt.currency(value)} />
           </span>
         </span>
         <span>
@@ -122,11 +115,15 @@ export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPosition
             "font-[var(--font-geist-mono)] tabular-nums",
             totalPnl >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"
           )}>
-            {formatSignedCurrency(totalPnl)}
+            <PriceFlash value={totalPnl} direction={totalPnl >= 0 ? "up" : "down"}>
+              <NumberTicker value={totalPnl} format={fmt.pnl} />
+            </PriceFlash>
           </span>
         </span>
         <span>
-          <span className="font-[var(--font-geist-mono)] tabular-nums text-[var(--text-secondary)]">{rows.length}</span> open
+          <span className="font-[var(--font-geist-mono)] tabular-nums text-[var(--text-secondary)]">
+            <NumberTicker value={rows.length} format={fmt.integer} />
+          </span> open
         </span>
       </div>
 
@@ -165,10 +162,12 @@ export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPosition
                   {row.trade.ticker}
                 </td>
                 <td className="px-2 py-1.5 text-right font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-primary)]">
-                  {formatCurrency(row.last)}
+                  <PriceFlash value={row.last}>
+                    <NumberTicker value={row.last} format={(value) => fmt.price(value)} />
+                  </PriceFlash>
                 </td>
                 <td className="px-2 py-1.5 text-right font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-secondary)]">
-                  {formatCurrency(row.marketValue)}
+                  <NumberTicker value={row.marketValue} format={(value) => fmt.currency(value)} />
                 </td>
                 <td
                   className={cn(
@@ -176,7 +175,11 @@ export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPosition
                     (row.todayChangePercent ?? 0) >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"
                   )}
                 >
-                  {formatSignedPercent(row.todayChangePercent)}
+                  {row.todayChangePercent == null ? "—" : (
+                    <PriceFlash value={row.todayChangePercent} direction={row.todayChangePercent >= 0 ? "up" : "down"}>
+                      <NumberTicker value={row.todayChangePercent} format={(value) => fmt.percent(value)} />
+                    </PriceFlash>
+                  )}
                 </td>
                 <td
                   className={cn(
@@ -184,7 +187,11 @@ export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPosition
                     (row.todayPnl ?? 0) >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"
                   )}
                 >
-                  {row.todayPnl == null ? "—" : formatSignedCurrency(row.todayPnl).replace("+", "")}
+                  {row.todayPnl == null ? "—" : (
+                    <PriceFlash value={row.todayPnl} direction={row.todayPnl >= 0 ? "up" : "down"}>
+                      <NumberTicker value={row.todayPnl} format={fmt.pnl} />
+                    </PriceFlash>
+                  )}
                 </td>
               </tr>
             ))}

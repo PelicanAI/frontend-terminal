@@ -3,6 +3,10 @@
 import { useMemo } from "react"
 import { useWatchlist } from "@/hooks/use-watchlist"
 import { useLiveQuotes } from "@/hooks/use-live-quotes"
+import { NumberTicker } from "@/components/motion/number-ticker"
+import { PriceFlash } from "@/components/motion/price-flash"
+import { SkeletonRow } from "@/components/motion/shimmer-skeleton"
+import { fmt } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 interface DeskWatchlistProps {
@@ -11,19 +15,6 @@ interface DeskWatchlistProps {
 }
 
 type AlertTone = "negative" | "positive" | "warning" | null
-
-function formatCurrency(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) return "—"
-  return `$${value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`
-}
-
-function formatSignedPercent(value: number | null | undefined): string {
-  if (value == null || Number.isNaN(value)) return "—"
-  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`
-}
 
 function getAlertState(
   price: number | null,
@@ -93,8 +84,10 @@ export default function DeskWatchlist({ onTickerClick, onAnalyze }: DeskWatchlis
 
   if (loading) {
     return (
-      <div className="flex h-full min-h-[180px] items-center justify-center bg-[var(--bg-surface)]/40 text-xs text-[var(--text-muted)]">
-        Loading watchlist...
+      <div className="flex h-full min-h-[180px] flex-col justify-center gap-3 bg-[var(--bg-surface)]/40 px-4">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <SkeletonRow key={index} cells={[{ width: "8ch" }, { width: "7ch" }, { width: "6ch" }, { width: "8ch", rounded: "full" }]} />
+        ))}
       </div>
     )
   }
@@ -133,13 +126,21 @@ export default function DeskWatchlist({ onTickerClick, onAnalyze }: DeskWatchlis
                   {row.item.ticker}
                 </span>
                 <span className="text-right font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-primary)]">
-                  {formatCurrency(row.price)}
+                  {row.price == null ? "—" : (
+                    <PriceFlash value={row.price}>
+                      <NumberTicker value={row.price} format={(value) => fmt.price(value)} />
+                    </PriceFlash>
+                  )}
                 </span>
                 <span className={cn(
                   "text-right font-[var(--font-geist-mono)] text-xs tabular-nums",
                   (row.changePercent ?? 0) >= 0 ? "text-[var(--data-positive)]" : "text-[var(--data-negative)]"
                 )}>
-                  {formatSignedPercent(row.changePercent)}
+                  {row.changePercent == null ? "—" : (
+                    <PriceFlash value={row.changePercent} direction={row.changePercent >= 0 ? "up" : "down"}>
+                      <NumberTicker value={row.changePercent} format={(value) => fmt.percent(value)} />
+                    </PriceFlash>
+                  )}
                 </span>
                 <span className="text-right">
                   {row.alert.label ? (

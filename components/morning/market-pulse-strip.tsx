@@ -2,6 +2,11 @@
 
 import { useMarketPulse } from '@/hooks/use-market-pulse'
 import { getMarketStatus } from '@/hooks/use-market-data'
+import { NumberTicker } from '@/components/motion/number-ticker'
+import { PressScale } from '@/components/motion/press-scale'
+import { PriceFlash } from '@/components/motion/price-flash'
+import { SkeletonRow } from '@/components/motion/shimmer-skeleton'
+import { fmt } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 const STATUS_CONFIG = {
@@ -30,11 +35,7 @@ export function MarketPulseStrip({ onIndexClick, compact = false }: MarketPulseS
           : "gap-6 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]/50 px-4 py-2.5"
       )}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-2 animate-pulse">
-            <div className="h-3 w-10 bg-[var(--bg-elevated)] rounded" />
-            <div className="h-4 w-16 bg-[var(--bg-elevated)] rounded" />
-            <div className="h-3 w-12 bg-[var(--bg-elevated)] rounded" />
-          </div>
+          <SkeletonRow key={i} gap={8} cells={[{ width: "4ch" }, { width: "7ch" }, { width: "6ch" }]} />
         ))}
       </div>
     )
@@ -51,41 +52,46 @@ export function MarketPulseStrip({ onIndexClick, compact = false }: MarketPulseS
     >
       <div className={cn("flex items-center", compact ? "gap-3" : "gap-6")}>
         {data?.items.map((item) => (
-          <button
-            key={item.symbol}
-            type="button"
-            onClick={() => onIndexClick?.(item.symbol, item.label)}
-            className={cn(
-              "shrink-0 rounded-md transition-colors hover:bg-[var(--bg-elevated)]",
-              compact ? "flex items-center gap-2 px-1.5 py-1" : "flex items-center gap-2 px-1.5 py-0.5"
-            )}
-          >
-            <span className={cn(
-              "font-medium text-[var(--text-muted)]",
-              compact ? "text-[10px] uppercase tracking-wide" : "text-xs"
-            )}>
-              {item.label}
-            </span>
-            <span className={cn(
-              "font-[var(--font-geist-mono)] font-medium tabular-nums text-[var(--text-primary)]",
-              compact ? "text-xs" : "text-sm"
-            )}>
-              {item.price != null
-                ? item.symbol === 'VIX'
-                  ? item.price.toFixed(2)
-                  : item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                : '---'}
-            </span>
-            {item.changePercent != null && (
+          <PressScale key={item.symbol}>
+            <button
+              type="button"
+              onClick={() => onIndexClick?.(item.symbol, item.label)}
+              className={cn(
+                "shrink-0 rounded-md transition-colors hover:bg-[var(--bg-elevated)]",
+                compact ? "flex items-center gap-2 px-1.5 py-1" : "flex items-center gap-2 px-1.5 py-0.5"
+              )}
+            >
               <span className={cn(
-                "font-[var(--font-geist-mono)] tabular-nums",
-                compact ? "text-[10px]" : "text-xs",
-                item.changePercent >= 0 ? 'text-[var(--data-positive)]' : 'text-[var(--data-negative)]'
+                "font-medium text-[var(--text-muted)]",
+                compact ? "text-[10px] uppercase tracking-wide" : "text-xs"
               )}>
-                {item.changePercent >= 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
+                {item.label}
               </span>
-            )}
-          </button>
+              <span className={cn(
+                "font-[var(--font-geist-mono)] font-medium tabular-nums text-[var(--text-primary)]",
+                compact ? "text-xs" : "text-sm"
+              )}>
+                {item.price != null
+                  ? (
+                    <PriceFlash value={item.price}>
+                      <NumberTicker value={item.price} format={(value) => fmt.price(value)} />
+                    </PriceFlash>
+                  )
+                  : '---'}
+              </span>
+              {item.changePercent != null && (
+                <span className={cn(
+                  "font-[var(--font-geist-mono)] tabular-nums",
+                  compact ? "text-[10px]" : "text-xs",
+                  item.changePercent >= 0 ? 'text-[var(--data-positive)]' : 'text-[var(--data-negative)]'
+                )}>
+                  <PriceFlash value={item.changePercent} direction={item.changePercent >= 0 ? "up" : "down"}>
+                    <NumberTicker value={item.changePercent} format={(value) => fmt.percent(value)} />
+                  </PriceFlash>
+                </span>
+              )}
+            </button>
+          </PressScale>
         ))}
       </div>
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { MarketPulseStrip } from "@/components/morning/market-pulse-strip"
-import { cn } from "@/lib/utils"
+import { TabIndicator } from "@/components/motion/tab-indicator"
 import DeskPositions from "./desk-positions"
 import DeskWatchlist from "./desk-watchlist"
 import DeskMovers from "./desk-movers"
@@ -31,24 +31,13 @@ export default function DeskDataZone({ onTickerClick, onAnalyze }: DeskDataZoneP
         <MarketPulseStrip compact onIndexClick={(symbol) => onTickerClick(symbol)} />
       </div>
 
-      <div className="flex flex-shrink-0 items-center gap-0.5 border-b border-[var(--border-subtle)] px-3 py-1">
-        <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              className={cn(
-                "rounded px-2.5 py-1 text-[11px] font-medium transition-colors duration-150",
-                activeTab === tab.key
-                  ? "bg-[var(--bg-elevated)] text-[var(--text-primary)]"
-                  : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      <div className="flex-shrink-0 px-3">
+        <TabIndicator
+          tabs={tabs.map((tab) => ({ id: tab.key, label: tab.label }))}
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as DeskTab)}
+          className="overflow-x-auto scrollbar-hide border-[var(--border-subtle)]"
+        />
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden">

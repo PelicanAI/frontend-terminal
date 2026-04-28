@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useRef, useState } from "react"
 import { PelicanChartProvider, usePelicanChart } from "@/providers/pelican-chart-provider"
+import { PressScale } from "@/components/motion/press-scale"
 import KlineChart, { type KlineChartRef } from "./kline-chart"
 import type { ChartIndicator, OverlayTool, TimeframeKey } from "@/types/chart"
 
@@ -41,16 +42,18 @@ function IndicatorDropdown() {
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-medium transition-colors ${
-          indicators.length > 0
-            ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
-            : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
-        }`}
-      >
-        Ind {indicators.length > 0 && `(${indicators.length})`}
-      </button>
+      <PressScale>
+        <button
+          onClick={() => setOpen(!open)}
+          className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-medium transition-colors ${
+            indicators.length > 0
+              ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
+              : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+          }`}
+        >
+          Ind {indicators.length > 0 && `(${indicators.length})`}
+        </button>
+      </PressScale>
 
       {open && (
         <>
@@ -60,36 +63,38 @@ function IndicatorDropdown() {
               Main
             </div>
             {MAIN_INDICATORS.map((ind) => (
-              <button
-                key={ind.key}
-                onClick={() => toggleIndicator(ind.key)}
-                className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left font-mono text-[10px] transition-colors ${
-                  indicators.includes(ind.key)
-                    ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]"
-                }`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${indicators.includes(ind.key) ? "bg-[var(--accent-primary)]" : "bg-[var(--border-default)]"}`} />
-                {ind.label}
-              </button>
+              <PressScale key={ind.key} hoverScale={1}>
+                <button
+                  onClick={() => toggleIndicator(ind.key)}
+                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left font-mono text-[10px] transition-colors ${
+                    indicators.includes(ind.key)
+                      ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]"
+                  }`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${indicators.includes(ind.key) ? "bg-[var(--accent-primary)]" : "bg-[var(--border-default)]"}`} />
+                  {ind.label}
+                </button>
+              </PressScale>
             ))}
             <div className="my-0.5 h-px bg-[var(--border-subtle)]" />
             <div className="px-2 py-1 text-[9px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
               Sub
             </div>
             {SUB_INDICATORS.map((ind) => (
-              <button
-                key={ind.key}
-                onClick={() => toggleIndicator(ind.key)}
-                className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left font-mono text-[10px] transition-colors ${
-                  indicators.includes(ind.key)
-                    ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]"
-                }`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${indicators.includes(ind.key) ? "bg-[var(--accent-primary)]" : "bg-[var(--border-default)]"}`} />
-                {ind.label}
-              </button>
+              <PressScale key={ind.key} hoverScale={1}>
+                <button
+                  onClick={() => toggleIndicator(ind.key)}
+                  className={`flex w-full items-center gap-2 rounded px-2 py-1 text-left font-mono text-[10px] transition-colors ${
+                    indicators.includes(ind.key)
+                      ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]"
+                  }`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${indicators.includes(ind.key) ? "bg-[var(--accent-primary)]" : "bg-[var(--border-default)]"}`} />
+                  {ind.label}
+                </button>
+              </PressScale>
             ))}
           </div>
         </>
@@ -109,18 +114,19 @@ function DrawingToolbar() {
   return (
     <div className="flex items-center gap-0.5">
       {DRAWING_TOOLS.map((tool) => (
-        <button
-          key={tool.key}
-          onClick={() => handleClick(tool.key)}
-          title={tool.label}
-          className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-medium transition-colors ${
-            activeTool === tool.key
-              ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
-              : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
-          }`}
-        >
-          {tool.label}
-        </button>
+        <PressScale key={tool.key}>
+          <button
+            onClick={() => handleClick(tool.key)}
+            title={tool.label}
+            className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-medium transition-colors ${
+              activeTool === tool.key
+                ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
+                : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+            }`}
+          >
+            {tool.label}
+          </button>
+        </PressScale>
       ))}
     </div>
   )
@@ -144,17 +150,18 @@ function DeskChartInner({ symbol }: DeskChartProps) {
           {/* Timeframes */}
           <div className="ml-2 flex items-center gap-0.5">
             {TIMEFRAMES.map((tf) => (
-              <button
-                key={tf}
-                onClick={() => setTimeframe(tf)}
-                className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-medium transition-colors ${
-                  timeframe === tf
-                    ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
-                    : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
-                }`}
-              >
-                {tf}
-              </button>
+              <PressScale key={tf}>
+                <button
+                  onClick={() => setTimeframe(tf)}
+                  className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-medium transition-colors ${
+                    timeframe === tf
+                      ? "bg-[var(--accent-muted)] text-[var(--accent-primary)]"
+                      : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+                  }`}
+                >
+                  {tf}
+                </button>
+              </PressScale>
             ))}
           </div>
 
