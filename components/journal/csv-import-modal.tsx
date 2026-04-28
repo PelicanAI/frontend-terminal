@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, type ChangeEvent, type DragEvent, type KeyboardEvent } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { PelicanButton } from "@/components/ui/pelican"
 import { HugeiconsIcon } from "@hugeicons/react"
@@ -103,19 +103,19 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
     if (fileInputRef.current) fileInputRef.current.value = ''
   }, [])
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setIsDragOver(true)
   }, [])
 
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
+  const handleDragLeave = useCallback((e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setIsDragOver(false)
   }, [])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback((e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setIsDragOver(false)
@@ -123,10 +123,16 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
     if (file) handleFile(file)
   }, [handleFile])
 
-  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) handleFile(file)
   }, [handleFile])
+
+  const handleUploadKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return
+    e.preventDefault()
+    fileInputRef.current?.click()
+  }, [])
 
   const missingRequired = REQUIRED_FIELDS.filter(f => !mapping[f])
 
@@ -210,11 +216,13 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
         {/* Step 1: Upload */}
         {step === 1 && (
           <div className="space-y-4">
-            <button
-              type="button"
+            <div
+              role="button"
+              tabIndex={0}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
+              onKeyDown={handleUploadKeyDown}
               className={`flex flex-col items-center justify-center gap-3 py-12 px-6 rounded-xl border-dashed border-2 transition-colors duration-150 cursor-pointer w-full appearance-none bg-transparent m-0 ${
                 isDragOver
                   ? 'border-[var(--accent-primary)] bg-[var(--accent-muted)]'
@@ -247,7 +255,7 @@ export function CSVImportModal({ open, onOpenChange, onImportComplete }: CSVImpo
                 className="hidden"
                 onChange={handleFileInputChange}
               />
-            </button>
+            </div>
 
             {parseError && (
               <div className="flex items-center gap-2 rounded-lg bg-[var(--data-negative)]/10 border border-[var(--data-negative)]/30 px-4 py-3 text-sm text-[var(--data-negative)]">
