@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { supportsAutocomplete } from "@/lib/config/asset-coverage"
 import { createUserRateLimiter, rateLimitResponse } from "@/lib/rate-limit"
 import { logger } from "@/lib/logger"
 
@@ -83,6 +84,22 @@ export interface TickerSearchResponse {
   count: number
 }
 
+function getResultAssetType(result: TickerSearchResult): string {
+  const market = result.market.toLowerCase()
+  const type = result.type.toLowerCase()
+  if (market === 'crypto') return 'crypto'
+  if (market === 'fx' || market === 'forex' || type === 'fx') return 'forex'
+  if (market === 'options' || type.includes('option')) return 'option'
+  if (market === 'futures' || type.includes('future')) return 'future'
+  if (type === 'etf') return 'etf'
+  if (market === 'indices' || market === 'index') return 'indices'
+  return 'stock'
+}
+
+function filterAutocompleteResults(results: TickerSearchResult[]): TickerSearchResult[] {
+  return results.filter((result) => supportsAutocomplete(getResultAssetType(result)))
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -119,7 +136,7 @@ export async function GET(request: NextRequest) {
         return aExact - bExact
       })
 
-      const sliced = filtered.slice(0, limit)
+      const sliced = filterAutocompleteResults(filtered).slice(0, limit)
 
       // Allow any 1-5 character uppercase string as a valid ticker
       if (sliced.length === 0 && /^[A-Z]{1,5}$/.test(upperQuery)) {
@@ -158,7 +175,7 @@ export async function GET(request: NextRequest) {
         return aExact - bExact
       })
 
-      const sliced = filtered.slice(0, limit)
+      const sliced = filterAutocompleteResults(filtered).slice(0, limit)
 
       // Allow any 1-5 character uppercase string as a valid ticker
       if (sliced.length === 0 && /^[A-Z]{1,5}$/.test(upperQuery)) {
@@ -251,7 +268,7 @@ export async function GET(request: NextRequest) {
       return aExact - bExact
     })
 
-    const finalResults = merged.slice(0, limit)
+    const finalResults = filterAutocompleteResults(merged).slice(0, limit)
 
     return NextResponse.json(
       {

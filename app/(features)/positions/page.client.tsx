@@ -102,8 +102,12 @@ export default function PositionsPage() {
     () => portfolio?.positions?.map(p => p.ticker) ?? [],
     [portfolio?.positions]
   )
+  const quoteTickers = useMemo(
+    () => portfolio?.positions?.map(p => `${p.ticker}:${p.asset_type}`) ?? [],
+    [portfolio?.positions]
+  )
   const { data: tickerHistory } = useTickerHistory(openTickers)
-  const { quotes } = useLiveQuotes(openTickers)
+  const { quotes } = useLiveQuotes(quoteTickers)
   const { data: pnlHistory, isLoading: pnlHistoryLoading } = usePortfolioPnl(portfolio?.positions ?? [])
 
   const [activeFilter, setActiveFilter] = useState('all')

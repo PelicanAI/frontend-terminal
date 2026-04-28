@@ -7,6 +7,7 @@ import { usePortfolioSummary } from "@/hooks/use-portfolio-summary"
 import { NumberTicker } from "@/components/motion/number-ticker"
 import { PriceFlash } from "@/components/motion/price-flash"
 import { SkeletonRow } from "@/components/motion/shimmer-skeleton"
+import { hasMarketData } from "@/lib/config/asset-coverage"
 import { fmt } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
@@ -26,12 +27,13 @@ function formatSignedCurrency(value: number | null | undefined): string {
 export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPositionsProps) {
   const { openTrades, isLoading } = useTrades()
   const { data: portfolio } = usePortfolioSummary()
-  const tickers = useMemo(() => [...new Set(openTrades.map((trade) => trade.ticker))], [openTrades])
+  const tickers = useMemo(() => [...new Set(openTrades.map((trade) => `${trade.ticker}:${trade.asset_type}`))], [openTrades])
   const { quotes } = useLiveQuotes(tickers)
 
   const rows = useMemo(() => {
     return openTrades
       .map((trade) => {
+        const marketDataAvailable = hasMarketData(trade.asset_type)
         const quote = quotes[trade.ticker]
         const last = quote?.price ?? trade.entry_price
         const direction = trade.direction === "long" ? 1 : -1
@@ -59,6 +61,7 @@ export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPosition
 
         return {
           trade,
+          marketDataAvailable,
           last,
           marketValue,
           totalPnl,
@@ -162,9 +165,16 @@ export default function DeskPositions({ onTickerClick, onAnalyze }: DeskPosition
                   {row.trade.ticker}
                 </td>
                 <td className="px-2 py-1.5 text-right font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-primary)]">
-                  <PriceFlash value={row.last}>
-                    <NumberTicker value={row.last} format={(value) => fmt.price(value)} />
-                  </PriceFlash>
+                  {row.marketDataAvailable ? (
+                    <PriceFlash value={row.last}>
+                      <NumberTicker value={row.last} format={(value) => fmt.price(value)} />
+                    </PriceFlash>
+                  ) : (
+                    <span className="inline-flex flex-col items-end leading-tight">
+                      <NumberTicker value={row.last} format={(value) => fmt.price(value)} />
+                      <span className="text-[9px] uppercase tracking-[0.08em] text-[var(--text-muted)]">Manual</span>
+                    </span>
+                  )}
                 </td>
                 <td className="px-2 py-1.5 text-right font-[var(--font-geist-mono)] text-xs tabular-nums text-[var(--text-secondary)]">
                   <NumberTicker value={row.marketValue} format={(value) => fmt.currency(value)} />

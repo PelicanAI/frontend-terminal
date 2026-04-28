@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils"
 import { toast } from "@/hooks/use-toast"
 import { trackEvent } from "@/lib/tracking"
 import { BudgetWarningBanner } from "@/components/risk-budget/budget-warning-banner"
+import { hasMarketData } from "@/lib/config/asset-coverage"
 
 interface LogTradeModalProps {
   open: boolean
@@ -97,6 +98,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
   const [setupTags, setSetupTags] = useState("")
   const [conviction, setConviction] = useState("5")
   const [isPaper, setIsPaper] = useState(false)
+  const assetHasMarketData = hasMarketData(assetType)
 
   // Pre-fill fields when editing an existing trade
   useEffect(() => {
@@ -383,6 +385,7 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
               {[
                 { type: 'stock', label: 'Stock' },
                 { type: 'option', label: 'Option' },
+                { type: 'future', label: 'Future' },
                 { type: 'crypto', label: 'Crypto' },
                 { type: 'etf', label: 'ETF' },
                 { type: 'forex', label: 'Forex' },
@@ -558,6 +561,12 @@ export function LogTradeModal({ open, onOpenChange, onSubmit, initialTicker = ""
                   />
                 </div>
               </div>
+
+              {!assetHasMarketData && (
+                <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+                  Live pricing for {assetType}s coming soon. Enter price manually.
+                </p>
+              )}
 
               {/* Position Size Calculation */}
               {quantity && entryPrice && (

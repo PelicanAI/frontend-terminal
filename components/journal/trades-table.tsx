@@ -22,6 +22,7 @@ import { PriceFlash } from "@/components/motion/price-flash"
 import { PelicanCard, PelicanButton, staggerContainer, staggerItem } from "@/components/ui/pelican"
 import { IconTooltip } from "@/components/ui/icon-tooltip"
 import { GradeBadge } from "@/components/grading/trade-grade-card"
+import { hasMarketData } from "@/lib/config/asset-coverage"
 import { fmt } from "@/lib/motion"
 
 const fmtPrice = (v: number) => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -327,6 +328,7 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
 
             const isWinner = displayPnL.amount !== null && displayPnL.amount > 0
             const isLoser = displayPnL.amount !== null && displayPnL.amount < 0
+            const marketDataAvailable = hasMarketData(trade.asset_type)
 
             return (
               <tr
@@ -383,7 +385,9 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                       </PriceFlash>
                     </span>
                   ) : trade.status === 'open' ? (
-                    <span className="text-[var(--text-disabled)]" title="Price unavailable">—</span>
+                    <span className="text-[var(--text-disabled)]" title={marketDataAvailable ? "Price unavailable" : "Live market data unavailable"}>
+                      {marketDataAvailable ? "—" : "Manual"}
+                    </span>
                   ) : (
                     <span className="text-[var(--text-disabled)]">—</span>
                   )}
@@ -557,7 +561,8 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
       >
         {sortedTrades.map((trade) => {
           const isSelected = selectedTradeId === trade.id
-          const unrealized = getUnrealizedPnL(trade, quotes)
+            const unrealized = getUnrealizedPnL(trade, quotes)
+            const marketDataAvailable = hasMarketData(trade.asset_type)
 
           const displayPnL = trade.status === 'open' && unrealized
             ? { amount: unrealized.pnlAmount, percent: unrealized.pnlPercent }
@@ -616,7 +621,9 @@ export function TradesTable({ trades, onSelectTrade, selectedTradeId, onScanTrad
                         </PriceFlash>
                       </span>
                     ) : (
-                      <span className="text-[var(--text-disabled)]">—</span>
+                      <span className="text-[var(--text-disabled)]" title={marketDataAvailable ? "Price unavailable" : "Live market data unavailable"}>
+                        {marketDataAvailable ? "—" : "Manual"}
+                      </span>
                     )}
                   </div>
                   <div>

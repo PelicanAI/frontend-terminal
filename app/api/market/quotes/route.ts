@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { hasMarketData, toAssetType } from '@/lib/config/asset-coverage'
 import { createUserRateLimiter, rateLimitResponse } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 
@@ -28,9 +29,13 @@ interface TickerWithType {
 function parseTickersParam(tickersParam: string): TickerWithType[] {
   // Format: "AAPL:stock,BTCUSD:crypto,EURUSD:forex" or just "AAPL,MSFT" (default to stock)
   return tickersParam.split(',').map(item => {
-    const parts = item.trim().split(':')
-    const ticker = parts[0] || ''
-    const assetType = parts[1] || 'stock'
+    const trimmed = item.trim()
+    const lastColon = trimmed.lastIndexOf(':')
+    const maybeAssetType = lastColon > -1 ? trimmed.slice(lastColon + 1) : ''
+    const normalizedAssetType = toAssetType(maybeAssetType)
+    const hasAssetAnnotation = maybeAssetType.length > 0 && normalizedAssetType !== 'other'
+    const assetType = hasAssetAnnotation ? normalizedAssetType : 'stock'
+    const ticker = hasAssetAnnotation ? trimmed.slice(0, lastColon) : trimmed
     return { ticker: ticker.toUpperCase(), assetType }
   })
 }
@@ -78,11 +83,13 @@ export async function GET(request: NextRequest) {
       const tickerToOriginal: Record<string, string> = {}
 
       for (const { ticker, assetType } of tickersWithTypes) {
-        if (!tickersByType[assetType]) {
-          tickersByType[assetType] = []
+        if (!hasMarketData(assetType)) continue
+        const quoteGroup = assetType === 'etf' ? 'stock' : assetType
+        if (!tickersByType[quoteGroup]) {
+          tickersByType[quoteGroup] = []
         }
         const polygonTicker = getPolygonTicker(ticker, assetType)
-        tickersByType[assetType].push(polygonTicker)
+        tickersByType[quoteGroup].push(polygonTicker)
         tickerToOriginal[polygonTicker] = ticker
       }
 

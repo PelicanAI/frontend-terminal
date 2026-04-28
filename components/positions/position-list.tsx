@@ -13,6 +13,7 @@ import { NumberTicker } from '@/components/motion/number-ticker'
 import { PressScale } from '@/components/motion/press-scale'
 import { PriceFlash } from '@/components/motion/price-flash'
 import { fmt } from '@/lib/motion'
+import { hasMarketData } from '@/lib/config/asset-coverage'
 import { backdrop } from '@/components/ui/pelican'
 import type { BehavioralInsights } from '@/hooks/use-behavioral-insights'
 import type { Quote } from '@/hooks/use-live-quotes'
@@ -46,6 +47,7 @@ export interface PositionData {
 }
 
 function getQuote(position: PortfolioPosition, quotes: Record<string, Quote>): Quote | null {
+  if (!hasMarketData(position.asset_type)) return null
   return quotes[position.ticker] ?? quotes[position.ticker.toUpperCase()] ?? null
 }
 
@@ -272,6 +274,7 @@ export function PositionList({
             {positionData.map((data) => {
               const { position, quote } = data
               const pnl = computePnl(position, quote)
+              const marketDataAvailable = hasMarketData(position.asset_type)
               const pnlPositive = (pnl.pnlAmount ?? 0) >= 0
               const rowTone = pnl.hasQuote ? (pnlPositive ? 'positive' : 'negative') : 'muted'
               const sideTone = position.direction === 'long' ? 'positive' : 'negative'
@@ -306,7 +309,9 @@ export function PositionList({
                   <td className="px-3 py-0 text-right"><DataValue>{formatPrice(position.entry_price)}</DataValue></td>
                   <td className="px-3 py-0 text-right">
                     <DataValue tone={pnl.hasQuote ? rowTone : 'muted'}>
-                      {pnl.currentPrice == null ? '—' : (
+                      {pnl.currentPrice == null ? (
+                        marketDataAvailable ? '—' : <span title="Live market data unavailable">Manual</span>
+                      ) : (
                         <PriceFlash value={pnl.currentPrice}>
                           <NumberTicker value={pnl.currentPrice} format={(value) => formatPrice(value)} />
                         </PriceFlash>
@@ -439,6 +444,7 @@ function PositionSheet({
 }) {
   const { position, quote, alerts } = data
   const pnl = computePnl(position, quote)
+  const marketDataAvailable = hasMarketData(position.asset_type)
   const pnlPositive = (pnl.pnlAmount ?? 0) >= 0
   const tone = pnl.hasQuote ? (pnlPositive ? 'positive' : 'negative') : 'muted'
   const exposurePct = portfolioStats.total_exposure > 0
@@ -497,9 +503,18 @@ function PositionSheet({
         </div>
         <div className="mt-2 flex items-baseline gap-3">
           <DataValue className="text-xl font-semibold">
-            <PriceFlash value={pnl.currentPrice ?? position.entry_price}>
-              <NumberTicker value={pnl.currentPrice ?? position.entry_price} format={(value) => formatPrice(value)} />
-            </PriceFlash>
+            {marketDataAvailable && pnl.currentPrice != null ? (
+              <PriceFlash value={pnl.currentPrice}>
+                <NumberTicker value={pnl.currentPrice} format={(value) => formatPrice(value)} />
+              </PriceFlash>
+            ) : (
+              <span className="inline-flex items-baseline gap-2">
+                <NumberTicker value={position.entry_price} format={(value) => formatPrice(value)} />
+                {!marketDataAvailable && (
+                  <span className="text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">Manual</span>
+                )}
+              </span>
+            )}
           </DataValue>
           <DataValue tone={tone}>
             {pnl.pnlAmount == null ? '—' : (
