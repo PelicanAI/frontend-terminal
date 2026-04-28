@@ -452,6 +452,26 @@ export default function PortfolioPage() {
   const { completeMilestone } = useOnboardingProgress()
   const activeConnectionName = activeConnections[0]?.brokerage_name || "Manual"
 
+  const handlePortfolioSync = useCallback(async () => {
+    if (isRefreshing) return
+    setIsRefreshing(true)
+    try {
+      await refreshPortfolio()
+      toast({
+        title: "Portfolio synced",
+        description: "Latest positions and P&L loaded.",
+      })
+    } catch (error) {
+      toast({
+        title: "Sync failed",
+        description: error instanceof Error ? error.message : "Try again in a moment.",
+        variant: "destructive",
+      })
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 800)
+    }
+  }, [isRefreshing, refreshPortfolio])
+
   const watchlistTickers = useMemo(
     () => new Set(watchlistItems.map((item) => item.ticker.toUpperCase())),
     [watchlistItems]
@@ -771,15 +791,7 @@ export default function PortfolioPage() {
           quotes={quotes}
           brokerName={activeConnectionName}
           isRefreshing={isRefreshing}
-          onRefresh={async () => {
-            if (isRefreshing) return
-            setIsRefreshing(true)
-            try {
-              await refreshPortfolio()
-            } finally {
-              setTimeout(() => setIsRefreshing(false), 800)
-            }
-          }}
+          onRefresh={handlePortfolioSync}
           onLogTrade={() => setShowLogTradeModal(true)}
           onProfile={() => setShowProfileModal(true)}
         />
@@ -839,15 +851,7 @@ export default function PortfolioPage() {
                     <DataSourceBar
                       activeConnectionName={activeConnectionName}
                       positionsCount={portfolio.positions.length}
-                      onSync={async () => {
-                        if (isRefreshing) return
-                        setIsRefreshing(true)
-                        try {
-                          await refreshPortfolio()
-                        } finally {
-                          setTimeout(() => setIsRefreshing(false), 800)
-                        }
-                      }}
+                      onSync={handlePortfolioSync}
                       onImport={() => setShowImportModal(true)}
                     />
 
